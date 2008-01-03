@@ -11,23 +11,21 @@
 package org.eclipse.osee.framework.ui.product;
 
 import java.io.InputStream;
+
 import org.eclipse.osee.framework.jdk.core.util.Lib;
-import org.eclipse.osee.framework.ui.plugin.OseeUiActivator;
-import org.eclipse.osee.framework.ui.plugin.util.OseeConsole;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IStartup;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The main plugin class to be used in the desktop.
  */
-public class OseeProductActivator extends OseeUiActivator implements IStartup {
+public class OseeProductActivator extends AbstractUIPlugin {
 
    public static final String USER_NAME_CHECK_BOX_PREFERENCE = "USER_NAME_CHECK_BOX_PREFERENCE";
    public static final String USER_NAME_TEXT_BOX_PREFERENCE = "USER_NAME_TEXT_BOX_PREFERENCE";
    public static final String SPELL_CHECK_ENABLED_PEFERENCE = "SPELL_CHECK_ENABLED_PEFERENCE";
    public static final boolean DEFAULT_SPELL_CHECK_ENABLED_PEFERENCE = true;
-   private static OseeConsole console = null;
+//   private static OseeConsole console = null;
    public static final String EMAIL_GROUPS_PREFERENCE = "EMAIL_GROUPS_PREFERENCE";
    private static OseeProductActivator pluginInstance; // The shared instance.
    private boolean prefsLoaded = false;
@@ -54,7 +52,7 @@ public class OseeProductActivator extends OseeUiActivator implements IStartup {
    public void start(BundleContext context) throws Exception {
       super.start(context);
       try {
-         InputStream is = this.getInputStream("/plugin.mappings");
+         InputStream is = getBundle().getEntry("/plugin.mappings").openStream();
          if (is != null) {
             oseeVersion = Lib.inputStreamToString(is);
             oseeVersion = oseeVersion.replace("0=", "");
@@ -82,33 +80,5 @@ public class OseeProductActivator extends OseeUiActivator implements IStartup {
       if (prefsLoaded) return;
 
       prefsLoaded = true;
-   }
-
-   /**
-    * Called directly after workbench initialization
-    */
-   public void earlyStartup() {
-
-      Display.getDefault().asyncExec(new Runnable() {
-
-         public void run() {
-
-            Display.getDefault().asyncExec(new Runnable() {
-
-               public void run() {
-                  final String version = System.getProperty("java.version");
-                  if (!version.contains("1.5")) {
-                     console = new OseeConsole("OSEE Core Plugin Console");
-                     Display.getDefault().timerExec(5 * 1000, new Runnable() {
-                        public void run() {
-                           console.popup();
-                           console.writeError("Incorrect Java Version \"" + version + "\".  You must have 1.5.0 or higher installed.\n");
-                        }
-                     });
-                  }
-               }
-            });
-         }
-      });
    }
 }
