@@ -270,7 +270,7 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
             try {
                Object obj = bundle.loadClass(classname).newInstance();
                IAtsNavigateItem task = (IAtsNavigateItem) obj;
-               for (XNavigateItem navItem : task.getSearchNavigateItems()) {
+               for (XNavigateItem navItem : task.getNavigateItems()) {
                   nameToNavItem.put(navItem.getName(), navItem);
                }
             } catch (Exception ex) {

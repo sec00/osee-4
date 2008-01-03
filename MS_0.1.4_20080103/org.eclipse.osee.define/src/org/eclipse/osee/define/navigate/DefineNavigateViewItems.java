@@ -88,7 +88,7 @@ public class DefineNavigateViewItems extends XNavigateViewItems {
                Class<?> taskClass = bundle.loadClass(classname);
                Object obj = taskClass.newInstance();
                IDefineNavigateItem task = (IDefineNavigateItem) obj;
-               items.addAll(task.getSearchNavigateItems());
+               items.addAll(task.getNavigateItems());
             } catch (Exception ex) {
                OSEELog.logException(DefinePlugin.class, "Error loading DefineNavigateItem extension", ex, true);
             }
