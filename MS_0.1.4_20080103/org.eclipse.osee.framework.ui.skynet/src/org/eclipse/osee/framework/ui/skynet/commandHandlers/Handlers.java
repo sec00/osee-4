@@ -45,7 +45,7 @@ public class Handlers {
     * @return
     */
    public static List<TransactionData> getTransactionDatasFromStructuredSelection(IStructuredSelection structuredSelection) {
-      return (List<TransactionData>) processSelectionObjects(TransactionData.class, structuredSelection);
+      return processSelectionObjects(TransactionData.class, structuredSelection);
    }
 
    /**
@@ -56,7 +56,7 @@ public class Handlers {
     * @return
     */
    public static List<ArtifactChange> getArtifactChangesFromStructuredSelection(IStructuredSelection structuredSelection) {
-      return (List<ArtifactChange>) processSelectionObjects(ArtifactChange.class, structuredSelection);
+      return processSelectionObjects(ArtifactChange.class, structuredSelection);
    }
 
    /**
@@ -66,7 +66,7 @@ public class Handlers {
     * @return
     */
    public static List<Branch> getBranchesFromStructuredSelection(IStructuredSelection structuredSelection) {
-      return (List<Branch>) processSelectionObjects(Branch.class, structuredSelection);
+      return processSelectionObjects(Branch.class, structuredSelection);
    }
 
    /**
@@ -76,7 +76,7 @@ public class Handlers {
     * @return
     */
    public static List<Artifact> getArtifactsFromStructuredSelection(IStructuredSelection structuredSelection) {
-      return (List<Artifact>) processSelectionObjects(Artifact.class, structuredSelection);
+      return processSelectionObjects(Artifact.class, structuredSelection);
    }
 
    /**
@@ -84,28 +84,29 @@ public class Handlers {
     * @param structuredSelection
     * @return Returns a list of objects from the sturctruedSelection that are an instance of the Class
     */
-   private static List<?> processSelectionObjects(Class<?> clazz, IStructuredSelection structuredSelection) {
-      List<Object> objects = new LinkedList<Object>();
-      Iterator<?> iterator = structuredSelection.iterator();
+   private static <E> List<E> processSelectionObjects(Class<E> clazz,
+			IStructuredSelection structuredSelection) {
+		List<E> objects = new LinkedList<E>();
+		Iterator<?> iterator = structuredSelection.iterator();
 
-      while (iterator.hasNext()) {
-         Object object = iterator.next();
-         Object targetObject = null;
+		while (iterator.hasNext()) {
+			Object object = iterator.next();
+			Object targetObject = null;
 
-         if (object instanceof IAdaptable) {
-            targetObject = ((IAdaptable) object).getAdapter(clazz);
-         } else if (object instanceof Match) {
-            targetObject = ((Match) object).getElement();
-         }
+			if (object instanceof IAdaptable) {
+				targetObject = ((IAdaptable) object).getAdapter(clazz);
+			} else if (object instanceof Match) {
+				targetObject = ((Match) object).getElement();
+			}
 
-         if (clazz.isInstance(targetObject)) {
-            objects.add(targetObject);
-         }
-      }
-      return objects;
-   }
+			if (clazz.isInstance(targetObject)) {
+				objects.add(clazz.cast(targetObject));
+			}
+		}
+		return objects;
+	}
 
-   //////////////////////////////////////////////////////////
+   // ////////////////////////////////////////////////////////
 
    /**
     * Populates a list of branches from a IStructuredSelection. Returns an empty list if no branches were found.

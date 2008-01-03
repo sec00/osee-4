@@ -11,8 +11,10 @@
 package org.eclipse.osee.framework.ui.skynet.commandHandlers;
 
 import static org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase.ModificationType.CHANGE;
+
 import java.sql.SQLException;
 import java.util.List;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -49,27 +51,29 @@ public class WordChangesBetweenCurrentAndParentHandler extends AbstractSelection
     */
    @Override
    public Object execute(ExecutionEvent event) throws ExecutionException {
-      IStructuredSelection myIStructuredSelection =
-            (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
+		IStructuredSelection myIStructuredSelection = (IStructuredSelection) AWorkbench
+				.getActivePage().getActivePart().getSite()
+				.getSelectionProvider().getSelection();
 
-      List<ChangeReportInput> getChangeReportInputNewList =
-            Handlers.getChangeReportInputNewListFromStructuredSelection(myIStructuredSelection);
-      if (mySelectedArtifactChangeList.size() > 0) {
-         ArtifactChange selectedArtifactChange = mySelectedArtifactChangeList.get(0);
-         TransactionId toTransactionId = getChangeReportInputNewList.get(0).getToTransaction();
-         try {
-            Artifact secondArtifact =
-                  myArtifactPersistenceManager.getArtifactFromId(selectedArtifactChange.getArtifact().getArtId(),
-                        toTransactionId);
-            RendererManager.getInstance().compareInJob(selectedArtifactChange.getConflictingModArtifact(),
-                  secondArtifact, DIFF_ARTIFACT);
-         } catch (Exception ex) {
-            OSEELog.logException(getClass(), ex, false);
-         }
-      }
+		List<ChangeReportInput> getChangeReportInputNewList = Handlers
+				.getChangeReportInputNewListFromStructuredSelection(myIStructuredSelection);
 
-      return null;
-   }
+		ArtifactChange selectedArtifactChange = mySelectedArtifactChangeList.get(0);
+		TransactionId toTransactionId = getChangeReportInputNewList.get(0).getToTransaction();
+		
+		try {
+			Artifact secondArtifact = myArtifactPersistenceManager
+					.getArtifactFromId(selectedArtifactChange.getArtifact()
+							.getArtId(), toTransactionId);
+			RendererManager.getInstance().compareInJob(
+					selectedArtifactChange.getConflictingModArtifact(),
+					secondArtifact, DIFF_ARTIFACT);
+		} catch (Exception ex) {
+			OSEELog.logException(getClass(), ex, false);
+		}
+
+		return null;
+	}
 
    @Override
    public boolean isEnabled() {
@@ -80,9 +84,8 @@ public class WordChangesBetweenCurrentAndParentHandler extends AbstractSelection
          return false;
       }
       ArtifactChange mySelectedArtifactChange = mySelectedArtifactChangeList.get(0);
-      Artifact changedArtifact = null;
       try {
-         changedArtifact = mySelectedArtifactChange.getArtifact();
+    	 Artifact changedArtifact = mySelectedArtifactChange.getArtifact();
          boolean readPermission = myAccessControlManager.checkObjectPermission(changedArtifact, PermissionEnum.READ);
          boolean wordArtifactSelected = changedArtifact instanceof WordArtifact;
          boolean modifiedWordArtifactSelected = wordArtifactSelected && mySelectedArtifactChange.getModType() == CHANGE;
