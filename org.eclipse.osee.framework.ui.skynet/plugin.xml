@@ -80,8 +80,6 @@
          </command>
 		<command id="org.eclipse.osee.framework.ui.skynet.changeReportView.viewWordChangeReport.command" name="View Word Change Report">
          </command>
-		<command id="org.eclipse.osee.framework.ui.skynet.changeReportView.viewChangeReport.command" name="View Change Report">
-         </command>
 		<command id="org.eclipse.osee.framework.ui.skynet.changeReportView.compressWordAttributes.command" name="Compress Word Attributes">
          </command>
 		<command id="org.eclipse.osee.framework.ui.skynet.changeReportView.tagArtifacts.command" name="Tag Artifact(s)">
@@ -140,19 +138,11 @@
       </handler>
 		<handler class="org.eclipse.osee.framework.ui.skynet.commandHandlers.OpenArtifactsInAtsWorldHandler" commandId="org.eclipse.osee.framework.ui.skynet.openArtifactsInAtsWorld.command">
       </handler>
-		<handler class="org.eclipse.osee.framework.ui.skynet.commandHandlers.ShowChangeReportHandler" commandId="org.eclipse.osee.framework.ui.skynet.showChangeReport.command">
-      </handler>
-		<handler class="org.eclipse.osee.framework.ui.skynet.commandHandlers.DeleteTransactionHandler" commandId="org.eclipse.osee.framework.ui.skynet.deleteTransaction.command">
-      </handler>
-		<handler class="org.eclipse.osee.framework.ui.skynet.commandHandlers.OpenBranchAssociatedArtifactHandler" commandId="org.eclipse.osee.framework.ui.skynet.openAssociatedArtifact.command">
-      </handler>
 		<handler class="org.eclipse.osee.framework.ui.skynet.commandHandlers.ViewWordChangeReportHandler" commandId="org.eclipse.osee.framework.ui.skynet.changeReportView.viewWordChangeReport.command">
-      </handler>
-		<handler class="org.eclipse.osee.framework.ui.skynet.commandHandlers.ViewChangeReportHandler" commandId="org.eclipse.osee.framework.ui.skynet.changeReportView.viewChangeReport.command">
       </handler>
 		<handler class="org.eclipse.osee.framework.ui.skynet.commandHandlers.CompressWordAttributesHandler" commandId="org.eclipse.osee.framework.ui.skynet.changeReportView.compressWordAttributes.command">
       </handler>
-		<handler class="org.eclipse.osee.framework.ui.skynet.commandHandlers.ShowResourceHistoryHandler" commandId="org.eclipse.osee.framework.ui.skynet.changeReportView.showResourceHistory.command">
+		<handler class="org.eclipse.osee.framework.ui.skynet.commandHandlers.ShowArtifactInResourceHandler" commandId="org.eclipse.osee.framework.ui.skynet.resource.command">
       </handler>
 		<handler class="org.eclipse.osee.framework.ui.skynet.commandHandlers.WordChangesToParentHandler" commandId="org.eclipse.osee.framework.ui.skynet.changeReportView.wordChangesToParent.command">
       </handler>
@@ -213,6 +203,9 @@
          </separator>
 			<command commandId="org.eclipse.osee.framework.ui.skynet.revealArtifactInExplorer.command">
          </command>
+   <command
+         commandId="org.eclipse.osee.framework.ui.skynet.resource.command">
+   </command>
 			<separator name="org.eclipse.osee.framework.ui.skynet.changeReportView.revealArtifactInExplorer.separator" visible="true">
          </separator>
 			<command commandId="org.eclipse.osee.framework.ui.skynet.changeReportView.revertArtifact.command">
