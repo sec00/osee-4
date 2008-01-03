@@ -31,6 +31,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osee.framework.jdk.core.type.HashCollection;
 import org.eclipse.osee.framework.jdk.core.util.GUID;
 import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
@@ -85,6 +86,7 @@ import org.eclipse.osee.framework.ui.skynet.menu.IGlobalMenuHelper;
 import org.eclipse.osee.framework.ui.skynet.render.RendererManager;
 import org.eclipse.osee.framework.ui.skynet.skywalker.SkyWalkerView;
 import org.eclipse.osee.framework.ui.skynet.util.ArtifactClipboard;
+import org.eclipse.osee.framework.ui.skynet.util.BranchSelectionDialog;
 import org.eclipse.osee.framework.ui.skynet.util.DbConnectionExceptionComposite;
 import org.eclipse.osee.framework.ui.skynet.util.HierarchicalReportDialog;
 import org.eclipse.osee.framework.ui.skynet.util.HtmlReportJob;
@@ -281,6 +283,7 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
       if (OseeProperties.getInstance().isDeveloper()) {
          createShowArtIdsAction();
       }
+      createSetDefaultBranchAction();
       OseeAts.addBugToViewToolbar(this, this, SkynetActivator.getInstance(), VIEW_ID, "Artifact Explorer");
 
       getViewSite().getActionBars().getStatusLineManager().add(branchStatusItem);
@@ -408,6 +411,24 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
 
       IMenuManager toolbarManager = getViewSite().getActionBars().getMenuManager();
       toolbarManager.add(showArtIds);
+   }
+
+   private void createSetDefaultBranchAction() {
+      Action setDefaultBranch = new Action("Set Default Branch", Action.AS_PUSH_BUTTON) {
+         @Override
+         public void run() {
+            BranchSelectionDialog branchSelection =
+                  new BranchSelectionDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell());
+            int result = branchSelection.open();
+            if (result == Window.OK) {
+               BranchPersistenceManager.getInstance().setDefaultBranch(branchSelection.getSelection());
+            }
+         }
+      };
+      setDefaultBranch.setImageDescriptor(SkynetGuiPlugin.getInstance().getImageDescriptor("branch_change.gif"));
+      setDefaultBranch.setAccelerator(SWT.CTRL | 'B');
+      IMenuManager toolbarManager = getViewSite().getActionBars().getMenuManager();
+      toolbarManager.add(setDefaultBranch);
    }
 
    protected void createShowArtTypeAction() {
