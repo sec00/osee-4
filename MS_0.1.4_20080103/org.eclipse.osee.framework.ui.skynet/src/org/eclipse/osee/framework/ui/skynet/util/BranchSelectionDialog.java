@@ -34,7 +34,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.PatternFilter;
 
 /**
@@ -46,9 +45,9 @@ public class BranchSelectionDialog extends MessageDialog {
    private OSEEFilteredTree oseeFilteredTree;
    private static PatternFilter patternFilter = new PatternFilter();
 
-   public BranchSelectionDialog(Shell parent) {
-      super(Display.getCurrent().getActiveShell(), "Select Branch", null, null, MessageDialog.NONE, new String[] {"Ok",
-            "Cancel"}, 0);
+   public BranchSelectionDialog(String title) {
+      super(Display.getCurrent().getActiveShell(), title, null, null, MessageDialog.NONE,
+            new String[] {"Ok", "Cancel"}, 0);
       setShellStyle(getShellStyle() | SWT.RESIZE);
    }
 

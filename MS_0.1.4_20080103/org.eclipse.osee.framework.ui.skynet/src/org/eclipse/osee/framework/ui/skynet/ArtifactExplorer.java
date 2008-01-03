@@ -417,8 +417,7 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
       Action setDefaultBranch = new Action("Set Default Branch", Action.AS_PUSH_BUTTON) {
          @Override
          public void run() {
-            BranchSelectionDialog branchSelection =
-                  new BranchSelectionDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell());
+            BranchSelectionDialog branchSelection = new BranchSelectionDialog("Set Default Branch");
             int result = branchSelection.open();
             if (result == Window.OK) {
                BranchPersistenceManager.getInstance().setDefaultBranch(branchSelection.getSelection());
@@ -426,7 +425,6 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
          }
       };
       setDefaultBranch.setImageDescriptor(SkynetGuiPlugin.getInstance().getImageDescriptor("branch_change.gif"));
-      setDefaultBranch.setAccelerator(SWT.CTRL | 'B');
       IMenuManager toolbarManager = getViewSite().getActionBars().getMenuManager();
       toolbarManager.add(setDefaultBranch);
    }
