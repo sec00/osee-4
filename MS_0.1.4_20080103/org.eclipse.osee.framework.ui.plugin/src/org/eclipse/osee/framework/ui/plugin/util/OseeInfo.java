@@ -8,20 +8,22 @@
  * Contributors:
  *     Boeing - initial API and implementation
  *******************************************************************************/
-package org.eclipse.osee.framework.skynet.core.util;
+package org.eclipse.osee.framework.ui.plugin.util;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
-import org.eclipse.osee.framework.skynet.core.SkynetActivator;
 import org.eclipse.osee.framework.ui.plugin.sql.SQL3DataType;
 import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandler;
 import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandlerStatement;
 import org.eclipse.osee.framework.ui.plugin.util.db.DbUtil;
 import org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase;
 
+/**
+ * @author Donald G. Dunne
+ */
 public class OseeInfo {
    public static Logger logger = ConfigUtil.getConfigFactory().getLogger(OseeInfo.class);
    private static final String GET_VALUE_SQL =
@@ -31,7 +33,6 @@ public class OseeInfo {
    private static final String DELETE_KEY_SQL = "DELETE FROM " + SkynetDatabase.OSEE_INFO_TABLE + " WHERE OSEE_KEY=?";
 
    public static final String SAVE_OUTFILE_IN_DB = "SAVE_OUTFILE_IN_DB";
-   private static Boolean autoTag = null;
 
    public static String getValue(String key) {
       String returnValue = "";
@@ -60,17 +61,4 @@ public class OseeInfo {
       }
    }
 
-   public static void setAutoTag(Boolean on) {
-      if (on == null) throw new IllegalArgumentException("on can not be null");
-
-      putValue(SkynetActivator.AUTO_TAG_KEY, on.toString());
-   }
-
-   public static Boolean isAutoTagOn() {
-      if (autoTag == null) {
-         autoTag = Boolean.valueOf(getValue(SkynetActivator.AUTO_TAG_KEY));
-      }
-
-      return autoTag;
-   }
 }

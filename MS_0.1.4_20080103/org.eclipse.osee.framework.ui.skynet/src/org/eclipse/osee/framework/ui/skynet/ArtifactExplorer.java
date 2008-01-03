@@ -85,6 +85,7 @@ import org.eclipse.osee.framework.ui.skynet.menu.IGlobalMenuHelper;
 import org.eclipse.osee.framework.ui.skynet.render.RendererManager;
 import org.eclipse.osee.framework.ui.skynet.skywalker.SkyWalkerView;
 import org.eclipse.osee.framework.ui.skynet.util.ArtifactClipboard;
+import org.eclipse.osee.framework.ui.skynet.util.DbConnectionExceptionComposite;
 import org.eclipse.osee.framework.ui.skynet.util.HierarchicalReportDialog;
 import org.eclipse.osee.framework.ui.skynet.util.HtmlReportJob;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
@@ -133,14 +134,7 @@ import org.eclipse.ui.texteditor.StatusLineContributionItem;
  * @author Ryan D. Brooks
  */
 public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActionable, ISelectionProvider {
-   private static final SkynetAuthentication skynetAuth = SkynetAuthentication.getInstance();
    private static final Logger logger = ConfigUtil.getConfigFactory().getLogger(ArtifactExplorer.class);
-   private static final ArtifactPersistenceManager artifactManager = ArtifactPersistenceManager.getInstance();
-   private static final ConfigurationPersistenceManager configurationPersistenceManager =
-         ConfigurationPersistenceManager.getInstance();
-   private static final BranchPersistenceManager branchManager = BranchPersistenceManager.getInstance();
-   private static final SkynetEventManager eventManager = SkynetEventManager.getInstance();
-   private static final AccessControlManager accessManager = AccessControlManager.getInstance();
    private static final Image ACCESS_DENIED_IMAGE = SkynetGuiPlugin.getInstance().getImage("lockkey.gif");
    public static final String VIEW_ID = "org.eclipse.osee.framework.ui.skynet.ArtifactExplorer";
    private static final String ROOT_GUID = "artifact.explorer.last.root_guid";
@@ -235,6 +229,8 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
 
    @Override
    public void createPartControl(Composite parent) {
+      if (!DbConnectionExceptionComposite.dbConnectionIsOk(parent)) return;
+
       GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
       gridData.heightHint = 1000;
       gridData.widthHint = 1000;
@@ -443,7 +439,8 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
                artifactExplorer =
                      (ArtifactExplorer) page.showView(ArtifactExplorer.VIEW_ID, GUID.generateGuidStr(),
                            IWorkbenchPage.VIEW_ACTIVATE);
-               artifactExplorer.explore(artifactManager.getDefaultHierarchyRootArtifact(branchManager.getDefaultBranch()));
+               artifactExplorer.explore(ArtifactPersistenceManager.getInstance().getDefaultHierarchyRootArtifact(
+                     BranchPersistenceManager.getInstance().getDefaultBranch()));
                artifactExplorer.setExpandedArtifacts(treeViewer.getExpandedElements());
             } catch (Exception ex) {
                throw new RuntimeException(ex);
@@ -527,7 +524,8 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
 
       try {
          Collection<ArtifactSubtypeDescriptor> descriptors =
-               configurationPersistenceManager.getArtifactSubtypeDescriptors(branchManager.getDefaultBranch());
+               ConfigurationPersistenceManager.getInstance().getArtifactSubtypeDescriptors(
+                     BranchPersistenceManager.getInstance().getDefaultBranch());
          for (ArtifactSubtypeDescriptor descriptor : descriptors) {
             if (!descriptor.getName().equals("Root Artifact")) {
                MenuItem item = new MenuItem(subMenu, SWT.PUSH);
@@ -729,9 +727,11 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
             while (iterator.hasNext()) {
                Artifact object = (Artifact) iterator.next();
                if ((new GlobalMenuPermissions(object)).isLocked()) {
-                  accessManager.unLockObject(object, skynetAuth.getAuthenticatedUser());
+                  AccessControlManager.getInstance().unLockObject(object,
+                        SkynetAuthentication.getInstance().getAuthenticatedUser());
                } else {
-                  accessManager.lockObject(object, skynetAuth.getAuthenticatedUser());
+                  AccessControlManager.getInstance().lockObject(object,
+                        SkynetAuthentication.getInstance().getAuthenticatedUser());
                }
             }
          }
@@ -863,7 +863,7 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
     */
    @Override
    public void setFocus() {
-      treeViewer.getControl().setFocus();
+      if (treeViewer != null) treeViewer.getControl().setFocus();
    }
 
    public void explore(Artifact artifact) throws CoreException, IllegalArgumentException {
@@ -873,18 +873,18 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
 
       root = artifact;
 
-      eventManager.unRegisterAll(this);
-      eventManager.register(ArtifactVersionIncrementedEvent.class, this);
-      eventManager.register(AuthenticationEvent.class, this);
-      eventManager.register(CacheArtifactModifiedEvent.class, this);
-      eventManager.register(CacheRelationModifiedEvent.class, this);
-      eventManager.register(TransactionRelationModifiedEvent.class, this);
-      eventManager.register(TransactionArtifactModifiedEvent.class, this);
-      eventManager.register(RemoteTransactionEvent.class, this);
-      eventManager.register(DefaultBranchChangedEvent.class, this);
-      eventManager.register(ArtifactLockStatusChanged.class, this);
-      eventManager.register(LocalCommitBranchEvent.class, this);
-      eventManager.register(RemoteCommitBranchEvent.class, this);
+      SkynetEventManager.getInstance().unRegisterAll(this);
+      SkynetEventManager.getInstance().register(ArtifactVersionIncrementedEvent.class, this);
+      SkynetEventManager.getInstance().register(AuthenticationEvent.class, this);
+      SkynetEventManager.getInstance().register(CacheArtifactModifiedEvent.class, this);
+      SkynetEventManager.getInstance().register(CacheRelationModifiedEvent.class, this);
+      SkynetEventManager.getInstance().register(TransactionRelationModifiedEvent.class, this);
+      SkynetEventManager.getInstance().register(TransactionArtifactModifiedEvent.class, this);
+      SkynetEventManager.getInstance().register(RemoteTransactionEvent.class, this);
+      SkynetEventManager.getInstance().register(DefaultBranchChangedEvent.class, this);
+      SkynetEventManager.getInstance().register(ArtifactLockStatusChanged.class, this);
+      SkynetEventManager.getInstance().register(LocalCommitBranchEvent.class, this);
+      SkynetEventManager.getInstance().register(RemoteCommitBranchEvent.class, this);
 
       if (treeViewer != null) {
          treeViewer.setInput(root);
@@ -1083,14 +1083,15 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
                try {
                   // Check that we are not already displaying the default
                   // branch
-                  Branch defaultBranch = branchManager.getDefaultBranch();
+                  Branch defaultBranch = BranchPersistenceManager.getInstance().getDefaultBranch();
 
                   if (root == null) {
-                     explore(artifactManager.getDefaultHierarchyRootArtifact(defaultBranch));
+                     explore(ArtifactPersistenceManager.getInstance().getDefaultHierarchyRootArtifact(defaultBranch));
                   } else if (root.getBranch() != defaultBranch) {
-                     Artifact candidate = artifactManager.getArtifact(root.getGuid(), defaultBranch);
+                     Artifact candidate =
+                           ArtifactPersistenceManager.getInstance().getArtifact(root.getGuid(), defaultBranch);
                      if (candidate == null) {
-                        explore(artifactManager.getDefaultHierarchyRootArtifact(defaultBranch));
+                        explore(ArtifactPersistenceManager.getInstance().getDefaultHierarchyRootArtifact(defaultBranch));
                      } else {
                         explore(candidate);
                      }
@@ -1110,7 +1111,8 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
                if (object instanceof Artifact) {
                   Artifact artifact = (Artifact) object;
                   try {
-                     explore(artifactManager.getArtifact(artifact.getGuid(), branchManager.getDefaultBranch()));
+                     explore(ArtifactPersistenceManager.getInstance().getArtifact(artifact.getGuid(),
+                           BranchPersistenceManager.getInstance().getDefaultBranch()));
                   } catch (IllegalArgumentException ex) {
                      logger.log(Level.SEVERE, ex.toString(), ex);
                   } catch (CoreException ex) {
@@ -1159,11 +1161,13 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
    public void init(IViewSite site, IMemento memento) throws PartInitException {
       super.init(site, memento);
 
+      if (!DbConnectionExceptionComposite.dbConnectionIsOk(null)) return;
       try {
          if (memento != null) {
 
             Artifact previousArtifact =
-                  artifactManager.getArtifact(memento.getString(ROOT_GUID), branchManager.getDefaultBranch());
+                  ArtifactPersistenceManager.getInstance().getArtifact(memento.getString(ROOT_GUID),
+                        BranchPersistenceManager.getInstance().getDefaultBranch());
             if (previousArtifact != null) {
                explore(previousArtifact);
                return;
@@ -1174,7 +1178,8 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
       }
 
       try {
-         explore(artifactManager.getDefaultHierarchyRootArtifact(branchManager.getDefaultBranch()));
+         explore(ArtifactPersistenceManager.getInstance().getDefaultHierarchyRootArtifact(
+               BranchPersistenceManager.getInstance().getDefaultBranch()));
       } catch (Exception ex) {
          logger.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
       }
@@ -1196,7 +1201,7 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
    @Override
    public void dispose() {
       super.dispose();
-      eventManager.unRegisterAll(this);
+      SkynetEventManager.getInstance().unRegisterAll(this);
       trees.remove(treeViewer.getTree());
    }
 

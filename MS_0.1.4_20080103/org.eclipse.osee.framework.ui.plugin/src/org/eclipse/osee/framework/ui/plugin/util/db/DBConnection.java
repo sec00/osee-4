@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.plugin.util.db;
 
-import static org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase.OSEE_INFO_TABLE;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,12 +22,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
 import org.eclipse.osee.framework.plugin.core.PluginCoreActivator;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.plugin.core.config.data.DbInformation;
 import org.eclipse.osee.framework.plugin.core.config.data.DbDetailData.ConfigField;
 import org.eclipse.osee.framework.plugin.core.db.IConnection;
 import org.eclipse.osee.framework.plugin.core.util.ExtensionPoints;
+import org.eclipse.osee.framework.ui.plugin.util.OseeInfo;
 import org.osgi.framework.Bundle;
 
 /**
@@ -36,7 +37,8 @@ import org.osgi.framework.Bundle;
  */
 public class DBConnection {
    private static final Logger logger = ConfigUtil.getConfigFactory().getLogger(DBConnection.class);
-   public static final String codeVersion = "20060727";
+   public static final int CODE_VERSION_VALUE = 20080103;
+   public static final String DB_VERSION_KEY = "version";
 
    private static Map<String, IConnection> connections = new HashMap<String, IConnection>();
 
@@ -74,13 +76,18 @@ public class DBConnection {
          connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 
          if (validityCheck && !userName.equals("peer")) {
-            ensureDatabaseCompatability(connection);
+            try {
+               ensureDatabaseCompatability(connection);
+            } catch (Exception ex) {
+               connection.close();
+               throw ex;
+            }
          }
 
          return connection;
       } catch (Throwable th) {
          logger.log(Level.SEVERE, "Unable to get database connection.", th);
-         throw new SQLException("Unable to get a connection: " + th.getMessage());
+         throw new SQLException("Unable to get a database connection: " + th.getMessage());
       }
    }
 
@@ -106,30 +113,47 @@ public class DBConnection {
       }
    }
 
-   private static void ensureDatabaseCompatability(Connection connection) throws SQLException {
-      String query = "SELECT OSEE_VALUE FROM " + OSEE_INFO_TABLE + " WHERE OSEE_KEY = \'version\'";
+   private static String dbVersionStr = null;
+
+   public static String getDatabaseVersion(Connection connection) throws SQLException {
+      // NOTE: Can't use OSEEInfo class cause it uses connection handler
+      String query = "SELECT OSEE_VALUE FROM OSEE_INFO WHERE OSEE_KEY = \'version\'";
 
       Statement statement = connection.createStatement();
       statement.setFetchSize(1);
       ResultSet rset = statement.executeQuery(query);
-      String dbVersion = null;
       if (rset.next()) {
-         dbVersion = rset.getString("OSEE_VALUE");
+         return rset.getString("OSEE_VALUE");
       }
       statement.close();
+      return "";
+   }
 
-      if (dbVersion == null || !dbVersion.equals(codeVersion)) {
-         throw new IllegalArgumentException(String.format("Code verion %s does not match database version %s",
-               codeVersion, dbVersion));
+   private static void ensureDatabaseCompatability(Connection connection) throws Exception {
+      if (dbVersionStr == null) {
+         dbVersionStr = getDatabaseVersion(connection);
+      }
+      int dbVersionInt = 0;
+      if (dbVersionStr != null) {
+         try {
+            dbVersionInt = new Integer(dbVersionStr);
+         } catch (Exception ex) {
+            // do nothing
+         }
+      }
+      if (dbVersionStr == null || CODE_VERSION_VALUE < dbVersionInt) {
+         String errorStr =
+               String.format(
+                     "This installation of OSEE \"%d\" is out of date and is not compatible with database version \"%s\".  Please restart OSEE and accept all updates.",
+                     CODE_VERSION_VALUE, dbVersionStr);
+         if (!OseeProperties.getInstance().isOverrideVersionCheck())
+            throw new IllegalArgumentException(errorStr);
+         else
+            logger.log(Level.SEVERE, "Overriding Version Check - " + errorStr);
       }
    }
 
    public static void insertDbVersion() throws SQLException {
-      String query =
-            String.format("INSERT INTO %s (OSEE_KEY,OSEE_VALUE) VALUES ('version', '%s')", OSEE_INFO_TABLE, codeVersion);
-      Statement statement =
-            getNewConnection(ConfigUtil.getConfigFactory().getOseeConfig().getDefaultClientData(), false).createStatement();
-      statement.executeUpdate(query);
-      statement.close();
+      OseeInfo.putValue(DB_VERSION_KEY, String.valueOf(CODE_VERSION_VALUE));
    }
 }
