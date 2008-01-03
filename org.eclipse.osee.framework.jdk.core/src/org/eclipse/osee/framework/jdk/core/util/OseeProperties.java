@@ -25,6 +25,7 @@ public class OseeProperties {
    public static final String OSEE_CMD_CONSOLE = "osee.cmd.console";
    public static final String OSEE_HTTP_PORT = "osee.http.port";
    public static final String OSEE_DEVELOPER = "Developer";
+   public static final String OSEE_OVERRIDE_VERSION_CHECK = "OseeOverrideVersionCheck";
 
    public static final String OSEE_NO_PROMPT = "OseeNoPrompt";
    private static final String OSEE_USE_FILE_SPECIFIED_SCHEMAS = "OseeUseFileSpecifiedSchemas";
@@ -81,6 +82,10 @@ public class OseeProperties {
 
    public boolean isDeveloper() {
       return System.getProperty(OSEE_DEVELOPER) != null || isAtsAdmin();
+   }
+
+   public boolean isOverrideVersionCheck() {
+      return System.getProperty(OSEE_OVERRIDE_VERSION_CHECK) != null;
    }
 
    public String getAuthenticationProviderId() {

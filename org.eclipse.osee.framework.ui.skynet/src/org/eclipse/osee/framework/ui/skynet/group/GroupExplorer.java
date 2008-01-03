@@ -58,6 +58,7 @@ import org.eclipse.osee.framework.ui.skynet.ats.IActionable;
 import org.eclipse.osee.framework.ui.skynet.ats.OseeAts;
 import org.eclipse.osee.framework.ui.skynet.branch.BranchLabelProvider;
 import org.eclipse.osee.framework.ui.skynet.render.RendererManager;
+import org.eclipse.osee.framework.ui.skynet.util.DbConnectionExceptionComposite;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.dialog.EntryDialog;
 import org.eclipse.swt.SWT;
@@ -100,8 +101,6 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
    private TreeViewer treeViewer;
    private Artifact rootArt;
    private UniversalGroupItem rootItem;
-   private SkynetEventManager eventManager = SkynetEventManager.getInstance();
-   private static final BranchPersistenceManager branchPersistenceManager = BranchPersistenceManager.getInstance();
    private static UniversalGroupItem selected;
    private StatusLineContributionItem branchStatusItem;
 
@@ -120,12 +119,7 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
     */
    public void createPartControl(Composite parent) {
 
-      try {
-         ConnectionHandler.getConnection();
-      } catch (Exception ex) {
-         (new Label(parent, SWT.NONE)).setText("  DB Connection Unavailable");
-         return;
-      }
+      if (!DbConnectionExceptionComposite.dbConnectionIsOk(parent)) return;
 
       GridData gridData = new GridData();
       gridData.verticalAlignment = GridData.FILL;
@@ -174,11 +168,11 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
          }
       });
 
-      eventManager.register(LocalTransactionEvent.class, this);
-      eventManager.register(RemoteTransactionEvent.class, this);
-      eventManager.register(LocalBranchEvent.class, this);
-      eventManager.register(RemoteBranchEvent.class, this);
-      eventManager.register(DefaultBranchChangedEvent.class, this);
+      SkynetEventManager.getInstance().register(LocalTransactionEvent.class, this);
+      SkynetEventManager.getInstance().register(RemoteTransactionEvent.class, this);
+      SkynetEventManager.getInstance().register(LocalBranchEvent.class, this);
+      SkynetEventManager.getInstance().register(RemoteBranchEvent.class, this);
+      SkynetEventManager.getInstance().register(DefaultBranchChangedEvent.class, this);
 
       getSite().setSelectionProvider(treeViewer);
       addExploreSelection();
@@ -559,7 +553,7 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
       try {
          if (event instanceof TransactionEvent) {
             EventData ed =
-                  ((TransactionEvent) event).getEventData(UniversalGroup.getTopUniversalGroupArtifact(branchPersistenceManager.getDefaultBranch()));
+                  ((TransactionEvent) event).getEventData(UniversalGroup.getTopUniversalGroupArtifact(BranchPersistenceManager.getInstance().getDefaultBranch()));
             if (ed.isRelChange()) {
                refresh();
             }
@@ -594,7 +588,7 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
 
    public void refresh() {
       try {
-         explore(UniversalGroup.getTopUniversalGroupArtifact(branchPersistenceManager.getDefaultBranch()));
+         explore(UniversalGroup.getTopUniversalGroupArtifact(BranchPersistenceManager.getInstance().getDefaultBranch()));
       } catch (Exception ex) {
          logger.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
       }
