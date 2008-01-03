@@ -17,15 +17,14 @@ import org.eclipse.osee.ats.ActionDebug;
 import org.eclipse.osee.ats.AtsPlugin;
 import org.eclipse.osee.ats.actions.NewAction;
 import org.eclipse.osee.ats.world.search.MultipleHridSearchItem;
-import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandler;
 import org.eclipse.osee.framework.ui.skynet.SkynetContributionItem;
 import org.eclipse.osee.framework.ui.skynet.ats.IActionable;
 import org.eclipse.osee.framework.ui.skynet.ats.OseeAts;
+import org.eclipse.osee.framework.ui.skynet.util.DbConnectionExceptionComposite;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.xnavigate.XNavigateItem;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -56,12 +55,7 @@ public class NavigateView extends ViewPart implements IActionable {
    public void createPartControl(Composite parent) {
       debug.report("createPartControl");
 
-      try {
-         ConnectionHandler.getConnection();
-      } catch (Exception ex) {
-         (new Label(parent, SWT.NONE)).setText("  DB Connection Unavailable");
-         return;
-      }
+      if (!DbConnectionExceptionComposite.dbConnectionIsOk(parent)) return;
 
       SkynetContributionItem.addTo(this, true);
 
