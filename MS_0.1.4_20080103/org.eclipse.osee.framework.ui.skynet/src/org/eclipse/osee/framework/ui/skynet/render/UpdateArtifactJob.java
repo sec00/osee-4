@@ -18,15 +18,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -154,11 +154,13 @@ public class UpdateArtifactJob extends UpdateJob {
    private final class WordArtifactUpdateTx extends AbstractSkynetTxTemplate {
       private List<String> deletedGuids;
       private Collection<Element> artElements;
+      private Set<Artifact> changedArtifacts;
 
       public WordArtifactUpdateTx(Branch branch, Collection<Element> artElements) {
          super(branch);
          this.artElements = artElements;
          this.deletedGuids = new LinkedList<String>();
+         this.changedArtifacts = new HashSet<Artifact>();
       }
 
       @Override
@@ -219,7 +221,7 @@ public class UpdateArtifactJob extends UpdateJob {
                artifact.setAttribute(WordAttribute.CONTENT_NAME, content);
                if (artifact.isDirty()) {
                   artifact.persist();
-                  eventManager.kick(new VisitorEvent(artifact, this));
+                  changedArtifacts.add(artifact);
                }
             } else {
                deletedGuids.add(guid);
@@ -235,6 +237,9 @@ public class UpdateArtifactJob extends UpdateJob {
       @Override
       protected void handleTxFinally() throws Exception {
          super.handleTxFinally();
+         for (Artifact artifact : changedArtifacts) {
+            eventManager.kick(new VisitorEvent(artifact, this));
+         }
          if (!deletedGuids.isEmpty()) {
             throw new IllegalArgumentException(
                   "The following deleted artifacts could not be saved: " + Collections.toString(",", deletedGuids));

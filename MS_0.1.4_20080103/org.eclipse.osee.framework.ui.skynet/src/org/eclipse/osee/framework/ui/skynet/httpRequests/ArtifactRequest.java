@@ -46,6 +46,9 @@ import org.eclipse.osee.framework.ui.skynet.render.RendererManager;
  * @author Roberto E. Escobar
  */
 public class ArtifactRequest implements IHttpServerRequest {
+   private static final long POLL_STARTING_WAIT_TIME = 1000;
+   private static final double RETRY_MULTIPLIER = 1.8;
+   private static final long RETRY_TIMEOUT = 120000;
    private static final String GUID_KEY = "guid";
    private static final String BRANCH_NAME_KEY = "branch";
    private static final String BRANCH_ID_KEY = "branchId";
@@ -115,8 +118,9 @@ public class ArtifactRequest implements IHttpServerRequest {
                break;
          }
       } catch (Exception ex) {
-         logger.log(Level.WARNING, String.format("Get Artifact Error: [%s]", httpRequest.getParametersAsString()), ex);
-         httpResponse.outputStandardError(400, "Exception handling request");
+         String message = String.format("Get Artifact Error: [%s]", httpRequest.getParametersAsString());
+         logger.log(Level.WARNING, message, ex);
+         httpResponse.outputStandardError(404, message);
       }
    }
 
@@ -195,12 +199,28 @@ public class ArtifactRequest implements IHttpServerRequest {
       try {
          transactionId = transactionIdManager.getPossiblyEditableTransactionIfFromCache(transactioNumber);
       } catch (Exception ex) {
-         try {
-            Thread.sleep(1000);
-         } catch (Exception ex1) {
+         long start = System.currentTimeMillis();
+         long waitTime = POLL_STARTING_WAIT_TIME;
+         while (transactionId == null && elapsedTime(start) < RETRY_TIMEOUT) {
+            try {
+               Thread.sleep(waitTime);
+               transactionId = transactionIdManager.getPossiblyEditableTransactionId(transactioNumber);
+            } catch (Exception ex2) {
+            }
+            if (transactionId == null) {
+               waitTime = computeNewWaitTime(waitTime);
+            }
          }
-         transactionId = transactionIdManager.getPossiblyEditableTransactionId(transactioNumber);
+         logger.log(Level.INFO, String.format("Found Artifact After Re-try for: %s ", elapsedTime(start)));
       }
       return ArtifactPersistenceManager.getInstance().getArtifact(guid, transactionId);
+   }
+
+   private long elapsedTime(long start) {
+      return System.currentTimeMillis() - start;
+   }
+
+   private long computeNewWaitTime(long old) {
+      return (long) (old * RETRY_MULTIPLIER);
    }
 }
