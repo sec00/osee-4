@@ -59,6 +59,7 @@ import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandler;
 import org.eclipse.osee.framework.ui.skynet.SkynetContributionItem;
 import org.eclipse.osee.framework.ui.skynet.ats.IActionable;
 import org.eclipse.osee.framework.ui.skynet.ats.OseeAts;
+import org.eclipse.osee.framework.ui.skynet.util.DbConnectionExceptionComposite;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.XDate;
 import org.eclipse.swt.SWT;
@@ -164,12 +165,7 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
    public void createPartControl(Composite parent) {
       debug.report("createPartControl");
 
-      try {
-         ConnectionHandler.getConnection();
-      } catch (Exception ex) {
-         (new Label(parent, SWT.NONE)).setText("  DB Connection Unavailable");
-         return;
-      }
+      if (!DbConnectionExceptionComposite.dbConnectionIsOk(parent)) return;
 
       GridLayout layout = new GridLayout();
       layout.numColumns = 1;
