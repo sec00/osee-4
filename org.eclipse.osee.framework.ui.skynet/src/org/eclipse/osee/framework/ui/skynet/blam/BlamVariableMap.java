@@ -58,7 +58,7 @@ public class BlamVariableMap {
       variableMap.put(alias, variable);
    }
 
-   public Object getValue(String variableName) {
+   private Object getValue(String variableName) {
       return getBlamVariable(variableName).getValue();
    }
 

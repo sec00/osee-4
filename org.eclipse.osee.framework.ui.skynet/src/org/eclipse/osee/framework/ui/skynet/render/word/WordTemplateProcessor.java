@@ -144,10 +144,11 @@ public class WordTemplateProcessor {
     * @throws IOException
     */
    public void applyTemplate(IFolder folder, BlamVariableMap variableMap) throws Exception {
-      String fileName = (String) variableMap.getValue("MasterFileName");
+      String fileName = variableMap.getString("MasterFileName");
       if (fileName == null) {
          fileName = "new file " + (new Date().toString().replaceAll(":", ";"));
       }
+      variableMap.setValue("useTree", Boolean.FALSE);
       AIFile.writeToFile(folder.getFile(fileName + ".xml"), applyTemplate(variableMap, masterTemplate, folder, null,
             null));
    }
@@ -257,19 +258,14 @@ public class WordTemplateProcessor {
             setNameMatcher.find();
             final String artifactSetName = textOnly(setNameMatcher.group(2));
 
-            Object object = variableMap.getValue(artifactSetName);
+            Collection<Artifact> artifacts = variableMap.getArtifacts(artifactSetName);
 
-            if (object instanceof Collection) {
-               Collection<Artifact> artifacts = (Collection<Artifact>) object;
+            if (!artifacts.isEmpty()) {
+               Artifact artifact = artifacts.iterator().next();
 
-               if (!artifacts.isEmpty()) {
-                  Artifact artifact = artifacts.iterator().next();
-
-                  if (!artifact.getSoleAttributeValue("Imported Paragraph Number").equals("")) {
-                     startParagraphNumber = artifact.getSoleAttributeValue("Imported Paragraph Number");
-                  }
+               if (!artifact.getSoleAttributeValue("Imported Paragraph Number").equals("")) {
+                  startParagraphNumber = artifact.getSoleAttributeValue("Imported Paragraph Number");
                }
-
             }
          }
       }
@@ -348,19 +344,17 @@ public class WordTemplateProcessor {
 
    @SuppressWarnings("unchecked")
    private void processArtifactSetHelper(String artifactSetName, BlamVariableMap variableMap, WordMLProducer wordMl, String outlineType) throws IOException, SQLException {
-      Object object = variableMap.getValue(artifactSetName);
+      Boolean useTree = variableMap.getValue(Boolean.class, "useTree");
 
-      if (object instanceof Tree) {
-         Tree<Object> tree = (Tree<Object>) object;
+      if (useTree.booleanValue()) {
+         Tree<Object> tree = (Tree<Object>) variableMap.getValue(Tree.class, artifactSetName);
 
          for (TreeNode<Object> node : tree.getRoot().getChildren()) {
 
             processObject(node, wordMl, false, outlineType);
          }
-      } else if (object instanceof Collection) {
-         Collection<Artifact> artifacts = (Collection<Artifact>) object;
-
-         for (Artifact artifact : artifacts) {
+      } else {
+         for (Artifact artifact : variableMap.getArtifacts(artifactSetName)) {
             if (artifact != null) {
                processObject(artifact, wordMl, true, outlineType);
             } else {
@@ -438,7 +432,7 @@ public class WordTemplateProcessor {
             }
 
             if (doSubDocuments) {
-               newVariableMap.setValue("Branch", variableMap.getValue("Branch"));
+               newVariableMap.setValue("Branch", variableMap.getBranch("Branch"));
                String subDocFileName = subdocumentName + ".xml";
                producer.process(newVariableMap);
                AIFile.writeToFile(folder.getFile(subDocFileName), applyTemplate(newVariableMap, slaveTemplate, folder,
