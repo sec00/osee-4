@@ -106,6 +106,12 @@ public class XNavigateComposite extends Composite {
       XNavigateItem item = (XNavigateItem) sel.iterator().next();
       if (item instanceof Runnable) {
          ((Runnable) item).run();
+      } else if (item instanceof XNavigateItemBlam) {
+         try {
+            ((XNavigateItemBlam) item).run();
+         } catch (SQLException ex) {
+            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
+         }
       } else if (item instanceof XNavigateItemAction) {
          try {
             ((XNavigateItemAction) item).run();
