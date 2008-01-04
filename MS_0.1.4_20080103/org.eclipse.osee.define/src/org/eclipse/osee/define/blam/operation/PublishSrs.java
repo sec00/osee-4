@@ -32,11 +32,8 @@ public class PublishSrs implements BlamOperation {
 
       WordTemplateProcessor processor = new WordTemplateProcessor(masterTemplate, slaveTemplate);
 
-      BlamVariableMap blamVariableMap = new BlamVariableMap();
-      blamVariableMap.setValue("MasterFileName", "SRS");
-      blamVariableMap.setValue("Branch", variableMap.getBranch("Branch"));
-
-      processor.applyTemplate(FileSystemRenderer.ensureRenderFolderExists(PresentationType.PREVIEW), blamVariableMap);
+      variableMap.setValue("MasterFileName", "SRS");
+      processor.applyTemplate(FileSystemRenderer.ensureRenderFolderExists(PresentationType.PREVIEW), variableMap);
    }
 
    /*
