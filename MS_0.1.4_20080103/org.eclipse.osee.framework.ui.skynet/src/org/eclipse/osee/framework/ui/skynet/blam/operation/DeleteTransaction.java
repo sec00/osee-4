@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.blam.operation;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
@@ -18,17 +20,17 @@ import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
  * @author Ryan D. Brooks
  */
 public class DeleteTransaction implements BlamOperation {
+   public static final Pattern transactionPattern = Pattern.compile("\\d+");
+
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#runOperation(org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap, org.eclipse.osee.framework.skynet.core.artifact.Branch)
     */
    public void runOperation(BlamVariableMap variableMap, IProgressMonitor monitor) throws Exception {
       BranchPersistenceManager branchManager = BranchPersistenceManager.getInstance();
-      //variableMap.getString("Transaction List").sp
-      int[] transactionIds = new int[] {20813, 20814};
 
-      for (int transacionId : transactionIds) {
-
-         branchManager.deleteTransaction(transacionId);
+      Matcher transactionIdMatcher = transactionPattern.matcher(variableMap.getString("Transaction List"));
+      while (transactionIdMatcher.find()) {
+         branchManager.deleteTransaction(Integer.parseInt(transactionIdMatcher.group()));
       }
    }
 
