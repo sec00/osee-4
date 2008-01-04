@@ -15,10 +15,6 @@
  <extension
        point="org.eclipse.ui.commands">
     <command
-          id="org.eclipse.osee.framework.ui.skynet.copy.command"
-          name="Copy">
-    </command>
-    <command
           id="org.eclipse.osee.framework.ui.skynet.openInEdit.command"
           name="Open">
     </command>
@@ -120,7 +116,15 @@
       </handler>
 		<handler class="org.eclipse.osee.framework.ui.skynet.branch.HierarchicalPresentationHandler" commandId="org.eclipse.osee.framework.ui.skynet.branch.branchView.hierarchicalPresentation.command">
       </handler>
-		<handler class="org.eclipse.osee.framework.ui.skynet.commandHandlers.CopyHandler" commandId="org.eclipse.osee.framework.ui.skynet.copy.command">
+		<handler class="org.eclipse.osee.framework.ui.skynet.commandHandlers.CopyHandler" commandId="org.eclipse.ui.edit.copy">
+     <activeWhen>
+        <with
+              variable="activePartId">
+           <equals
+                 value="org.eclipse.osee.framework.ui.skynet.branch.BranchView">
+           </equals>
+        </with>
+     </activeWhen>
       </handler>
 		<handler class="org.eclipse.osee.framework.ui.skynet.commandHandlers.ViewerReportHandler" commandId="org.eclipse.osee.framework.ui.skynet.viewerReport.command">
       </handler>
@@ -175,7 +179,7 @@
   <menuContribution
         locationURI="popup:org.eclipse.osee.framework.ui.skynet.branch.BranchView">
      <command
-           commandId="org.eclipse.osee.framework.ui.skynet.copy.command">
+           commandId="org.eclipse.ui.edit.copy">
      </command>
   </menuContribution>
 	</extension>
@@ -218,9 +222,9 @@
          </command>
 			<separator name="org.eclipse.osee.framework.ui.skynet.viewerReport.separator" visible="true">
          </separator>
-			<command commandId="org.eclipse.osee.framework.ui.skynet.copy.command">
+			<command commandId="org.eclipse.ui.edit.copy">
          </command>
-			<separator name="org.eclipse.osee.framework.ui.skynet.changeReportView.copy.separator" visible="true">
+			<separator name="org.eclipse.ui.edit.copy.seperator" visible="true">
          </separator>
 			<command commandId="org.eclipse.osee.framework.ui.skynet.changeReportView.compressWordAttributes.command">
          </command>
@@ -244,15 +248,11 @@
          </command>
 			<separator name="artifactSearchViewCopySeparator" visible="true">
          </separator>
-			<command commandId="org.eclipse.osee.framework.ui.skynet.copy.command">
+			<command commandId="org.eclipse.ui.edit.copy">
          </command>
 		</menuContribution>
 	</extension>
-	<extension point="org.eclipse.ui.commandImages">
-		<image commandId="org.eclipse.osee.framework.ui.skynet.copy.command" icon="images/email.gif">
-         </image>
-		<image commandId="org.eclipse.osee.framework.ui.skynet.resource.command" icon="images/edit.gif">
-         </image>
+	<extension point="org.eclipse.ui.commandImages">ge>
 		<image commandId="org.eclipse.osee.framework.ui.skynet.previewArtifactRecurse.command" icon="images/preview_artifact.gif">
          </image>
 		<image commandId="org.eclipse.osee.framework.ui.skynet.previewArtifact.command" icon="images/preview_artifact.gif">
@@ -447,9 +447,5 @@
 	<extension id="AddCommonBranch" name="AddCommonBranch" point="org.eclipse.osee.framework.database.IDbInitializationTask">
 		<DatabaseTask classname="org.eclipse.osee.framework.ui.skynet.dbinit.AddCommonBranch">
          </DatabaseTask>
-	</extension>
-	<extension point="org.eclipse.ui.bindings">
-		<key commandId="org.eclipse.osee.framework.ui.skynet.copy.command" schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" sequence="M1+C">
-         </key>
 	</extension>
 </plugin>
