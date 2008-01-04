@@ -53,7 +53,7 @@ public class PublishPids implements BlamOperation {
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
     */
    public String getXWidgetsXml() {
-      return "<xWidgets><XWidget xwidgetType=\"XBranchListViewer\" displayName=\"Branch\" /></xWidgets>";
+      return branchXWidgetXml;
    }
 
    /* (non-Javadoc)
