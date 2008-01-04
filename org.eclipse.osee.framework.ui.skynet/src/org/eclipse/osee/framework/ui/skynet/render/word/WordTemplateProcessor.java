@@ -344,7 +344,7 @@ public class WordTemplateProcessor {
 
    @SuppressWarnings("unchecked")
    private void processArtifactSetHelper(String artifactSetName, BlamVariableMap variableMap, WordMLProducer wordMl, String outlineType) throws IOException, SQLException {
-      Boolean useTree = variableMap.getValue(Boolean.class, "useTree");
+      Boolean useTree = variableMap.getBoolean("useTree");
 
       if (useTree.booleanValue()) {
          Tree<Object> tree = (Tree<Object>) variableMap.getValue(Tree.class, artifactSetName);
