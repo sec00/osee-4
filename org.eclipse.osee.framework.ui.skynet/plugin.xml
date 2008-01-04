@@ -346,9 +346,6 @@
 	<extension id="SrsProducer" name="SrsProducer" point="org.eclipse.osee.framework.ui.skynet.WordMlProducer">
 		<producer class="org.eclipse.osee.framework.ui.skynet.render.word.SrsProducer"/>
 	</extension>
-	<extension id="RecursiveSaveOp" point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
-		<Operation className="org.eclipse.osee.framework.ui.skynet.blam.operation.RecursiveSaveOp"/>
-	</extension>
 	<extension id="TagAllItems" point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
 		<Operation className="org.eclipse.osee.framework.ui.skynet.blam.operation.TagAllItems"/>
 	</extension>
