@@ -6,17 +6,18 @@
 package org.eclipse.osee.framework.ui.skynet.widgets.xnavigate;
 
 import java.sql.SQLException;
-import org.eclipse.osee.framework.ui.plugin.util.Displays;
-import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
+import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.artifact.ArtifactPersistenceManager;
+import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
+import org.eclipse.osee.framework.ui.skynet.blam.BlamWorkflow;
 import org.eclipse.osee.framework.ui.skynet.blam.WorkflowEditor;
 import org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation;
-import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 
 /**
  * @author Donald G. Dunne
  */
 public class XNavigateItemBlam extends XNavigateItem {
-
+   private static Artifact workflowFolder;
    private final BlamOperation blamOperation;
 
    /**
@@ -24,26 +25,27 @@ public class XNavigateItemBlam extends XNavigateItem {
     * @param name
     */
    public XNavigateItemBlam(XNavigateItem parent, BlamOperation blamOperation) {
-      super(parent, blamOperation.getClass().getName().replaceAll("^.*\\.", ""));
+      super(parent, blamOperation.getClass().getSimpleName());
       this.blamOperation = blamOperation;
    }
 
    public void run() throws SQLException {
-      if (blamOperation != null) {
-         Displays.ensureInDisplayThread(new Runnable() {
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.lang.Runnable#run()
-             */
-            public void run() {
-               try {
-                  WorkflowEditor.openOperationAsWorkflow(blamOperation);
-               } catch (Exception ex) {
-                  OSEELog.logException(SkynetGuiPlugin.class, ex, true);
-               }
-            }
-         });
+      if (workflowFolder == null) {
+         workflowFolder =
+               ArtifactPersistenceManager.getInstance().getArtifactFromTypeName("Folder", "Blam Workflows",
+                     BranchPersistenceManager.getInstance().getCommonBranch());
       }
+
+      Artifact workflow;
+      try {
+         workflow = workflowFolder.getChild(getName());
+      } catch (IllegalArgumentException ex) {
+         workflow = BlamWorkflow.createBlamWorkflow(blamOperation);
+         workflow.setDescriptiveName(getName());
+         workflowFolder.addChild(workflow);
+         workflow.persist();
+      }
+
+      WorkflowEditor.editArtifact(workflow);
    }
 }

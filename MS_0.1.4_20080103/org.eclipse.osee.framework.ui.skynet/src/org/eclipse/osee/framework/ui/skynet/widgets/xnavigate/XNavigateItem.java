@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.widgets.xnavigate;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.swt.graphics.Image;
@@ -65,4 +66,6 @@ public class XNavigateItem {
       this.name = name;
    }
 
+   public void run() throws SQLException {
+   }
 }
