@@ -35,7 +35,7 @@ public class PublishPids implements BlamOperation {
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#runOperation(org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap, org.eclipse.osee.framework.skynet.core.artifact.Branch)
     */
    public void runOperation(BlamVariableMap variableMap, IProgressMonitor monitor) throws Exception {
-      Branch branch = (Branch) variableMap.getValue("Branch");
+      Branch branch = variableMap.getBranch("Branch");
       ArtifactPersistenceManager artifactManager = ArtifactPersistenceManager.getInstance();
       RendererManager rendererManager = RendererManager.getInstance();
       Artifact root = artifactManager.getDefaultHierarchyRootArtifact(branch);
