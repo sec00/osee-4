@@ -29,6 +29,7 @@ public class XNavigateItemBlam extends XNavigateItem {
       this.blamOperation = blamOperation;
    }
 
+   @Override
    public void run() throws SQLException {
       if (workflowFolder == null) {
          workflowFolder =
@@ -43,7 +44,7 @@ public class XNavigateItemBlam extends XNavigateItem {
          workflow = BlamWorkflow.createBlamWorkflow(blamOperation);
          workflow.setDescriptiveName(getName());
          workflowFolder.addChild(workflow);
-         workflow.persist();
+         workflow.persist(true);
       }
 
       WorkflowEditor.editArtifact(workflow);
