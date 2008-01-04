@@ -12,8 +12,10 @@ package org.eclipse.osee.define.blam.operation;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.TreeSet;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,11 +47,15 @@ public class PublishSoftwareTestPlan implements BlamOperation {
       swReqsByPartition = new HashCollection<String, Artifact>(false, LinkedList.class);
    }
 
+   private static final List<String> xWidgets =
+         Arrays.asList("<XWidget xwidgetType=\"XBranchListViewer\" displayName=\"Branch\" />");
+
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#runOperation(org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap, org.eclipse.osee.framework.skynet.core.artifact.Branch)
     */
-   public void runOperation(BlamVariableMap variableMap, Branch branch, IProgressMonitor monitor) throws Exception {
+   public void runOperation(BlamVariableMap variableMap, IProgressMonitor monitor) throws Exception {
       init();
+      Branch branch = variableMap.getBranch("Branch");
       ArtifactPersistenceManager artifactManager = ArtifactPersistenceManager.getInstance();
 
       monitor.beginTask("Publish Software Test Plan", IProgressMonitor.UNKNOWN);
@@ -109,5 +115,21 @@ public class PublishSoftwareTestPlan implements BlamOperation {
          }
          recurseSwReqs(child);
       }
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
+    */
+   public List<String> getXWidgetXml() {
+      return xWidgets;
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getDescriptionUsage()
+    */
+   public String getDescriptionUsage() {
+      return "Select parameters below and click the play button at the top right.";
    }
 }

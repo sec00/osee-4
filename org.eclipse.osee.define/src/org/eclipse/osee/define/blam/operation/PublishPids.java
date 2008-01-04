@@ -11,6 +11,8 @@
 package org.eclipse.osee.define.blam.operation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -26,10 +28,14 @@ import org.eclipse.osee.framework.ui.skynet.render.RendererManager;
  */
 public class PublishPids implements BlamOperation {
 
+   private static final List<String> xWidgets =
+         Arrays.asList("<XWidget xwidgetType=\"XBranchListViewer\" displayName=\"Branch\" />");
+
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#runOperation(org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap, org.eclipse.osee.framework.skynet.core.artifact.Branch)
     */
-   public void runOperation(BlamVariableMap variableMap, Branch branch, IProgressMonitor monitor) throws Exception {
+   public void runOperation(BlamVariableMap variableMap, IProgressMonitor monitor) throws Exception {
+      Branch branch = (Branch) variableMap.getValue("Branch");
       ArtifactPersistenceManager artifactManager = ArtifactPersistenceManager.getInstance();
       RendererManager rendererManager = RendererManager.getInstance();
       Artifact root = artifactManager.getDefaultHierarchyRootArtifact(branch);
@@ -46,5 +52,19 @@ public class PublishPids implements BlamOperation {
          IRenderer renderer = rendererManager.getRendererById("org.eclipse.osee.framework.ui.skynet.word");
          renderer.preview(new ArrayList<Artifact>(children), "Publish Pids", monitor);
       }
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
+    */
+   public List<String> getXWidgetXml() {
+      return xWidgets;
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getDescriptionUsage()
+    */
+   public String getDescriptionUsage() {
+      return "Select parameters below and click the play button at the top right.";
    }
 }

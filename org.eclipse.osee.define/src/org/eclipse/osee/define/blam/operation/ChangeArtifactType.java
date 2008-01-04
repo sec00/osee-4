@@ -11,6 +11,7 @@
 package org.eclipse.osee.define.blam.operation;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +22,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osee.framework.jdk.core.util.Collections;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
-import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.skynet.core.attribute.ArtifactSubtypeDescriptor;
 import org.eclipse.osee.framework.skynet.core.attribute.Attribute;
 import org.eclipse.osee.framework.skynet.core.attribute.ConfigurationPersistenceManager;
@@ -50,8 +50,12 @@ public class ChangeArtifactType implements BlamOperation {
    private List<Attribute> attributesToPurge;
    private List<RelationLinkBase> linksToPurge;
 
+   private static final List<String> xWidgets =
+         Arrays.asList("<XWidget xwidgetType=\"XListDropViewer\" displayName=\"artifact\" />",
+               "<XWidget xwidgetType=\"XArtifactTypeListViewer\" displayName=\"descriptor\" />");
+
    @SuppressWarnings("unchecked")
-   public void runOperation(BlamVariableMap variableMap, Branch branch, IProgressMonitor monitor) throws Exception {
+   public void runOperation(BlamVariableMap variableMap, IProgressMonitor monitor) throws Exception {
       processChange(variableMap.getArtifacts("artifact"), variableMap.getArtifactSubtypeDescriptor("descriptor"));
    }
 
@@ -186,5 +190,21 @@ public class ChangeArtifactType implements BlamOperation {
 
       artifact.changeArtifactType(descriptor);
       artifact.persist();
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
+    */
+   public List<String> getXWidgetXml() {
+      return xWidgets;
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getDescriptionUsage()
+    */
+   public String getDescriptionUsage() {
+      return "Select parameters below and click the play button at the top right.";
    }
 }
