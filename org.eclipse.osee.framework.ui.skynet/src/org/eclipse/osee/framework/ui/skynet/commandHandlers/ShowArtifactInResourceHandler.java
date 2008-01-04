@@ -70,7 +70,7 @@ public class ShowArtifactInResourceHandler extends AbstractSelectionChangedHandl
 
       if (selectionProvider != null) {
          IStructuredSelection structuredSelection = (IStructuredSelection) selectionProvider.getSelection();
-         List<Artifact> artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
+         artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
 
          if (artifacts.isEmpty()) {
             return false;
