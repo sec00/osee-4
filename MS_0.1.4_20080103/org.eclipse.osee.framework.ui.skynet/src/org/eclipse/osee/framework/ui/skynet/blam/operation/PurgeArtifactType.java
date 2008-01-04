@@ -11,8 +11,9 @@
 package org.eclipse.osee.framework.ui.skynet.blam.operation;
 
 import java.sql.ResultSet;
+import java.util.Arrays;
+import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.skynet.core.attribute.ArtifactSubtypeDescriptor;
 import org.eclipse.osee.framework.ui.plugin.sql.SQL3DataType;
 import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandler;
@@ -37,12 +38,13 @@ public class PurgeArtifactType implements BlamOperation {
          "delete from osee_define_txs txs3 where exists (select * from osee_define_artifact_type ary1, osee_define_txs txs2 where ary1.art_type_id = ? and ary1.gamma_id = txs2.gamma_id AND txs2.gamma_id = txs3.gamma_id)";
    public static final String DELETE_ARIFACT_TYPE = "delete from osee_define_artifact_type where art_type_id = ?";
 
+   private static final List<String> xWidgets =
+         Arrays.asList("<XWidget xwidgetType=\"XArtifactTypeListViewer\" displayName=\"Artifact Type\" />");
+
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#runOperation(org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap, org.eclipse.osee.framework.skynet.core.artifact.Branch, org.eclipse.core.runtime.IProgressMonitor)
     */
-   public void runOperation(BlamVariableMap variableMap, Branch branchIgnoreMe, IProgressMonitor monitor) throws Exception {
-      //    <XWidget xwidgetType="XArtifactTypeListViewer" displayName="Artifact Type" />
-
+   public void runOperation(BlamVariableMap variableMap, IProgressMonitor monitor) throws Exception {
       ArtifactSubtypeDescriptor artType = variableMap.getArtifactSubtypeDescriptor("Artifact Type");
       int artTypeId = artType.getArtTypeId();
 
@@ -65,5 +67,19 @@ public class PurgeArtifactType implements BlamOperation {
       ConnectionHandler.runPreparedUpdate(DELETE_VALID_ATTRIBUTE, SQL3DataType.INTEGER, artTypeId);
       ConnectionHandler.runPreparedUpdate(DELETE_ARIFACT_TYPE_GAMMAS, SQL3DataType.INTEGER, artTypeId);
       ConnectionHandler.runPreparedUpdate(DELETE_ARIFACT_TYPE, SQL3DataType.INTEGER, artTypeId);
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getDescriptionUsage()
+    */
+   public String getDescriptionUsage() {
+      return "Select parameters below and click the play button at the top right.";
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
+    */
+   public List<String> getXWidgetXml() {
+      return xWidgets;
    }
 }

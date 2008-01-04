@@ -10,14 +10,17 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.blam.operation;
 
+import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
 
 /**
  * @author Ryan D. Brooks
  */
 public interface BlamOperation {
+   public abstract void runOperation(BlamVariableMap variableMap, IProgressMonitor monitor) throws Exception;
 
-   public abstract void runOperation(BlamVariableMap variableMap, Branch branch, IProgressMonitor monitor) throws Exception;
+   public abstract List<String> getXWidgetXml();
+
+   public abstract String getDescriptionUsage();
 }

@@ -11,7 +11,9 @@
 package org.eclipse.osee.framework.ui.skynet.blam.operation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactPersistenceManager;
@@ -30,7 +32,10 @@ import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
  */
 public class TagAllItems implements BlamOperation {
 
-   public void runOperation(BlamVariableMap variableMap, Branch blamOperationBranch, IProgressMonitor monitor) throws Exception {
+   private static final List<String> xWidgets =
+         Arrays.asList("<XWidget xwidgetType=\"XBranchListViewer\" displayName=\"Branch\" />");
+
+   public void runOperation(BlamVariableMap variableMap, IProgressMonitor monitor) throws Exception {
       try {
          Branch branch = (Branch) variableMap.getValue("Branch");
 
@@ -65,5 +70,19 @@ public class TagAllItems implements BlamOperation {
       } finally {
          monitor.done();
       }
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
+    */
+   public List<String> getXWidgetXml() {
+      return xWidgets;
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getDescriptionUsage()
+    */
+   public String getDescriptionUsage() {
+      return "Select parameters below and click the play button at the top right.";
    }
 }

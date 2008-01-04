@@ -26,8 +26,10 @@ import org.eclipse.osee.framework.jdk.core.util.xml.Jaxp;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.skynet.core.artifact.factory.IArtifactFactory;
+import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.XWidgetParser;
 import org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation;
+import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.workflow.DynamicXWidgetLayout;
 import org.eclipse.osee.framework.ui.skynet.widgets.workflow.DynamicXWidgetLayoutData;
 import org.w3c.dom.Document;
@@ -154,5 +156,24 @@ public class BlamWorkflow extends Artifact {
       operations.clear();
       loadFromXml();
       return operations;
+   }
+
+   /**
+    * @return
+    * @throws CoreException
+    * @throws IOException
+    * @throws SAXException
+    * @throws ParserConfigurationException
+    * @throws IllegalArgumentException
+    */
+   public String getDescriptionUsage() {
+      try {
+         if (getOperations().size() == 1) {
+            return operations.get(0).getDescriptionUsage();
+         }
+      } catch (Exception ex) {
+         OSEELog.logException(SkynetGuiPlugin.class, ex, true);
+      }
+      return "Select parameters below and click the play button at the top right.";
    }
 }

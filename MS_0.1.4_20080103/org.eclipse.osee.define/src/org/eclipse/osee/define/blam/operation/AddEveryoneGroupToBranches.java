@@ -11,6 +11,8 @@
 package org.eclipse.osee.define.blam.operation;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
 import org.eclipse.osee.framework.skynet.core.access.PermissionEnum;
@@ -33,7 +35,7 @@ public class AddEveryoneGroupToBranches implements BlamOperation {
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#runOperation(org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap, org.eclipse.osee.framework.skynet.core.artifact.Branch, org.eclipse.core.runtime.IProgressMonitor)
     */
-   public void runOperation(BlamVariableMap variableMap, Branch branch, IProgressMonitor monitor) throws Exception {
+   public void runOperation(BlamVariableMap variableMap, IProgressMonitor monitor) throws Exception {
       Collection<Artifact> artifacts;
 
       for (Branch brnch : branchPersistenceManager.getBranches()) {
@@ -51,4 +53,19 @@ public class AddEveryoneGroupToBranches implements BlamOperation {
 
    }
 
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
+    */
+   public List<String> getXWidgetXml() {
+      return Collections.emptyList();
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getDescriptionUsage()
+    */
+   public String getDescriptionUsage() {
+      return "Select parameters below and click the play button at the top right.";
+   }
 }
