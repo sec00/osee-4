@@ -18,6 +18,8 @@ import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
  */
 public interface BlamOperation {
    public static final String emptyXWidgetsXml = "<xWidgets/>";
+   public static final String branchXWidgetXml =
+         "<xWidgets><XWidget xwidgetType=\"XBranchListViewer\" displayName=\"Branch\" /></xWidgets>";
 
    public abstract void runOperation(BlamVariableMap variableMap, IProgressMonitor monitor) throws Exception;
 
