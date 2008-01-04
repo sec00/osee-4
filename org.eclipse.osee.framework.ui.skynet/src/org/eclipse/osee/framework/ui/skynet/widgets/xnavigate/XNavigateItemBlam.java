@@ -6,9 +6,11 @@
 package org.eclipse.osee.framework.ui.skynet.widgets.xnavigate;
 
 import java.sql.SQLException;
-import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
+import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
+import org.eclipse.osee.framework.ui.skynet.blam.WorkflowEditor;
 import org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation;
+import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 
 /**
  * @author Donald G. Dunne
@@ -35,7 +37,11 @@ public class XNavigateItemBlam extends XNavigateItem {
              * @see java.lang.Runnable#run()
              */
             public void run() {
-               AWorkbench.popup("ERROR", "Not Implemented Yet");
+               try {
+                  WorkflowEditor.openOperationAsWorkflow(blamOperation);
+               } catch (Exception ex) {
+                  OSEELog.logException(SkynetGuiPlugin.class, ex, true);
+               }
             }
          });
       }
