@@ -58,10 +58,6 @@ public class BlamVariableMap {
       variableMap.put(alias, variable);
    }
 
-   private Object getValue(String variableName) {
-      return getBlamVariable(variableName).getValue();
-   }
-
    public void setValue(String variableName, Object value) {
       BlamVariable variable = variableMap.get(variableName);
       if (variable == null) {
@@ -107,6 +103,10 @@ public class BlamVariableMap {
       return getValue(Branch.class, parameterName);
    }
 
+   public boolean getBoolean(String parameterName) {
+      return getValue(Boolean.class, parameterName);
+   }
+
    @SuppressWarnings("unchecked")
    private <T> Collection<T> getCollection(Class<T> clazz, String parameterName) {
       return getValue(Collection.class, parameterName);
@@ -120,12 +120,9 @@ public class BlamVariableMap {
       return objects.iterator().next();
    }
 
-   public <T> T getValue(Class<T> clazz, String parameterName) {
-      Object object = getValue(parameterName);
+   public <T> T getValue(Class<T> clazz, String variableName) {
+      Object object = getBlamVariable(variableName).getValue();
 
-      if (object == null) {
-         throw new IllegalArgumentException("Parameter can not be null");
-      }
       if (!clazz.isInstance(object)) {
          throw new IllegalArgumentException(
                "Expecting object of type " + clazz.getName() + " not " + object.getClass().getName());
