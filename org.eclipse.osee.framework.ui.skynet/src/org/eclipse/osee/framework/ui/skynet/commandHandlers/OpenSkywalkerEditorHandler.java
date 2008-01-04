@@ -42,6 +42,10 @@ public class OpenSkywalkerEditorHandler extends AbstractSelectionChangedHandler 
             (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
       artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
 
+      if (artifacts.isEmpty()) {
+         return false;
+      }
+
       return accessControlManager.checkObjectListPermission(artifacts, PermissionEnum.READ);
    }
 }
