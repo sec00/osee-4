@@ -134,7 +134,7 @@
            <with
                  variable="activePartId">
               <equals
-                    value="org.eclipse.osee.framework.ui.skynetd.ArtifactSearchView">
+                    value="org.eclipse.search.ui.views.SearchView">
               </equals>
            </with>
         </or>
