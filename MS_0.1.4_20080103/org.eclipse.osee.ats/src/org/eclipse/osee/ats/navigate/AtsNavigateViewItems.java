@@ -66,9 +66,12 @@ import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactTypeSearch
 import org.eclipse.osee.framework.skynet.core.artifact.search.ISearchPrimitive;
 import org.eclipse.osee.framework.skynet.core.artifact.search.Operator;
 import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandler;
+import org.eclipse.osee.framework.ui.skynet.blam.BlamOperations;
+import org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.xnavigate.XNavigateItem;
 import org.eclipse.osee.framework.ui.skynet.widgets.xnavigate.XNavigateItemAction;
+import org.eclipse.osee.framework.ui.skynet.widgets.xnavigate.XNavigateItemBlam;
 import org.eclipse.osee.framework.ui.skynet.widgets.xnavigate.XNavigateViewItems;
 import org.osgi.framework.Bundle;
 
@@ -202,6 +205,12 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
       XNavigateItem importItems = new XNavigateItem(null, "Import");
       new ImportActionsViaSpreadsheet(importItems);
       items.add(importItems);
+
+      XNavigateItem blamOperationItems = new XNavigateItem(null, "Blam Operations");
+      for (BlamOperation blamOperation : BlamOperations.getBlamOperations()) {
+         new XNavigateItemBlam(blamOperationItems, blamOperation);
+      }
+      items.add(blamOperationItems);
 
       if (AtsPlugin.isAtsAdmin()) {
          XNavigateItem adminItems = new XNavigateItem(null, "Admin");
