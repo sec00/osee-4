@@ -12,8 +12,6 @@ package org.eclipse.osee.framework.ui.skynet.blam.operation;
 
 import static org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase.ATTRIBUTE_VERSION_TABLE;
 import java.sql.ResultSet;
-import java.util.Collections;
-import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandler;
 import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandlerStatement;
@@ -66,7 +64,7 @@ public class FindInvalidUTF8Chars implements BlamOperation {
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
     */
-   public List<String> getXWidgetXml() {
-      return Collections.emptyList();
+   public String getXWidgetsXml() {
+      return emptyXWidgetsXml;
    }
 }

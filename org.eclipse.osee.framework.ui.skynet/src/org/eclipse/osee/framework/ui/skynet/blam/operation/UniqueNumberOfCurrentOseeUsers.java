@@ -11,8 +11,6 @@
 package org.eclipse.osee.framework.ui.skynet.blam.operation;
 
 import java.sql.ResultSet;
-import java.util.Collections;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -64,7 +62,7 @@ public class UniqueNumberOfCurrentOseeUsers implements BlamOperation {
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
     */
-   public List<String> getXWidgetXml() {
-      return Collections.emptyList();
+   public String getXWidgetsXml() {
+      return emptyXWidgetsXml;
    }
 }

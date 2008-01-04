@@ -25,7 +25,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.osee.framework.jdk.core.util.xml.Jaxp;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
+import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.factory.IArtifactFactory;
+import org.eclipse.osee.framework.skynet.core.attribute.ConfigurationPersistenceManager;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.XWidgetParser;
 import org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation;
@@ -46,6 +48,7 @@ public class BlamWorkflow extends Artifact {
    private XWidgetParser xWidgetParser;
    private List<DynamicXWidgetLayoutData> layoutDatas;
    private DynamicXWidgetLayout dynamicXWidgetLayout;
+   private BlamOperation soleOperation;
 
    /**
     * @param parentFactory
@@ -63,11 +66,39 @@ public class BlamWorkflow extends Artifact {
       this.layoutDatas = new LinkedList<DynamicXWidgetLayoutData>();
    }
 
+   public static BlamWorkflow createBlamWorkflow(BlamOperation soleOperation) throws SQLException {
+      BlamWorkflow blamWorkflow =
+            (BlamWorkflow) ConfigurationPersistenceManager.getInstance().getArtifactSubtypeDescriptor(ARTIFACT_NAME,
+                  BranchPersistenceManager.getInstance().getCommonBranch()).makeNewArtifact();
+      blamWorkflow.soleOperation = soleOperation;
+      return blamWorkflow;
+   }
+
    @Override
    public void onBirth() throws SQLException {
       super.onBirth();
       setSoleAttributeValue("Workflow Definition",
             "<Workflow><Operation name=\"org.my.plugin.blamExtensionId\" /></Workflow>");
+   }
+
+   public List<DynamicXWidgetLayoutData> getLayoutDatas() throws IllegalArgumentException, ParserConfigurationException, SAXException, IOException, CoreException {
+      if (layoutDatas.isEmpty()) {
+         getOperations();
+      }
+      return layoutDatas;
+   }
+
+   public List<BlamOperation> getOperations() throws IllegalArgumentException, ParserConfigurationException, SAXException, IOException, CoreException {
+      operations.clear();
+
+      if (soleOperation == null) {
+         loadFromXml();
+      } else {
+         operations.add(soleOperation);
+         layoutDatas = xWidgetParser.extractWorkAttributes(dynamicXWidgetLayout, "hi");
+      }
+
+      return operations;
    }
 
    private void loadFromXml() throws ParserConfigurationException, SAXException, IOException, IllegalArgumentException, CoreException {
@@ -86,37 +117,8 @@ public class BlamWorkflow extends Artifact {
       }
    }
 
-   public void saveLayoutData(String xml) throws ParserConfigurationException, SAXException, IOException, IllegalArgumentException, CoreException, SQLException {
-      String blamXml = getSoleAttributeValue("Workflow Definition");
-      Document document = Jaxp.readXmlDocument(blamXml);
-      Element rootElement = document.getDocumentElement();
-
-      NodeList oldXwidgets = rootElement.getElementsByTagName("Widgets");
-
-      // delete all old Xwidgets
-      for (int i = 0; i < oldXwidgets.getLength(); i++) {
-         rootElement.removeChild(oldXwidgets.item(i));
-      }
-
-      String doc = Jaxp.getDocumentXml(document);
-      doc = doc.replace("<Workflow>", "<Workflow>" + xml);
-
-      setSoleAttributeValue("Workflow Definition", doc);
-      persist();
-   }
-
-   private String getOperationsListing(IExtensionRegistry registry) {
-      StringBuilder strB = new StringBuilder(1000);
-      IExtensionPoint point =
-            Platform.getExtensionRegistry().getExtensionPoint("org.eclipse.osee.framework.ui.skynet.BlamOperation");
-      IExtension[] extensions = point.getExtensions();
-
-      for (IExtension extension : extensions) {
-         strB.append("Ext Point Id: ");
-         strB.append(extension.getUniqueIdentifier());
-         strB.append('\n');
-      }
-      return strB.toString();
+   private void setLayoutData(Element element) throws ParserConfigurationException, SAXException, IOException {
+      layoutDatas = xWidgetParser.extractlayoutDatas(dynamicXWidgetLayout, element);
    }
 
    private void loadBlamOperationFromXml(Element operation) throws CoreException, IllegalArgumentException {
@@ -141,31 +143,20 @@ public class BlamWorkflow extends Artifact {
       }
    }
 
-   public List<DynamicXWidgetLayoutData> getLayoutDatas() throws IllegalArgumentException, ParserConfigurationException, SAXException, IOException, CoreException {
-      if (layoutDatas.isEmpty()) {
-         getOperations();
+   private String getOperationsListing(IExtensionRegistry registry) {
+      StringBuilder strB = new StringBuilder(1000);
+      IExtensionPoint point =
+            Platform.getExtensionRegistry().getExtensionPoint("org.eclipse.osee.framework.ui.skynet.BlamOperation");
+      IExtension[] extensions = point.getExtensions();
+
+      for (IExtension extension : extensions) {
+         strB.append("Ext Point Id: ");
+         strB.append(extension.getUniqueIdentifier());
+         strB.append('\n');
       }
-      return layoutDatas;
+      return strB.toString();
    }
 
-   private void setLayoutData(Element element) throws ParserConfigurationException, SAXException, IOException {
-      layoutDatas = xWidgetParser.extractlayoutDatas(dynamicXWidgetLayout, element);
-   }
-
-   public List<BlamOperation> getOperations() throws IllegalArgumentException, ParserConfigurationException, SAXException, IOException, CoreException {
-      operations.clear();
-      loadFromXml();
-      return operations;
-   }
-
-   /**
-    * @return
-    * @throws CoreException
-    * @throws IOException
-    * @throws SAXException
-    * @throws ParserConfigurationException
-    * @throws IllegalArgumentException
-    */
    public String getDescriptionUsage() {
       try {
          if (getOperations().size() == 1) {
@@ -175,5 +166,24 @@ public class BlamWorkflow extends Artifact {
          OSEELog.logException(SkynetGuiPlugin.class, ex, true);
       }
       return "Select parameters below and click the play button at the top right.";
+   }
+
+   public void saveLayoutData(String xml) throws ParserConfigurationException, SAXException, IOException, IllegalArgumentException, CoreException, SQLException {
+      String blamXml = getSoleAttributeValue("Workflow Definition");
+      Document document = Jaxp.readXmlDocument(blamXml);
+      Element rootElement = document.getDocumentElement();
+
+      NodeList oldXwidgets = rootElement.getElementsByTagName("Widgets");
+
+      // delete all old Xwidgets
+      for (int i = 0; i < oldXwidgets.getLength(); i++) {
+         rootElement.removeChild(oldXwidgets.item(i));
+      }
+
+      String doc = Jaxp.getDocumentXml(document);
+      doc = doc.replace("<Workflow>", "<Workflow>" + xml);
+
+      setSoleAttributeValue("Workflow Definition", doc);
+      persist();
    }
 }

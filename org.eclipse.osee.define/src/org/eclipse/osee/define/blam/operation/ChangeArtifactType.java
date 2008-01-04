@@ -11,7 +11,6 @@
 package org.eclipse.osee.define.blam.operation;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,10 +48,6 @@ public class ChangeArtifactType implements BlamOperation {
          RelationPersistenceManager.getInstance();
    private List<Attribute> attributesToPurge;
    private List<RelationLinkBase> linksToPurge;
-
-   private static final List<String> xWidgets =
-         Arrays.asList("<XWidget xwidgetType=\"XListDropViewer\" displayName=\"artifact\" />",
-               "<XWidget xwidgetType=\"XArtifactTypeListViewer\" displayName=\"descriptor\" />");
 
    @SuppressWarnings("unchecked")
    public void runOperation(BlamVariableMap variableMap, IProgressMonitor monitor) throws Exception {
@@ -197,8 +192,8 @@ public class ChangeArtifactType implements BlamOperation {
     * 
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
     */
-   public List<String> getXWidgetXml() {
-      return xWidgets;
+   public String getXWidgetsXml() {
+      return "<xWidgets><XWidget xwidgetType=\"XListDropViewer\" displayName=\"artifact\" /><XWidget xwidgetType=\"XArtifactTypeListViewer\" displayName=\"descriptor\" /></xWidgets>";
    }
 
    /* (non-Javadoc)

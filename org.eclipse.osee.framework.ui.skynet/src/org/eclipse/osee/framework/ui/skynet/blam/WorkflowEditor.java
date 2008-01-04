@@ -65,7 +65,6 @@ public class WorkflowEditor extends AbstractArtifactEditor implements IBlamEvent
     * as the corresponding method in ArtifactExloper in the hope on day this will use a common interface
     * 
     * @param artifact
-    * @throws PartInitException
     */
    public static void editArtifact(final Artifact artifact) {
       Displays.ensureInDisplayThread(new Runnable() {
