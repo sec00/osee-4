@@ -11,8 +11,6 @@
 package org.eclipse.osee.define.blam.operation;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
 import org.eclipse.osee.framework.skynet.core.access.PermissionEnum;
@@ -58,8 +56,8 @@ public class AddEveryoneGroupToBranches implements BlamOperation {
     * 
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
     */
-   public List<String> getXWidgetXml() {
-      return Collections.emptyList();
+   public String getXWidgetsXml() {
+      return emptyXWidgetsXml;
    }
 
    /* (non-Javadoc)

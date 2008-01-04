@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.blam.operation;
 
-import java.util.Arrays;
-import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
@@ -20,9 +18,6 @@ import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
  * @author Ryan D. Brooks
  */
 public class DeleteTransaction implements BlamOperation {
-   private static final List<String> xWidgets =
-         Arrays.asList("<XWidget xwidgetType=\"XText\" displayName=\"Transaction List\" />");
-
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#runOperation(org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap, org.eclipse.osee.framework.skynet.core.artifact.Branch)
     */
@@ -41,8 +36,8 @@ public class DeleteTransaction implements BlamOperation {
     * (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
     */
-   public List<String> getXWidgetXml() {
-      return xWidgets;
+   public String getXWidgetsXml() {
+      return "<xWidgets><XWidget xwidgetType=\"XText\" displayName=\"Transaction List\" /></xWidgets>";
    }
 
    /* (non-Javadoc)

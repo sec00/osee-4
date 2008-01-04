@@ -17,7 +17,6 @@ import static org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabas
 import static org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase.TRANSACTIONS_TABLE;
 import static org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase.TRANSACTION_DETAIL_TABLE;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -49,10 +48,6 @@ public class UpdateFromParentBranch implements BlamOperation {
    private static final LocalAliasTable LINK_ALIAS_2 = new LocalAliasTable(RELATION_LINK_VERSION_TABLE, "t10");
 
    private static final TransactionIdManager transactionIdManager = TransactionIdManager.getInstance();
-
-   private static final List<String> xWidgets =
-         Arrays.asList("<XWidget xwidgetType=\"XBranchListViewer\" displayName=\"Child Branch Name\" />",
-               "<XWidget xwidgetType=\"XListDropViewer\" displayName=\"Parent Branch Artifacts to update to Child Branch\" />");
 
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#runOperation(org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap, org.eclipse.osee.framework.skynet.core.artifact.Branch, org.eclipse.core.runtime.IProgressMonitor)
@@ -126,8 +121,8 @@ public class UpdateFromParentBranch implements BlamOperation {
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
     */
-   public List<String> getXWidgetXml() {
-      return xWidgets;
+   public String getXWidgetsXml() {
+      return "<xWidgets><XWidget xwidgetType=\"XBranchListViewer\" displayName=\"Child Branch Name\" /><XWidget xwidgetType=\"XListDropViewer\" displayName=\"Parent Branch Artifacts to update to Child Branch\" /></xWidgets>";
    }
 
    /* (non-Javadoc)

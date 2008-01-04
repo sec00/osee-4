@@ -12,10 +12,8 @@ package org.eclipse.osee.define.blam.operation;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.TreeSet;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -46,9 +44,6 @@ public class PublishSoftwareTestPlan implements BlamOperation {
    public PublishSoftwareTestPlan() {
       swReqsByPartition = new HashCollection<String, Artifact>(false, LinkedList.class);
    }
-
-   private static final List<String> xWidgets =
-         Arrays.asList("<XWidget xwidgetType=\"XBranchListViewer\" displayName=\"Branch\" />");
 
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#runOperation(org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap, org.eclipse.osee.framework.skynet.core.artifact.Branch)
@@ -122,8 +117,8 @@ public class PublishSoftwareTestPlan implements BlamOperation {
     * 
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
     */
-   public List<String> getXWidgetXml() {
-      return xWidgets;
+   public String getXWidgetsXml() {
+      return "<xWidgets><XWidget xwidgetType=\"XBranchListViewer\" displayName=\"Branch\" /></xWidgets>";
    }
 
    /* (non-Javadoc)

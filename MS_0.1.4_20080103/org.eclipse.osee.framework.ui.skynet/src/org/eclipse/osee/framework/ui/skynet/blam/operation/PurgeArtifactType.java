@@ -11,8 +11,6 @@
 package org.eclipse.osee.framework.ui.skynet.blam.operation;
 
 import java.sql.ResultSet;
-import java.util.Arrays;
-import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.skynet.core.attribute.ArtifactSubtypeDescriptor;
 import org.eclipse.osee.framework.ui.plugin.sql.SQL3DataType;
@@ -37,9 +35,6 @@ public class PurgeArtifactType implements BlamOperation {
    public static final String DELETE_ARIFACT_TYPE_GAMMAS =
          "delete from osee_define_txs txs3 where exists (select * from osee_define_artifact_type ary1, osee_define_txs txs2 where ary1.art_type_id = ? and ary1.gamma_id = txs2.gamma_id AND txs2.gamma_id = txs3.gamma_id)";
    public static final String DELETE_ARIFACT_TYPE = "delete from osee_define_artifact_type where art_type_id = ?";
-
-   private static final List<String> xWidgets =
-         Arrays.asList("<XWidget xwidgetType=\"XArtifactTypeListViewer\" displayName=\"Artifact Type\" />");
 
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#runOperation(org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap, org.eclipse.osee.framework.skynet.core.artifact.Branch, org.eclipse.core.runtime.IProgressMonitor)
@@ -79,7 +74,7 @@ public class PurgeArtifactType implements BlamOperation {
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
     */
-   public List<String> getXWidgetXml() {
-      return xWidgets;
+   public String getXWidgetsXml() {
+      return "<XWidget xwidgetType=\"XArtifactTypeListViewer\" displayName=\"Artifact Type\" />";
    }
 }

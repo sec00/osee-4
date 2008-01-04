@@ -13,7 +13,6 @@ package org.eclipse.osee.define.blam.operation;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
@@ -76,8 +75,8 @@ public class CheckValidType implements BlamOperation {
     * (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
     */
-   public List<String> getXWidgetXml() {
-      return Collections.emptyList();
+   public String getXWidgetsXml() {
+      return emptyXWidgetsXml;
    }
 
    /* (non-Javadoc)

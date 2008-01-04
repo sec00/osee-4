@@ -11,8 +11,6 @@
 package org.eclipse.osee.define.blam.operation;
 
 import java.io.FileInputStream;
-import java.util.Arrays;
-import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.jdk.core.util.io.Streams;
 import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
@@ -25,10 +23,6 @@ import org.eclipse.osee.framework.ui.skynet.render.word.WordTemplateProcessor;
  * @author Robert A. Fisher
  */
 public class PublishSrs implements BlamOperation {
-
-   private static final List<String> xWidgets =
-         Arrays.asList("<XWidget xwidgetType=\"XText\" displayName=\"Master Template\" />",
-               "<XWidget xwidgetType=\"XText\" displayName=\"Slave Template\" />");
 
    public void runOperation(BlamVariableMap variableMap, IProgressMonitor monitor) throws Exception {
       String masterTemplate =
@@ -49,8 +43,8 @@ public class PublishSrs implements BlamOperation {
     * (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
     */
-   public List<String> getXWidgetXml() {
-      return xWidgets;
+   public String getXWidgetsXml() {
+      return "<xWidgets><XWidget xwidgetType=\"XText\" displayName=\"Master Template\" /><XWidget xwidgetType=\"XText\" displayName=\"Slave Template\" /></xWidgets>";
    }
 
    /* (non-Javadoc)

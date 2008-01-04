@@ -6,8 +6,6 @@
 package org.eclipse.osee.define.blam.operation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -20,8 +18,6 @@ import org.eclipse.osee.framework.ui.skynet.render.RendererManager;
  * @author Jeff C. Phillips
  */
 public class PublishRequirements implements BlamOperation {
-   private static final List<String> xWidgets =
-         Arrays.asList("<Widgets><XWidget xwidgetType=\"XListDropViewer\" displayName=\"artifact\" /></Widgets>");
 
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#runOperation(org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap, org.eclipse.osee.framework.skynet.core.artifact.Branch, org.eclipse.core.runtime.IProgressMonitor)
@@ -49,7 +45,7 @@ public class PublishRequirements implements BlamOperation {
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
     */
-   public List<String> getXWidgetXml() {
-      return xWidgets;
+   public String getXWidgetsXml() {
+      return "<xWidgets><XWidget xwidgetType=\"XListDropViewer\" displayName=\"artifact\" /></xWidgets>";
    }
 }

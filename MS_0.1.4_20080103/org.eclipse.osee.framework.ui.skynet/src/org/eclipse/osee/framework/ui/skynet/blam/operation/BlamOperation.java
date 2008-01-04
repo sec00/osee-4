@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.blam.operation;
 
-import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
 
@@ -18,9 +17,11 @@ import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
  * @author Ryan D. Brooks
  */
 public interface BlamOperation {
+   public static final String emptyXWidgetsXml = "<xWidgets/>";
+
    public abstract void runOperation(BlamVariableMap variableMap, IProgressMonitor monitor) throws Exception;
 
-   public abstract List<String> getXWidgetXml();
+   public abstract String getXWidgetsXml();
 
    public abstract String getDescriptionUsage();
 }

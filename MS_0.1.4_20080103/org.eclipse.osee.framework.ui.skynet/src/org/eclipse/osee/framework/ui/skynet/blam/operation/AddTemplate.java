@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.blam.operation;
 
-import java.util.Arrays;
-import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
@@ -23,14 +21,6 @@ import org.eclipse.osee.framework.ui.skynet.render.WordRenderer;
  * @author Ryan D. Brooks
  */
 public class AddTemplate implements BlamOperation {
-
-   private static final List<String> xWidgets =
-         Arrays.asList("<XWidget xwidgetType=\"XBranchListViewer\" displayName=\"Branch\" />",
-               "<XWidget xwidgetType=\"XText\" displayName=\"Presentation Type\" />",
-               "<XWidget xwidgetType=\"XText\" displayName=\"Bundle Name\" />",
-               "<XWidget xwidgetType=\"XText\" displayName=\"Template Name\" />",
-               "<XWidget xwidgetType=\"XText\" displayName=\"Template Path\" />");
-
    /**
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#runOperation(org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap,
     *      org.eclipse.core.runtime.IProgressMonitor)
@@ -52,8 +42,8 @@ public class AddTemplate implements BlamOperation {
     * (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.blam.operation.BlamOperation#getXWidgetXml()
     */
-   public List<String> getXWidgetXml() {
-      return xWidgets;
+   public String getXWidgetsXml() {
+      return "<xWidgets><XWidget xwidgetType=\"XBranchListViewer\" displayName=\"Branch\" /><XWidget xwidgetType=\"XText\" displayName=\"Presentation Type\" /><XWidget xwidgetType=\"XText\" displayName=\"Bundle Name\" /><XWidget xwidgetType=\"XText\" displayName=\"Template Name\" /><XWidget xwidgetType=\"XText\" displayName=\"Template Path\" /></xWidgets>";
    }
 
    /* (non-Javadoc)
