@@ -23,10 +23,6 @@ import org.eclipse.osee.framework.skynet.core.attribute.DynamicAttributeDescript
  * @author Ryan D. Brooks
  */
 public class BlamVariableMap {
-   public static enum BlamVariableType {
-      STRING, INTEGER, REAL, ARTIFACT
-   };
-
    private final HashMap<String, BlamVariable> variableMap;
 
    public BlamVariableMap() {

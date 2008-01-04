@@ -148,7 +148,6 @@ public class WordTemplateProcessor {
       if (fileName == null) {
          fileName = "new file " + (new Date().toString().replaceAll(":", ";"));
       }
-      variableMap.setValue("useTree", Boolean.FALSE);
       AIFile.writeToFile(folder.getFile(fileName + ".xml"), applyTemplate(variableMap, masterTemplate, folder, null,
             null));
    }
@@ -160,6 +159,7 @@ public class WordTemplateProcessor {
     * @throws IOException
     */
    private InputStream applyTemplate(BlamVariableMap variableMap, String template, IFolder folder, String nextParagraphNumber, String outlineType) throws Exception {
+      variableMap.setValue("useTree", Boolean.FALSE);
       CharBackedInputStream charBak = new CharBackedInputStream();
       WordMLProducer wordMl = new WordMLProducer(charBak);
       Matcher matcher = headElementsPattern.matcher(template);
@@ -200,6 +200,7 @@ public class WordTemplateProcessor {
       WordMLProducer wordMl = new WordMLProducer(charBak);
       int lastEndIndex = 0;
 
+      variableMap.setValue("useTree", Boolean.FALSE);
       outlineNumber = peekAtFirstArtifactToGetParagraphNumber(template, null, variableMap);
       //modifications to the template must be done before the matcher
       template = wordMl.setHeadingNumbers(outlineNumber, template);
