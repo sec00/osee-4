@@ -8,6 +8,7 @@ package org.eclipse.osee.framework.ui.skynet.commandHandlers;
 import java.util.List;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
@@ -37,15 +38,22 @@ public class RevealInArtifactExplorer extends AbstractSelectionChangedHandler {
     */
    @Override
    public boolean isEnabled() {
-      IStructuredSelection structuredSelection =
-            (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
-      List<Artifact> artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
+      boolean isEnabled = false;
 
-      if (artifacts.isEmpty()) {
-         return false;
+      ISelectionProvider selectionProvider =
+            AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider();
+
+      if (selectionProvider != null) {
+         IStructuredSelection structuredSelection = (IStructuredSelection) selectionProvider.getSelection();
+         List<Artifact> artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
+
+         if (artifacts.isEmpty()) {
+            return false;
+         }
+
+         artifact = artifacts.iterator().next();
+         isEnabled = artifact.getBranch() == branchPersistenceManager.getDefaultBranch();
       }
-
-      artifact = artifacts.iterator().next();
-      return artifact.getBranch() == branchPersistenceManager.getDefaultBranch();
+      return isEnabled;
    }
 }

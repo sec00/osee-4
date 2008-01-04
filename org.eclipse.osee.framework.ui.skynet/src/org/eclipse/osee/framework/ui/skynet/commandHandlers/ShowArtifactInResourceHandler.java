@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
@@ -62,22 +63,28 @@ public class ShowArtifactInResourceHandler extends AbstractSelectionChangedHandl
 
    @Override
    public boolean isEnabled() {
-      List<Artifact> artifacts =
-            Handlers.getArtifactsFromStructuredSelection((IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection());
+      boolean isEnabled = false;
 
-      if (artifacts.isEmpty()) {
-         return false;
+      ISelectionProvider selectionProvider =
+            AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider();
+
+      if (selectionProvider != null) {
+         IStructuredSelection structuredSelection = (IStructuredSelection) selectionProvider.getSelection();
+         List<Artifact> artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
+
+         if (artifacts.isEmpty()) {
+            return false;
+         }
+
+         boolean readPermission = true;
+         boolean reportBranch = true;
+
+         for (Artifact artifact : artifacts) {
+            readPermission &= accessControlManager.checkObjectPermission(artifact, PermissionEnum.READ);
+            reportBranch &= (artifact.getBranch() == branchPersistenceManager.getDefaultBranch());
+         }
+         isEnabled = readPermission && reportBranch;
       }
-
-      boolean readPermission = true;
-      boolean reportBranch = true;
-
-      for (Artifact artifact : artifacts) {
-         readPermission &= accessControlManager.checkObjectPermission(artifact, PermissionEnum.READ);
-         reportBranch &= (artifact.getBranch() == branchPersistenceManager.getDefaultBranch());
-      }
-      return readPermission && reportBranch;
-
+      return isEnabled;
    }
-
 }
