@@ -77,8 +77,6 @@ public class BlamWorkflow extends Artifact {
    @Override
    public void onBirth() throws SQLException {
       super.onBirth();
-      setSoleAttributeValue("Workflow Definition",
-            "<Workflow><Operation name=\"org.my.plugin.blamExtensionId\" /></Workflow>");
    }
 
    public List<DynamicXWidgetLayoutData> getLayoutDatas() throws IllegalArgumentException, ParserConfigurationException, SAXException, IOException, CoreException {
@@ -95,7 +93,7 @@ public class BlamWorkflow extends Artifact {
          loadFromXml();
       } else {
          operations.add(soleOperation);
-         layoutDatas = xWidgetParser.extractWorkAttributes(dynamicXWidgetLayout, "hi");
+         layoutDatas = xWidgetParser.extractWorkAttributes(dynamicXWidgetLayout, soleOperation.getXWidgetsXml());
       }
 
       return operations;

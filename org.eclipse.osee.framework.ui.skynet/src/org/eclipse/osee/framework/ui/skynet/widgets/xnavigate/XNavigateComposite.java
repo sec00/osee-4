@@ -97,37 +97,22 @@ public class XNavigateComposite extends Composite {
             if (e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR) handleDoubleClick();
          }
       });
-
    }
 
    protected void handleDoubleClick() {
       IStructuredSelection sel = (IStructuredSelection) filteredTree.getViewer().getSelection();
       if (!sel.iterator().hasNext()) return;
       XNavigateItem item = (XNavigateItem) sel.iterator().next();
-      if (item instanceof Runnable) {
-         ((Runnable) item).run();
-      } else if (item instanceof XNavigateItemBlam) {
-         try {
-            ((XNavigateItemBlam) item).run();
-         } catch (SQLException ex) {
-            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
-         }
-      } else if (item instanceof XNavigateItemAction) {
-         try {
-            ((XNavigateItemAction) item).run();
-         } catch (SQLException ex) {
-            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
-         }
-      } else if (item instanceof XNavigateItemSkynetTxJobItem) {
-         try {
-            ((XNavigateItemSkynetTxJobItem) item).run();
-         } catch (SQLException ex) {
-            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
-         }
-      } else {
-         filteredTree.getViewer().setExpandedState(item, true);
-      }
 
+      if (item.getChildren().size() > 0) {
+         filteredTree.getViewer().setExpandedState(item, true);
+      } else {
+         try {
+            item.run();
+         } catch (SQLException ex) {
+            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
+         }
+      }
    }
 
    public void refresh() {
