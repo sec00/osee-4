@@ -229,15 +229,15 @@ public class BranchLabelProvider implements ITableLabelProvider, ITableColorProv
             try {
                String txt =
                      artifactChange.getName() + (showChangeType ? " (" + getChangeType(artifactChange) + ")" : "");
-               if (artifactChange.getModType() != ModificationType.DELETE) {
+               if (artifactChange.getModType() == ModificationType.DELETE && artifactChange.getChangeType() == ChangeType.INCOMING) {
+                  txt = "Artifact Deleted";
+               } else {
                   if (attributeAction != null && !attributeAction.noneSelected()) {
                      String attributeText = attributeAction.getSelectedAttributeData(artifactChange.getArtifact());
                      if (attributeText != null) {
                         return txt + attributeText;
                      }
                   }
-               } else if (artifactChange.getChangeType() == ChangeType.INCOMING) {
-                  txt = "Artifact Deleted";
                }
                return txt;
             } catch (SQLException ex) {
