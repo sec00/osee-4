@@ -87,6 +87,9 @@ public class CompressWordAttributesHandler extends AbstractSelectionChangedHandl
 
    @Override
    public boolean isEnabled() {
+      if (PlatformUI.getWorkbench().isClosing()) {
+         return false;
+      }
       try {
          IStructuredSelection myIStructuredSelection =
                (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
