@@ -20,6 +20,7 @@ import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.ats.OseeAts;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Jeff C. Phillips
@@ -42,6 +43,9 @@ public class OpenArtifactsInAtsWorldHandler extends AbstractHandler {
 
    @Override
    public boolean isEnabled() {
+      if (PlatformUI.getWorkbench().isClosing()) {
+         return false;
+      }
       try {
          IStructuredSelection structuredSelection =
                (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();

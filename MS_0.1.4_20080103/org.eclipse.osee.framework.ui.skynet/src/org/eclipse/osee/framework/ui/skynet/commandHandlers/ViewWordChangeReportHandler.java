@@ -29,6 +29,7 @@ import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.skynet.render.RendererManager;
 import org.eclipse.osee.framework.ui.skynet.render.WordRenderer;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Paul K. Waldfogel
@@ -89,6 +90,9 @@ public class ViewWordChangeReportHandler extends AbstractSelectionChangedHandler
 
    @Override
    public boolean isEnabled() {
+      if (PlatformUI.getWorkbench().isClosing()) {
+         return false;
+      }
       List<Artifact> artifacts = new LinkedList<Artifact>();
       try {
          IStructuredSelection structuredSelection =

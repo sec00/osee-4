@@ -26,6 +26,7 @@ import org.eclipse.osee.framework.ui.plugin.util.db.schemas.ChangeType;
 import org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase;
 import org.eclipse.osee.framework.ui.skynet.render.RendererManager;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Paul K. Waldfogel
@@ -62,6 +63,10 @@ public class WordChangesBetweenCurrentAndParentHandler extends AbstractSelection
 
    @Override
    public boolean isEnabled() {
+      if (PlatformUI.getWorkbench().isClosing()) {
+         return false;
+      }
+
       IStructuredSelection structuredSelection =
             (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
       List<ArtifactChange> artifactChanges = Handlers.getArtifactChangesFromStructuredSelection(structuredSelection);

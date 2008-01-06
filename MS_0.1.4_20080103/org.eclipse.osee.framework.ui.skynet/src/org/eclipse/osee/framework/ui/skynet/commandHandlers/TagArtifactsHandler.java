@@ -19,6 +19,7 @@ import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.plugin.util.Jobs;
 import org.eclipse.osee.framework.ui.skynet.TagArtifactsJob;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Paul K. Waldfogel
@@ -35,6 +36,9 @@ public class TagArtifactsHandler extends AbstractSelectionChangedHandler {
 
    @Override
    public boolean isEnabled() {
+      if (PlatformUI.getWorkbench().isClosing()) {
+         return false;
+      }
       try {
          IStructuredSelection structuredSelection =
                (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
