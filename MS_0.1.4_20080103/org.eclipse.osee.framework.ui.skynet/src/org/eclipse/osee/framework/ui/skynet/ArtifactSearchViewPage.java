@@ -518,7 +518,7 @@ public class ArtifactSearchViewPage extends AbstractArtifactSearchViewPage imple
 
          @Override
          public boolean isEnabled() {
-            return true;
+            return accessControlManager.checkObjectListPermission(getSelectedArtifacts(viewer), PermissionEnum.WRITE);
          }
       });
    }
