@@ -43,6 +43,7 @@ import org.eclipse.osee.framework.ui.plugin.util.db.AbstractDbTxTemplate;
 import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandler;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Paul K. Waldfogel
@@ -216,6 +217,10 @@ public class RevertArtifactHandler extends AbstractSelectionChangedHandler {
 
    @Override
    public boolean isEnabled() {
+      if (PlatformUI.getWorkbench().isClosing()) {
+         return false;
+      }
+
       try {
          IStructuredSelection structuredSelection =
                (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();

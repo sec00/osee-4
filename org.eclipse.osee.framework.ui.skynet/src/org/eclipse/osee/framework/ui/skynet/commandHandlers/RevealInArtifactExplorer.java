@@ -14,6 +14,7 @@ import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.skynet.ArtifactExplorer;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Jeff C. Phillips
@@ -39,6 +40,10 @@ public class RevealInArtifactExplorer extends AbstractSelectionChangedHandler {
    @Override
    public boolean isEnabled() {
       boolean isEnabled = false;
+
+      if (PlatformUI.getWorkbench().isClosing()) {
+         return false;
+      }
 
       ISelectionProvider selectionProvider =
             AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider();
