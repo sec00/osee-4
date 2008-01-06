@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Paul K. Waldfogel
@@ -29,12 +30,13 @@ public abstract class AbstractSelectionChangedHandler extends AbstractHandler {
    private SelectionChanhedListener selectionChanhedListener;
 
    public AbstractSelectionChangedHandler() {
-      IWorkbenchPart myIWorkbenchPart = AWorkbench.getActivePage().getActivePart();
-      IWorkbenchPartSite myIWorkbenchPartSite = myIWorkbenchPart.getSite();
-      myISelectionProvider = myIWorkbenchPartSite.getSelectionProvider();
-      selectionChanhedListener = new SelectionChanhedListener();
-
-      myISelectionProvider.addSelectionChangedListener(selectionChanhedListener);
+      if (!PlatformUI.getWorkbench().isClosing()) {
+         IWorkbenchPart myIWorkbenchPart = AWorkbench.getActivePage().getActivePart();
+         IWorkbenchPartSite myIWorkbenchPartSite = myIWorkbenchPart.getSite();
+         myISelectionProvider = myIWorkbenchPartSite.getSelectionProvider();
+         selectionChanhedListener = new SelectionChanhedListener();
+         myISelectionProvider.addSelectionChangedListener(selectionChanhedListener);
+      }
    }
 
    /* (non-Javadoc)
@@ -42,7 +44,9 @@ public abstract class AbstractSelectionChangedHandler extends AbstractHandler {
     */
    @Override
    public void dispose() {
-      myISelectionProvider.removeSelectionChangedListener(selectionChanhedListener);
+      if (myISelectionProvider != null) {
+         myISelectionProvider.removeSelectionChangedListener(selectionChanhedListener);
+      }
       super.dispose();
    }
 

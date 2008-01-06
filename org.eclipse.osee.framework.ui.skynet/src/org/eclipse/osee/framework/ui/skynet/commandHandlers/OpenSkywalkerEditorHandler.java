@@ -19,6 +19,7 @@ import org.eclipse.osee.framework.skynet.core.access.PermissionEnum;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.skynet.skywalker.SkyWalkerView;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Jeff C. Phillips
@@ -38,6 +39,9 @@ public class OpenSkywalkerEditorHandler extends AbstractSelectionChangedHandler 
 
    @Override
    public boolean isEnabled() {
+      if (PlatformUI.getWorkbench().isClosing()) {
+         return false;
+      }
       IStructuredSelection structuredSelection =
             (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
       artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
