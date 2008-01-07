@@ -39,8 +39,6 @@ public class XListDropViewer extends XListViewer {
    private ArrayContentProvider myArrayContentProvider = null;
    private ArtifactLabelProvider myArtifactLabelProvider = null;
 
-   //   private Map<Object, Object> mySelectedItemsMap = new HashMap<Object, Object>();
-
    /**
     * @param displayLabel
     */
@@ -95,45 +93,12 @@ public class XListDropViewer extends XListViewer {
 
             myArrayContentProvider.inputChanged(myTableViewer, orginalInput, modList);
             refresh();
-            //old
-            //            Object myGetInputObject = myTableViewer.getInput();
-            //            List myFullList = null;
-            //            if (myGetInputObject instanceof List) {
-            //               myFullList = (List<Object>) myGetInputObject;
-            //               List myAdjustedList = myFullList;
-            //               for (int i = 0; i < myAdjustedList.size(); i++) {
-            //                  if (mySelectedItemsMap.containsKey(myAdjustedList.get(i))) {
-            //                     myTableViewer.remove(myAdjustedList.get(i));
-            //                     myAdjustedList.remove(i);
-            //                  }
-            //               }
-            //               myArrayContentProvider.inputChanged(myTableViewer, myFullList, myAdjustedList);
-            //            }
          }
 
          public void widgetDefaultSelected(SelectionEvent ev) {
          }
       });
    }
-
-   //   public class MenuEnablingListener implements MenuListener {
-   //
-   //      public void menuHidden(MenuEvent e) {
-   //      }
-   //
-   //      @SuppressWarnings("unchecked")
-   //      public void menuShown(MenuEvent e) {
-   //         IStructuredSelection myIStructuredSelection = (IStructuredSelection) myTableViewer.getSelection();
-   //         mySelectedItemsMap.clear();
-   //         if (!myIStructuredSelection.isEmpty()) {
-   //            List<Object> mySelectedItems = myIStructuredSelection.toList();
-   //            for (Object mySelectedItem : mySelectedItems) {
-   //               mySelectedItemsMap.put(mySelectedItem, mySelectedItem);
-   //            }
-   //         }
-   //         removeFromMenuItem.setEnabled(!myIStructuredSelection.isEmpty());
-   //      }
-   //   }
 
    /**
     * Adds artifacts to the viewer's input.
