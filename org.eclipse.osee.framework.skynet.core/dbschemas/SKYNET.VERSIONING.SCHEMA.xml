@@ -537,8 +537,8 @@
 	</Table>
 
   <Table name="OSEE_INFO" schema="OSEE">
-    <Column defaultValue="not null" id="OSEE_VALUE" type="VARCHAR" limits="28" />
-    <Column defaultValue="not null" id="OSEE_KEY" type="VARCHAR" limits="28" />
+    <Column defaultValue="not null" id="OSEE_VALUE" type="VARCHAR" limits="50" />
+    <Column defaultValue="not null" id="OSEE_KEY" type="VARCHAR" limits="50" />
     <Constraint schema="OSEE" id="KEY_UN" type="UNIQUE" appliesTo="OSEE_KEY" />
   </Table>
 
