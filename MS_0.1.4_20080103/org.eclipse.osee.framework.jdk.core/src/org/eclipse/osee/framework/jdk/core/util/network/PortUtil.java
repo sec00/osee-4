@@ -36,6 +36,12 @@ public class PortUtil {
    int nextPort = 18000;
 
    private PortUtil() {
+	   String startPort = System.getProperty("osee.startport", "180000");
+	   try{
+		   basePort = nextPort = Integer.parseInt(startPort);
+	   } catch (Exception ex){
+		   
+	   }
       for (int j = nextPort; j < 64000; j += 250) {
          if (checkIfPortIsTaken(j)) {
             basePort = nextPort = j;
