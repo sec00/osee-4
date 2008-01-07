@@ -11,7 +11,6 @@
 package org.eclipse.osee.framework.ui.product;
 
 import java.io.InputStream;
-
 import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -25,12 +24,17 @@ public class OseeProductActivator extends AbstractUIPlugin {
    public static final String USER_NAME_TEXT_BOX_PREFERENCE = "USER_NAME_TEXT_BOX_PREFERENCE";
    public static final String SPELL_CHECK_ENABLED_PEFERENCE = "SPELL_CHECK_ENABLED_PEFERENCE";
    public static final boolean DEFAULT_SPELL_CHECK_ENABLED_PEFERENCE = true;
-//   private static OseeConsole console = null;
    public static final String EMAIL_GROUPS_PREFERENCE = "EMAIL_GROUPS_PREFERENCE";
    private static OseeProductActivator pluginInstance; // The shared instance.
    private boolean prefsLoaded = false;
 
-   private String oseeVersion = "Development";
+   // Until release, version returned from getOseeVersion will be DEFAULT_DEVELOPMENT_VERSION
+   public static String DEFAULT_DEVELOPMENT_VERSION = "Development";
+   private String oseeVersion = DEFAULT_DEVELOPMENT_VERSION;
+
+   public boolean isDevelopmentVersion() {
+      return getOseeVersion().equals(DEFAULT_DEVELOPMENT_VERSION);
+   }
 
    /**
     * The constructor.
@@ -80,5 +84,14 @@ public class OseeProductActivator extends AbstractUIPlugin {
       if (prefsLoaded) return;
 
       prefsLoaded = true;
+   }
+
+   /**
+    * This method public for testing purposes only
+    * 
+    * @param oseeVersion the oseeVersion to set
+    */
+   public void setOseeCodeVersion(String oseeVersion) {
+      this.oseeVersion = oseeVersion;
    }
 }
