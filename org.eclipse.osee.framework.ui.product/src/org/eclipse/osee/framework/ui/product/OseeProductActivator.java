@@ -56,10 +56,12 @@ public class OseeProductActivator extends AbstractUIPlugin {
    public void start(BundleContext context) throws Exception {
       super.start(context);
       try {
-         InputStream is = getBundle().getEntry("/plugin.mappings").openStream();
-         if (is != null) {
-            oseeVersion = Lib.inputStreamToString(is);
-            oseeVersion = oseeVersion.replace("0=", "");
+         if (getBundle().getEntry("/plugin.mappings") != null) {
+            InputStream is = getBundle().getEntry("/plugin.mappings").openStream();
+            if (is != null) {
+               oseeVersion = Lib.inputStreamToString(is);
+               oseeVersion = oseeVersion.replace("0=", "");
+            }
          }
       } catch (Exception ex) {
 
