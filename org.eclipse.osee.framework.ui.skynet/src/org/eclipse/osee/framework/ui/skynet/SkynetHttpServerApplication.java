@@ -19,23 +19,35 @@ import org.eclipse.osee.framework.skynet.core.linking.HttpServer;
  */
 public class SkynetHttpServerApplication implements IApplication {
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
-    */
-   public Object start(IApplicationContext context) throws Exception {
-      HttpServer.remoteServerStartup();
-      while (true)
-         ;
-   }
+	private Object object;
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see org.eclipse.equinox.app.IApplication#stop()
-    */
-   public void stop() {
-   }
+	public SkynetHttpServerApplication() {
+		object = new Object();
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
+	 */
+	public Object start(IApplicationContext context) throws Exception {
+		HttpServer.remoteServerStartup();
+
+		synchronized (object) {
+			this.object.wait();
+		}
+		HttpServer.stopServers();
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.equinox.app.IApplication#stop()
+	 */
+	public void stop() {
+		synchronized (object) {
+			this.object.notify();
+		}
+	}
 }
