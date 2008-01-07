@@ -29,7 +29,7 @@ public class OseeDbVersion {
 
    private static final Logger logger = ConfigUtil.getConfigFactory().getLogger(OseeDbVersion.class);
    public static final String OSEE_DB_VERSION_KEY = "osee.db.version";
-   public static final String OSEE_DB_CHECK_VERSION_KEY = "osee.db.check.version";
+   public static final String OSEE_DB_CHECK_VERSION_KEY = "osee.db.version.check.enabled";
 
    public static String getOseeDbVersion(Connection connection) throws SQLException {
       return getDatabaseValue(connection, OSEE_DB_VERSION_KEY);
