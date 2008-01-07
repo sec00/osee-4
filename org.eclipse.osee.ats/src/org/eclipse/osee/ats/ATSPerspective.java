@@ -41,7 +41,7 @@ public class ATSPerspective implements IPerspectiveFactory {
       layout.addShowViewShortcut(WorldView.VIEW_ID);
       layout.addShowViewShortcut(NavigateView.VIEW_ID);
       layout.addShowViewShortcut(ActionHyperView.VIEW_ID);
-      layout.addShowViewShortcut(ActionSkyWalker.VIEW_ID);
+      //      layout.addShowViewShortcut(ActionSkyWalker.VIEW_ID);
 
       layout.addShowViewShortcut(ArtifactHyperView.VIEW_ID);
       layout.addShowViewShortcut(ArtifactExplorer.VIEW_ID);
