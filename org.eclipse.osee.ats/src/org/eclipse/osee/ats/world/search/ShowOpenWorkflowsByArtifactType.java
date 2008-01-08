@@ -44,7 +44,7 @@ public class ShowOpenWorkflowsByArtifactType extends WorldSearchItem {
    }
 
    @Override
-   public Collection<Artifact> performSearch() throws SQLException, IllegalArgumentException {
+   public Collection<Artifact> performSearch(SearchType searchType) throws SQLException, IllegalArgumentException {
 
       List<ISearchPrimitive> artTypeNameCriteria = new LinkedList<ISearchPrimitive>();
       for (String artType : artifactTypes)
@@ -83,7 +83,7 @@ public class ShowOpenWorkflowsByArtifactType extends WorldSearchItem {
    }
 
    @Override
-   public void performUI() {
+   public void performUI(SearchType searchType) {
       return;
    }
 

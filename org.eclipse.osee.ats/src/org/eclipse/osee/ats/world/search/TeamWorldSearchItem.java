@@ -86,8 +86,8 @@ public class TeamWorldSearchItem extends WorldSearchItem {
    }
 
    @Override
-   public String getSelectedName() {
-      return String.format("%s - %s", super.getSelectedName(), getProductSearchName());
+   public String getSelectedName(SearchType searchType) {
+      return String.format("%s - %s", super.getSelectedName(searchType), getProductSearchName());
    }
 
    /**
@@ -128,7 +128,7 @@ public class TeamWorldSearchItem extends WorldSearchItem {
    }
 
    @Override
-   public Collection<Artifact> performSearch() throws SQLException, IllegalArgumentException {
+   public Collection<Artifact> performSearch(SearchType searchType) throws SQLException, IllegalArgumentException {
       getTeamDefs();
       List<ISearchPrimitive> teamDefWorkflowCriteria = new LinkedList<ISearchPrimitive>();
       for (TeamDefinitionArtifact tda : getSearchTeamDefs())
@@ -180,7 +180,7 @@ public class TeamWorldSearchItem extends WorldSearchItem {
    }
 
    @Override
-   public void performUI() {
+   public void performUI(SearchType searchType) {
       if (teamDefNames != null) return;
       if (teamDefs != null) return;
       TeamDefinitionTreeDialog diag = new TeamDefinitionTreeDialog(Active.Both);

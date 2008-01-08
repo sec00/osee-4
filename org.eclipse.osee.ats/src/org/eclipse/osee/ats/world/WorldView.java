@@ -41,6 +41,7 @@ import org.eclipse.osee.ats.artifact.TeamWorkFlowArtifact;
 import org.eclipse.osee.ats.navigate.AtsNavigateViewItems;
 import org.eclipse.osee.ats.util.SMAMetrics;
 import org.eclipse.osee.ats.world.search.WorldSearchItem;
+import org.eclipse.osee.ats.world.search.WorldSearchItem.SearchType;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -154,13 +155,13 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
           * @see java.lang.Runnable#run()
           */
          public void run() {
+            xViewer.set(arts);
             if (arts.size() == 0)
                setTableTitle("No Results Found - " + name, true);
             else
                setTableTitle(name, false);
-            xViewer.set(arts);
          }
-      });
+      }, true);
    }
 
    public void setFocus() {
@@ -308,7 +309,7 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
       }
 
       public String getText(Object arg0) {
-         return ((WorldSearchItem) arg0).getSelectedName();
+         return ((WorldSearchItem) arg0).getSelectedName(SearchType.Search);
       }
 
       public void addListener(ILabelProviderListener arg0) {
@@ -337,16 +338,46 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
       }
    }
 
+   public void loadTable(WorldSearchItem searchItem, boolean sort) {
+      loadTable(searchItem, SearchType.Search, sort);
+   }
+
+   public void loadTable(WorldSearchItem searchItem, SearchType searchType, boolean sort) {
+      this.lastSearchItem = searchItem;
+      debug.report("loadTable", true);
+      if (!ConnectionHandler.isConnected()) {
+         AWorkbench.popup("ERROR", "DB Connection Unavailable");
+         return;
+      }
+
+      if (searchItem == null) return;
+
+      searchItem.performUI(searchType);
+      if (searchItem.isCancelled()) return;
+
+      LoadTableJob job = null;
+      try {
+         job = new LoadTableJob(searchItem, SearchType.Search, this, sort);
+         job.setUser(false);
+         job.setPriority(Job.LONG);
+         job.schedule();
+      } catch (Exception ex) {
+         OSEELog.logException(AtsPlugin.class, "Load Table Failed", ex, true);
+      }
+   }
+
    private class LoadTableJob extends Job {
 
       @SuppressWarnings("unused")
       private final boolean sort;
       private final WorldSearchItem searchItem;
       private boolean cancel = false;
+      private final SearchType searchType;
 
-      public LoadTableJob(WorldSearchItem searchItem, WorldView worldView, boolean sort) {
-         super("Loading \"" + searchItem.getSelectedName() + "\"...");
+      public LoadTableJob(WorldSearchItem searchItem, SearchType searchType, WorldView worldView, boolean sort) {
+         super("Loading \"" + searchItem.getSelectedName(searchType) + "\"...");
          this.searchItem = searchItem;
+         this.searchType = searchType;
          this.sort = sort;
       }
 
@@ -359,7 +390,7 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
       protected IStatus run(IProgressMonitor monitor) {
 
          setTableTitle(
-               "Loading \"" + (searchItem.getSelectedName() != null ? searchItem.getSelectedName() : "") + "\"...",
+               "Loading \"" + (searchItem.getSelectedName(searchType) != null ? searchItem.getSelectedName(searchType) : "") + "\"...",
                false);
          cancel = false;
          searchItem.setCancelled(cancel);
@@ -367,30 +398,30 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
          final Collection<Artifact> artifacts;
          xViewer.clear();
          try {
-            artifacts = searchItem.performSearchGetResults(true);
+            artifacts = searchItem.performSearchGetResults(false, searchType);
             if (artifacts.size() == 0) {
                if (searchItem.isCancelled()) {
                   monitor.done();
-                  setTableTitle("CANCELLED - " + searchItem.getSelectedName(), false);
+                  setTableTitle("CANCELLED - " + searchItem.getSelectedName(searchType), false);
                   return Status.CANCEL_STATUS;
                } else {
                   monitor.done();
-                  setTableTitle("No Results Found - " + searchItem.getSelectedName(), true);
+                  setTableTitle("No Results Found - " + searchItem.getSelectedName(searchType), true);
                   return Status.OK_STATUS;
                }
             }
-            load((searchItem.getSelectedName() != null ? searchItem.getSelectedName() : ""), artifacts, false);
+            load((searchItem.getSelectedName(searchType) != null ? searchItem.getSelectedName(searchType) : ""),
+                  artifacts, false);
          } catch (final Exception ex) {
             String str = "Exception occurred. Network may be down.";
             if (ex.getLocalizedMessage() != null && !ex.getLocalizedMessage().equals("")) str +=
                   " => " + ex.getLocalizedMessage();
-            setTableTitle("Searching Error - " + searchItem.getSelectedName(), false);
+            setTableTitle("Searching Error - " + searchItem.getSelectedName(searchType), false);
             logger.log(Level.SEVERE, "Searching Error - " + ex.getLocalizedMessage(), ex);
             monitor.done();
             return new Status(Status.ERROR, AtsPlugin.PLUGIN_ID, -1, str, null);
          }
          monitor.done();
-         setTableTitle(searchItem.getSelectedName(), false);
          return Status.OK_STATUS;
       }
    }
@@ -419,26 +450,6 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
       } else
          extraInfoLabel.setText("");
       extraInfoLabel.getParent().layout();
-   }
-
-   public void loadTable(WorldSearchItem searchItem, boolean sort) {
-      this.lastSearchItem = searchItem;
-      debug.report("loadTable", true);
-      if (!ConnectionHandler.isConnected()) {
-         AWorkbench.popup("ERROR", "DB Connection Unavailable");
-         return;
-      }
-
-      if (searchItem == null) return;
-      LoadTableJob job = null;
-      try {
-         job = new LoadTableJob(searchItem, this, sort);
-         job.setUser(false);
-         job.setPriority(Job.LONG);
-         job.schedule();
-      } catch (Exception ex) {
-         OSEELog.logException(AtsPlugin.class, "Load Table Failed", ex, true);
-      }
    }
 
    protected void createActions() {
@@ -470,7 +481,7 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
       Action refreshAction = new Action("Refresh") {
 
          public void run() {
-            if (lastSearchItem != null) loadTable(lastSearchItem, true);
+            if (lastSearchItem != null) loadTable(lastSearchItem, SearchType.ReSearch, true);
          }
       };
       refreshAction.setImageDescriptor(AtsPlugin.getInstance().getImageDescriptor("refresh.gif"));
@@ -587,7 +598,8 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
    }
 
    public String getActionDescription() {
-      if (lastSearchItem != null) return String.format("Search Item: %s", lastSearchItem.getSelectedName());
+      if (lastSearchItem != null) return String.format("Search Item: %s",
+            lastSearchItem.getSelectedName(SearchType.Search));
       return "";
    }
 
