@@ -73,6 +73,8 @@ public class VersionTargetedForTeamSearchItem extends WorldSearchItem {
 
    @Override
    public void performUI(SearchType searchType) {
+      super.performUI(searchType);
+      if (searchType == SearchType.ReSearch && selectedVersionArt != null) return;
       if (versionArt != null) return;
       try {
          TeamDefinitionArtifact selectedTeamDef = teamDef;

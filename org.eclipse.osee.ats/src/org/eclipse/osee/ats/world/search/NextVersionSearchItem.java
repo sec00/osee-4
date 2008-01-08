@@ -47,12 +47,10 @@ public class NextVersionSearchItem extends WorldSearchItem {
    @Override
    public String getSelectedName(SearchType searchType) {
       String name = super.getName();
-      TeamDefinitionArtifact teamDef = teamDefHoldingVersions;
-      if (teamDef == null) {
-         if (searchType == SearchType.ReSearch && selectedTeamDef != null) teamDef = selectedTeamDef;
-      }
+      TeamDefinitionArtifact teamDef = getTeamDefinition(searchType);
       try {
          if (teamDef != null) {
+            name += (teamDef != null ? " - " + teamDef.getDescriptiveName() : "");
             VersionArtifact verArt = teamDef.getNextReleaseVersion();
             name += (verArt != null ? " - " + verArt.getDescriptiveName() : "");
          }
@@ -89,6 +87,7 @@ public class NextVersionSearchItem extends WorldSearchItem {
 
    @Override
    public void performUI(SearchType searchType) {
+      super.performUI(searchType);
       if (teamDefHoldingVersions != null) return;
       if (searchType == SearchType.ReSearch && selectedTeamDef != null) return;
       try {

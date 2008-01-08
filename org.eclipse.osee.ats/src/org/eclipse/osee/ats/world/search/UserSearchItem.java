@@ -72,14 +72,15 @@ public abstract class UserSearchItem extends WorldSearchItem {
 
    @Override
    public void performUI(SearchType searchType) {
+      super.performUI(searchType);
       if (user != null) return;
+      if (searchType == SearchType.ReSearch && selectedUser != null) return;
       UserListDialog ld = new UserListDialog(Display.getCurrent().getActiveShell());
       int result = ld.open();
       if (result == 0) {
          selectedUser = (User) ld.getSelection();
          return;
-      } else
-         selectedUser = null;
+      }
       cancelled = true;
    }
 }

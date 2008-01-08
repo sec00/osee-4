@@ -71,6 +71,7 @@ public abstract class WorldSearchItem {
    }
 
    public Collection<Artifact> performSearchGetResults(boolean performUi, final SearchType searchType) throws SQLException, IllegalArgumentException {
+      cancelled = false;
       if (performUi) {
          Displays.ensureInDisplayThread(new Runnable() {
             /* (non-Javadoc)

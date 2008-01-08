@@ -80,6 +80,7 @@ public class StateWorldSearchItem extends WorldSearchItem {
    @Override
    public void performUI(SearchType searchType) {
       if (stateClass != null) return;
+      if (searchType == SearchType.ReSearch && selectedStateClass != null) return;
       EntryDialog ed = new EntryDialog("Enter State", "Enter state name.");
       if (ed.open() == 0) {
          selectedStateClass = ed.getEntry();

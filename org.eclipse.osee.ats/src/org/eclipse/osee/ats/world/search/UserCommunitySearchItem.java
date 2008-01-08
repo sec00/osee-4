@@ -92,8 +92,10 @@ public class UserCommunitySearchItem extends WorldSearchItem {
 
    @Override
    public void performUI(SearchType searchType) {
+      super.performUI(searchType);
       if (userCommName != null) return;
       if (userComm != null) return;
+      if (searchType == SearchType.ReSearch && selectedUserComm != null) return;
       UserCommunityListDialog gld = new UserCommunityListDialog();
       int result = gld.open();
       if (result == 0) {

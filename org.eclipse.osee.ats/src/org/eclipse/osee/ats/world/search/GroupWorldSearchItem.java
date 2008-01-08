@@ -73,8 +73,10 @@ public class GroupWorldSearchItem extends WorldSearchItem {
 
    @Override
    public void performUI(SearchType searchType) {
+      super.performUI(searchType);
       if (groupName != null) return;
       if (group != null) return;
+      if (searchType == SearchType.ReSearch && selectedGroup != null) return;
       GroupListDialog gld = new GroupListDialog(Display.getCurrent().getActiveShell());
       int result = gld.open();
       if (result == 0) {
