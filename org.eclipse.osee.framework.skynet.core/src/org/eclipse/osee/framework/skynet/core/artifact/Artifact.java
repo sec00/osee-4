@@ -1271,30 +1271,55 @@ public class Artifact implements Unique, PersistenceObject, IAdaptable, Comparab
    }
 
    /**
-    * Save artifact, any of it's links specified, and any of the artifacts on the other side of the links are dirty
-    * 
-    * @param links
-    * @param revert TODO
-    * @throws SQLException
+    * Save artifact, any of it's links specified, and any of the artifacts on the other side of the links that are dirty
     */
-   public void saveRelationsAndArtifacts(Set<IRelationEnumeration> links, boolean revert) throws SQLException {
-      if (isDirty()) if (revert)
-         revert();
-      else
-         persist();
-      // Loop through all relations
+   public void saveArtifactsFromRelations(Set<IRelationEnumeration> links) throws SQLException {
+      saveRevertArtifactsFromRelations(links, false);
+   }
+
+   /**
+    * Revert artifact, any of it's links specified, and any of the artifacts on the other side of the links that are
+    * dirty
+    */
+   public void revertArtifactsFromRelations(Set<IRelationEnumeration> links) throws SQLException {
+      saveRevertArtifactsFromRelations(links, true);
+   }
+
+   private void saveRevertArtifactsFromRelations(Set<IRelationEnumeration> links, boolean revert) throws SQLException {
+      Set<Artifact> artifactToManipulate = new HashSet<Artifact>();
+      artifactToManipulate.add(this);
+      Set<IRelationLink> linksToManipulate = new HashSet<IRelationLink>();
+
+      // Loop through all relations and collect all artifact to operate on
       for (IRelationEnumeration side : links) {
-         for (Artifact art : getArtifacts(side)) {
-            // Check artifact dirty
-            if (art.isDirty()) if (revert)
-               art.revert();
-            else
-               art.persist();
+         for (Artifact artifact : getArtifacts(side)) {
+            artifactToManipulate.add(artifact);
             // Check the links to this artifact
-            for (IRelationLink link : getRelations(side, art))
-               if (link.isDirty() && !revert) link.persist();
+            for (IRelationLink link : getRelations(artifact)) {
+               linksToManipulate.add(link);
+            }
          }
       }
+      // Loop through all relations and persist/revert as necessary
+      for (IRelationLink link : linksToManipulate) {
+         if (link.isDirty()) {
+            if (revert) {
+               link.delete();
+            } else {
+               link.persist();
+            }
+         }
+      }
+      // Loop through all artifacts and persist/revert as necessary
+      for (Artifact artifact : artifactToManipulate) {
+         if (revert) {
+            artifact.revert();
+         } else {
+            artifact.persist();
+         }
+      }
+      // Persist link manager to ensure deleted links get persisted
+      getLinkManager().persistLinks();
    }
 
    /**

@@ -749,7 +749,7 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IEvent
 
    public void saveSMA() {
       try {
-         saveRelationsAndArtifacts(smaRelations, false);
+         saveArtifactsFromRelations(smaRelations);
       } catch (SQLException ex) {
          OSEELog.logException(AtsPlugin.class, "Can't save artifact " + getHumanReadableId(), ex, true);
       }
@@ -757,7 +757,7 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IEvent
 
    public void revertSMA() {
       try {
-         saveRelationsAndArtifacts(smaRelations, true);
+         revertArtifactsFromRelations(smaRelations);
       } catch (SQLException ex) {
          OSEELog.logException(AtsPlugin.class, "Can't revert artifact " + getHumanReadableId(), ex, true);
       }
