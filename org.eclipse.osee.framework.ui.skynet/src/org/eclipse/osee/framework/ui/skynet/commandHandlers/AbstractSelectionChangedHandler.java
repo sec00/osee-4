@@ -29,6 +29,7 @@ public abstract class AbstractSelectionChangedHandler extends AbstractHandler {
 
    public AbstractSelectionChangedHandler() {
       if (!PlatformUI.getWorkbench().isClosing()) {
+         viewerMenuDetectListener = new ViewerMenuDetectListener();
          IWorkbenchPart workbenchPart = AWorkbench.getActivePage().getActivePart();
          Object object = workbenchPart.getSite().getSelectionProvider();
 
