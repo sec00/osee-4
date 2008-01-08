@@ -11,45 +11,30 @@
 package org.eclipse.osee.framework.ui.skynet.commandHandlers;
 
 import java.util.List;
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
-import org.eclipse.osee.framework.skynet.core.access.PermissionEnum;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.skynet.skywalker.SkyWalkerView;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Jeff C. Phillips
  */
-public class OpenSkywalkerEditorHandler extends AbstractSelectionChangedHandler {
-   private static final AccessControlManager accessControlManager = AccessControlManager.getInstance();
-   private List<Artifact> artifacts;
-
+public class OpenSkywalkerEditorHandler extends AbstractHandler {
    /* (non-Javadoc)
     * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
     */
    @Override
    public Object execute(ExecutionEvent arg0) throws ExecutionException {
-      SkyWalkerView.exploreArtifact(artifacts.iterator().next());
-      return null;
-   }
-
-   @Override
-   public boolean isEnabled() {
-      if (PlatformUI.getWorkbench().isClosing()) {
-         return false;
-      }
       IStructuredSelection structuredSelection =
             (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
-      artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
+      List<Artifact> artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
 
-      if (artifacts.isEmpty()) {
-         return false;
+      if (!artifacts.isEmpty()) {
+         SkyWalkerView.exploreArtifact(artifacts.iterator().next());
       }
-
-      return accessControlManager.checkObjectListPermission(artifacts, PermissionEnum.READ);
+      return null;
    }
 }
