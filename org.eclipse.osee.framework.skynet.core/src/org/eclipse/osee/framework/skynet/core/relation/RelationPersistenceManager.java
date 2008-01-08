@@ -232,7 +232,6 @@ public class RelationPersistenceManager implements PersistenceManager {
                   getTxBuilder().deleteLink(link);
                }
             }
-
          };
 
          try {
@@ -243,36 +242,30 @@ public class RelationPersistenceManager implements PersistenceManager {
       }
    }
 
-   public void doDelete(IRelationLink relationLink, SkynetTransaction transaction) {
+   public void doDelete(IRelationLink relationLink, SkynetTransaction transaction) throws SQLException {
       // if the persistence memo is null the link has never been saved, therefore it does not
-      // need to be versioned.
+      // need to be version controlled.
       if (relationLink.getPersistenceMemo() == null) return;
 
-      try {
-         int gammaId = SkynetDatabase.getNextGammaId();
-         Artifact aArtifact = relationLink.getArtifactA();
-         Artifact bArtifact = relationLink.getArtifactB();
-         int aArtId = aArtifact.getArtId();
-         int aArtTypeId = aArtifact.getArtTypeId();
-         int bArtId = bArtifact.getArtId();
-         int bArtTypeId = bArtifact.getArtTypeId();
+      int gammaId = SkynetDatabase.getNextGammaId();
+      Artifact aArtifact = relationLink.getArtifactA();
+      Artifact bArtifact = relationLink.getArtifactB();
+      int aArtId = aArtifact.getArtId();
+      int aArtTypeId = aArtifact.getArtTypeId();
+      int bArtId = bArtifact.getArtId();
+      int bArtTypeId = bArtifact.getArtTypeId();
 
-         transaction.addTransactionDataItem(new RelationTransactionData(relationLink, gammaId,
-               transaction.getTransactionNumber(), SkynetDatabase.ModificationType.DELETE));
+      transaction.addTransactionDataItem(new RelationTransactionData(relationLink, gammaId,
+            transaction.getTransactionNumber(), SkynetDatabase.ModificationType.DELETE));
 
-         transaction.addRemoteEvent(new RemoteRelationLinkDeletedEvent(relationLink.getPersistenceMemo().getGammaId(),
-               relationLink.getBranch().getBranchId(), transaction.getTransactionNumber(),
-               relationLink.getPersistenceMemo().getLinkId(), aArtId, aArtTypeId, bArtId, bArtTypeId,
-               aArtifact.getFactory().getClass().getCanonicalName(),
-               bArtifact.getFactory().getClass().getCanonicalName(),
-               SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId()));
+      transaction.addRemoteEvent(new RemoteRelationLinkDeletedEvent(relationLink.getPersistenceMemo().getGammaId(),
+            relationLink.getBranch().getBranchId(), transaction.getTransactionNumber(),
+            relationLink.getPersistenceMemo().getLinkId(), aArtId, aArtTypeId, bArtId, bArtTypeId,
+            aArtifact.getFactory().getClass().getCanonicalName(), bArtifact.getFactory().getClass().getCanonicalName(),
+            SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId()));
 
-         transaction.addLocalEvent(new TransactionRelationModifiedEvent(relationLink, aArtifact.getBranch(),
-               relationLink.getLinkDescriptor().getName(), relationLink.getASideName(), ModType.Deleted, this));
-
-      } catch (SQLException ex) {
-         logger.log(Level.SEVERE, ex.toString(), ex);
-      }
+      transaction.addLocalEvent(new TransactionRelationModifiedEvent(relationLink, aArtifact.getBranch(),
+            relationLink.getLinkDescriptor().getName(), relationLink.getASideName(), ModType.Deleted, this));
    }
 
    /**
