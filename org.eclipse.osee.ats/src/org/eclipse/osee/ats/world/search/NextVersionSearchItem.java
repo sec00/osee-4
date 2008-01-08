@@ -46,13 +46,17 @@ public class NextVersionSearchItem extends WorldSearchItem {
 
    @Override
    public String getSelectedName() {
+      String name = super.getName();
       try {
-         VersionArtifact verArt = getTeamDefinition().getNextReleaseVersion();
-         return super.getName() + (verArt != null ? " - " + verArt.getDescriptiveName() : "");
+         if (getTeamDefinition() != null) {
+            VersionArtifact verArt = getTeamDefinition().getNextReleaseVersion();
+            name += (verArt != null ? " - " + verArt.getDescriptiveName() : "");
+         }
       } catch (SQLException ex) {
          OSEELog.logException(AtsPlugin.class, ex, false);
-         return "Exception Occurred - See Log";
+         return "Exception Occurred - See Log - " + ex.getLocalizedMessage();
       }
+      return name;
    }
 
    private TeamDefinitionArtifact getTeamDefinition() {
