@@ -36,7 +36,7 @@ public class PortUtil {
    int nextPort = 18000;
 
    private PortUtil() {
-	   String startPort = System.getProperty("osee.startport", "180000");
+	   String startPort = System.getProperty("osee.startport", "18000");
 	   try{
 		   basePort = nextPort = Integer.parseInt(startPort);
 	   } catch (Exception ex){
