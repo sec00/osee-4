@@ -70,7 +70,6 @@ public class BlamWorkflow extends Artifact {
       BlamWorkflow blamWorkflow =
             (BlamWorkflow) ConfigurationPersistenceManager.getInstance().getArtifactSubtypeDescriptor(ARTIFACT_NAME,
                   BranchPersistenceManager.getInstance().getCommonBranch()).makeNewArtifact();
-      blamWorkflow.soleOperation = soleOperation;
       return blamWorkflow;
    }
 
@@ -183,5 +182,12 @@ public class BlamWorkflow extends Artifact {
 
       setSoleAttributeValue("Workflow Definition", doc);
       persist();
+   }
+
+   /**
+    * @param soleOperation the soleOperation to set
+    */
+   public void setSoleOperation(BlamOperation soleOperation) {
+      this.soleOperation = soleOperation;
    }
 }

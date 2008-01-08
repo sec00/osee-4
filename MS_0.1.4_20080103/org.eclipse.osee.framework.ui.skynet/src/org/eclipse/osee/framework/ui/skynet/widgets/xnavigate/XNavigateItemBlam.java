@@ -37,15 +37,16 @@ public class XNavigateItemBlam extends XNavigateItem {
                      BranchPersistenceManager.getInstance().getCommonBranch());
       }
 
-      Artifact workflow;
+      BlamWorkflow workflow;
       try {
-         workflow = workflowFolder.getChild(getName());
+         workflow = (BlamWorkflow) workflowFolder.getChild(getName());
       } catch (IllegalArgumentException ex) {
          workflow = BlamWorkflow.createBlamWorkflow(blamOperation);
          workflow.setDescriptiveName(getName());
          workflowFolder.addChild(workflow);
          workflow.persist(true);
       }
+      workflow.setSoleOperation(blamOperation);
 
       WorkflowEditor.editArtifact(workflow);
    }
