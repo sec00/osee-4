@@ -87,7 +87,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- * Insert the type's description here.
+ * ATS World View provides a tree-table view of the ATS object results loaded from searches
  * 
  * @see ViewPart
  * @author Donald G. Dunne
@@ -144,7 +144,11 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
    }
 
    public void load(final String name, final Collection<? extends Artifact> arts) {
-      lastSearchItem = null;
+      load(name, arts, true);
+   }
+
+   public void load(final String name, final Collection<? extends Artifact> arts, boolean clearLastSearchItem) {
+      if (clearLastSearchItem) lastSearchItem = null;
       Displays.ensureInDisplayThread(new Runnable() {
          /* (non-Javadoc)
           * @see java.lang.Runnable#run()
@@ -354,14 +358,16 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
       @Override
       protected IStatus run(IProgressMonitor monitor) {
 
-         setTableTitle("Loading \"" + searchItem.getSelectedName() + "\"...", false);
+         setTableTitle(
+               "Loading \"" + (searchItem.getSelectedName() != null ? searchItem.getSelectedName() : "") + "\"...",
+               false);
          cancel = false;
          searchItem.setCancelled(cancel);
          debug.report("Querying DB", true);
          final Collection<Artifact> artifacts;
          xViewer.clear();
          try {
-            artifacts = searchItem.performSearchGetResults(true, true);
+            artifacts = searchItem.performSearchGetResults(true);
             if (artifacts.size() == 0) {
                if (searchItem.isCancelled()) {
                   monitor.done();
@@ -373,9 +379,8 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
                   return Status.OK_STATUS;
                }
             }
-         }
-
-         catch (final Exception ex) {
+            load((searchItem.getSelectedName() != null ? searchItem.getSelectedName() : ""), artifacts, false);
+         } catch (final Exception ex) {
             String str = "Exception occurred. Network may be down.";
             if (ex.getLocalizedMessage() != null && !ex.getLocalizedMessage().equals("")) str +=
                   " => " + ex.getLocalizedMessage();
@@ -388,7 +393,6 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
          setTableTitle(searchItem.getSelectedName(), false);
          return Status.OK_STATUS;
       }
-
    }
 
    public void setTableTitle(final String title, final boolean warning) {

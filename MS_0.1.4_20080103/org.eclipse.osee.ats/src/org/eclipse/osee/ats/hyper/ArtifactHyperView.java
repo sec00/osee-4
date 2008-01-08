@@ -252,7 +252,7 @@ public class ArtifactHyperView extends HyperView implements IEventReceiver, IPar
          public void run() {
             MultipleHridSearchItem gsi = new MultipleHridSearchItem();
             try {
-               Collection<Artifact> arts = gsi.performSearchGetResults(true, false);
+               Collection<Artifact> arts = gsi.performSearchGetResults(true);
                if (arts.size() == 0) {
                   AWorkbench.popup("ERROR", "No Artifacts Found");
                   return;

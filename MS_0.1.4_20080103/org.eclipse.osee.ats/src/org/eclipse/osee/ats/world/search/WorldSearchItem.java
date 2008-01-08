@@ -14,13 +14,9 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import org.eclipse.osee.ats.artifact.ActionArtifact;
-import org.eclipse.osee.ats.artifact.StateMachineArtifact;
-import org.eclipse.osee.ats.world.WorldView;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactPersistenceManager;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
-import org.eclipse.osee.framework.ui.skynet.artifact.editor.ArtifactEditor;
 
 /**
  * @author Donald G. Dunne
@@ -30,7 +26,6 @@ public abstract class WorldSearchItem {
    private final String name;
    protected static Set<Artifact> EMPTY_SET = new HashSet<Artifact>();
    protected boolean cancelled = false;
-   protected boolean loadWorldView = true;
    protected ArtifactPersistenceManager apm = ArtifactPersistenceManager.getInstance();
 
    public WorldSearchItem(String name) {
@@ -63,11 +58,10 @@ public abstract class WorldSearchItem {
     * @throws IllegalArgumentException
     */
    public Collection<Artifact> performSearchGetResults() throws SQLException, IllegalArgumentException {
-      return performSearchGetResults(false, false);
+      return performSearchGetResults(false);
    }
 
-   public Collection<Artifact> performSearchGetResults(boolean performUi, boolean loadWorldView) throws SQLException, IllegalArgumentException {
-      this.loadWorldView = loadWorldView;
+   public Collection<Artifact> performSearchGetResults(boolean performUi) throws SQLException, IllegalArgumentException {
       if (performUi) {
          Displays.ensureInDisplayThread(new Runnable() {
             /* (non-Javadoc)
@@ -80,29 +74,11 @@ public abstract class WorldSearchItem {
 
       }
       if (cancelled) return EMPTY_SET;
-      Collection<Artifact> arts = performSearch();
-      if (loadWorldView) loadResultArtifacts(arts);
-      return arts;
+      return performSearch();
    }
 
    public void performUI() {
       cancelled = false;
-   }
-
-   private void loadResultArtifacts(Collection<Artifact> artifacts) {
-      final Set<Artifact> addedArts = new HashSet<Artifact>();
-      for (Artifact artifact : artifacts) {
-         if (isCancelled())
-            return;
-         else if ((!(artifact instanceof ActionArtifact)) && (!(artifact instanceof StateMachineArtifact))) {
-            ArtifactEditor.editArtifact(artifact);
-            continue;
-         } else
-            addedArts.add(artifact);
-      }
-      if (loadWorldView && addedArts.size() > 0) {
-         WorldView.loadIt(getSelectedName(), addedArts);
-      }
    }
 
    public boolean isCancelled() {
@@ -111,20 +87,6 @@ public abstract class WorldSearchItem {
 
    public void setCancelled(boolean cancelled) {
       this.cancelled = cancelled;
-   }
-
-   public boolean isLoadWorldView() {
-      return loadWorldView;
-   }
-
-   /**
-    * By default, performSearch loads worldview with results. Set to false to perform search and use getResultArtifacts
-    * to get result set.
-    * 
-    * @param loadWorldView
-    */
-   public void setLoadWorldView(boolean loadWorldView) {
-      this.loadWorldView = loadWorldView;
    }
 
 }

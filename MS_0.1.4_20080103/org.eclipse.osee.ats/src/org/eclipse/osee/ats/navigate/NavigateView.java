@@ -10,14 +10,21 @@
  *******************************************************************************/
 package org.eclipse.osee.ats.navigate;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.ats.ActionDebug;
 import org.eclipse.osee.ats.AtsPlugin;
 import org.eclipse.osee.ats.actions.NewAction;
+import org.eclipse.osee.ats.artifact.ActionArtifact;
+import org.eclipse.osee.ats.artifact.StateMachineArtifact;
 import org.eclipse.osee.ats.world.search.MultipleHridSearchItem;
+import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.ui.skynet.SkynetContributionItem;
+import org.eclipse.osee.framework.ui.skynet.artifact.editor.ArtifactEditor;
 import org.eclipse.osee.framework.ui.skynet.ats.IActionable;
 import org.eclipse.osee.framework.ui.skynet.ats.OseeAts;
 import org.eclipse.osee.framework.ui.skynet.util.DbConnectionExceptionComposite;
@@ -93,7 +100,15 @@ public class NavigateView extends ViewPart implements IActionable {
          public void run() {
             MultipleHridSearchItem srch = new MultipleHridSearchItem();
             try {
-               srch.performSearchGetResults(true, true);
+               Collection<Artifact> artifacts = srch.performSearchGetResults(true);
+               final Set<Artifact> addedArts = new HashSet<Artifact>();
+               for (Artifact artifact : artifacts) {
+                  if ((!(artifact instanceof ActionArtifact)) && (!(artifact instanceof StateMachineArtifact))) {
+                     ArtifactEditor.editArtifact(artifact);
+                     continue;
+                  } else
+                     addedArts.add(artifact);
+               }
             } catch (Exception ex) {
                OSEELog.logException(AtsPlugin.class, ex, true);
             }
