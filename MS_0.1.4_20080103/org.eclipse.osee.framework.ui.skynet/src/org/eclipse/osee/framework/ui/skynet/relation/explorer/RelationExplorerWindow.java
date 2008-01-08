@@ -311,16 +311,14 @@ public class RelationExplorerWindow {
                artifact = model.getArtifact();
 
             if (artifact != null) {
-               relationGroup.addArtifact(artifact);
-
-               if (persistOnOk) {
-                  try {
+               try {
+                  relationGroup.addArtifact(artifact);
+                  if (persistOnOk) {
                      relationGroup.getLinkManager().persistLinks();
-                  } catch (SQLException ex) {
-                     AWorkbench.popup("ERROR", ex.getLocalizedMessage());
-                     SkynetGuiPlugin.getLogger().log(Level.SEVERE, ex.getLocalizedMessage(), ex);
                   }
-
+               } catch (SQLException ex) {
+                  AWorkbench.popup("ERROR", ex.getLocalizedMessage());
+                  SkynetGuiPlugin.getLogger().log(Level.SEVERE, ex.getLocalizedMessage(), ex);
                }
             }
          }
