@@ -15,9 +15,9 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.osee.ats.AtsPlugin;
 import org.eclipse.osee.ats.artifact.TeamDefinitionArtifact;
 import org.eclipse.osee.ats.artifact.VersionArtifact;
@@ -60,13 +60,11 @@ public class TeamDefinitionTreeByVersionDialog extends TeamDefinitionTreeDialog 
    protected Control createDialogArea(Composite container) {
 
       super.createDialogArea(container);
-      getTreeViewer().addSelectionChangedListener(new ISelectionChangedListener() {
-         /*
-          * (non-Javadoc)
-          * 
-          * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+      getTreeViewer().addCheckStateListener(new ICheckStateListener() {
+         /* (non-Javadoc)
+          * @see org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse.jface.viewers.CheckStateChangedEvent)
           */
-         public void selectionChanged(SelectionChangedEvent event) {
+         public void checkStateChanged(CheckStateChangedEvent event) {
             try {
                Collection<Object> objs = new HashSet<Object>();
                if (getTreeViewer().getSelection().isEmpty()) return;
