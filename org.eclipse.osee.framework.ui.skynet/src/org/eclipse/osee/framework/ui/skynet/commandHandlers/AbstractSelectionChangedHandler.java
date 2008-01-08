@@ -15,7 +15,10 @@ import org.eclipse.core.commands.HandlerEvent;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
@@ -27,14 +30,24 @@ import org.eclipse.ui.PlatformUI;
 public abstract class AbstractSelectionChangedHandler extends AbstractHandler {
    private final HandlerEvent enabledChangedEvent = new HandlerEvent(this, true, false);
    private ISelectionProvider myISelectionProvider;
-   private SelectionChanhedListener selectionChanhedListener;
+   private SelectionChangedListener selectionChanhedListener;
 
    public AbstractSelectionChangedHandler() {
       if (!PlatformUI.getWorkbench().isClosing()) {
          IWorkbenchPart myIWorkbenchPart = AWorkbench.getActivePage().getActivePart();
          IWorkbenchPartSite myIWorkbenchPartSite = myIWorkbenchPart.getSite();
          myISelectionProvider = myIWorkbenchPartSite.getSelectionProvider();
-         selectionChanhedListener = new SelectionChanhedListener();
+         selectionChanhedListener = new SelectionChangedListener();
+
+         if (myISelectionProvider instanceof Viewer) {
+            ((Viewer) myISelectionProvider).getControl().addMenuDetectListener(new MenuDetectListener() {
+
+               public void menuDetected(MenuDetectEvent e) {
+                  fireHandlerChanged(enabledChangedEvent);
+               }
+
+            });
+         }
          myISelectionProvider.addSelectionChangedListener(selectionChanhedListener);
       }
    }
@@ -50,7 +63,7 @@ public abstract class AbstractSelectionChangedHandler extends AbstractHandler {
       super.dispose();
    }
 
-   private class SelectionChanhedListener implements ISelectionChangedListener {
+   private class SelectionChangedListener implements ISelectionChangedListener {
       /* (non-Javadoc)
        * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
        */
