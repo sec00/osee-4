@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Display;
  * @author Donald G. Dunne
  */
 public class MultipleHridSearchItem extends WorldSearchItem {
-   private String id = "";
+   private String enteredIds = "";
 
    public MultipleHridSearchItem() {
       super("Search by ID(s)");
@@ -49,7 +49,7 @@ public class MultipleHridSearchItem extends WorldSearchItem {
 
       List<ISearchPrimitive> idCriteria = new LinkedList<ISearchPrimitive>();
       Set<String> nonHridGuids = new HashSet<String>();
-      for (String str : id.split(",")) {
+      for (String str : enteredIds.split(",")) {
          str = str.replaceAll(" ", "");
          if (str.length() == 5)
             idCriteria.add(new ArtifactHridSearch(str));
@@ -76,7 +76,6 @@ public class MultipleHridSearchItem extends WorldSearchItem {
             for (ActionArtifact teamWf : actionArts) {
                resultArts.add(teamWf);
             }
-            return resultArts;
          }
       }
 
@@ -85,10 +84,10 @@ public class MultipleHridSearchItem extends WorldSearchItem {
                ArtifactPersistenceManager.getInstance().getArtifacts(idCriteria, false,
                      BranchPersistenceManager.getInstance().getAtsBranch());
          if (isCancelled()) return EMPTY_SET;
-         return arts;
+         if (arts != null) resultArts.addAll(arts);
       }
 
-      return EMPTY_SET;
+      return resultArts;
    }
 
    @Override
@@ -99,12 +98,19 @@ public class MultipleHridSearchItem extends WorldSearchItem {
                         "Cancel"}, 0);
       int response = ed.open();
       if (response == 0) {
-         id = ed.getEntry();
-         id = id.replaceAll(" ", "");
+         enteredIds = ed.getEntry();
+         enteredIds = enteredIds.replaceAll(" ", "");
          return;
       } else
-         id = null;
+         enteredIds = null;
       cancelled = true;
+   }
+
+   /**
+    * @return the enteredIds
+    */
+   public String getEnteredIds() {
+      return enteredIds;
    }
 
 }
