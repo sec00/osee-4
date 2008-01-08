@@ -119,7 +119,7 @@ public class BlamVariableMap {
    public <T> T getValue(Class<T> clazz, String variableName) {
       Object object = getBlamVariable(variableName).getValue();
 
-      if (!clazz.isInstance(object)) {
+      if (object != null && !clazz.isInstance(object)) {
          throw new IllegalArgumentException(
                "Expecting object of type " + clazz.getName() + " not " + object.getClass().getName());
       }
