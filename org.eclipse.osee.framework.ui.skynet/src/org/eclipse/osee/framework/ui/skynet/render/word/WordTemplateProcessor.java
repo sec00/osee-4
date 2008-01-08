@@ -603,7 +603,7 @@ public class WordTemplateProcessor {
          return;
       }
 
-      // This is for SRS Publishing
+      // This is for SRS Publishing. Do not publish unspecified attributes
       if (!allAttrs && (attributeName.equals("Partition") || attributeName.equals("Safety Criticality"))) {
          for (Attribute partition : artifact.getAttributeManager("Partition").getAttributes()) {
             if (partition.getStringData().equals("Unspecified")) {
@@ -612,10 +612,15 @@ public class WordTemplateProcessor {
          }
       }
 
-      for (Attribute attribute : artifact.getAttributeManager(attributeName).getAttributes()) {
+      DynamicAttributeManager dynamicAttributeManager = artifact.getAttributeManager(attributeName);
+      Collection<Attribute> attributes = dynamicAttributeManager.getAttributes();
+
+      if (!attributes.isEmpty()) {
+         Attribute attribute = attributes.iterator().next();
+
          // check if the attribute descriptor name is in the ignore list.
          if (ignoreAttributeExtensions.contains(attribute.getManager().getDescriptor().getName())) {
-            continue;
+            return;
          }
 
          if (attributeName.equals(WordAttribute.CONTENT_NAME)) {
@@ -642,9 +647,9 @@ public class WordTemplateProcessor {
             }
 
             if (attributeElement.format.contains(">x<")) {
-               wordMl.addWordMl(format.replace(">x<", ">" + attribute.getStringData() + "<"));
+               wordMl.addWordMl(format.replace(">x<", ">" + dynamicAttributeManager.getAttributesStr() + "<"));
             } else {
-               wordMl.addTextInsideParagraph(attribute.getStringData());
+               wordMl.addTextInsideParagraph(dynamicAttributeManager.getAttributesStr());
             }
             wordMl.endParagraph();
          }
