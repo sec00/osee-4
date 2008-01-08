@@ -122,7 +122,6 @@ public class BranchPersistenceManager implements PersistenceManager {
    private static final SkynetEventManager eventManager = SkynetEventManager.getInstance();
 
    private ArtifactPersistenceManager artifactManager;
-   private RemoteEventManager remoteEventManager;
    private BranchCreator branchCreator;
    private ConfigurationPersistenceManager configurationManager;
 
@@ -151,7 +150,6 @@ public class BranchPersistenceManager implements PersistenceManager {
     */
    public void onManagerWebInit() throws Exception {
       artifactManager = ArtifactPersistenceManager.getInstance();
-      remoteEventManager = RemoteEventManager.getInstance();
       branchCreator = BranchCreator.getInstance();
       configurationManager = ConfigurationPersistenceManager.getInstance();
    }
