@@ -92,6 +92,7 @@ public class MultipleHridSearchItem extends WorldSearchItem {
 
    @Override
    public void performUI(SearchType searchType) {
+      super.performUI(searchType);
       EntryDialog ed =
             new EntryDialog(Display.getCurrent().getActiveShell(), getName(), null,
                   "Enter GUID(s) or 5 Character ID(s) (comma separated)", MessageDialog.QUESTION, new String[] {"OK",

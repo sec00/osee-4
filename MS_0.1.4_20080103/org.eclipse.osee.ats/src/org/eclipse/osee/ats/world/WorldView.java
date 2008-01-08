@@ -339,10 +339,12 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
    }
 
    public void loadTable(WorldSearchItem searchItem, boolean sort) {
+      searchItem.setCancelled(false);
       loadTable(searchItem, SearchType.Search, sort);
    }
 
    public void loadTable(WorldSearchItem searchItem, SearchType searchType, boolean sort) {
+      searchItem.setCancelled(false);
       this.lastSearchItem = searchItem;
       debug.report("loadTable", true);
       if (!ConnectionHandler.isConnected()) {

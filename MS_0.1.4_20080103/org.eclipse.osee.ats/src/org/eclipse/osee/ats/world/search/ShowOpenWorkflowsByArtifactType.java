@@ -82,9 +82,4 @@ public class ShowOpenWorkflowsByArtifactType extends WorldSearchItem {
       return arts;
    }
 
-   @Override
-   public void performUI(SearchType searchType) {
-      return;
-   }
-
 }

@@ -185,8 +185,10 @@ public class TeamVersionWorldSearchItem extends WorldSearchItem {
 
    @Override
    public void performUI(SearchType searchType) {
+      super.performUI(searchType);
       if (teamDefNames != null) return;
       if (teamDefs != null) return;
+      if (searchType == SearchType.ReSearch && selectedTeamDefs != null) return;
       TeamDefinitionTreeByVersionDialog diag = new TeamDefinitionTreeByVersionDialog(Active.Both);
       diag.setShowFinished(showFinished);
       diag.setShowAction(showAction);

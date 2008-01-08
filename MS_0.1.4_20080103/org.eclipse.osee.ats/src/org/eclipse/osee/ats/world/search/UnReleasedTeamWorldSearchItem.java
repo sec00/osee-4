@@ -204,8 +204,10 @@ public class UnReleasedTeamWorldSearchItem extends WorldSearchItem {
 
    @Override
    public void performUI(SearchType searchType) {
+      super.performUI(searchType);
       if (teamDefNames != null) return;
       if (teamDefs != null) return;
+      if (searchType == SearchType.ReSearch && selectedTeamDefs != null) return;
       TeamDefinitionTreeDialog diag = new TeamDefinitionTreeDialog(Active.Both);
       try {
          diag.setInput(TeamDefinitionArtifact.getTeamReleaseableDefinitions(Active.Both));

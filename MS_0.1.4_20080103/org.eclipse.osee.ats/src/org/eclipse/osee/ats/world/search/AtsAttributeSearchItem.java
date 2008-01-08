@@ -83,6 +83,7 @@ public class AtsAttributeSearchItem extends WorldSearchItem {
 
    @Override
    public void performUI(SearchType searchType) {
+      super.performUI(searchType);
       EntryDialog ed =
             new EntryDialog(Display.getCurrent().getActiveShell(), "Search by Ats Attribute", null,
                   "Enter string to search for.", MessageDialog.QUESTION, new String[] {"OK", "Cancel"}, 0);

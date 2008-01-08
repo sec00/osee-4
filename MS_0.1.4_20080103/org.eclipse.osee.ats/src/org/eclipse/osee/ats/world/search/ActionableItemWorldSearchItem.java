@@ -166,8 +166,10 @@ public class ActionableItemWorldSearchItem extends WorldSearchItem {
 
    @Override
    public void performUI(SearchType searchType) {
+      super.performUI(searchType);
       if (actionItemNames != null) return;
       if (actionItems != null) return;
+      if (searchType == SearchType.ReSearch && selectedActionItems != null) return;
       ActionActionableItemListDialog diag = new ActionActionableItemListDialog(Active.Both);
       diag.setShowFinished(showFinished);
       diag.setShowAction(showAction);
