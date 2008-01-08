@@ -395,15 +395,10 @@ public class WordRenderer extends FileRenderer {
     */
    @Override
    public InputStream getRenderInputStream(IProgressMonitor monitor, Artifact artifact, String option, PresentationType presentationType) throws Exception {
-      ArrayList<Artifact> artifacts = null;
-
-      if (artifact == null) {
-         return getRenderInputStream(monitor, artifacts, option, presentationType);
+      ArrayList<Artifact> artifacts = new ArrayList<Artifact>(1);
+      if (artifact != null) {
+         artifacts.add(artifact);
       }
-
-      artifacts = new ArrayList<Artifact>(1);
-      artifacts.add(artifact);
-
       return getRenderInputStream(monitor, artifacts, option, presentationType);
    }
 
@@ -418,22 +413,12 @@ public class WordRenderer extends FileRenderer {
    public InputStream getRenderInputStream(IProgressMonitor monitor, List<Artifact> artifacts, String option, PresentationType presentationType) throws Exception {
       final List<Artifact> notMultiEditableArtifacts = new LinkedList<Artifact>();
       final BlamVariableMap variableMap = new BlamVariableMap();
-      boolean containsNullArtifact = false;
       String template;
 
-      if (artifacts != null) {
-         for (Artifact artifact : artifacts) {
-            containsNullArtifact = (artifact == null);
-
-            if (containsNullArtifact) {
-               break;
-            }
-         }
+      if (artifacts.isEmpty()) {
+         //  Still need to get a default template with a null artifact list
+         template = getTemplate(null, presentationType, option, branchManager.getCommonBranch());
       } else {
-         containsNullArtifact = true;
-      }
-
-      if (!containsNullArtifact) {
          boolean isSingleEdit = artifacts.size() == 1;
          Artifact firstArtifact = artifacts.iterator().next();
          template = getTemplate(firstArtifact, presentationType, option, firstArtifact.getBranch());
@@ -456,10 +441,8 @@ public class WordRenderer extends FileRenderer {
          }
 
          artifacts.removeAll(notMultiEditableArtifacts);
-      } else {
-         // Still need to get a default template with a null artifact list
-         template = getTemplate(null, presentationType, option, branchManager.getCommonBranch());
       }
+
       variableMap.setValue(DEFAULT_SET_NAME, artifacts);
       return templateProcessor.applyTemplate(variableMap, template, null);
    }
