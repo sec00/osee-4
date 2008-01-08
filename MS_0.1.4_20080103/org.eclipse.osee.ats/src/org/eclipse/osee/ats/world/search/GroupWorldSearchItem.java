@@ -46,8 +46,8 @@ public class GroupWorldSearchItem extends WorldSearchItem {
    }
 
    @Override
-   public String getSelectedName() {
-      return String.format("%s - %s", super.getSelectedName(), getGroupSearchName());
+   public String getSelectedName(SearchType searchType) {
+      return String.format("%s - %s", super.getSelectedName(searchType), getGroupSearchName());
    }
 
    public void getProduct() {
@@ -57,7 +57,7 @@ public class GroupWorldSearchItem extends WorldSearchItem {
    }
 
    @Override
-   public Collection<Artifact> performSearch() throws SQLException, IllegalArgumentException {
+   public Collection<Artifact> performSearch(SearchType searchType) throws SQLException, IllegalArgumentException {
       getProduct();
       if (getSearchGroup() == null) return EMPTY_SET;
       Collection<Artifact> arts = getSearchGroup().getArtifacts(RelationSide.UNIVERSAL_GROUPING__MEMBERS);
@@ -72,7 +72,7 @@ public class GroupWorldSearchItem extends WorldSearchItem {
    }
 
    @Override
-   public void performUI() {
+   public void performUI(SearchType searchType) {
       if (groupName != null) return;
       if (group != null) return;
       GroupListDialog gld = new GroupListDialog(Display.getCurrent().getActiveShell());

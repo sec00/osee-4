@@ -77,8 +77,8 @@ public class ActionableItemWorldSearchItem extends WorldSearchItem {
    }
 
    @Override
-   public String getSelectedName() {
-      return String.format("%s - %s", super.getSelectedName(), getProductSearchName());
+   public String getSelectedName(SearchType searchType) {
+      return String.format("%s - %s", super.getSelectedName(searchType), getProductSearchName());
    }
 
    public void getActionableItems() throws SQLException, IllegalArgumentException {
@@ -114,7 +114,7 @@ public class ActionableItemWorldSearchItem extends WorldSearchItem {
    }
 
    @Override
-   public Collection<Artifact> performSearch() throws SQLException, IllegalArgumentException {
+   public Collection<Artifact> performSearch(SearchType searchType) throws SQLException, IllegalArgumentException {
       getActionableItems();
 
       // Find all Team Workflows with one of the given AI's
@@ -165,7 +165,7 @@ public class ActionableItemWorldSearchItem extends WorldSearchItem {
    }
 
    @Override
-   public void performUI() {
+   public void performUI(SearchType searchType) {
       if (actionItemNames != null) return;
       if (actionItems != null) return;
       ActionActionableItemListDialog diag = new ActionActionableItemListDialog(Active.Both);

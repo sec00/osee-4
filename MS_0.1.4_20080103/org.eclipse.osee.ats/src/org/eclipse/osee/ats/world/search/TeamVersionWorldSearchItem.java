@@ -83,12 +83,12 @@ public class TeamVersionWorldSearchItem extends WorldSearchItem {
    }
 
    @Override
-   public String getSelectedName() {
+   public String getSelectedName(SearchType searchType) {
       if (selectedVersion != null)
-         return String.format("%s - %s - %s", super.getSelectedName(), getProductSearchName(),
+         return String.format("%s - %s - %s", super.getSelectedName(searchType), getProductSearchName(),
                selectedVersion.getDescriptiveName());
       else
-         return String.format("%s - %s", super.getSelectedName(), getProductSearchName());
+         return String.format("%s - %s", super.getSelectedName(searchType), getProductSearchName());
    }
 
    public void getTeamDefs() throws SQLException, IllegalArgumentException {
@@ -123,7 +123,7 @@ public class TeamVersionWorldSearchItem extends WorldSearchItem {
    }
 
    @Override
-   public Collection<Artifact> performSearch() throws SQLException, IllegalArgumentException {
+   public Collection<Artifact> performSearch(SearchType searchType) throws SQLException, IllegalArgumentException {
       getTeamDefs();
 
       List<ISearchPrimitive> teamDefWorkflowCriteria = new LinkedList<ISearchPrimitive>();
@@ -184,7 +184,7 @@ public class TeamVersionWorldSearchItem extends WorldSearchItem {
    }
 
    @Override
-   public void performUI() {
+   public void performUI(SearchType searchType) {
       if (teamDefNames != null) return;
       if (teamDefs != null) return;
       TeamDefinitionTreeByVersionDialog diag = new TeamDefinitionTreeByVersionDialog(Active.Both);

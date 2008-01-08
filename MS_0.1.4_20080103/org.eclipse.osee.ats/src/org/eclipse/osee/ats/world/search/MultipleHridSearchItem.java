@@ -45,7 +45,7 @@ public class MultipleHridSearchItem extends WorldSearchItem {
    }
 
    @Override
-   public Collection<Artifact> performSearch() throws SQLException, IllegalArgumentException {
+   public Collection<Artifact> performSearch(SearchType searchType) throws SQLException, IllegalArgumentException {
 
       List<ISearchPrimitive> idCriteria = new LinkedList<ISearchPrimitive>();
       Set<String> nonHridGuids = new HashSet<String>();
@@ -92,7 +92,7 @@ public class MultipleHridSearchItem extends WorldSearchItem {
    }
 
    @Override
-   public void performUI() {
+   public void performUI(SearchType searchType) {
       EntryDialog ed =
             new EntryDialog(Display.getCurrent().getActiveShell(), getName(), null,
                   "Enter GUID(s) or 5 Character ID(s) (comma separated)", MessageDialog.QUESTION, new String[] {"OK",

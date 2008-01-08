@@ -27,6 +27,9 @@ public abstract class WorldSearchItem {
    protected static Set<Artifact> EMPTY_SET = new HashSet<Artifact>();
    protected boolean cancelled = false;
    protected ArtifactPersistenceManager apm = ArtifactPersistenceManager.getInstance();
+   public static enum SearchType {
+      Search, ReSearch
+   };
 
    public WorldSearchItem(String name) {
       super();
@@ -42,42 +45,48 @@ public abstract class WorldSearchItem {
     * Method called to display the current search in the view. Override to provide more information about selected
     * values (eg MyWorld)
     * 
+    * @param searchType TODO
     * @return selected name
     */
-   public String getSelectedName() {
+   public String getSelectedName(SearchType searchType) {
       return getName();
    }
 
-   public abstract Collection<Artifact> performSearch() throws SQLException, IllegalArgumentException;
+   public abstract Collection<Artifact> performSearch(SearchType searchType) throws SQLException, IllegalArgumentException;
 
-   /**
-    * Perform search and return result set without loading in WorldView. This method can be used repeatedly.
-    * 
-    * @return artifacts resulting from search
-    * @throws SQLException
-    * @throws IllegalArgumentException
-    */
+   public Collection<Artifact> performReSearch() throws SQLException, IllegalArgumentException {
+      return EMPTY_SET;
+   }
+
    public Collection<Artifact> performSearchGetResults() throws SQLException, IllegalArgumentException {
-      return performSearchGetResults(false);
+      return performSearchGetResults(false, SearchType.Search);
+   }
+
+   public Collection<Artifact> performSearchGetResults(SearchType searchType) throws SQLException, IllegalArgumentException {
+      return performSearchGetResults(false, searchType);
    }
 
    public Collection<Artifact> performSearchGetResults(boolean performUi) throws SQLException, IllegalArgumentException {
+      return performSearchGetResults(performUi, SearchType.Search);
+   }
+
+   public Collection<Artifact> performSearchGetResults(boolean performUi, final SearchType searchType) throws SQLException, IllegalArgumentException {
       if (performUi) {
          Displays.ensureInDisplayThread(new Runnable() {
             /* (non-Javadoc)
              * @see java.lang.Runnable#run()
              */
             public void run() {
-               performUI();
+               performUI(searchType);
             }
          }, true);
 
       }
       if (cancelled) return EMPTY_SET;
-      return performSearch();
+      return performSearch(searchType);
    }
 
-   public void performUI() {
+   public void performUI(SearchType searchType) {
       cancelled = false;
    }
 
