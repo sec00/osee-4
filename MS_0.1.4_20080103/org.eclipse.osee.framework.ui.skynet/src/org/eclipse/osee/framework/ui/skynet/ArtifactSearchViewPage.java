@@ -26,7 +26,11 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -39,6 +43,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
+import org.eclipse.osee.framework.skynet.core.SkynetActivator;
 import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
 import org.eclipse.osee.framework.skynet.core.access.PermissionEnum;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -190,9 +195,85 @@ public class ArtifactSearchViewPage extends AbstractArtifactSearchViewPage imple
       createSetAllPartitions(menuManager, viewer);
       menuManager.add(new Separator());
       createDeleteArtifactHandler(menuManager, viewer);
+      createPurgeArtifactHandler(menuManager, viewer);
 
       // The additions group is a standard group
       menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+   }
+
+   /**
+    * @param menuManager
+    * @param viewer
+    */
+   private void createPurgeArtifactHandler(MenuManager menuManager, final TableViewer viewer) {
+
+      CommandContributionItem purgeArtifactCommand =
+            Commands.getLocalCommandContribution("org.eclipse.osee.framework.ui.skynet.purge.command", getSite(), null,
+                  null, null, null, null, null, null, null);
+      menuManager.add(purgeArtifactCommand);
+
+      handlerService.activateHandler(purgeArtifactCommand.getId(), new AbstractSelectionEnabledHandler(menuManager) {
+
+         @Override
+         public Object execute(ExecutionEvent event) throws ExecutionException {
+            final List<Artifact> artifacts = getSelectedArtifacts(viewer);
+
+            if (MessageDialog.openConfirm(
+                  PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                  "Confirm Artifact Purge ",
+                  " Are you sure you want to purge this artifact, all of " + "its children and all history associated with these artifacts from the database ?")) {
+               Job job = new Job("Purge artifact") {
+
+                  @Override
+                  protected IStatus run(IProgressMonitor monitor) {
+                     IStatus toReturn = Status.CANCEL_STATUS;
+                     monitor.beginTask("Purge artifact", artifacts.size());
+                     final IProgressMonitor fMonitor = monitor;
+
+                     AbstractSkynetTxTemplate purgeTx =
+                           new AbstractSkynetTxTemplate(artifacts.iterator().next().getBranch()) {
+                              @Override
+                              protected void handleTxWork() throws Exception {
+                                 for (Artifact artifactToPurge : artifacts) {
+                                    if (!artifactToPurge.isDeleted()) {
+                                       fMonitor.setTaskName("Purge: " + artifactToPurge.getDescriptiveName());
+                                       artifactToPurge.purge();
+                                    }
+                                    fMonitor.worked(1);
+                                 }
+                                 fMonitor.done();
+                              }
+                           };
+
+                     // Perform the purge transaction
+                     try {
+                        purgeTx.execute();
+                        toReturn = Status.OK_STATUS;
+                     } catch (Exception ex) {
+                        OSEELog.logException(SkynetGuiPlugin.class, ex, false);
+                        toReturn = new Status(Status.ERROR, SkynetActivator.PLUGIN_ID, -1, ex.getMessage(), ex);
+                     } finally {
+                        monitor.done();
+                     }
+                     return toReturn;
+                  }
+               };
+               Jobs.startJob(job);
+            }
+            return null;
+         }
+
+         @Override
+         public boolean isEnabled() {
+            if (PlatformUI.getWorkbench().isClosing()) {
+               return false;
+            }
+            boolean isEnabled =
+                  OseeProperties.getInstance().isDeveloper() && accessControlManager.checkObjectListPermission(
+                        getSelectedArtifacts(viewer), PermissionEnum.WRITE);
+            return isEnabled;
+         }
+      });
    }
 
    /**
