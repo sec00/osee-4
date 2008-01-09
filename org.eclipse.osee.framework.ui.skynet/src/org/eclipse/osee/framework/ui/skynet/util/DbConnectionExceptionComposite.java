@@ -1,33 +1,30 @@
-/*
- * Created on Jan 3, 2008
+/*******************************************************************************
+ * Copyright (c) 2004, 2007 Boeing.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  *
- * PLACE_YOUR_DISTRIBUTION_STATEMENT_RIGHT_HERE
- */
+ * Contributors:
+ *     Boeing - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.util;
 
-import org.eclipse.osee.framework.ui.plugin.util.ALayout;
 import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandler;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
+import org.eclipse.osee.framework.ui.swt.ExceptionComposite;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 
 /**
  * @author Donald G. Dunne
  */
-public class DbConnectionExceptionComposite extends Composite {
+public class DbConnectionExceptionComposite extends ExceptionComposite {
 
    /**
     * @param parent
     * @param style
     */
    public DbConnectionExceptionComposite(Composite parent, Exception ex) {
-      super(parent, SWT.NONE);
-      setLayout(ALayout.getZeroMarginLayout(1, true));
-      setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, true, true));
-      Text text = new Text(this, SWT.WRAP);
-      text.setText(ex.getLocalizedMessage());
-      text.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, true, true));
+      super(parent, ex);
    }
 
    /**

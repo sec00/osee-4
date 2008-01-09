@@ -60,16 +60,12 @@ public class UniversalGroup {
       return new ArrayList<Artifact>();
    }
 
-   public static Artifact addGroup(String name) throws IllegalArgumentException {
+   public static Artifact addGroup(String name) throws Exception {
       if (getGroups(name).size() > 0) throw new IllegalArgumentException("Group Already Exists");
 
       AddGroupTx addGroupTx = null;
-      try {
-         addGroupTx = new AddGroupTx(branchManager.getCommonBranch(), name);
-         addGroupTx.execute();
-      } catch (Exception ex) {
-         logger.log(Level.SEVERE, "Transaction Failed", ex);
-      }
+      addGroupTx = new AddGroupTx(branchManager.getCommonBranch(), name);
+      addGroupTx.execute();
       return addGroupTx.getGroupArtifact();
    }
 

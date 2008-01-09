@@ -129,11 +129,6 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
       parent.setLayout(gridLayout);
       parent.setLayoutData(gridData);
 
-      if (!ConnectionHandler.isConnected()) {
-         (new Label(parent, SWT.NONE)).setText("DB Connection Unavailable");
-         return;
-      }
-
       getViewSite().getActionBars().getStatusLineManager().add(branchStatusItem);
 
       treeViewer = new TreeViewer(parent);
