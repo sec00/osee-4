@@ -408,7 +408,7 @@ public class Artifact implements Unique, PersistenceObject, IAdaptable, Comparab
       Artifact child = descriptor.makeNewArtifact();
       child.setDescriptiveName(name);
       addChild(child);
-      child.persist();
+      child.persistAttributes();
       child.getLinkManager().persistLinks();
    }
 
@@ -902,14 +902,31 @@ public class Artifact implements Unique, PersistenceObject, IAdaptable, Comparab
       SkynetEventManager.getInstance().kick(new CacheArtifactModifiedEvent(this, ModType.Reverted, this));
    }
 
-   public void persist() throws SQLException {
+   public void persistAttributes() throws SQLException {
       persist(false, true);
+   }
+
+   public void persistAttributesAndLinks() throws SQLException {
+      persistAttributes();
+      getLinkManager().persistLinks();
+   }
+
+   public void persistAttributesAndLinks(Set<IRelationEnumeration> linkTypes) throws SQLException {
+      persistAttributes();
+      getLinkManager().persistLinks();
    }
 
    public void persist(boolean recurse) throws SQLException {
       persist(recurse, true);
    }
 
+   /**
+    * make this method private
+    * 
+    * @param recurse
+    * @param persistAttributes
+    * @throws SQLException
+    */
    public void persist(boolean recurse, boolean persistAttributes) throws SQLException {
       checkDeleted();
       if (artifactManager == null) {
@@ -1285,6 +1302,8 @@ public class Artifact implements Unique, PersistenceObject, IAdaptable, Comparab
       saveRevertArtifactsFromRelations(links, true);
    }
 
+   @Deprecated
+   //  use persistAttributesAndLinks() instead
    private void saveRevertArtifactsFromRelations(Set<IRelationEnumeration> links, boolean revert) throws SQLException {
       Set<Artifact> artifactToManipulate = new HashSet<Artifact>();
       artifactToManipulate.add(this);
@@ -1315,10 +1334,11 @@ public class Artifact implements Unique, PersistenceObject, IAdaptable, Comparab
          if (revert) {
             artifact.revert();
          } else {
-            artifact.persist();
+            artifact.persistAttributes();
          }
       }
       // Persist link manager to ensure deleted links get persisted
+      //TODO: this defeats the whole purpose of a selective persist based on link type
       getLinkManager().persistLinks();
    }
 

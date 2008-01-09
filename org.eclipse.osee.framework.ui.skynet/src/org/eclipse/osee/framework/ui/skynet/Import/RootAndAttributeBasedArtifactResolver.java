@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.Import;
 
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,6 +19,8 @@ import java.util.LinkedList;
 import java.util.Set;
 import org.eclipse.osee.framework.jdk.core.type.HashCollection;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.artifact.factory.PolymorphicArtifactFactory;
+import org.eclipse.osee.framework.skynet.core.attribute.ArtifactSubtypeDescriptor;
 import org.eclipse.osee.framework.skynet.core.attribute.Attribute;
 import org.eclipse.osee.framework.skynet.core.attribute.DynamicAttributeDescriptor;
 import org.eclipse.osee.framework.ui.skynet.Import.RoughArtifact.NameAndVal;
@@ -27,6 +30,8 @@ import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
  * @author Robert A. Fisher
  */
 public class RootAndAttributeBasedArtifactResolver implements IArtifactImportResolver {
+   private static boolean usePolymorphicArtifactFactory = false;
+   private static PolymorphicArtifactFactory polymorphicArtifactFactory = PolymorphicArtifactFactory.getInstance();
    private final LinkedList<DynamicAttributeDescriptor> identifyingAttributeDescriptors;
    private final Collection<String> EMPTY = new ArrayList<String>(0);
 
@@ -90,7 +95,7 @@ public class RootAndAttributeBasedArtifactResolver implements IArtifactImportRes
       return value.trim().replaceAll("\\.$", "").toLowerCase();
    }
 
-   public Artifact resolve(RoughArtifact roughArtifact) throws SQLException {
+   public Artifact resolve(RoughArtifact roughArtifact) throws SQLException, FileNotFoundException {
       Set<Artifact> siblings = roughArtifact.getRoughParent().getAssociatedArtifact().getChildren();
       Collection<Artifact> candidates = new LinkedList<Artifact>();
 
@@ -100,12 +105,50 @@ public class RootAndAttributeBasedArtifactResolver implements IArtifactImportRes
          }
       }
 
+      Artifact realArtifact = null;
       if (candidates.size() == 1) {
-         return candidates.iterator().next();
+         realArtifact = candidates.iterator().next();
+         roughArtifact.updateValues(realArtifact);
       } else if (candidates.size() > 1) {
          OSEELog.logInfo(getClass(),
                "Found " + candidates.size() + " candidates during reuse import for " + roughArtifact.getName(), false);
+
+         ArtifactSubtypeDescriptor descriptor = roughArtifact.getDescriptorForGetReal();
+
+         if (usePolymorphicArtifactFactory) {
+            realArtifact =
+                  polymorphicArtifactFactory.makeNewArtifact(descriptor, roughArtifact.getGuid(),
+                        roughArtifact.getHumandReadableId());
+         } else {
+            realArtifact = descriptor.makeNewArtifact(roughArtifact.getGuid(), roughArtifact.getHumandReadableId());
+         }
+
+         // Try to confer attributes in 'initialization mode' to avoid default attributes
+         // on optional attributes. The attributes would be loaded at this point from
+         // onBirth() code in the artifact.
+         if (realArtifact.attributesNotLoaded()) {
+            realArtifact.startAttributeInitialization();
+            roughArtifact.conferAttributesUpon(realArtifact);
+            realArtifact.finalizeAttributeInitialization();
+         } else {
+            roughArtifact.conferAttributesUpon(realArtifact);
+         }
       }
-      return null;
+
+      return realArtifact;
+   }
+
+   /**
+    * @return the usePolymorphicArtifactFactory
+    */
+   public static boolean isUsePolymorphicArtifactFactory() {
+      return usePolymorphicArtifactFactory;
+   }
+
+   /**
+    * @param usePolymorphicArtifactFactory the usePolymorphicArtifactFactory to set
+    */
+   public static void setUsePolymorphicArtifactFactory(boolean usePolymorphicArtifactFactory) {
+      RootAndAttributeBasedArtifactResolver.usePolymorphicArtifactFactory = usePolymorphicArtifactFactory;
    }
 }

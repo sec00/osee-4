@@ -71,7 +71,7 @@ public class AtsConfigDemoDatabaseConfig extends DbInitializationTask {
       VersionArtifact verArt = teamDef.getVersionArtifact(versionName, false);
       verArt.setSoleAttributeValue(ATSAttributes.PARENT_BRANCH_ID_ATTRIBUTE.getStoreName(),
             String.valueOf(branch.getBranchId()));
-      verArt.persist();
+      verArt.persistAttributes();
    }
 
    public static enum SawBuilds {

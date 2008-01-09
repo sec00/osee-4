@@ -99,7 +99,7 @@ public class GenerateParagraphNumbersAction extends Action {
 
             monitor.subTask(paragraphNumber + " " + artifact.getDescriptiveName());
             artifact.setAttribute("Imported Paragraph Number", paragraphNumber);
-            artifact.persist();
+            artifact.persistAttributes();
             monitor.worked(1);
 
             for (Artifact child : artifact.getChildren()) {

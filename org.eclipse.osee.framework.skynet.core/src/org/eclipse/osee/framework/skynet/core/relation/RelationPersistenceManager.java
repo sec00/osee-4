@@ -310,10 +310,8 @@ public class RelationPersistenceManager implements PersistenceManager {
 
          try {
             if (link.isDirty()) {
-               // The relation link will be clean by the end of this, so mark it early so that if
-               // this
-               // relation
-               // get's persisted by a one if it's artifact we don't get an infinite loop
+               // The relation link will be clean by the end of this, so mark it early so that if this relation get's
+               // persisted by a one if it's artifact we don't get an infinite loop
                link.setNotDirty();
 
                link.getArtifactA().persist(false, false);

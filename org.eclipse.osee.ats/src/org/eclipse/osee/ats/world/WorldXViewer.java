@@ -801,7 +801,7 @@ public class WorldXViewer extends XViewer {
                AWorkbench.popup("INFO", sb.toString());
 
                smaMgr.setState(implementState);
-               smaMgr.getSma().persist();
+               smaMgr.getSma().persistAttributes();
             }
          }
       } catch (SQLException ex) {

@@ -77,7 +77,7 @@ public class WorkspaceFileArtifact extends Artifact {
                artifact = descriptor.makeNewArtifact();
                artifact.setAttribute("Content URL", location);
                artifact.setAttribute("Name", new File(location).getName());
-               artifact.persist();
+               artifact.persistAttributes();
             } catch (SQLException ex) {
                ex.printStackTrace();
             }

@@ -167,7 +167,7 @@ public class SkynetAuthentication implements PersistenceManager {
    private void persistUser(User user) {
       duringUserCreation = true;
       try {
-         user.persist();
+         user.persistAttributes();
          user.getLinkManager().persistLinks();
       } catch (SQLException ex) {
          duringUserCreation = false;
@@ -296,7 +296,7 @@ public class SkynetAuthentication implements PersistenceManager {
             if (create && ex.getLocalizedMessage().contains("There must be exactly one")) {
                user = createUser(name, "", name, true);
                try {
-                  user.persist();
+                  user.persistAttributes();
                } catch (SQLException ex2) {
                   logger.log(Level.SEVERE, ex.getLocalizedMessage(), ex2);
                }

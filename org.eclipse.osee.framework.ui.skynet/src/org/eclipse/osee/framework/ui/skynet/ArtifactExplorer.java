@@ -1328,7 +1328,7 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
                      // Replace all of the parent relations
                      for (Artifact artifact : artifactsToBeRelated) {
                         artifact.relateReplace(RelationSide.DEFAULT_HIERARCHICAL__PARENT, parentArtifact, true);
-                        artifact.persist();
+                        artifact.persistAttributes();
                      }
                   }
 

@@ -193,7 +193,7 @@ public class ChangeArtifactType implements BlamOperation {
       }
 
       artifact.changeArtifactType(descriptor);
-      artifact.persist();
+      artifact.persistAttributes();
    }
 
    /*

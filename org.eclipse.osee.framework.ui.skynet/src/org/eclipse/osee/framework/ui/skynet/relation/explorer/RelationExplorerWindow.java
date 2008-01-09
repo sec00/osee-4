@@ -301,7 +301,7 @@ public class RelationExplorerWindow {
                      artifact = descriptor.makeNewArtifact();
                      artifact.setAttribute("Name", model.getName());
                      artifact.setAttribute("Content URL", urls.get(names.indexOf(model.getName())));
-                     artifact.persist();
+                     artifact.persistAttributes();
                   } catch (SQLException ex) {
                      AWorkbench.popup("ERROR", ex.getLocalizedMessage());
                      SkynetGuiPlugin.getLogger().log(Level.SEVERE, ex.getLocalizedMessage(), ex);

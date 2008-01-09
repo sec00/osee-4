@@ -1356,7 +1356,7 @@ public class ArtifactPersistenceManager implements PersistenceManager {
             configurationPersistenceManager.getArtifactSubtypeDescriptor(ROOT_ARTIFACT_TYPE_NAME, branch);
       Artifact root = descriptor.makeNewArtifact();
       root.setDescriptiveName(DEFAULT_HIERARCHY_ROOT_NAME);
-      root.persist();
+      root.persistAttributes();
       return root;
    }
 

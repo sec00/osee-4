@@ -87,7 +87,7 @@ public class ActionArtifact extends ATSArtifact implements IWorldViewArtifact {
       resetTitleOffChildren();
       resetValidationOffChildren();
       resetDescriptionOffChildren();
-      if (isDirty()) persist();
+      if (isDirty()) persistAttributes();
    }
 
    /**
@@ -796,7 +796,7 @@ public class ActionArtifact extends ATSArtifact implements IWorldViewArtifact {
                // ADD it
                if (!teamArt.getActionableItemsDam().getActionableItems().contains(aia)) {
                   teamArt.getActionableItemsDam().addActionableItem(aia);
-                  teamArt.persist();
+                  teamArt.persistAttributes();
                   sb.append(aia.getDescriptiveName() + " => added to existing team workflow \"" + tda.getDescriptiveName() + "\"\n");
                   teamExists = true;
                } else {

@@ -123,7 +123,7 @@ public class UpdateArtifactJob extends UpdateJob {
    private void updateNativeArtifact(Artifact artifact) throws IllegalStateException, FileNotFoundException, SQLException {
       artifact.setAttribute(NativeArtifact.CONTENT_NAME, new FileInputStream(workingFile));
 
-      artifact.persist();
+      artifact.persistAttributes();
       eventManager.kick(new VisitorEvent(artifact, this));
    }
 
@@ -220,7 +220,7 @@ public class UpdateArtifactJob extends UpdateJob {
 
                artifact.setAttribute(WordAttribute.CONTENT_NAME, content);
                if (artifact.isDirty()) {
-                  artifact.persist();
+                  artifact.persistAttributes();
                   changedArtifacts.add(artifact);
                }
             } else {
