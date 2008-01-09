@@ -896,11 +896,12 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IEvent
     */
    public String getWorldViewValidationRequiredStr() {
       try {
-         return String.valueOf(getSoleBooleanAttributeValue(ATSAttributes.VALIDATION_REQUIRED_ATTRIBUTE.getStoreName()));
+         if (isAttributeTypeValid(ATSAttributes.VALIDATION_REQUIRED_ATTRIBUTE.getStoreName())) return String.valueOf(getSoleBooleanAttributeValue(ATSAttributes.VALIDATION_REQUIRED_ATTRIBUTE.getStoreName()));
       } catch (Exception ex) {
          OSEELog.logException(AtsPlugin.class, ex, false);
          return ex.getLocalizedMessage();
       }
+      return "";
    }
 
    /*
