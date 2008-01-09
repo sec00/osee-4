@@ -237,7 +237,7 @@
          </separator>
 			<command
          commandId="org.eclipse.osee.framework.ui.skynet.openInEdit.command"
-         label="Show Final Version">
+         label="Open Final Version">
          </command>
 			<menu label="Preview">
 				<command commandId="org.eclipse.osee.framework.ui.skynet.previewArtifact.command">
