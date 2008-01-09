@@ -59,16 +59,6 @@ public class OseeProperties {
          }
          return values;
       }
-
-      // if (filterGroups == null) {
-      // filterGroups = ConfigUtil.getConfigFactory().getOseeConfig().getJiniServiceGroups();
-      // }
-      // if (filterGroups == null || filterGroups.length > 0) {
-      // logger.log(Level.SEVERE, "[-D" + OseeProperties.OSEE_JINI_SERVICE_GROUPS + "] was not
-      // set.\n"
-      // + "Please enter the Jini Group this service register with.");
-      // System.exit(1);
-      // }
       return null;
    }
 
