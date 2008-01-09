@@ -15,8 +15,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -26,8 +24,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
-import org.eclipse.osee.framework.skynet.core.SkynetActivator;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactData;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactPersistenceManager;
@@ -95,7 +91,6 @@ import org.eclipse.ui.texteditor.StatusLineContributionItem;
  * @author Donald G. Dunne
  */
 public class GroupExplorer extends ViewPart implements IEventReceiver, IActionable {
-   private static final Logger logger = ConfigUtil.getConfigFactory().getLogger(GroupExplorer.class);
    public static final String VIEW_ID = "org.eclipse.osee.framework.ui.skynet.group.GroupExplorer";
    private static final String ROOT_GUID = "group.explorer.last.root_guid";
    private TreeViewer treeViewer;
@@ -190,7 +185,6 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
    }
 
    protected void createActions() {
-
       Action refreshAction = new Action("Refresh", Action.AS_PUSH_BUTTON) {
 
          public void run() {
@@ -286,12 +280,10 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
       if (ed.open() == 0) {
          try {
             UniversalGroup.addGroup(ed.getEntry());
-         } catch (IllegalArgumentException ex) {
-            AWorkbench.popup("ERROR", "Error creating group\n\n" + ex.getLocalizedMessage());
-            logger.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
-            return;
+            treeViewer.refresh();
+         } catch (Exception ex) {
+            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
          }
-         treeViewer.refresh();
       }
    }
 
@@ -319,7 +311,7 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
          try {
             unrelateTx.execute();
          } catch (Exception ex) {
-            OSEELog.logException(getClass(), ex, true);
+            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
          }
       }
    }
@@ -349,7 +341,7 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
             deleteUniversalGroupTx.execute();
             refresh();
          } catch (Exception ex) {
-            OSEELog.logException(getClass(), ex, true);
+            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
          }
       }
    }
@@ -376,7 +368,7 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
             RelationPersistenceManager.getInstance().moveObjectB(selItem.getParentItem().getArtifact(),
                   selItem.getArtifact(), RelationSide.UNIVERSAL_GROUPING__MEMBERS, dir);
          } catch (SQLException ex) {
-            OSEELog.logException(SkynetActivator.class, ex, true);
+            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
          }
       }
    }
@@ -470,7 +462,7 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
             try {
                relateArtifactTx.execute();
             } catch (Exception ex) {
-               OSEELog.logException(SkynetActivator.class, ex, true);
+               OSEELog.logException(SkynetGuiPlugin.class, ex, true);
             }
          }
          treeViewer.refresh(item);
@@ -541,11 +533,7 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
     */
    private void addExploreSelection() {
       if (rootArt != null) {
-         try {
-            refresh();
-         } catch (IllegalArgumentException ex) {
-            logger.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
-         }
+         refresh();
       }
    }
 
@@ -562,9 +550,9 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
          } else if (event instanceof BranchEvent) {
             refresh();
          } else
-            SkynetGuiPlugin.getLogger().log(Level.SEVERE, "Unexpected event => " + event);
+            OSEELog.logInfo(SkynetGuiPlugin.class, "Unexpected event => " + event, true);
       } catch (SQLException ex) {
-         SkynetGuiPlugin.getLogger().log(Level.SEVERE, "Can't get group root artifact", ex);
+         OSEELog.logException(SkynetGuiPlugin.class, ex, true);
       }
    }
 
@@ -588,10 +576,14 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
 
    public void refresh() {
       try {
-         explore(UniversalGroup.getTopUniversalGroupArtifact(BranchPersistenceManager.getInstance().getDefaultBranch()));
+         refresh(UniversalGroup.getTopUniversalGroupArtifact(BranchPersistenceManager.getInstance().getDefaultBranch()));
       } catch (Exception ex) {
-         logger.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+         OSEELog.logException(SkynetGuiPlugin.class, ex, true);
       }
+   }
+
+   public void refresh(Artifact topUniversalGroupArtifact) throws IllegalArgumentException, CoreException, SQLException {
+      explore(topUniversalGroupArtifact);
       updateStatusLabel();
    }
 
@@ -611,21 +603,23 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
 
    @Override
    public void init(IViewSite site, IMemento memento) throws PartInitException {
-      super.init(site, memento);
-      if (memento != null) {
-         try {
+      try {
+         super.init(site, memento);
+         if (memento == null) {
+            refresh();
+         } else {
             Artifact previousArtifact =
                   ArtifactPersistenceManager.getInstance().getArtifact(memento.getString(ROOT_GUID),
-                        BranchPersistenceManager.getInstance().getCommonBranch());
-            if (previousArtifact != null) {
-               explore(previousArtifact);
-               return;
+                        BranchPersistenceManager.getInstance().getDefaultBranch());
+            if (previousArtifact == null) {
+               refresh();
+            } else {
+               refresh(previousArtifact);
             }
-         } catch (Exception ex) {
-            logger.log(Level.SEVERE, "Falling back to the root artifact: " + ex.getLocalizedMessage(), ex);
          }
+      } catch (Exception ex) {
+         OSEELog.logException(SkynetGuiPlugin.class, ex, true);
       }
-      refresh();
    }
 
    @Override
@@ -650,5 +644,4 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
    public String getActionDescription() {
       return "";
    }
-
 }
