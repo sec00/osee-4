@@ -357,6 +357,8 @@ public class RemoteEventManager implements IServiceLookupListener, PersistenceMa
                         relationPersistenceManager.updateRelationCache(skynetRelationLinkEvent, localEvents,
                               editableTransactionId, priorEditableTransactionId);
                      }
+                  } else {
+                     logger.log(Level.INFO, "Unexpected ISkynetEvent " + event.getClass().getName());
                   }
                }
                eventManager.kick(new RemoteTransactionEvent(localEvents, this));
