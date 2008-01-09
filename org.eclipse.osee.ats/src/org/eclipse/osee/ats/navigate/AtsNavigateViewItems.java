@@ -123,14 +123,14 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
 
       otherItems = new XNavigateItem(null, "Other User Searches");
       new SearchNavigateItem(otherItems, new MyWorldSearchItem("User's World"));
-      new SearchNavigateItem(otherItems, new MyReviewWorkflowItem("User's Reviews"));
-      new SearchNavigateItem(otherItems, new MyTeamWFSearchItem("User's Team Workflows"));
-      new SearchNavigateItem(otherItems, new MyTaskSearchItem("User's Tasks"));
       new SearchNavigateItem(otherItems, new MyOrigSearchItem("User's Originator - InWork", null, true));
       new SearchNavigateItem(otherItems, new MyOrigSearchItem("User's Originator - All", null, false));
+      new SearchNavigateItem(otherItems, new MyTeamWFSearchItem("User's Team Workflows"));
+      new SearchNavigateItem(otherItems, new MyTaskSearchItem("User's Tasks"));
       new SearchNavigateItem(otherItems, new MyCompletedSearchItem("User's Completed"));
       new SearchNavigateItem(otherItems, new MyFavoritesSearchItem("User's Favorites"));
       new SearchNavigateItem(otherItems, new MySubscribedSearchItem("User's Subscribed"));
+      new SearchNavigateItem(otherItems, new MyReviewWorkflowItem("User's Reviews"));
       items.add(otherItems);
 
       items.add(new SearchNavigateItem(null, new GroupWorldSearchItem()));
