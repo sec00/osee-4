@@ -270,8 +270,6 @@
          </separator>
 			<command commandId="org.eclipse.osee.framework.ui.skynet.changeReportView.compressWordAttributes.command">
          </command>
-			<command commandId="org.eclipse.osee.framework.ui.skynet.changeReportView.tagArtifacts.command">
-         </command>
    <separator
          name="org.eclipse.ui.edit.delete.seperator"
          visible="true">
