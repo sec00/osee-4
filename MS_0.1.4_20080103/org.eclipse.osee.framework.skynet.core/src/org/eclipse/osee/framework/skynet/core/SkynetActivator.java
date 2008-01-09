@@ -54,10 +54,9 @@ public class SkynetActivator extends OseeUiActivator {
    public boolean isAutoTaggingEnabled() {
       String propertyValue = System.getProperty(AUTO_TAG_KEY, null);
       if (propertyValue != null) {
-         return propertyValue.equalsIgnoreCase("true");
-      } else {
-         return Boolean.valueOf(OseeInfo.getValue(SkynetActivator.AUTO_TAG_KEY));
+         return Boolean.parseBoolean(propertyValue);
       }
+      return Boolean.parseBoolean(OseeInfo.getValue(SkynetActivator.AUTO_TAG_KEY));
    }
 
    public static void setAutoTaggingEnabled(boolean enabled) {

@@ -10,16 +10,11 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.blam.operation;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
-import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactHasStaleTags;
-import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactTypeSearch;
-import org.eclipse.osee.framework.skynet.core.artifact.search.ISearchPrimitive;
-import org.eclipse.osee.framework.skynet.core.artifact.search.Operator;
 import org.eclipse.osee.framework.skynet.core.attribute.ArtifactSubtypeDescriptor;
 import org.eclipse.osee.framework.skynet.core.attribute.ConfigurationPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.tagging.TagManager;
@@ -27,6 +22,7 @@ import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
 
 /**
  * @author Robert A. Fisher
+ * @author Ryan D. Brooks
  */
 public class TagAllItems implements BlamOperation {
 
@@ -40,21 +36,15 @@ public class TagAllItems implements BlamOperation {
 
          monitor.beginTask("Tagging Artifacts", descriptors.size());
 
-         ArrayList<ISearchPrimitive> criteria = new ArrayList<ISearchPrimitive>(2);
-         criteria.add(new ArtifactHasStaleTags());
-
-         Collection<Artifact> staleArtifacts;
          ArtifactPersistenceManager artifactManager = ArtifactPersistenceManager.getInstance();
          TagManager tagManager = TagManager.getInstance();
-         int count, total;
 
          for (ArtifactSubtypeDescriptor descriptor : descriptors) {
-            monitor.subTask("Loading stale " + descriptor.getName() + " artifacts");
-            criteria.set(1, new ArtifactTypeSearch(descriptor.getName(), Operator.EQUAL));
-            staleArtifacts = artifactManager.getArtifacts(criteria, true, branch);
+            monitor.subTask("Loading artifact of type " + descriptor.getName());
+            Collection<Artifact> staleArtifacts = artifactManager.getArtifactsFromSubtype(descriptor);
 
-            count = 0;
-            total = staleArtifacts.size();
+            int count = 0;
+            int total = staleArtifacts.size();
             for (Artifact artifact : staleArtifacts) {
                monitor.subTask("Tagging " + descriptor.getName() + " artifact " + ++count + " of " + total);
                tagManager.autoTag(true, artifact);
