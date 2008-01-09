@@ -22,7 +22,7 @@ final class HttpPutMethod implements IHttpMethod {
 
    public void processRequest(HttpRequest httpRequest, HttpResponse httpResponse) {
       //      String requestType = httpRequest.getUrlRequest();
-      boolean handled = false;
+      //boolean handled = false;
 
       System.out.println("Put request: " + httpRequest.getRawRequest());
 

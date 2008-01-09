@@ -62,7 +62,6 @@ import org.eclipse.osee.framework.skynet.core.attribute.ArtifactSubtypeDescripto
 import org.eclipse.osee.framework.skynet.core.attribute.ConfigurationPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.dbinit.MasterSkynetTypesImport;
 import org.eclipse.osee.framework.skynet.core.event.SkynetEventManager;
-import org.eclipse.osee.framework.skynet.core.remoteEvent.RemoteEventManager;
 import org.eclipse.osee.framework.skynet.core.revision.RevisionManager;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionId;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionIdManager;
