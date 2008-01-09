@@ -75,7 +75,7 @@ public class ConnectWorkflowToBranchOrTransaction implements BlamOperation {
          for (Artifact workflow : teamWorkflows) {
             if (workflow.getHumanReadableId().equals(hrid)) {
                workflow.setSoleAttributeValue("ats.Transaction Id", String.valueOf(rSet.getInt("transaction_id")));
-               workflow.persist();
+               workflow.persistAttributes();
                return;
             }
          }

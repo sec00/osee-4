@@ -637,7 +637,7 @@ public class TeamWorkFlowArtifact extends StateMachineArtifact implements IWorld
          if (workResult.isTrue()) {
             if (teamDefinition != null) setTeamDefinition(teamDefinition);
             getParentActionArtifact().resetAttributesOffChildren();
-            persist();
+            persistAttributes();
          }
       }
    }

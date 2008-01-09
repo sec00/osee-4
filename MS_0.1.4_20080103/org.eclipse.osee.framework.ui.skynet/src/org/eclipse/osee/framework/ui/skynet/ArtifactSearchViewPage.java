@@ -715,7 +715,7 @@ public class ArtifactSearchViewPage extends AbstractArtifactSearchViewPage imple
                            if (attr.getStringData().equals("Unspecified")) attr.delete();
                         }
 
-                        art.persist();
+                        art.persistAttributes();
                      }
                   }
                };

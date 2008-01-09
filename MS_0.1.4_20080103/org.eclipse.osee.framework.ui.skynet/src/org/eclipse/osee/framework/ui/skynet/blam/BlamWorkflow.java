@@ -181,7 +181,7 @@ public class BlamWorkflow extends Artifact {
       doc = doc.replace("<Workflow>", "<Workflow>" + xml);
 
       setSoleAttributeValue("Workflow Definition", doc);
-      persist();
+      persistAttributes();
    }
 
    /**

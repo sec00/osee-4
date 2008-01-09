@@ -38,7 +38,7 @@ public class UpdateAttributeValues implements BlamOperation {
          for (Attribute attribute : attributes) {
             attribute.setStringData(newValue);
          }
-         artifact.persist();
+         artifact.persistAttributes();
       }
    }
 

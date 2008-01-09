@@ -540,7 +540,7 @@ public class WordTemplateProcessor {
                artifact.setAttribute("Imported Paragraph Number", paragraphNumber.toString());
 
                try {
-                  artifact.persist();
+                  artifact.persistAttributes();
                } catch (SQLException ex) {
                   logger.log(Level.SEVERE, ex.toString(), ex);
                }

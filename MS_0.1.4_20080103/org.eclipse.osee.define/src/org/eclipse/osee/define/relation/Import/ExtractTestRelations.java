@@ -126,7 +126,7 @@ public class ExtractTestRelations {
                configurationPersistenceManager.getArtifactSubtypeDescriptor("Test Script", branch).makeNewArtifact();
          testArtifact.setAttribute("Name", testArtifactFile.getName());
          testArtifact.setAttribute("Content URL", testArtifactFile.getFullPath().toString());
-         testArtifact.persist();
+         testArtifact.persistAttributes();
       }
       return testArtifact;
 

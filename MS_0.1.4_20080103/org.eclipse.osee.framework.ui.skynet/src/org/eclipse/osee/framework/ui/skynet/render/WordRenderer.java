@@ -484,7 +484,7 @@ public class WordRenderer extends FileRenderer {
       addTemplateToMap(templateMap, bundleName, templateName, templatePath);
 
       javaAttribute.setObject(templateMap);
-      document.persist();
+      document.persistAttributes();
    }
 
    private void addTemplateToMap(HashMap<String, String> templateMap, String bundleName, String templateName, String templatePath) throws IOException {
@@ -540,6 +540,6 @@ public class WordRenderer extends FileRenderer {
       }
 
       javaAttribute.setObject(templateMap);
-      document.persist();
+      document.persistAttributes();
    }
 }

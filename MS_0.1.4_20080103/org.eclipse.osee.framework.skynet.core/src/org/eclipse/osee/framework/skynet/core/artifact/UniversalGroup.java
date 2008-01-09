@@ -86,7 +86,7 @@ public class UniversalGroup {
          Artifact art =
                ConfigurationPersistenceManager.getInstance().getArtifactSubtypeDescriptor(ARTIFACT_TYPE_NAME, branch).makeNewArtifact();
          art.setDescriptiveName(ArtifactPersistenceManager.ROOT_ARTIFACT_TYPE_NAME);
-         art.persist();
+         art.persistAttributes();
       }
    }
 
@@ -109,7 +109,7 @@ public class UniversalGroup {
                ConfigurationPersistenceManager.getInstance().getArtifactSubtypeDescriptor(
                      UniversalGroup.ARTIFACT_TYPE_NAME, getTxBranch()).makeNewArtifact();
          groupArt.setDescriptiveName(name);
-         groupArt.persist();
+         groupArt.persistAttributes();
          Artifact groupRoot = getTopUniversalGroupArtifact(getTxBranch());
          groupRoot.relate(RelationSide.UNIVERSAL_GROUPING__MEMBERS, groupArt, true);
       }

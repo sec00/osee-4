@@ -516,7 +516,7 @@ public class SMAWorkFlowSection extends SectionPart {
          }
 
          try {
-            smaMgr.getSma().persist();
+            smaMgr.getSma().persistAttributes();
          } catch (SQLException ex) {
             OSEELog.logException(AtsPlugin.class, ex, true);
          }

@@ -582,7 +582,7 @@ public class SMAManager {
             if (diag.open() == 0) {
                verArt.setAttribute(ATSAttributes.RELEASE_DATE_ATTRIBUTE.getStoreName(),
                      diag.getSelectedDate().getTime() + "");
-               verArt.persist();
+               verArt.persistAttributes();
                return true;
             }
          } else {
@@ -593,7 +593,7 @@ public class SMAManager {
             if (diag.open() == 0) {
                sma.setSoleAttributeValue(ATSAttributes.RELEASE_DATE_ATTRIBUTE.getStoreName(),
                      diag.getSelectedDate().getTime() + "");
-               sma.persist();
+               sma.persistAttributes();
                return true;
             }
          }
@@ -618,7 +618,7 @@ public class SMAManager {
             if (diag.open() == 0) {
                verArt.setAttribute(ATSAttributes.ESTIMATED_RELEASE_DATE_ATTRIBUTE.getStoreName(),
                      diag.getSelectedDate().getTime() + "");
-               verArt.persist();
+               verArt.persistAttributes();
                return true;
             }
          } else {
@@ -631,7 +631,7 @@ public class SMAManager {
             if (diag.open() == 0) {
                sma.setSoleAttributeValue(ATSAttributes.ESTIMATED_RELEASE_DATE_ATTRIBUTE.getStoreName(),
                      diag.getSelectedDate().getTime() + "");
-               sma.persist();
+               sma.persistAttributes();
                return true;
             }
          }
@@ -895,7 +895,7 @@ public class SMAManager {
 
       // Persist
       if (persist) {
-         getSma().persist();
+         getSma().persistAttributes();
       }
 
       getSma().transitioned(fromPage, toPage, toAssignees, true);
