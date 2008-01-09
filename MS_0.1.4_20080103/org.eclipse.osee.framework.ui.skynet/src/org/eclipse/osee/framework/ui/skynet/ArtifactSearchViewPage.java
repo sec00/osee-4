@@ -11,6 +11,7 @@
 
 package org.eclipse.osee.framework.ui.skynet;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -40,6 +42,7 @@ import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
 import org.eclipse.osee.framework.skynet.core.access.PermissionEnum;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.artifact.ArtifactPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.CacheArtifactModifiedEvent;
@@ -185,9 +188,47 @@ public class ArtifactSearchViewPage extends AbstractArtifactSearchViewPage imple
       createOpenInMassArtifactEditorHandler(menuManager, viewer);
       menuManager.add(new Separator());
       createSetAllPartitions(menuManager, viewer);
+      menuManager.add(new Separator());
+      createDeleteArtifactHandler(menuManager, viewer);
 
       // The additions group is a standard group
       menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+   }
+
+   /**
+    * @param menuManager
+    * @param viewer
+    */
+   private void createDeleteArtifactHandler(MenuManager menuManager, final TableViewer viewer) {
+      CommandContributionItem deleteArtifactCommand =
+            Commands.getLocalCommandContribution("org.eclipse.ui.edit.delete", getSite(), null, null, null, null, null,
+                  null, null, null);
+      menuManager.add(deleteArtifactCommand);
+
+      handlerService.activateHandler(deleteArtifactCommand.getId(), new AbstractSelectionEnabledHandler(menuManager) {
+         @Override
+         public Object execute(ExecutionEvent event) throws ExecutionException {
+            try {
+               MessageDialog dialog =
+                     new MessageDialog(Display.getCurrent().getActiveShell(), "Confirm Artifact Deletion", null,
+                           " Are you sure you want to delete this artifact and all of the default hierarchy children?",
+                           MessageDialog.QUESTION,
+                           new String[] {IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL}, 1);
+               if (dialog.open() == 0) {
+                  ArtifactPersistenceManager.getInstance().deleteArtifact(
+                        getSelectedArtifacts(viewer).toArray(Artifact.EMPTY_ARRAY));
+               }
+            } catch (SQLException ex) {
+               OSEELog.logException(SkynetGuiPlugin.class, ex, false);
+            }
+            return null;
+         }
+
+         @Override
+         public boolean isEnabled() {
+            return accessControlManager.checkObjectListPermission(getSelectedArtifacts(viewer), PermissionEnum.WRITE);
+         }
+      });
    }
 
    /**
