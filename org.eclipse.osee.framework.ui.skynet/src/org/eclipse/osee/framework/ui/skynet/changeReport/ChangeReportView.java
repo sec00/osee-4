@@ -143,7 +143,7 @@ public class ChangeReportView extends ViewPart implements IActionable, IEventRec
    private static final String SHOW_FINAL_VERSION_TXT = "Show Final &Version";
    private static final String DIFF_ARTIFACT = "DIFF_ARTIFACT";
    private Action sortAction = null;
-   private Collection<Artifact> attributeModifiedArtifacts = null;
+   private Collection<Integer> attributeModifiedArtifactIds = null;
 
    private TreeViewer changeTable;
    private MenuItem diffMenuItem;
@@ -425,24 +425,24 @@ public class ChangeReportView extends ViewPart implements IActionable, IEventRec
          @Override
          public void run() {
             if (sortAction.isChecked()) {
-               if (attributeModifiedArtifacts == null) {
+               if (attributeModifiedArtifactIds == null) {
+                  attributeModifiedArtifactIds = new ArrayList<Integer>();
                   try {
                      TransactionId baseTransId = ((ChangeReportInput) changeTable.getInput()).getBaseTransaction();
                      TransactionId toTransId = ((ChangeReportInput) changeTable.getInput()).getToTransaction();
-                     attributeModifiedArtifacts =
-                           RevisionManager.getInstance().getNewAndModifiedArtifacts(baseTransId, toTransId, false);
+                     for (Artifact artifact : RevisionManager.getInstance().getNewAndModifiedArtifacts(baseTransId,
+                           toTransId, false)) {
+                        attributeModifiedArtifactIds.add(artifact.getArtId());
+                     }
                   } catch (SQLException ex) {
-                     // Don't want to repeat the errored search
-                     attributeModifiedArtifacts = new ArrayList<Artifact>();
                      OSEELog.logSevere(SkynetGuiPlugin.class, "Error getting modified artifacts", true);
                   }
                }
                ((BranchLabelProvider) changeTable.getLabelProvider()).setShowChangeType(true,
-                     attributeModifiedArtifacts);
+                     attributeModifiedArtifactIds);
                changeTable.setSorter(viewerSorter);
             } else {
-               ((BranchLabelProvider) changeTable.getLabelProvider()).setShowChangeType(false,
-                     new ArrayList<Artifact>());
+               ((BranchLabelProvider) changeTable.getLabelProvider()).setShowChangeType(false, new ArrayList<Integer>());
                changeTable.setSorter(new LabelSorter());
             }
          }
@@ -474,7 +474,6 @@ public class ChangeReportView extends ViewPart implements IActionable, IEventRec
       toolbarManager.add(sortAction);
       OseeAts.addBugToViewToolbar(this, this, SkynetGuiPlugin.getInstance(), VIEW_ID, "Change Report");
    }
-
    ViewerSorter viewerSorter = new ViewerSorter() {
 
       @SuppressWarnings("unchecked")
@@ -487,8 +486,8 @@ public class ChangeReportView extends ViewPart implements IActionable, IEventRec
                   boolean art1RelChgOnly = false;
                   boolean art2RelChgOnly = false;
                   try {
-                     art1RelChgOnly = !attributeModifiedArtifacts.contains(artChg1.getArtifact());
-                     art2RelChgOnly = !attributeModifiedArtifacts.contains(artChg2.getArtifact());
+                     art1RelChgOnly = !attributeModifiedArtifactIds.contains(artChg1.getArtifact());
+                     art2RelChgOnly = !attributeModifiedArtifactIds.contains(artChg2.getArtifact());
                      // sort relation change only artifacts last
                      if ((art1RelChgOnly && art2RelChgOnly) || (!art1RelChgOnly && !art2RelChgOnly))
                         getComparator().compare(artChg1.getName(), artChg2.getName());
