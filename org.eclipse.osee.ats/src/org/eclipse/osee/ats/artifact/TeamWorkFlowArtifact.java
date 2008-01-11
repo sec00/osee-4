@@ -12,7 +12,6 @@
 package org.eclipse.osee.ats.artifact;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -666,10 +665,10 @@ public class TeamWorkFlowArtifact extends StateMachineArtifact implements IWorld
    }
 
    /* (non-Javadoc)
-    * @see org.eclipse.osee.framework.ui.skynet.widgets.IBranchArtifact#getBranches()
+    * @see org.eclipse.osee.framework.ui.skynet.widgets.IBranchArtifact#getCommitManagerBranch()
     */
-   public Collection<Branch> getBranches() throws IllegalStateException, SQLException {
-      if (getSmaMgr().getBranchMgr().getWorkingBranch() != null) return Arrays.asList(new Branch[] {getSmaMgr().getBranchMgr().getWorkingBranch().getParentBranch()});
+   public Branch getWorkingBranch() throws IllegalStateException, SQLException {
+      if (getSmaMgr().getBranchMgr().getWorkingBranch() != null) return getSmaMgr().getBranchMgr().getWorkingBranch();
       return null;
    }
 }

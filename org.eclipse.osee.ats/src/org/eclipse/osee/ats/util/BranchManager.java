@@ -48,7 +48,9 @@ import org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase.Modif
 import org.eclipse.osee.framework.ui.skynet.branch.BranchView;
 import org.eclipse.osee.framework.ui.skynet.changeReport.ChangeReportView;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
+import org.eclipse.osee.framework.ui.skynet.widgets.IBranchArtifact;
 import org.eclipse.osee.framework.ui.skynet.widgets.dialog.CheckBoxDialog;
+import org.eclipse.osee.framework.ui.skynet.widgets.xcommit.CommitManagerView;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
@@ -144,6 +146,22 @@ public class BranchManager {
          }
       } catch (Exception ex) {
          OSEELog.logException(AtsPlugin.class, "Can't show change report.", ex, true);
+      }
+   }
+
+   /**
+    * Display change report associated with the branch, if exists, or transaction, if branch has been committed.
+    */
+   public void showCommitManager() {
+      try {
+         if (smaMgr.getBranchMgr().getWorkingBranch() == null) {
+            AWorkbench.popup("ERROR", "No working branch");
+         } else if (!(smaMgr.getSma() instanceof IBranchArtifact)) {
+            AWorkbench.popup("ERROR", "Not IBranchArtifact");
+         } else
+            CommitManagerView.openViewUpon((IBranchArtifact) smaMgr.getSma());
+      } catch (SQLException ex) {
+         OSEELog.logException(AtsPlugin.class, ex, true);
       }
    }
 

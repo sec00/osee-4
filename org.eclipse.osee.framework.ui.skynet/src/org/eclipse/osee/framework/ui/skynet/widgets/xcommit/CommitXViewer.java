@@ -12,6 +12,8 @@ package org.eclipse.osee.framework.ui.skynet.widgets.xcommit;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -23,8 +25,6 @@ import org.eclipse.osee.framework.ui.skynet.util.SkynetGuiDebug;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.IXViewerFactory;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewer;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewerColumn;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -36,6 +36,7 @@ public class CommitXViewer extends XViewer {
 
    private static String NAMESPACE = "osee.skynet.gui.CommitXViewer";
    private final XCommitViewer xCommitViewer;
+   private Branch workingBranch;
 
    /**
     * @param parent
@@ -53,11 +54,6 @@ public class CommitXViewer extends XViewer {
    @Override
    protected void createSupportWidgets(Composite parent) {
       super.createSupportWidgets(parent);
-      parent.addDisposeListener(new DisposeListener() {
-         public void widgetDisposed(DisposeEvent e) {
-            ((XCommitContentProvider) getContentProvider()).clear();
-         }
-      });
       createMenuActions();
    }
 
@@ -98,24 +94,18 @@ public class CommitXViewer extends XViewer {
       mm.insertBefore(MENU_GROUP_PRE, new Separator());
    }
 
-   public Collection<Branch> getLoadedUserRoleItems() {
-      return ((XCommitContentProvider) getContentProvider()).getRootSet();
-   }
-
-   public void set(Collection<? extends Branch> branches) {
-      ((XCommitContentProvider) getContentProvider()).set(branches);
-   }
-
-   public void clear() {
-      ((XCommitContentProvider) getContentProvider()).clear();
+   public void setWorkingBranch(Branch workingBranch) {
+      this.workingBranch = workingBranch;
+      Set<Branch> branches = new HashSet<Branch>();
+      branches.add(workingBranch.getParentBranch());
+      setInput(branches.toArray());
+      expandAll();
    }
 
    /**
     * Release resources
     */
    public void dispose() {
-      // Dispose of the table objects is done through separate dispose listener off tree
-      // Tell the label provider to release its resources
       getLabelProvider().dispose();
    }
 
@@ -161,6 +151,13 @@ public class CommitXViewer extends XViewer {
     */
    public XCommitViewer getXUserRoleViewer() {
       return xCommitViewer;
+   }
+
+   /**
+    * @return the workingBranch
+    */
+   public Branch getWorkingBranch() {
+      return workingBranch;
    }
 
 }

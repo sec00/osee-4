@@ -10,86 +10,21 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.widgets.xcommit;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
-import org.eclipse.osee.framework.ui.plugin.util.Displays;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 
 public class XCommitContentProvider implements ITreeContentProvider {
 
-   protected Collection<Branch> rootSet = new HashSet<Branch>();
-   private final CommitXViewer xViewer;
+   private final CommitXViewer commitXViewer;
    private static Object[] EMPTY_ARRAY = new Object[0];
 
-   public XCommitContentProvider(CommitXViewer WorldXViewer) {
+   public XCommitContentProvider(CommitXViewer commitXViewer) {
       super();
-      this.xViewer = WorldXViewer;
-   }
-
-   public void add(final Branch item) {
-      add(Arrays.asList(new Branch[] {item}));
-   }
-
-   public void add(final Collection<? extends Branch> items) {
-      Displays.ensureInDisplayThread(new Runnable() {
-         public void run() {
-            if (xViewer.getInput() == null) xViewer.setInput(rootSet);
-            rootSet.addAll(items);
-            xViewer.refresh();
-         };
-      });
-   }
-
-   public void set(final Collection<? extends Branch> arts) {
-      Displays.ensureInDisplayThread(new Runnable() {
-         public void run() {
-            if (xViewer.getInput() == null) xViewer.setInput(rootSet);
-            clear();
-            add(arts);
-         };
-      });
-   }
-
-   public void remove(final Artifact art) {
-      remove(Arrays.asList(new Artifact[] {art}));
-   }
-
-   public void remove(final Collection<? extends Artifact> arts) {
-      if (xViewer.getInput() == null) xViewer.setInput(rootSet);
-      ArrayList<Branch> delItems = new ArrayList<Branch>();
-      delItems.addAll(rootSet);
-      for (Artifact art : arts) {
-         for (Branch wai : rootSet)
-            if (wai.equals(art)) delItems.add(wai);
-      }
-      removeItems(delItems);
-   }
-
-   public void removeItems(final Collection<? extends Branch> arts) {
-      Displays.ensureInDisplayThread(new Runnable() {
-         public void run() {
-            if (xViewer.getInput() == null) xViewer.setInput(rootSet);
-            rootSet.remove(arts);
-            xViewer.refresh();
-         };
-      });
-   }
-
-   public void clear() {
-      Displays.ensureInDisplayThread(new Runnable() {
-         public void run() {
-            if (xViewer.getInput() == null) xViewer.setInput(rootSet);
-            rootSet.clear();
-            xViewer.refresh();
-         };
-      });
+      this.commitXViewer = commitXViewer;
    }
 
    @SuppressWarnings("unchecked")
@@ -128,13 +63,6 @@ public class XCommitContentProvider implements ITreeContentProvider {
 
    @SuppressWarnings("unchecked")
    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-   }
-
-   /**
-    * @return the rootSet
-    */
-   public Collection<Branch> getRootSet() {
-      return rootSet;
    }
 
 }

@@ -12,7 +12,6 @@
 package org.eclipse.osee.ats.editor.service.branch;
 
 import java.sql.SQLException;
-import org.eclipse.osee.ats.AtsPlugin;
 import org.eclipse.osee.ats.editor.SMAManager;
 import org.eclipse.osee.ats.editor.SMAWorkFlowSection;
 import org.eclipse.osee.ats.editor.service.WorkPageService;
@@ -24,11 +23,8 @@ import org.eclipse.osee.framework.skynet.core.event.RemoteBranchEvent;
 import org.eclipse.osee.framework.skynet.core.event.SkynetEventManager;
 import org.eclipse.osee.framework.ui.plugin.event.Event;
 import org.eclipse.osee.framework.ui.plugin.event.IEventReceiver;
-import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.skynet.XFormToolkit;
-import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.IBranchArtifact;
-import org.eclipse.osee.framework.ui.skynet.widgets.xcommit.CommitManagerView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
@@ -73,16 +69,7 @@ public class CommitManagerService extends WorkPageService implements IEventRecei
                }
 
                public void linkActivated(HyperlinkEvent e) {
-                  try {
-                     if (smaMgr.getBranchMgr().getWorkingBranch() == null) {
-                        AWorkbench.popup("ERROR", "No working branch");
-                     } else if (!(smaMgr.getSma() instanceof IBranchArtifact)) {
-                        AWorkbench.popup("ERROR", "Not IBranchArtifact");
-                     } else
-                        CommitManagerView.openViewUpon((IBranchArtifact) smaMgr.getSma());
-                  } catch (SQLException ex) {
-                     OSEELog.logException(AtsPlugin.class, ex, true);
-                  }
+                  smaMgr.getBranchMgr().showCommitManager();
                }
             });
       }
@@ -130,7 +117,7 @@ public class CommitManagerService extends WorkPageService implements IEventRecei
       boolean enabled = false;
       try {
          enabled =
-               ((smaMgr.getSma() instanceof IBranchArtifact) && ((IBranchArtifact) smaMgr.getSma()).getBranches() != null);
+               ((smaMgr.getSma() instanceof IBranchArtifact) && ((IBranchArtifact) smaMgr.getSma()).getWorkingBranch() != null);
       } catch (SQLException ex) {
          // do nothing
       }
