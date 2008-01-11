@@ -472,7 +472,7 @@ public final class Lib {
             new IOOutputThread(output, new BufferedReader(new InputStreamReader(proc.getErrorStream())));
 
       InputBufferThread outThread =
-            new InputBufferThread(new BufferedReader(new InputStreamReader(proc.getInputStream())));
+            new InputBufferThread(proc.getInputStream());
 
       errThread.setName("err");
       outThread.setName("out");
