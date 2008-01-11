@@ -583,15 +583,6 @@ public class BranchView extends ViewPart implements IActionable, IEventReceiver 
       createBranchSelectionMenu(subMenuManager, new CommitHandler(menuManager, false));
    }
 
-   // private void createClipboardCommand(MenuManager menuManager) {
-   // CommandContributionItem clipBoardCommand = Commands.getLocalCommandContribution(getSite(),
-   // "clipBoardCommand", "Copy", null, null, null, null, null, null);
-   // menuManager.add(clipBoardCommand);
-   //
-   // // handlerService.activateHandler(clipBoardCommand.getId(), new
-   // ArtifactClipboardCommand(menuManager, null, null, null));
-   // }
-
    private void createDeleteBranchCommand(MenuManager menuManager) {
       CommandContributionItem deleteBranchCommand =
             Commands.getLocalCommandContribution(getSite(), "deleteBranchCommand", "Delete Branch", null, null, null,
