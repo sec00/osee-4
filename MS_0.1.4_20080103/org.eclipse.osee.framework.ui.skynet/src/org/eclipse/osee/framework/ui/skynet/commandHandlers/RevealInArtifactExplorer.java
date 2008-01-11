@@ -48,7 +48,7 @@ public class RevealInArtifactExplorer extends AbstractSelectionChangedHandler {
       ISelectionProvider selectionProvider =
             AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider();
 
-      if (selectionProvider != null) {
+      if (selectionProvider != null && selectionProvider.getSelection() instanceof IStructuredSelection) {
          IStructuredSelection structuredSelection = (IStructuredSelection) selectionProvider.getSelection();
          List<Artifact> artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
 

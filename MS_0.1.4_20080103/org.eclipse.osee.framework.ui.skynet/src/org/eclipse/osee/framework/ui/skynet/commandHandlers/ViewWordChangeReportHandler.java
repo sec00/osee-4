@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
 import org.eclipse.osee.framework.skynet.core.access.PermissionEnum;
@@ -93,19 +94,27 @@ public class ViewWordChangeReportHandler extends AbstractSelectionChangedHandler
       if (PlatformUI.getWorkbench().isClosing()) {
          return false;
       }
-      List<Artifact> artifacts = new LinkedList<Artifact>();
-      try {
-         IStructuredSelection structuredSelection =
-               (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
-         mySelectedArtifactChangeList = Handlers.getArtifactChangesFromStructuredSelection(structuredSelection);
 
-         for (ArtifactChange artifactChange : mySelectedArtifactChangeList) {
-            artifacts.add(artifactChange.getArtifact());
+      List<Artifact> artifacts = new LinkedList<Artifact>();
+      boolean isEnabled = false;
+
+      try {
+         ISelectionProvider selectionProvider =
+               AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider();
+
+         if (selectionProvider != null && selectionProvider.getSelection() instanceof IStructuredSelection) {
+            IStructuredSelection structuredSelection = (IStructuredSelection) selectionProvider.getSelection();
+            mySelectedArtifactChangeList = Handlers.getArtifactChangesFromStructuredSelection(structuredSelection);
+
+            for (ArtifactChange artifactChange : mySelectedArtifactChangeList) {
+               artifacts.add(artifactChange.getArtifact());
+            }
+            isEnabled = accessControlManager.checkObjectListPermission(artifacts, PermissionEnum.READ);
          }
       } catch (SQLException ex) {
          OSEELog.logException(getClass(), ex, true);
       }
 
-      return accessControlManager.checkObjectListPermission(artifacts, PermissionEnum.READ);
+      return isEnabled;
    }
 }

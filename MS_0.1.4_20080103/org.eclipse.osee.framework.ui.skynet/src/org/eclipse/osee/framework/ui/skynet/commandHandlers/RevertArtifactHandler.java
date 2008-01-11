@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.framework.jdk.core.util.Collections;
 import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
@@ -221,24 +222,29 @@ public class RevertArtifactHandler extends AbstractSelectionChangedHandler {
          return false;
       }
 
+      boolean isEnabled = false;
       try {
-         IStructuredSelection structuredSelection =
-               (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
+         ISelectionProvider selectionProvider =
+               AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider();
 
-         List<ArtifactChange> artifactChanges = Handlers.getArtifactChangesFromStructuredSelection(structuredSelection);
+         if (selectionProvider != null && selectionProvider.getSelection() instanceof IStructuredSelection) {
+            IStructuredSelection structuredSelection = (IStructuredSelection) selectionProvider.getSelection();
+            List<ArtifactChange> artifactChanges =
+                  Handlers.getArtifactChangesFromStructuredSelection(structuredSelection);
 
-         if (artifactChanges.isEmpty()) {
-            return false;
+            if (artifactChanges.isEmpty()) {
+               return false;
+            }
+
+            artifactChange = artifactChanges.get(0);
+
+            isEnabled =
+                  myAccessControlManager.checkObjectPermission(artifactChange.getArtifact(), PermissionEnum.WRITE);
          }
-
-         artifactChange = artifactChanges.get(0);
-
-         boolean writePermission =
-               myAccessControlManager.checkObjectPermission(artifactChange.getArtifact(), PermissionEnum.WRITE);
-         return writePermission;
       } catch (Exception ex) {
          OSEELog.logException(getClass(), ex, true);
          return false;
       }
+      return isEnabled;
    }
 }

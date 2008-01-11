@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.List;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
 import org.eclipse.osee.framework.skynet.core.access.PermissionEnum;
@@ -81,32 +82,40 @@ public class WordChangesToParentHandler extends AbstractSelectionChangedHandler 
       if (PlatformUI.getWorkbench().isClosing()) {
          return false;
       }
+
+      boolean isEnabled = false;
+
       try {
-         IStructuredSelection myIStructuredSelection =
-               (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
-         mySelectedArtifactChangeList = Handlers.getArtifactChangesFromStructuredSelection(myIStructuredSelection);
+         ISelectionProvider selectionProvider =
+               AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider();
 
-         if (mySelectedArtifactChangeList.size() == 0) {
-            return (false);
+         if (selectionProvider != null && selectionProvider.getSelection() instanceof IStructuredSelection) {
+            IStructuredSelection structuredSelection = (IStructuredSelection) selectionProvider.getSelection();
+            mySelectedArtifactChangeList = Handlers.getArtifactChangesFromStructuredSelection(structuredSelection);
+
+            if (mySelectedArtifactChangeList.size() == 0) {
+               return (false);
+            }
+            ArtifactChange mySelectedArtifactChange = mySelectedArtifactChangeList.get(0);
+
+            if (mySelectedArtifactChange.getModType() == NEW || mySelectedArtifactChange.getModType() == DELETE) {
+               return (false);
+            }
+
+            Artifact changedArtifact = mySelectedArtifactChange.getArtifact();
+            Branch reportBranch = changedArtifact.getBranch();
+            Branch parentBranch = reportBranch.getParentBranch();
+            boolean wordArtifactSelected = changedArtifact instanceof WordArtifact;
+            boolean validDiffParent = wordArtifactSelected && parentBranch != null;
+
+            boolean readPermission = myAccessControlManager.checkObjectPermission(changedArtifact, PermissionEnum.READ);
+            boolean modifiedWordArtifactSelected =
+                  wordArtifactSelected && mySelectedArtifactChange.getModType() == CHANGE;
+            isEnabled = validDiffParent && modifiedWordArtifactSelected && readPermission;
          }
-         ArtifactChange mySelectedArtifactChange = mySelectedArtifactChangeList.get(0);
-
-         if (mySelectedArtifactChange.getModType() == NEW || mySelectedArtifactChange.getModType() == DELETE) {
-            return (false);
-         }
-
-         Artifact changedArtifact = mySelectedArtifactChange.getArtifact();
-         Branch reportBranch = changedArtifact.getBranch();
-         Branch parentBranch = reportBranch.getParentBranch();
-         boolean wordArtifactSelected = changedArtifact instanceof WordArtifact;
-         boolean validDiffParent = wordArtifactSelected && parentBranch != null;
-
-         boolean readPermission = myAccessControlManager.checkObjectPermission(changedArtifact, PermissionEnum.READ);
-         boolean modifiedWordArtifactSelected = wordArtifactSelected && mySelectedArtifactChange.getModType() == CHANGE;
-         return validDiffParent && modifiedWordArtifactSelected && readPermission;
       } catch (SQLException ex) {
          OSEELog.logException(getClass(), ex, true);
-         return (false);
       }
+      return isEnabled;
    }
 }

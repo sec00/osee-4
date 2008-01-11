@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.List;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
 import org.eclipse.osee.framework.skynet.core.access.PermissionEnum;
@@ -71,24 +72,28 @@ public class WordChangesMadeToHandler extends AbstractSelectionChangedHandler {
          return false;
       }
 
-      IStructuredSelection myIStructuredSelection =
-            (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
+      boolean isEnabled = false;
+      ISelectionProvider selectionProvider =
+            AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider();
 
-      mySelectedArtifactChangeList = Handlers.getArtifactChangesFromStructuredSelection(myIStructuredSelection);
+      if (selectionProvider != null && selectionProvider.getSelection() instanceof IStructuredSelection) {
+         IStructuredSelection structuredSelection = (IStructuredSelection) selectionProvider.getSelection();
+         mySelectedArtifactChangeList = Handlers.getArtifactChangesFromStructuredSelection(structuredSelection);
 
-      if (mySelectedArtifactChangeList.size() == 0) {
-         return false;
+         if (mySelectedArtifactChangeList.size() == 0) {
+            return false;
+         }
+         ArtifactChange mySelectedArtifactChange = mySelectedArtifactChangeList.get(0);
+
+         try {
+            Artifact changedArtifact = mySelectedArtifactChange.getArtifact();
+            boolean readPermission = myAccessControlManager.checkObjectPermission(changedArtifact, PermissionEnum.READ);
+            boolean wordArtifactSelected = changedArtifact instanceof WordArtifact;
+            isEnabled = readPermission && wordArtifactSelected;
+         } catch (SQLException ex) {
+            OSEELog.logException(getClass(), ex, true);
+         }
       }
-      ArtifactChange mySelectedArtifactChange = mySelectedArtifactChangeList.get(0);
-
-      try {
-         Artifact changedArtifact = mySelectedArtifactChange.getArtifact();
-         boolean readPermission = myAccessControlManager.checkObjectPermission(changedArtifact, PermissionEnum.READ);
-         boolean wordArtifactSelected = changedArtifact instanceof WordArtifact;
-         return readPermission && wordArtifactSelected;
-      } catch (SQLException ex) {
-         OSEELog.logException(getClass(), ex, true);
-         return (false);
-      }
+      return isEnabled;
    }
 }

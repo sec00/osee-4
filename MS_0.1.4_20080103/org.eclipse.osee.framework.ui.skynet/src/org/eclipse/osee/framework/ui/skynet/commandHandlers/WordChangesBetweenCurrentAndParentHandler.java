@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
 import org.eclipse.osee.framework.skynet.core.access.PermissionEnum;
@@ -67,28 +68,33 @@ public class WordChangesBetweenCurrentAndParentHandler extends AbstractSelection
          return false;
       }
 
-      IStructuredSelection structuredSelection =
-            (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
-      List<ArtifactChange> artifactChanges = Handlers.getArtifactChangesFromStructuredSelection(structuredSelection);
+      boolean isEnabled = false;
+      ISelectionProvider selectionProvider =
+            AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider();
 
-      if (artifactChanges.size() == 0) {
-         return false;
+      if (selectionProvider != null && selectionProvider.getSelection() instanceof IStructuredSelection) {
+         IStructuredSelection structuredSelection = (IStructuredSelection) selectionProvider.getSelection();
+         List<ArtifactChange> artifactChanges = Handlers.getArtifactChangesFromStructuredSelection(structuredSelection);
+
+         if (artifactChanges.size() == 0) {
+            return false;
+         }
+
+         artifactChange = artifactChanges.get(0);
+         try {
+            Artifact artifact = artifactChange.getArtifact();
+
+            boolean readPermission = myAccessControlManager.checkObjectPermission(artifact, PermissionEnum.READ);
+            boolean wordArtifactSelected = artifact instanceof WordArtifact;
+            boolean modifiedWordArtifactSelected =
+                  wordArtifactSelected && artifactChange.getModType() == SkynetDatabase.ModificationType.CHANGE;
+            boolean conflictedWordArtifactSelected =
+                  modifiedWordArtifactSelected && artifactChange.getChangeType() == ChangeType.CONFLICTING;
+            isEnabled = readPermission && conflictedWordArtifactSelected;
+         } catch (SQLException ex) {
+            OSEELog.logException(getClass(), ex, true);
+         }
       }
-
-      artifactChange = artifactChanges.get(0);
-      try {
-         Artifact artifact = artifactChange.getArtifact();
-
-         boolean readPermission = myAccessControlManager.checkObjectPermission(artifact, PermissionEnum.READ);
-         boolean wordArtifactSelected = artifact instanceof WordArtifact;
-         boolean modifiedWordArtifactSelected =
-               wordArtifactSelected && artifactChange.getModType() == SkynetDatabase.ModificationType.CHANGE;
-         boolean conflictedWordArtifactSelected =
-               modifiedWordArtifactSelected && artifactChange.getChangeType() == ChangeType.CONFLICTING;
-         return readPermission && conflictedWordArtifactSelected;
-      } catch (SQLException ex) {
-         OSEELog.logException(getClass(), ex, true);
-         return (false);
-      }
+      return isEnabled;
    }
 }
