@@ -48,7 +48,7 @@ public class OpenMassArtifactEditorHandler extends AbstractSelectionChangedHandl
       ISelectionProvider selectionProvider =
             AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider();
 
-      if (selectionProvider != null) {
+      if (selectionProvider != null && selectionProvider.getSelection() instanceof IStructuredSelection) {
          IStructuredSelection structuredSelection = (IStructuredSelection) selectionProvider.getSelection();
          artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
 

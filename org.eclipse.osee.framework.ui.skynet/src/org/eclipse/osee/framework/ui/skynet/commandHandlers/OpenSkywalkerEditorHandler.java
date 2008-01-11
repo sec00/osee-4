@@ -14,6 +14,7 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
@@ -28,12 +29,16 @@ public class OpenSkywalkerEditorHandler extends AbstractHandler {
     */
    @Override
    public Object execute(ExecutionEvent arg0) throws ExecutionException {
-      IStructuredSelection structuredSelection =
-            (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
-      List<Artifact> artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
+      ISelectionProvider selectionProvider =
+            AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider();
 
-      if (!artifacts.isEmpty()) {
-         SkyWalkerView.exploreArtifact(artifacts.iterator().next());
+      if (selectionProvider != null && selectionProvider.getSelection() instanceof IStructuredSelection) {
+         IStructuredSelection structuredSelection = (IStructuredSelection) selectionProvider.getSelection();
+         List<Artifact> artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
+
+         if (!artifacts.isEmpty()) {
+            SkyWalkerView.exploreArtifact(artifacts.iterator().next());
+         }
       }
       return null;
    }

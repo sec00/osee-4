@@ -14,6 +14,7 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
@@ -46,15 +47,22 @@ public class OpenArtifactsInAtsWorldHandler extends AbstractHandler {
       if (PlatformUI.getWorkbench().isClosing()) {
          return false;
       }
-      try {
-         IStructuredSelection structuredSelection =
-               (IStructuredSelection) AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider().getSelection();
-         artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
 
-         return artifacts.size() > 0;
+      boolean isEnabled = false;
+      try {
+         ISelectionProvider selectionProvider =
+               AWorkbench.getActivePage().getActivePart().getSite().getSelectionProvider();
+
+         if (selectionProvider != null && selectionProvider.getSelection() instanceof IStructuredSelection) {
+            IStructuredSelection structuredSelection = (IStructuredSelection) selectionProvider.getSelection();
+            artifacts = Handlers.getArtifactsFromStructuredSelection(structuredSelection);
+
+            isEnabled = artifacts.size() > 0;
+         }
       } catch (Exception ex) {
          OSEELog.logException(getClass(), ex, true);
-         return false;
+         return isEnabled;
       }
+      return isEnabled;
    }
 }
