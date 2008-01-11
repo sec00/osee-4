@@ -113,6 +113,13 @@ public class Branch implements Comparable<Branch>, IAdaptable {
       return branchShortName;
    }
 
+   public String getBranchShortestName() {
+      if (branchShortName != null)
+         return branchShortName;
+      else
+         return branchName;
+   }
+
    /**
     * Sets the branch short name to the given value
     * 

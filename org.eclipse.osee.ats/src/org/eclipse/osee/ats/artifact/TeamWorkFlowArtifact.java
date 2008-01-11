@@ -12,6 +12,7 @@
 package org.eclipse.osee.ats.artifact;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -42,13 +43,14 @@ import org.eclipse.osee.framework.skynet.core.util.Artifacts;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
 import org.eclipse.osee.framework.ui.skynet.util.ChangeType;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
+import org.eclipse.osee.framework.ui.skynet.widgets.IBranchArtifact;
 import org.eclipse.osee.framework.ui.skynet.widgets.XDate;
 import org.eclipse.swt.widgets.Display;
 
 /**
  * @author Donald G. Dunne
  */
-public class TeamWorkFlowArtifact extends StateMachineArtifact implements IWorldViewArtifact, IATSStateMachineArtifact {
+public class TeamWorkFlowArtifact extends StateMachineArtifact implements IWorldViewArtifact, IBranchArtifact, IATSStateMachineArtifact {
 
    public static String ARTIFACT_NAME = "Team Workflow";
    private XActionableItemsDam actionableItemsDam;
@@ -654,5 +656,20 @@ public class TeamWorkFlowArtifact extends StateMachineArtifact implements IWorld
       } catch (SQLException ex) {
          return "Exception: " + ex.getLocalizedMessage();
       }
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.skynet.widgets.IBranchArtifact#getArtifact()
+    */
+   public Artifact getArtifact() {
+      return this;
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.skynet.widgets.IBranchArtifact#getBranches()
+    */
+   public Collection<Branch> getBranches() throws IllegalStateException, SQLException {
+      if (getSmaMgr().getBranchMgr().getWorkingBranch() != null) return Arrays.asList(new Branch[] {getSmaMgr().getBranchMgr().getWorkingBranch().getParentBranch()});
+      return null;
    }
 }
