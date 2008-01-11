@@ -57,7 +57,7 @@ public class CommitManagerView extends ViewPart implements IActionable {
                      IWorkbenchPage page = AWorkbench.getActivePage();
                      CommitManagerView commitManagerView =
                            (CommitManagerView) page.showView(VIEW_ID,
-                                 String.valueOf(branchArtifact.getBranches().iterator().next().getBranchId()),
+                                 String.valueOf(branchArtifact.getWorkingBranch().getBranchId()),
                                  IWorkbenchPage.VIEW_ACTIVATE);
                      commitManagerView.explore(branchArtifact);
 
@@ -116,7 +116,7 @@ public class CommitManagerView extends ViewPart implements IActionable {
       try {
          if (xCommitViewer != null && branchArtifact != null) xCommitViewer.setArtifact(branchArtifact.getArtifact(),
                "");
-         setPartName("Commit Manager: " + branchArtifact.getBranches().iterator().next().getBranchShortestName());
+         setPartName("Commit Manager: " + branchArtifact.getWorkingBranch().getBranchShortestName());
       } catch (SQLException ex) {
          OSEELog.logException(SkynetGuiPlugin.class, ex, true);
       }
