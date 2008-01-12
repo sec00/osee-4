@@ -19,6 +19,10 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
+import org.eclipse.osee.framework.skynet.core.event.BranchEvent;
+import org.eclipse.osee.framework.skynet.core.event.SkynetEventManager;
+import org.eclipse.osee.framework.ui.plugin.event.Event;
+import org.eclipse.osee.framework.ui.plugin.event.IEventReceiver;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.util.SkynetGuiDebug;
@@ -32,7 +36,7 @@ import org.eclipse.swt.widgets.TreeItem;
 /**
  * @author Donald G. Dunne
  */
-public class CommitXViewer extends XViewer {
+public class CommitXViewer extends XViewer implements IEventReceiver {
 
    private static String NAMESPACE = "osee.skynet.gui.CommitXViewer";
    private final XCommitViewer xCommitViewer;
@@ -44,6 +48,7 @@ public class CommitXViewer extends XViewer {
     */
    public CommitXViewer(Composite parent, int style, XCommitViewer xViewer) {
       this(parent, style, NAMESPACE, new CommitXViewerFactory(), xViewer);
+      SkynetEventManager.getInstance().register(BranchEvent.class, this);
    }
 
    public CommitXViewer(Composite parent, int style, String nameSpace, IXViewerFactory xViewerFactory, XCommitViewer xRoleViewer) {
@@ -158,6 +163,20 @@ public class CommitXViewer extends XViewer {
     */
    public Branch getWorkingBranch() {
       return workingBranch;
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.plugin.event.IEventReceiver#onEvent(org.eclipse.osee.framework.ui.plugin.event.Event)
+    */
+   public void onEvent(Event event) {
+      xCommitViewer.refresh();
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.plugin.event.IEventReceiver#runOnEventInDisplayThread()
+    */
+   public boolean runOnEventInDisplayThread() {
+      return true;
    }
 
 }
