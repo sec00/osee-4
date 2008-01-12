@@ -14,6 +14,7 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
+import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewerCells;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewerColumn;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -21,11 +22,11 @@ import org.eclipse.swt.graphics.Image;
 public class XCommitLabelProvider implements ITableLabelProvider {
    Font font = null;
 
-   private final CommitXViewer treeViewer;
+   private final CommitXViewer commitXViewer;
 
-   public XCommitLabelProvider(CommitXViewer treeViewer) {
+   public XCommitLabelProvider(CommitXViewer commitXViewer) {
       super();
-      this.treeViewer = treeViewer;
+      this.commitXViewer = commitXViewer;
    }
 
    public String getColumnText(Object element, int columnIndex) {
@@ -37,7 +38,7 @@ public class XCommitLabelProvider implements ITableLabelProvider {
       }
       Branch branch = ((Branch) element);
       if (branch == null) return "";
-      XViewerColumn xCol = treeViewer.getXTreeColumn(columnIndex);
+      XViewerColumn xCol = commitXViewer.getXTreeColumn(columnIndex);
       if (xCol != null) {
          CommitColumn aCol = CommitColumn.getAtsXColumn(xCol);
          return getColumnText(element, columnIndex, branch, xCol, aCol);
@@ -58,11 +59,27 @@ public class XCommitLabelProvider implements ITableLabelProvider {
     */
    public String getColumnText(Object element, int columnIndex, Branch branch, XViewerColumn xCol, CommitColumn aCol) {
       if (!xCol.isShow()) return ""; // Since not shown, don't display
-      if (aCol == CommitColumn.Status_Col)
-         return "Hours";
-      else if (aCol == CommitColumn.Status_Col)
-         return "Status";
-      else if (aCol == CommitColumn.Name_Col) return branch.getBranchName();
+      if (aCol == CommitColumn.Type_Col) {
+         if (branch.equals(commitXViewer.getWorkingBranch()))
+            return "Working";
+         else if (branch.equals(commitXViewer.getWorkingBranch().getParentBranch()))
+            return "Parent Baseline";
+         else {
+            try {
+               if (branch.isBaselineBranch()) return "Baseline";
+            } catch (Exception ex) {
+               return XViewerCells.getCellExceptionString(ex);
+            }
+         }
+         return "";
+      } else if (aCol == CommitColumn.Status_Col) {
+         if (branch.equals(commitXViewer.getWorkingBranch()))
+            return "";
+         else if (branch.equals(commitXViewer.getWorkingBranch().getParentBranch()) || branch.isBaselineBranch()) return isCommittedInto(branch) ? "Committed" : "UnCommitted";
+         return "";
+      } else if (aCol == CommitColumn.Name_Col)
+         return branch.getBranchName();
+      else if (aCol == CommitColumn.Short_Name_Col) return branch.getBranchShortName();
       return "Unhandled Column";
    }
 
@@ -82,17 +99,35 @@ public class XCommitLabelProvider implements ITableLabelProvider {
    }
 
    public CommitXViewer getTreeViewer() {
-      return treeViewer;
+      return commitXViewer;
    }
 
    public Image getColumnImage(Object element, int columnIndex) {
       if (element instanceof String) return null;
       Branch branch = (Branch) element;
-      XViewerColumn xCol = treeViewer.getXTreeColumn(columnIndex);
+      XViewerColumn xCol = commitXViewer.getXTreeColumn(columnIndex);
       if (xCol == null) return null;
       CommitColumn dCol = CommitColumn.getAtsXColumn(xCol);
       if (!xCol.isShow()) return null; // Since not shown, don't display
-      if (dCol == CommitColumn.Name_Col) return SkynetGuiPlugin.getInstance().getImage("branch.gif");
+      if (dCol == CommitColumn.Name_Col) {
+         if (branch.equals(commitXViewer.getWorkingBranch())) return SkynetGuiPlugin.getInstance().getImage(
+               "nav_forward.gif");
+         return SkynetGuiPlugin.getInstance().getImage("branch.gif");
+      } else if (dCol == CommitColumn.Status_Col) {
+         return getCommitStatusImage(branch);
+      }
+      return null;
+   }
+
+   private boolean isCommittedInto(Branch branch) {
+      return !branch.getBranchName().equals("ftb2");
+   }
+
+   private Image getCommitStatusImage(Branch branch) {
+      if (branch.equals(commitXViewer.getWorkingBranch()))
+         return null;
+      else if (branch.equals(commitXViewer.getWorkingBranch().getParentBranch()) || branch.isBaselineBranch()) return isCommittedInto(branch) ? SkynetGuiPlugin.getInstance().getImage(
+            "green_light.gif") : SkynetGuiPlugin.getInstance().getImage("red_light.gif");
       return null;
    }
 }

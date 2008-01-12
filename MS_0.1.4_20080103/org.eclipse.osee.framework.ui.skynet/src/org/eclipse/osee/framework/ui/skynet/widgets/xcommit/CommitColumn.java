@@ -21,9 +21,13 @@ import org.eclipse.swt.SWT;
  */
 public enum CommitColumn {
 
+   Type_Col("Type", 100, SWT.LEFT, true, SortDataType.String, false),
+
    Status_Col("Status", 100, SWT.LEFT, true, SortDataType.String, false),
 
-   Name_Col("Name", 700, SWT.LEFT, true, SortDataType.String, false);
+   Name_Col("Name", 450, SWT.LEFT, true, SortDataType.String, false),
+
+   Short_Name_Col("Short Name", 200, SWT.LEFT, true, SortDataType.String, false);
 
    private final String name;
    private final int width;

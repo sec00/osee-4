@@ -169,7 +169,7 @@ public class XCommitViewer extends XWidget implements IEventReceiver, IDamWidget
    public void loadTable() {
       try {
          if (artifact != null && (artifact instanceof IBranchArtifact)) xCommitViewer.setWorkingBranch(((IBranchArtifact) artifact).getWorkingBranch());
-         extraInfoLabel.setText("Commit Status for branch: " + ((IBranchArtifact) artifact).getWorkingBranch());
+         extraInfoLabel.setText("Commit Status for branch: \"" + ((IBranchArtifact) artifact).getWorkingBranch() + "\" - \"" + ((IBranchArtifact) artifact).getWorkingBranch().getBranchShortName() + "\"");
       } catch (Exception ex) {
          OSEELog.logException(SkynetGuiPlugin.class, ex, true);
       }
