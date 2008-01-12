@@ -216,11 +216,6 @@ public class XCommitViewer extends XWidget implements IEventReceiver, IDamWidget
          extraInfoLabel.setText("At least one role entry is required");
          return false;
       }
-      //      Result result = reviewArt.isUserRoleValid();
-      //      if (result.isFalse()) {
-      //         extraInfoLabel.setText(result.getText());
-      //         return false;
-      //      }
       extraInfoLabel.setText("");
       return true;
    }
@@ -236,26 +231,7 @@ public class XCommitViewer extends XWidget implements IEventReceiver, IDamWidget
 
    @Override
    public String toHTML(String labelFont) {
-      if (getXViewer().getTree().getItemCount() == 0) return "";
-      StringBuffer html = new StringBuffer();
-      try {
-         html.append(AHTML.addSpace(1) + AHTML.getLabelStr(AHTML.LABEL_FONT, "Tasks"));
-         html.append(AHTML.startBorderTable(100, normalColor, ""));
-         html.append(AHTML.addHeaderRowMultiColumnTable(new String[] {"Role", "User", "Hours", "Major", "Minor",
-               "Issues"}));
-         //         for (UserRole item : reviewArt.getUserRoleManager().getUserRoles()) {
-         //            html.append(AHTML.addRowMultiColumnTable(new String[] {item.getRole().name(), item.getUser().getName(),
-         //                  AtsLib.doubleToStrString(item.getHoursSpent(), true),
-         //                  reviewArt.getUserRoleManager().getNumMajor(item.getUser()) + "",
-         //                  reviewArt.getUserRoleManager().getNumMinor(item.getUser()) + "",
-         //                  reviewArt.getUserRoleManager().getNumIssues(item.getUser()) + ""}));
-         //         }
-         html.append(AHTML.endBorderTable());
-      } catch (Exception ex) {
-         OSEELog.logException(SkynetGuiPlugin.class, ex, false);
-         return "User Role Item Exception - " + ex.getLocalizedMessage();
-      }
-      return html.toString();
+      return AHTML.simplePage("Unhandled");
    }
 
    @Override
