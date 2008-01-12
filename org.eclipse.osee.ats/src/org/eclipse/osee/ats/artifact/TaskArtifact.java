@@ -32,6 +32,7 @@ import org.eclipse.osee.framework.skynet.core.relation.RelationSide;
 import org.eclipse.osee.framework.skynet.core.util.Artifacts;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
+import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewerCells;
 
 /**
  * @author Donald G. Dunne
@@ -306,7 +307,7 @@ public class TaskArtifact extends StateMachineArtifact implements IWorldViewArti
          }
          return "";
       } catch (Exception ex) {
-         return getCellExceptionString(ex);
+         return XViewerCells.getCellExceptionString(ex);
       }
    }
 
