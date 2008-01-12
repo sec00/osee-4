@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -62,6 +63,8 @@ public class CommitXViewer extends XViewer implements IEventReceiver {
       createMenuActions();
    }
 
+   Action openMergeViewAction;
+
    public void createMenuActions() {
       MenuManager mm = getMenuManager();
       mm.createContextMenu(getControl());
@@ -70,6 +73,22 @@ public class CommitXViewer extends XViewer implements IEventReceiver {
             updateMenuActions();
          }
       });
+
+      openMergeViewAction = new Action("Open Merge View", Action.AS_PUSH_BUTTON) {
+         @Override
+         public void run() {
+            AWorkbench.popup("ERROR", "Not implemented yet");
+         }
+      };
+   }
+
+   public void updateEditMenuActions() {
+      MenuManager mm = getMenuManager();
+
+      // EDIT MENU BLOCK
+      mm.insertBefore(MENU_GROUP_PRE, openMergeViewAction);
+      openMergeViewAction.setEnabled(getSelectedBranches().size() == 1 && getSelectedBranches().iterator().next().isBaselineBranch());
+
    }
 
    @Override
@@ -83,12 +102,6 @@ public class CommitXViewer extends XViewer implements IEventReceiver {
    @Override
    public boolean isColumnMultiEditEnabled() {
       return true;
-   }
-
-   public void updateEditMenuActions() {
-      // MenuManager mm = getMenuManager();
-
-      // EDIT MENU BLOCK
    }
 
    public void updateMenuActions() {
@@ -114,7 +127,7 @@ public class CommitXViewer extends XViewer implements IEventReceiver {
       getLabelProvider().dispose();
    }
 
-   public ArrayList<Branch> getSelectedBranchItems() {
+   public ArrayList<Branch> getSelectedBranches() {
       ArrayList<Branch> arts = new ArrayList<Branch>();
       TreeItem items[] = getTree().getSelection();
       if (items.length > 0) for (TreeItem item : items)
