@@ -16,6 +16,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.artifact.ArtifactPersistenceManager;
+import org.eclipse.osee.framework.skynet.core.artifact.Branch;
+import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
 import org.eclipse.osee.framework.ui.plugin.util.Jobs;
@@ -26,7 +30,10 @@ import org.eclipse.osee.framework.ui.skynet.widgets.IBranchArtifact;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -39,6 +46,7 @@ public class CommitManagerView extends ViewPart implements IActionable {
    private static String HELP_CONTEXT_ID = "CommitManagerView";
    private XCommitViewer xCommitViewer;
    private IBranchArtifact branchArtifact;
+   private static final String INPUT = "CommitManagerViewInput";
 
    /**
     * @author Donald G. Dunne
@@ -124,6 +132,49 @@ public class CommitManagerView extends ViewPart implements IActionable {
 
    public String getActionDescription() {
       return "";
+   }
+
+   @Override
+   public void init(IViewSite site, IMemento memento) throws PartInitException {
+      super.init(site, memento);
+
+      try {
+         if (memento != null) {
+            memento = memento.getChild(INPUT);
+            if (memento != null) {
+               int artId = memento.getInteger("artId");
+               if (artId > 0) {
+                  int branchId = memento.getInteger("branchId");
+                  if (branchId > 0) {
+                     Branch branch = BranchPersistenceManager.getInstance().getBranch(branchId);
+                     if (branch != null) {
+                        Artifact artifact = ArtifactPersistenceManager.getInstance().getArtifactFromId(artId, branch);
+                        if (artifact != null) explore((IBranchArtifact) artifact);
+                     }
+                  }
+               }
+            }
+         }
+      } catch (Exception ex) {
+         OSEELog.logWarning(getClass(), "Commit Manager error on init: " + ex.getLocalizedMessage(), false);
+      }
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.eclipse.ui.part.ViewPart#saveState(org.eclipse.ui.IMemento)
+    */
+   @Override
+   public void saveState(IMemento memento) {
+      super.saveState(memento);
+      try {
+         memento = memento.createChild(INPUT);
+         memento.putInteger("artId", branchArtifact.getArtifact().getArtId());
+         memento.putInteger("branchId", branchArtifact.getArtifact().getBranch().getBranchId());
+      } catch (Exception ex) {
+         OSEELog.logException(SkynetGuiPlugin.class, ex, false);
+      }
    }
 
 }
