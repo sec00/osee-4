@@ -40,8 +40,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osee.framework.jdk.core.type.DoubleKeyHashMap;
 import org.eclipse.osee.framework.jdk.core.util.time.GlobalTime;
 import org.eclipse.osee.framework.messaging.event.skynet.ISkynetArtifactEvent;
-import org.eclipse.osee.framework.messaging.event.skynet.event.RemoteArtifactDeletedEvent;
-import org.eclipse.osee.framework.messaging.event.skynet.event.RemoteArtifactModifiedEvent;
+import org.eclipse.osee.framework.messaging.event.skynet.event.NetworkArtifactDeletedEvent;
+import org.eclipse.osee.framework.messaging.event.skynet.event.NetworkArtifactModifiedEvent;
 import org.eclipse.osee.framework.messaging.event.skynet.event.SkynetAttributeChange;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.plugin.core.util.ExtensionDefinedObjects;
@@ -1117,7 +1117,7 @@ public class ArtifactPersistenceManager implements PersistenceManager {
          processTransactionForArtifact(artifact, SkynetDatabase.ModificationType.DELETE, transaction,
                SkynetDatabase.getNextGammaId());
 
-         transaction.addRemoteEvent(new RemoteArtifactDeletedEvent(artifact.getBranch().getBranchId(),
+         transaction.addRemoteEvent(new NetworkArtifactDeletedEvent(artifact.getBranch().getBranchId(),
                transaction.getTransactionNumber(), artifact.getArtId(), artifact.getArtTypeId(),
                artifact.getFactory().getClass().getCanonicalName(),
                SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId()));
@@ -1263,7 +1263,7 @@ public class ArtifactPersistenceManager implements PersistenceManager {
                }
             }
 
-            if (event instanceof RemoteArtifactModifiedEvent) {
+            if (event instanceof NetworkArtifactModifiedEvent) {
                // only if links are loaded
                if (oldArtifact.isLinkManagerLoaded()) {
                   links = oldArtifact.getLinkManager().getLinks();
@@ -1273,12 +1273,12 @@ public class ArtifactPersistenceManager implements PersistenceManager {
 
                Artifact newArtifact = (Artifact) oldArtifact.clone();
                setChangedAttributesOnNewArtifact(newArtifact,
-                     ((RemoteArtifactModifiedEvent) event).getAttributeChanges());
+                     ((NetworkArtifactModifiedEvent) event).getAttributeChanges());
                relationManager.resetLinksToNewArtifact(newArtifact, oldArtifact, links);
                newArtifact.setNotDirty();
 
                localEvents.add(new ArtifactVersionIncrementedEvent(oldArtifact, newArtifact, this));
-            } else if (event instanceof RemoteArtifactDeletedEvent) {
+            } else if (event instanceof NetworkArtifactDeletedEvent) {
                oldArtifact.setDeleted();
                localEvents.add(new TransactionArtifactModifiedEvent(oldArtifact, ModType.Deleted, this));
             }

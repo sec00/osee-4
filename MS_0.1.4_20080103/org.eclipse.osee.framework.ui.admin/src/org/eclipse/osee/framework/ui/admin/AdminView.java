@@ -18,7 +18,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
 import org.eclipse.osee.framework.messaging.event.skynet.ISkynetEvent;
-import org.eclipse.osee.framework.messaging.event.skynet.event.RemoteBroadcastEvent;
+import org.eclipse.osee.framework.messaging.event.skynet.event.NetworkBroadcastEvent;
 import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
 import org.eclipse.osee.framework.skynet.core.User;
 import org.eclipse.osee.framework.skynet.core.remoteEvent.RemoteEventManager;
@@ -132,7 +132,7 @@ public class AdminView extends ViewPart implements IActionable {
             if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), "Broadcast Message",
                   "Broadcast message\n\n\"" + message + "\"\n\nAre you sure?")) {
                List<ISkynetEvent> remoteEvents = new LinkedList<ISkynetEvent>();
-               remoteEvents.add(new RemoteBroadcastEvent(0, 0, message,
+               remoteEvents.add(new NetworkBroadcastEvent(0, 0, message,
                      SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId()));
                rem.kick(remoteEvents.toArray(ISkynetEvent.EMPTY_ARRAY));
                AWorkbench.popup("Success", "Message sent.");

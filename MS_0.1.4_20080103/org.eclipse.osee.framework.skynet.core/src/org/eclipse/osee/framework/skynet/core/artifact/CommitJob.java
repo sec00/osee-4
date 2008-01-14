@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osee.framework.jdk.core.type.Pair;
 import org.eclipse.osee.framework.jdk.core.util.Collections;
-import org.eclipse.osee.framework.messaging.event.skynet.RemoteCommitBranchEvent;
+import org.eclipse.osee.framework.messaging.event.skynet.NetworkCommitBranchEvent;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.SkynetActivator;
 import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
@@ -240,7 +240,7 @@ class CommitJob extends Job {
             if (archiveBranch) fromBranch.archive();
             eventManager.kick(new LocalCommitBranchEvent(this, fromBranchId));
             RemoteEventManager.getInstance().kick(
-                  new RemoteCommitBranchEvent(fromBranchId,
+                  new NetworkCommitBranchEvent(fromBranchId,
                         SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId()));
          } else {
             throw new IllegalStateException(" A branch can not be commited without any changes made.");

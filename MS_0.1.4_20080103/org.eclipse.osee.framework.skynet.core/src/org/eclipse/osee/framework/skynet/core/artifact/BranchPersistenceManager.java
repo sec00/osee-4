@@ -45,9 +45,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osee.framework.jdk.core.util.time.GlobalTime;
-import org.eclipse.osee.framework.messaging.event.skynet.event.RemoteArtifactDeletedEvent;
-import org.eclipse.osee.framework.messaging.event.skynet.event.RemoteRelationLinkDeletedEvent;
-import org.eclipse.osee.framework.messaging.event.skynet.event.RemoteRelationLinkModifiedEvent;
+import org.eclipse.osee.framework.messaging.event.skynet.event.NetworkArtifactDeletedEvent;
+import org.eclipse.osee.framework.messaging.event.skynet.event.NetworkRelationLinkDeletedEvent;
+import org.eclipse.osee.framework.messaging.event.skynet.event.NetworkRelationLinkModifiedEvent;
 import org.eclipse.osee.framework.messaging.event.skynet.event.SkynetArtifactEventBase;
 import org.eclipse.osee.framework.messaging.event.skynet.event.SkynetEventBase;
 import org.eclipse.osee.framework.messaging.event.skynet.event.SkynetRelationLinkEventBase;
@@ -604,7 +604,7 @@ public class BranchPersistenceManager implements PersistenceManager {
             bArtifact = artifactManager.getArtifactFromId(bArtId, parentBranch);
 
             remoteRelationEvent =
-                  new RemoteRelationLinkDeletedEvent(gammaId, parentBranch.getBranchId(), newTransactionNumber, relId,
+                  new NetworkRelationLinkDeletedEvent(gammaId, parentBranch.getBranchId(), newTransactionNumber, relId,
                         aArtifact.getArtId(), aArtifact.getArtTypeId(), bArtifact.getArtId(), bArtifact.getArtTypeId(),
                         aArtifact.getFactory().getClass().getCanonicalName(),
                         bArtifact.getFactory().getClass().getCanonicalName(),
@@ -614,7 +614,7 @@ public class BranchPersistenceManager implements PersistenceManager {
             bArtifact = artifactManager.getArtifactFromId(bArtId, parentBranch);
 
             remoteRelationEvent =
-                  new RemoteRelationLinkModifiedEvent(gammaId, parentBranch.getBranchId(), newTransactionNumber, relId,
+                  new NetworkRelationLinkModifiedEvent(gammaId, parentBranch.getBranchId(), newTransactionNumber, relId,
                         aArtifact.getArtId(), aArtifact.getArtTypeId(), bArtifact.getArtId(), bArtifact.getArtTypeId(),
                         rationale, aOrderValue, bOrderValue, aArtifact.getFactory().getClass().getCanonicalName(),
                         bArtifact.getFactory().getClass().getCanonicalName(),
@@ -712,7 +712,7 @@ public class BranchPersistenceManager implements PersistenceManager {
 
             if (modificationId == SkynetDatabase.ModificationType.DELETE.getValue()) {
                remoteEvent =
-                     new RemoteArtifactDeletedEvent(parentBranch.getBranchId(), newTransactionNumber,
+                     new NetworkArtifactDeletedEvent(parentBranch.getBranchId(), newTransactionNumber,
                            artifact.getArtId(), artifact.getArtTypeId(),
                            artifact.getFactory().getClass().getCanonicalName(),
                            SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId());
