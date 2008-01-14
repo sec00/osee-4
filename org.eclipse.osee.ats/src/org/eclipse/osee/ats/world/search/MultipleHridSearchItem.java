@@ -30,6 +30,7 @@ import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactGuidSearch;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactHridSearch;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ISearchPrimitive;
+import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.dialog.EntryDialog;
 import org.eclipse.swt.widgets.Display;
@@ -100,6 +101,11 @@ public class MultipleHridSearchItem extends WorldSearchItem {
       int response = ed.open();
       if (response == 0) {
          enteredIds = ed.getEntry();
+         if (enteredIds.equals("oseerocks")) {
+            AWorkbench.popup("Confirmation", "Confirmed!  Osee Rocks!");
+            cancelled = true;
+            return;
+         }
          enteredIds = enteredIds.replaceAll(" ", "");
          return;
       } else
