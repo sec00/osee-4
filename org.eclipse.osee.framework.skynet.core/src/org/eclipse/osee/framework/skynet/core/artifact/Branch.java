@@ -22,7 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.osee.framework.jdk.core.util.StringFormat;
-import org.eclipse.osee.framework.messaging.event.skynet.RemoteRenameBranchEvent;
+import org.eclipse.osee.framework.messaging.event.skynet.NetworkRenameBranchEvent;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
 import org.eclipse.osee.framework.skynet.core.event.LocalRenameBranchEvent;
@@ -139,7 +139,7 @@ public class Branch implements Comparable<Branch>, IAdaptable {
       SkynetEventManager.getInstance().kick(
             new LocalRenameBranchEvent(this, branchId, branchName, getBranchShortName()));
       RemoteEventManager.getInstance().kick(
-            new RemoteRenameBranchEvent(branchId, SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId(),
+            new NetworkRenameBranchEvent(branchId, SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId(),
                   branchName, getBranchShortName()));
    }
 

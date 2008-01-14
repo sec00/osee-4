@@ -27,9 +27,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.eclipse.osee.framework.jdk.core.type.DoubleKeyHashMap;
 import org.eclipse.osee.framework.messaging.event.skynet.ISkynetRelationLinkEvent;
-import org.eclipse.osee.framework.messaging.event.skynet.event.RemoteNewRelationLinkEvent;
-import org.eclipse.osee.framework.messaging.event.skynet.event.RemoteRelationLinkDeletedEvent;
-import org.eclipse.osee.framework.messaging.event.skynet.event.RemoteRelationLinkModifiedEvent;
+import org.eclipse.osee.framework.messaging.event.skynet.event.NetworkNewRelationLinkEvent;
+import org.eclipse.osee.framework.messaging.event.skynet.event.NetworkRelationLinkDeletedEvent;
+import org.eclipse.osee.framework.messaging.event.skynet.event.NetworkRelationLinkModifiedEvent;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.PersistenceManager;
 import org.eclipse.osee.framework.skynet.core.PersistenceManagerInit;
@@ -200,7 +200,7 @@ public class RelationPersistenceManager implements PersistenceManager {
          relationLink.getPersistenceMemo().setGammaId(gammaId);
          linkId = memo.getLinkId();
 
-         transaction.addRemoteEvent(new RemoteRelationLinkModifiedEvent(relationLink.getPersistenceMemo().getGammaId(),
+         transaction.addRemoteEvent(new NetworkRelationLinkModifiedEvent(relationLink.getPersistenceMemo().getGammaId(),
                relationLink.getBranch().getBranchId(), transaction.getTransactionNumber(), linkId, aArtId, aArtTypeId,
                bArtId, bArtTypeId, relationLink.getRationale(), relationLink.getAOrder(), relationLink.getBOrder(),
                aArtifact.getFactory().getClass().getCanonicalName(),
@@ -258,7 +258,7 @@ public class RelationPersistenceManager implements PersistenceManager {
       transaction.addTransactionDataItem(new RelationTransactionData(relationLink, gammaId,
             transaction.getTransactionNumber(), SkynetDatabase.ModificationType.DELETE));
 
-      transaction.addRemoteEvent(new RemoteRelationLinkDeletedEvent(relationLink.getPersistenceMemo().getGammaId(),
+      transaction.addRemoteEvent(new NetworkRelationLinkDeletedEvent(relationLink.getPersistenceMemo().getGammaId(),
             relationLink.getBranch().getBranchId(), transaction.getTransactionNumber(),
             relationLink.getPersistenceMemo().getLinkId(), aArtId, aArtTypeId, bArtId, bArtTypeId,
             aArtifact.getFactory().getClass().getCanonicalName(), bArtifact.getFactory().getClass().getCanonicalName(),
@@ -337,7 +337,7 @@ public class RelationPersistenceManager implements PersistenceManager {
                         SQL3DataType.INTEGER, aArtId, SQL3DataType.INTEGER, bArtId, SQL3DataType.INTEGER, aOrder,
                         SQL3DataType.INTEGER, bOrder, SQL3DataType.VARCHAR, rationale, SQL3DataType.INTEGER, linkId);
 
-                  transaction.addRemoteEvent(new RemoteRelationLinkModifiedEvent(
+                  transaction.addRemoteEvent(new NetworkRelationLinkModifiedEvent(
                         link.getPersistenceMemo().getGammaId(), link.getBranch().getBranchId(),
                         transaction.getTransactionNumber(), linkId, aArtId, aArtTypeId, bArtId, bArtTypeId, rationale,
                         aOrder, bOrder, aArtifact.getFactory().getClass().getCanonicalName(),
@@ -559,10 +559,10 @@ public class RelationPersistenceManager implements PersistenceManager {
          if (relationsCache.containsKey(relId, newTransactionId)) {
             IRelationLink link = relationsCache.get(relId, newTransactionId);
 
-            if (event instanceof RemoteRelationLinkModifiedEvent) {
+            if (event instanceof NetworkRelationLinkModifiedEvent) {
 
-               RemoteRelationLinkModifiedEvent remoteRelationLinkModifiedEvent =
-                     (RemoteRelationLinkModifiedEvent) event;
+               NetworkRelationLinkModifiedEvent remoteRelationLinkModifiedEvent =
+                     (NetworkRelationLinkModifiedEvent) event;
 
                if (link.isDirty()) {
                   String msg = "There has been a conflict with a relationLink";
@@ -578,7 +578,7 @@ public class RelationPersistenceManager implements PersistenceManager {
                   localEvents.add(new TransactionRelationModifiedEvent(link, branch,
                         link.getLinkDescriptor().getName(), link.getASideName(), ModType.Changed, this));
                }
-            } else if (event instanceof RemoteRelationLinkDeletedEvent) {
+            } else if (event instanceof NetworkRelationLinkDeletedEvent) {
                Artifact aArt = link.getArtifactA();
                Artifact bArt = link.getArtifactB();
 
@@ -589,8 +589,8 @@ public class RelationPersistenceManager implements PersistenceManager {
                localEvents.add(new TransactionRelationModifiedEvent(link, branch, link.getLinkDescriptor().getName(),
                      link.getASideName(), ModType.Deleted, this));
             }
-         } else if (event instanceof RemoteNewRelationLinkEvent) {
-            RemoteNewRelationLinkEvent newRelationEvent = (RemoteNewRelationLinkEvent) event;
+         } else if (event instanceof NetworkNewRelationLinkEvent) {
+            NetworkNewRelationLinkEvent newRelationEvent = (NetworkNewRelationLinkEvent) event;
 
             try {
                ArtifactFactory<?> aFactory =

@@ -174,7 +174,6 @@ public class BranchManager {
     */
    public Branch getWorkingBranch() throws SQLException {
       Set<Branch> branches = BranchPersistenceManager.getInstance().getAssociatedArtifactBranches(smaMgr.getSma());
-      // Cache null working branch so don't re-search for every call
       if (branches.size() == 0) {
          return null;
       } else if (branches.size() > 1) {

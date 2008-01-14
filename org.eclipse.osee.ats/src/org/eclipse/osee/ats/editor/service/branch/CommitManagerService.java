@@ -72,9 +72,9 @@ public class CommitManagerService extends WorkPageService implements IEventRecei
                   smaMgr.getBranchMgr().showCommitManager();
                }
             });
+         SkynetEventManager.getInstance().register(LocalBranchEvent.class, this);
+         SkynetEventManager.getInstance().register(RemoteBranchEvent.class, this);
       }
-      SkynetEventManager.getInstance().register(LocalBranchEvent.class, this);
-      SkynetEventManager.getInstance().register(RemoteBranchEvent.class, this);
       refresh();
    }
 

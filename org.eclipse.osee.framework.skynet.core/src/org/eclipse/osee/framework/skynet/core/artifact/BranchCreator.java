@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 import org.eclipse.osee.framework.jdk.core.type.HashCollection;
 import org.eclipse.osee.framework.jdk.core.util.StringFormat;
 import org.eclipse.osee.framework.jdk.core.util.time.GlobalTime;
-import org.eclipse.osee.framework.messaging.event.skynet.RemoteNewBranchEvent;
+import org.eclipse.osee.framework.messaging.event.skynet.NetworkNewBranchEvent;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.PersistenceManager;
 import org.eclipse.osee.framework.skynet.core.PersistenceManagerInit;
@@ -529,7 +529,7 @@ public class BranchCreator implements PersistenceManager {
                preserveArtTypes);
 
          eventManager.kick(new LocalNewBranchEvent(this, childBranch.getBranchId()));
-         remoteEventManager.kick(new RemoteNewBranchEvent(childBranch.getBranchId(),
+         remoteEventManager.kick(new NetworkNewBranchEvent(childBranch.getBranchId(),
                SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId()));
 
       }
