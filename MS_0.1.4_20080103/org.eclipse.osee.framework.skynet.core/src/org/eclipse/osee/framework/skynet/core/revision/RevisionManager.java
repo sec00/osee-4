@@ -113,7 +113,7 @@ public class RevisionManager implements PersistenceManager {
    private static final LocalAliasTable ARTIFACT_VERSION_ALIAS_2 = new LocalAliasTable(ARTIFACT_VERSION_TABLE, "av2");
    private static final LocalAliasTable TRANSACTIONS_ALIAS_1 = new LocalAliasTable(TRANSACTIONS_TABLE, "tx1");
    private static final LocalAliasTable TRANSACTIONS_ALIAS_2 = new LocalAliasTable(TRANSACTIONS_TABLE, "tx2");
-   private static Map<Integer, Set<Integer>> commitArtifactIdToTransactionId;
+   private Map<Integer, Set<Integer>> commitArtifactIdToTransactionId;
 
    private static final RevisionManager instance = new RevisionManager();
 
@@ -122,6 +122,7 @@ public class RevisionManager implements PersistenceManager {
    private RevisionManager() {
       super();
       this.bemsToName = new HashMap<Integer, String>();
+      this.commitArtifactIdToTransactionId = new HashMap<Integer, Set<Integer>>();
    }
 
    public static RevisionManager getInstance() {
@@ -163,6 +164,20 @@ public class RevisionManager implements PersistenceManager {
    }
 
    public Set<Integer> getTransactionDataPerCommitArtifact(Artifact commitArtifact) throws SQLException {
+      checkCommitArtifactToTransactionCache();
+
+      if (commitArtifact != null && commitArtifactIdToTransactionId.containsKey(commitArtifact.getArtId())) {
+         return commitArtifactIdToTransactionId.get(commitArtifact.getArtId());
+      }
+
+      return new HashSet<Integer>();
+   }
+
+   public void cacheTransactionDataPerCommitArtifact(Artifact commitArtifact, int transactionData) throws SQLException {
+      cacheTransactionDataPerCommitArtifact(commitArtifact.getArtId(), transactionData);
+   }
+
+   private void checkCommitArtifactToTransactionCache() throws SQLException {
       if (commitArtifactIdToTransactionId == null) {
          commitArtifactIdToTransactionId = new HashMap<Integer, Set<Integer>>();
 
@@ -178,18 +193,17 @@ public class RevisionManager implements PersistenceManager {
             DbUtil.close(chStmt);
          }
       }
-      if (commitArtifactIdToTransactionId.containsKey(commitArtifact.getArtId())) return commitArtifactIdToTransactionId.get(commitArtifact.getArtId());
-      return new HashSet<Integer>();
    }
 
-   public void cacheTransactionDataPerCommitArtifact(Artifact commitArtifact, int transactionData) {
-      cacheTransactionDataPerCommitArtifact(commitArtifact.getArtId(), transactionData);
-   }
+   public void cacheTransactionDataPerCommitArtifact(int commitArtifactId, int transactionId) throws SQLException {
+      checkCommitArtifactToTransactionCache();
 
-   public void cacheTransactionDataPerCommitArtifact(int commitArtifactId, int transactionId) {
-      Set<Integer> transactionIds;
-      transactionIds = commitArtifactIdToTransactionId.get(commitArtifactId);
-      if (transactionIds == null) transactionIds = new HashSet<Integer>();
+      Set<Integer> transactionIds = commitArtifactIdToTransactionId.get(commitArtifactId);
+
+      if (transactionIds == null) {
+         transactionIds = new HashSet<Integer>();
+      }
+
       transactionIds.add(transactionId);
       commitArtifactIdToTransactionId.put(commitArtifactId, transactionIds);
    }
