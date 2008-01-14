@@ -1508,12 +1508,13 @@ public class Artifact implements Unique, PersistenceObject, IAdaptable, Comparab
    private static final String[] NUMBER =
          new String[] {"Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"};
 
+   /**
+    * Since artifact names are free text it is important to reformat the name to ensure it is suitable as an element
+    * name
+    * 
+    * @return artifact name in a form that is valid as an XML element
+    */
    public String getSafeName() {
-      // Since artifact names are free text it is important to reformat the name
-      // to ensure it is suitable as an element name
-      // NOTE: The current program.launch has a tokenizing bug that causes an error if consecutive
-      // spaces are in the name
-
       String elementName = safeNamePattern.matcher(getDescriptiveName()).replaceAll("_");
 
       // Ensure the name did not end up empty
