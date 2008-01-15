@@ -492,8 +492,4 @@
 		<DatabaseTask classname="org.eclipse.osee.framework.ui.skynet.dbinit.AddCommonBranch">
          </DatabaseTask>
 	</extension>
-	<extension id="AddCommonBranch" name="AddCommonBranch" point="org.eclipse.osee.framework.database.IDbInitializationTask">
-		<DatabaseTask classname="org.eclipse.osee.framework.ui.skynet.dbinit.AddCommonBranch">
-         </DatabaseTask>
-	</extension>
 </plugin>
