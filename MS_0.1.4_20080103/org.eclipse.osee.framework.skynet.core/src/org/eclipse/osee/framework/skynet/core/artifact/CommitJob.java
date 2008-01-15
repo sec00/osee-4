@@ -174,6 +174,8 @@ class CommitJob extends Job {
       private final Branch toBranch;
       private final Branch fromBranch;
       private final boolean archiveBranch;
+      private boolean success = true;
+      private int fromBranchId = -1;
 
       private CommitDbTx(Branch fromBranch, Branch toBranch, TransactionId fromTransactionId, boolean archiveBranch) {
          super();
@@ -195,7 +197,6 @@ class CommitJob extends Job {
 
          TransactionId baseTransactionId = fromTransactionId;
          User userToBlame = SkynetAuthentication.getInstance().getAuthenticatedUser();
-         int fromBranchId = -1;
          String sql = null;
 
          if (fromBranch != null) {
@@ -238,15 +239,25 @@ class CommitJob extends Job {
 
             tagArtifacts(toBranch, fromBranchId, newTransactionNumber);
             if (archiveBranch) fromBranch.archive();
+         } else {
+            throw new IllegalStateException(" A branch can not be commited without any changes made.");
+         }
+         success = true;
+         monitor.done();
+      }
+
+      /* (non-Javadoc)
+       * @see org.eclipse.osee.framework.ui.plugin.util.db.AbstractDbTxTemplate#handleTxFinally()
+       */
+      @Override
+      protected void handleTxFinally() throws Exception {
+         super.handleTxFinally();
+         if (success) {
             eventManager.kick(new LocalCommitBranchEvent(this, fromBranchId));
             RemoteEventManager.getInstance().kick(
                   new NetworkCommitBranchEvent(fromBranchId,
                         SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId()));
-         } else {
-            throw new IllegalStateException(" A branch can not be commited without any changes made.");
          }
-
-         monitor.done();
       }
 
       /*
@@ -257,6 +268,7 @@ class CommitJob extends Job {
       @Override
       protected void handleTxException(Exception ex) throws Exception {
          super.handleTxException(ex);
+         success = false;
       }
 
       private void tagArtifacts(Branch toBranch, int fromBranchId, int commitTransactionId) throws SQLException {

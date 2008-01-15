@@ -191,9 +191,9 @@ public class BranchCreator implements PersistenceManager {
    public static void branchWithHistory(Branch newBranch, TransactionId parentTransactionId, Set<ArtifactSubtypeDescriptor> compressArtTypes, Set<ArtifactSubtypeDescriptor> preserveArtTypes) throws SQLException {
       HashCollection<Integer, Integer> historyMap =
             new HashCollection<Integer /*
-                                                                                                                                                                             * parent
-                                                                                                                                                                             * transactoin_id
-                                                                                                                                                                             */, Integer /* gamma_id */>(
+                                                                                                                                                                                                              * parent
+                                                                                                                                                                                                              * transactoin_id
+                                                                                                                                                                                                              */, Integer /* gamma_id */>(
                   false, HashSet.class);
       ConnectionHandlerStatement chStmt = null;
       try {
@@ -493,6 +493,7 @@ public class BranchCreator implements PersistenceManager {
       private Artifact associatedArtifact;
       private Set<ArtifactSubtypeDescriptor> compressArtTypes;
       private Set<ArtifactSubtypeDescriptor> preserveArtTypes;
+      private boolean success = false;
 
       public CreateChildBranchTx(TransactionId parentTransactionId, String childBranchShortName, String childBranchName, Artifact associatedArtifact, Set<ArtifactSubtypeDescriptor> compressArtTypes, Set<ArtifactSubtypeDescriptor> preserveArtTypes) {
          this.childBranch = null;
@@ -528,10 +529,32 @@ public class BranchCreator implements PersistenceManager {
          copyBranchAddressing(childBranch, newTransactionNumber, parentTransactionId, compressArtTypes,
                preserveArtTypes);
 
-         eventManager.kick(new LocalNewBranchEvent(this, childBranch.getBranchId()));
-         remoteEventManager.kick(new NetworkNewBranchEvent(childBranch.getBranchId(),
-               SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId()));
+         success = true;
 
+      }
+
+      /* (non-Javadoc)
+       * @see org.eclipse.osee.framework.ui.plugin.util.db.AbstractDbTxTemplate#handleTxException(java.lang.Exception)
+       */
+      @Override
+      protected void handleTxException(Exception ex) throws Exception {
+         super.handleTxException(ex);
+         success = false;
+      }
+
+      /*
+       * (non-Javadoc)
+       * 
+       * @see org.eclipse.osee.framework.ui.plugin.util.db.AbstractDbTxTemplate#handleTxFinally()
+       */
+      @Override
+      protected void handleTxFinally() throws Exception {
+         super.handleTxFinally();
+         if (success) {
+            eventManager.kick(new LocalNewBranchEvent(this, childBranch.getBranchId()));
+            remoteEventManager.kick(new NetworkNewBranchEvent(childBranch.getBranchId(),
+                  SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId()));
+         }
       }
 
       public Branch getChildBranch() {
