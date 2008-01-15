@@ -14,6 +14,10 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.osee.ats.editor.SMAManager;
 import org.eclipse.osee.ats.editor.service.WorkPageService;
 import org.eclipse.osee.framework.jdk.core.type.Pair;
+import org.eclipse.osee.framework.skynet.core.event.LocalBranchEvent;
+import org.eclipse.osee.framework.skynet.core.event.LocalBranchToArtifactCacheUpdateEvent;
+import org.eclipse.osee.framework.skynet.core.event.RemoteBranchEvent;
+import org.eclipse.osee.framework.skynet.core.event.SkynetEventManager;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionId;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionIdManager;
 import org.eclipse.osee.framework.ui.plugin.event.Event;
@@ -47,6 +51,9 @@ public class ShowChangeReportToolbarService extends WorkPageService implements I
       };
       action.setToolTipText(getName());
       action.setImageDescriptor(SkynetGuiPlugin.getInstance().getImageDescriptor("branch_change.gif"));
+      SkynetEventManager.getInstance().register(LocalBranchEvent.class, this);
+      SkynetEventManager.getInstance().register(RemoteBranchEvent.class, this);
+      SkynetEventManager.getInstance().register(LocalBranchToArtifactCacheUpdateEvent.class, this);
       return action;
    }
 
@@ -74,9 +81,17 @@ public class ShowChangeReportToolbarService extends WorkPageService implements I
       return enabled;
    }
 
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.ats.editor.service.WorkPageService#refresh()
+    */
+   @Override
+   public void refresh() {
+      super.refresh();
+      if (action != null) action.setEnabled(isEnabled());
+   }
+
    public void onEvent(Event event) {
       refresh();
-      if (action != null) action.setEnabled(isEnabled());
    }
 
    /*

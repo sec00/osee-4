@@ -52,8 +52,20 @@ import org.eclipse.osee.framework.skynet.core.artifact.search.ISearchPrimitive;
 import org.eclipse.osee.framework.skynet.core.artifact.search.RelationInTransactionSearch;
 import org.eclipse.osee.framework.skynet.core.attribute.ArtifactSubtypeDescriptor;
 import org.eclipse.osee.framework.skynet.core.attribute.ConfigurationPersistenceManager;
+import org.eclipse.osee.framework.skynet.core.event.LocalBranchEvent;
+import org.eclipse.osee.framework.skynet.core.event.LocalBranchToArtifactCacheUpdateEvent;
+import org.eclipse.osee.framework.skynet.core.event.LocalCommitBranchEvent;
+import org.eclipse.osee.framework.skynet.core.event.LocalDeletedBranchEvent;
+import org.eclipse.osee.framework.skynet.core.event.LocalNewBranchEvent;
+import org.eclipse.osee.framework.skynet.core.event.RemoteBranchEvent;
+import org.eclipse.osee.framework.skynet.core.event.RemoteCommitBranchEvent;
+import org.eclipse.osee.framework.skynet.core.event.RemoteDeletedBranchEvent;
+import org.eclipse.osee.framework.skynet.core.event.RemoteNewBranchEvent;
+import org.eclipse.osee.framework.skynet.core.event.SkynetEventManager;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionId;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionIdManager;
+import org.eclipse.osee.framework.ui.plugin.event.Event;
+import org.eclipse.osee.framework.ui.plugin.event.IEventReceiver;
 import org.eclipse.osee.framework.ui.plugin.sql.SQL3DataType;
 import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandler;
 import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandlerStatement;
@@ -71,7 +83,7 @@ import org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase.Modif
  * 
  * @author Jeff C. Phillips
  */
-public class RevisionManager implements PersistenceManager {
+public class RevisionManager implements PersistenceManager, IEventReceiver {
    private static final String SELECT_TRANSACTIONS =
          "SELECT " + TRANSACTION_DETAIL_TABLE.columns("transaction_id", "commit_art_id", TXD_COMMENT, "time", "author") + " FROM " + TRANSACTION_DETAIL_TABLE + " WHERE " + TRANSACTION_DETAIL_TABLE.column("branch_id") + " = ?" + " ORDER BY transaction_id DESC";
 
@@ -122,7 +134,6 @@ public class RevisionManager implements PersistenceManager {
    private RevisionManager() {
       super();
       this.bemsToName = new HashMap<Integer, String>();
-      this.commitArtifactIdToTransactionId = new HashMap<Integer, Set<Integer>>();
    }
 
    public static RevisionManager getInstance() {
@@ -192,6 +203,8 @@ public class RevisionManager implements PersistenceManager {
          } finally {
             DbUtil.close(chStmt);
          }
+         SkynetEventManager.getInstance().register(LocalBranchEvent.class, this);
+         SkynetEventManager.getInstance().register(RemoteBranchEvent.class, this);
       }
    }
 
@@ -899,5 +912,27 @@ public class RevisionManager implements PersistenceManager {
       }
 
       return hasConflicts;
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.plugin.event.IEventReceiver#onEvent(org.eclipse.osee.framework.ui.plugin.event.Event)
+    */
+   public void onEvent(Event event) {
+      if ((event instanceof LocalDeletedBranchEvent) || (event instanceof RemoteDeletedBranchEvent) || (event instanceof LocalNewBranchEvent) || (event instanceof RemoteNewBranchEvent) || (event instanceof LocalCommitBranchEvent) || (event instanceof RemoteCommitBranchEvent)) {
+         // Clear the cache so it gets reloaded
+         commitArtifactIdToTransactionId = null;
+         /**
+          * Need to kick event for classes that need to be notified only after the cache has been updated; Even though
+          * cache has bee set to null, it will be re-created upon next call to get cached information
+          */
+         SkynetEventManager.getInstance().kick(new LocalBranchToArtifactCacheUpdateEvent(this));
+      }
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.plugin.event.IEventReceiver#runOnEventInDisplayThread()
+    */
+   public boolean runOnEventInDisplayThread() {
+      return false;
    }
 }
