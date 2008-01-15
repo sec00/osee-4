@@ -284,7 +284,7 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
                   nameToNavItem.put(navItem.getName(), navItem);
                }
             } catch (Exception ex) {
-               OSEELog.logException(AtsPlugin.class, "Error loading AtsNavigateItem extension", ex, true);
+               OSEELog.logException(AtsPlugin.class, "Error loading AtsNavigateItem extension", ex, false);
             }
          }
       }
