@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.widgets.xcommit;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -112,7 +113,7 @@ public class CommitXViewer extends XViewer implements IEventReceiver {
       mm.insertBefore(MENU_GROUP_PRE, new Separator());
    }
 
-   public void setWorkingBranch(Branch workingBranch) {
+   public void setWorkingBranch(Branch workingBranch) throws SQLException {
       this.workingBranch = workingBranch;
       Set<Branch> branches = new HashSet<Branch>();
       branches.add(workingBranch.getParentBranch());

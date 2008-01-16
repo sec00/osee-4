@@ -18,12 +18,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.osee.framework.jdk.core.util.StringFormat;
 import org.eclipse.osee.framework.messaging.event.skynet.NetworkRenameBranchEvent;
-import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
 import org.eclipse.osee.framework.skynet.core.event.LocalRenameBranchEvent;
 import org.eclipse.osee.framework.skynet.core.event.SkynetEventManager;
@@ -36,7 +33,6 @@ import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandler;
  * @author Robert A. Fisher
  */
 public class Branch implements Comparable<Branch>, IAdaptable {
-   private static final Logger logger = ConfigUtil.getConfigFactory().getLogger(Branch.class);
    private static final BranchPersistenceManager branchManager = BranchPersistenceManager.getInstance();
    private static final SkynetAuthentication skynetAuth = SkynetAuthentication.getInstance();
    private static final String UPDATE_BRANCH_SHORT_NAME =
@@ -139,8 +135,9 @@ public class Branch implements Comparable<Branch>, IAdaptable {
       SkynetEventManager.getInstance().kick(
             new LocalRenameBranchEvent(this, branchId, branchName, getBranchShortName()));
       RemoteEventManager.getInstance().kick(
-            new NetworkRenameBranchEvent(branchId, SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId(),
-                  branchName, getBranchShortName()));
+            new NetworkRenameBranchEvent(branchId,
+                  SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId(), branchName,
+                  getBranchShortName()));
    }
 
    /**
@@ -177,19 +174,15 @@ public class Branch implements Comparable<Branch>, IAdaptable {
       return branchName;
    }
 
-   public Branch getParentBranch() {
+   public Branch getParentBranch() throws SQLException {
       if (parentBranch == null && parentBranchId != NULL_PARENT_BRANCH_ID) {
-         try {
-            parentBranch = branchManager.getBranch(parentBranchId);
-         } catch (SQLException ex) {
-            logger.log(Level.SEVERE, ex.toString(), ex);
-         }
+         parentBranch = branchManager.getBranch(parentBranchId);
       }
       return parentBranch;
    }
 
-   public boolean hasParentBranch() {
-      return (getParentBranch() != null);
+   public boolean hasParentBranch() throws SQLException {
+      return getParentBranch() != null;
    }
 
    public Collection<Branch> getChildBranches() throws SQLException {
@@ -309,5 +302,4 @@ public class Branch implements Comparable<Branch>, IAdaptable {
       }
       return null;
    }
-
 }
