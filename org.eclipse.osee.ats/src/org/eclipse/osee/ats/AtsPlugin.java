@@ -12,6 +12,7 @@
 package org.eclipse.osee.ats;
 
 import java.util.logging.Logger;
+import org.eclipse.osee.ats.util.AtsAdmin;
 import org.eclipse.osee.ats.util.AtsBranchAccessHandler;
 import org.eclipse.osee.framework.database.DatabaseActivator;
 import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
@@ -94,7 +95,7 @@ public class AtsPlugin extends OseeUiActivator {
    }
 
    public static boolean isAtsAdmin() {
-      return OseeProperties.getInstance().isAtsAdmin();
+      return AtsAdmin.isAtsAdmin();
    }
 
    public static boolean isAtsUseWorkflowFiles() {
