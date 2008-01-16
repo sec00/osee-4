@@ -1072,7 +1072,13 @@ public class BranchView extends ViewPart implements IActionable, IEventReceiver 
       @Override
       public boolean isEnabled() {
          IStructuredSelection selection = (IStructuredSelection) branchTable.getSelection();
-         boolean validBranchSelected = SkynetSelections.oneDescendantBranchSelected(selection) && useParentBranch;
+         boolean validBranchSelected;
+         try {
+            validBranchSelected = SkynetSelections.oneDescendantBranchSelected(selection) && useParentBranch;
+         } catch (SQLException ex) {
+            OSEELog.logException(SkynetGuiPlugin.class, ex, false);
+            validBranchSelected = false;
+         }
 
          if (validBranchSelected) {
             validBranchSelected &=
@@ -1088,10 +1094,15 @@ public class BranchView extends ViewPart implements IActionable, IEventReceiver 
          protected IContributionItem[] getContributionItems() {
             String parentBranchName = "";
             IStructuredSelection selection = (IStructuredSelection) branchTable.getSelection();
-            if (SkynetSelections.oneDescendantBranchSelected(selection)) {
-               Branch parent =
-                     ((Branch) SkynetSelections.boilDownObject(selection.getFirstElement())).getParentBranch();
-               parentBranchName = parent.getBranchName();
+
+            try {
+               if (SkynetSelections.oneDescendantBranchSelected(selection)) {
+                  Branch parent =
+                        ((Branch) SkynetSelections.boilDownObject(selection.getFirstElement())).getParentBranch();
+                  parentBranchName = parent.getBranchName();
+               }
+            } catch (SQLException ex) {
+               logger.log(Level.SEVERE, ex.toString(), ex);
             }
             IContributionItem[] myIContributionItems =
                   new IContributionItem[] {Commands.getLocalCommandContribution(getSite(), "commitIntoParentCommand",

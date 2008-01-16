@@ -10,10 +10,12 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.widgets.xcommit;
 
+import java.sql.SQLException;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
+import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewerCells;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewerColumn;
 import org.eclipse.swt.graphics.Font;
@@ -41,7 +43,11 @@ public class XCommitLabelProvider implements ITableLabelProvider {
       XViewerColumn xCol = commitXViewer.getXTreeColumn(columnIndex);
       if (xCol != null) {
          CommitColumn aCol = CommitColumn.getAtsXColumn(xCol);
-         return getColumnText(element, columnIndex, branch, xCol, aCol);
+         try {
+            return getColumnText(element, columnIndex, branch, xCol, aCol);
+         } catch (SQLException ex) {
+            OSEELog.logException(SkynetGuiPlugin.class, ex, false);
+         }
       }
       return "";
    }
@@ -56,8 +62,9 @@ public class XCommitLabelProvider implements ITableLabelProvider {
     * @param xCol
     * @param aCol
     * @return column string
+    * @throws SQLException
     */
-   public String getColumnText(Object element, int columnIndex, Branch branch, XViewerColumn xCol, CommitColumn aCol) {
+   public String getColumnText(Object element, int columnIndex, Branch branch, XViewerColumn xCol, CommitColumn aCol) throws SQLException {
       if (!xCol.isShow()) return ""; // Since not shown, don't display
       if (aCol == CommitColumn.Type_Col) {
          if (branch.equals(commitXViewer.getWorkingBranch()))
@@ -114,7 +121,11 @@ public class XCommitLabelProvider implements ITableLabelProvider {
                "nav_forward.gif");
          return SkynetGuiPlugin.getInstance().getImage("branch.gif");
       } else if (dCol == CommitColumn.Status_Col) {
-         return getCommitStatusImage(branch);
+         try {
+            return getCommitStatusImage(branch);
+         } catch (Exception ex) {
+            OSEELog.logException(SkynetGuiPlugin.class, ex, false);
+         }
       }
       return null;
    }
@@ -123,7 +134,7 @@ public class XCommitLabelProvider implements ITableLabelProvider {
       return !branch.getBranchName().equals("ftb2");
    }
 
-   private Image getCommitStatusImage(Branch branch) {
+   private Image getCommitStatusImage(Branch branch) throws IllegalArgumentException, SQLException {
       if (branch.equals(commitXViewer.getWorkingBranch()))
          return null;
       else if (branch.equals(commitXViewer.getWorkingBranch().getParentBranch()) || branch.isBaselineBranch()) return isCommittedInto(branch) ? SkynetGuiPlugin.getInstance().getImage(

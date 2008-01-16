@@ -554,7 +554,7 @@ public class ArtifactPersistenceManager implements PersistenceManager {
 
    private static final String ARTIFACT_COUNT_SELECT = "SELECT COUNT(*) artifacts FROM " + ARTIFACT_TABLE + " WHERE ";
 
-   private static String getSql(ISearchPrimitive searchCriteria, String header, List<Object> dataList, Branch branch) {
+   private static String getSql(ISearchPrimitive searchCriteria, String header, List<Object> dataList, Branch branch) throws SQLException {
       StringBuilder sql = new StringBuilder(header);
 
       sql.append(ARTIFACT_TABLE.column("art_id") + " in (");
@@ -564,11 +564,11 @@ public class ArtifactPersistenceManager implements PersistenceManager {
       return sql.toString();
    }
 
-   public static String getSelectArtIdSql(ISearchPrimitive searchCriteria, List<Object> dataList, Branch branch) {
+   public static String getSelectArtIdSql(ISearchPrimitive searchCriteria, List<Object> dataList, Branch branch) throws SQLException {
       return getSelectArtIdSql(searchCriteria, dataList, null, branch);
    }
 
-   public static String getSelectArtIdSql(ISearchPrimitive searchCriteria, List<Object> dataList, String alias, Branch branch) {
+   public static String getSelectArtIdSql(ISearchPrimitive searchCriteria, List<Object> dataList, String alias, Branch branch) throws SQLException {
       StringBuilder sql = new StringBuilder();
 
       sql.append("SELECT ");
@@ -608,11 +608,11 @@ public class ArtifactPersistenceManager implements PersistenceManager {
       }
    }
 
-   public static String getIdSql(List<ISearchPrimitive> searchCriteria, boolean all, List<Object> dataList, Branch branch) {
+   public static String getIdSql(List<ISearchPrimitive> searchCriteria, boolean all, List<Object> dataList, Branch branch) throws SQLException {
       return getSql(searchCriteria, all, ARTIFACT_ID_SELECT, dataList, branch);
    }
 
-   private String getSql(List<ISearchPrimitive> searchCriteria, boolean all, List<Object> dataList, TransactionId transactionId) {
+   private String getSql(List<ISearchPrimitive> searchCriteria, boolean all, List<Object> dataList, TransactionId transactionId) throws SQLException {
       dataList.add(SQL3DataType.INTEGER);
       dataList.add(transactionId.getBranch().getBranchId());
       dataList.add(SQL3DataType.INTEGER);
@@ -621,7 +621,7 @@ public class ArtifactPersistenceManager implements PersistenceManager {
       return getSql(searchCriteria, all, ARTIFACT_SELECT, dataList, transactionId.getBranch());
    }
 
-   private static String getSql(List<ISearchPrimitive> searchCriteria, boolean all, String header, List<Object> dataList, Branch branch) {
+   private static String getSql(List<ISearchPrimitive> searchCriteria, boolean all, String header, List<Object> dataList, Branch branch) throws SQLException {
       StringBuilder sql = new StringBuilder(header);
 
       if (all) {
