@@ -20,6 +20,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
 import org.eclipse.osee.framework.skynet.core.access.AccessControlData;
+import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
 import org.eclipse.osee.framework.skynet.core.access.PermissionEnum;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactPersistenceManager;
@@ -184,9 +185,11 @@ public class PolicyDialog extends Dialog {
 
    private void checkEnabled() {
       // get information from db
+      boolean accessEnabled = AccessControlManager.getInstance().checkObjectPermission(object, PermissionEnum.WRITE);
+
       radEnabled.setSelection(true);
 
-      boolean enable = radEnabled.getSelection();
+      boolean enable = radEnabled.getSelection() && accessEnabled;
       boolean isArtifact = object instanceof Artifact;
 
       cmbUsers.setEnabled(enable);
