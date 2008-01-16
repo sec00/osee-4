@@ -41,7 +41,6 @@ import org.eclipse.osee.framework.skynet.core.ArtifactVersionIncrementedEvent;
 import org.eclipse.osee.framework.skynet.core.SkynetActivator;
 import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
 import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
-import org.eclipse.osee.framework.skynet.core.access.PermissionEnum;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactData;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactModifiedEvent;
@@ -347,23 +346,6 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
       new MenuItem(popupMenu, SWT.SEPARATOR);
       createAccessControlMenuItem(popupMenu);
       treeViewer.getTree().setMenu(popupMenu);
-
-      popupMenu.addMenuListener(new MenuListener() {
-
-         public void menuHidden(MenuEvent e) {
-         }
-
-         public void menuShown(MenuEvent e) {
-            IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
-            Iterator<?> iterator = selection.iterator();
-            Object object = iterator.next();
-
-            if (object instanceof Artifact) {
-               accessControlMenuItem.setEnabled(AccessControlManager.getInstance().checkObjectPermission(
-                     (Artifact) object, PermissionEnum.WRITE));
-            }
-         }
-      });
    }
 
    protected void createUpAction() {
@@ -1059,6 +1041,7 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
          goIntoMenuItem.setEnabled(permiss.isReadPermission());
          copyMenuItem.setEnabled(permiss.isReadPermission());
          pasteMenuItem.setEnabled(permiss.isWritePermission());
+
       }
    }
 
