@@ -61,6 +61,15 @@ public class PolicyTableViewer {
       tableViewer.setInput(accessControlList.values());
    }
 
+   /**
+    * Disables the cell modifiers, not the entire table so user can still scroll
+    * 
+    * @param enabled
+    */
+   public void setEnabled(boolean enabled) {
+      ((PolicyTableCellModifier) tableViewer.getCellModifier()).setEnabled(enabled);
+   }
+
    public void addItem(Artifact subject, Object object, PermissionEnum permission) {
       AccessObject accessObject = accessManager.getAccessObject(object);
       AccessControlData data = new AccessControlData(subject, accessObject, permission, true);

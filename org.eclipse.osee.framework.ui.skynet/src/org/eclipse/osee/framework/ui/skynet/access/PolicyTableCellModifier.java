@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.TableItem;
 public class PolicyTableCellModifier implements ICellModifier {
 
    private PolicyTableViewer policyTableViewer;
+   private boolean enabled = true;
 
    public PolicyTableCellModifier(PolicyTableViewer policyTableViewer) {
       super();
@@ -34,7 +35,7 @@ public class PolicyTableCellModifier implements ICellModifier {
    public boolean canModify(Object element, String property) {
       // Find the index of the column
       int columnIndex = Columns.valueOf(property).ordinal();
-      if (columnIndex == Columns.Delete.ordinal()) return true;
+      if (columnIndex == Columns.Delete.ordinal() && isEnabled()) return true;
       return false;
    }
 
@@ -70,5 +71,21 @@ public class PolicyTableCellModifier implements ICellModifier {
          if (index != -1) policyTableViewer.modifyPermissionLevel(data, PermissionEnum.values()[index]);
       }
       policyTableViewer.refresh();
+   }
+
+   /**
+    * @return the enabled
+    */
+   public boolean isEnabled() {
+      return enabled;
+   }
+
+   /**
+    * Don't disable entire viewer, just delete button
+    * 
+    * @param enabled the enabled to set
+    */
+   public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
    }
 }

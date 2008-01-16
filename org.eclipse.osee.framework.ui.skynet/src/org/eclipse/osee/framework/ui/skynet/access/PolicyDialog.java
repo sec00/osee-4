@@ -38,6 +38,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 
@@ -52,7 +53,7 @@ public class PolicyDialog extends Dialog {
    private static final ArtifactPersistenceManager artifactManager = ArtifactPersistenceManager.getInstance();
    private static final BranchPersistenceManager branchManager = BranchPersistenceManager.getInstance();
    private static final SkynetAuthentication skynetAuthentication = SkynetAuthentication.getInstance();
-   private PolicyTableViewer tableViewer;
+   private PolicyTableViewer policyTableViewer;
    private Button radEnabled;
    private Button radDisabled;
    private Button btnAdd;
@@ -60,6 +61,7 @@ public class PolicyDialog extends Dialog {
    private Combo cmbUsers;
    private Combo cmbPermissionLevel;
    private Object object;
+   private Label accessLabel;
 
    public PolicyDialog(Shell parentShell, Object object) {
       super(parentShell);
@@ -145,13 +147,16 @@ public class PolicyDialog extends Dialog {
             PermissionEnum permission = (PermissionEnum) cmbPermissionLevel.getData(cmbPermissionLevel.getText());
 
             if (subject != null && permission != null) {
-               tableViewer.addItem(subject, object, permission);
+               policyTableViewer.addItem(subject, object, permission);
             }
          }
       });
    }
 
    private void addDialogContols(Composite mainComposite) {
+
+      accessLabel = new Label(mainComposite, SWT.NONE);
+
       radDisabled = new Button(mainComposite, SWT.RADIO);
       radDisabled.setText("Disabled");
       radDisabled.setEnabled(false);
@@ -164,7 +169,7 @@ public class PolicyDialog extends Dialog {
       group.setLayout(new GridLayout(1, false));
 
       Table table = new Table(group, SWT.BORDER | SWT.V_SCROLL | SWT.SINGLE | SWT.FULL_SELECTION);
-      tableViewer = new PolicyTableViewer(table, object);
+      policyTableViewer = new PolicyTableViewer(table, object);
       GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
       gridData.heightHint = 100;
       gridData.widthHint = 500;
@@ -187,6 +192,7 @@ public class PolicyDialog extends Dialog {
       // get information from db
       boolean accessEnabled = AccessControlManager.getInstance().checkObjectPermission(object, PermissionEnum.WRITE);
 
+      accessLabel.setText(accessEnabled ? "" : "You do not have permissions to modify access.");
       radEnabled.setSelection(true);
 
       boolean enable = radEnabled.getSelection() && accessEnabled;
@@ -195,14 +201,14 @@ public class PolicyDialog extends Dialog {
       cmbUsers.setEnabled(enable);
       cmbPermissionLevel.setEnabled(enable);
       btnAdd.setEnabled(enable);
-      tableViewer.getTable().setEnabled(enable);
+      policyTableViewer.setEnabled(enable);
 
       chkChildrenPermission.setEnabled(isArtifact);
    }
 
    @Override
    protected void okPressed() {
-      for (AccessControlData data : tableViewer.getAccessControlList().values()) {
+      for (AccessControlData data : policyTableViewer.getAccessControlList().values()) {
          if (data.isDirty()) data.persist(chkChildrenPermission.getSelection());
       }
       super.okPressed();
