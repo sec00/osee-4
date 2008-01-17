@@ -60,7 +60,7 @@ public class SMARelationsComposite extends Composite {
       this.smaMgr = smaMgr;
       try {
          setLayout(ALayout.getZeroMarginLayout(2, false));
-         GridData gd = new GridData(GridData.FILL_BOTH);
+         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
          gd.widthHint = 500;
          setLayoutData(gd);
          toolkit.adapt(this);
