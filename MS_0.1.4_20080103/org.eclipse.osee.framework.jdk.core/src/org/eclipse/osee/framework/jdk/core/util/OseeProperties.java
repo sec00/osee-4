@@ -32,6 +32,7 @@ public class OseeProperties {
    private static final String PRINT_SQL = "PrintSql";
    private static final String DONT_LOG_USAGE = "DontLogUsage";
    private static final String OSEE_DB_CONFIG_INIT_CHOICE = "osee.db.config.init.choice";
+   private static boolean developer = false;
 
    private static OseeProperties instance = null;
    private static Logger logger = null;
@@ -62,16 +63,12 @@ public class OseeProperties {
       return null;
    }
 
-   public boolean isAtsUseWorkflowFiles() {
-      return System.getProperty("AtsUseWorkflowFiles") != null;
-   }
-
-   public boolean isAtsAdmin() {
-      return System.getProperty("AtsAdmin") != null;
+   public void setDeveloper(boolean developer) {
+      OseeProperties.developer = developer;
    }
 
    public boolean isDeveloper() {
-      return System.getProperty(OSEE_DEVELOPER) != null || isAtsAdmin();
+      return System.getProperty(OSEE_DEVELOPER) != null || developer;
    }
 
    public boolean isOverrideVersionCheck() {
@@ -80,22 +77,6 @@ public class OseeProperties {
 
    public String getAuthenticationProviderId() {
       return System.getProperty(OSEE_AUTHENTICATION_PROVIDER_ID);
-   }
-
-   public boolean isAtsShowUser() {
-      return System.getProperty("AtsShowUser") != null;
-   }
-
-   public boolean isAtsIgnoreConfigUpgrades() {
-      return System.getProperty("AtsIgnoreConfigUpgrades") != null;
-   }
-
-   public boolean isAtsDisableEmail() {
-      return System.getProperty("AtsDisableEmail") != null;
-   }
-
-   public boolean isAtsAlwaysEmailMe() {
-      return System.getProperty("AtsAlwaysEmailMe") != null;
    }
 
    public boolean isEmailMe() {
