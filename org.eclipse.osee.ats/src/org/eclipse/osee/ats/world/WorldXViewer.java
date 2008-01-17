@@ -55,6 +55,7 @@ import org.eclipse.osee.framework.ui.plugin.util.Result;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.artifact.ArtifactPromptChange;
 import org.eclipse.osee.framework.ui.skynet.artifact.editor.ArtifactEditor;
+import org.eclipse.osee.framework.ui.skynet.artifact.massEditor.MassArtifactEditor;
 import org.eclipse.osee.framework.ui.skynet.ats.AtsOpenOption;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.dialog.HtmlDialog;
@@ -118,7 +119,7 @@ public class WorldXViewer extends XViewer {
    Action editTargetVersionAction;
    Action editActionableItemsAction;
    Action convertActionableItemsAction;
-   Action openInAtsEditorAction;
+   Action openInAtsEditorAction, openInMassEditorAction;
    Action favoritesAction;
    Action subscribedAction;
    Action openInArtifactEditorAction;
@@ -205,6 +206,17 @@ public class WorldXViewer extends XViewer {
          public void run() {
             AtsLib.openAtsAction(getSelectedArtifactItems().iterator().next().getArtifact(),
                   AtsOpenOption.OpenOneOrPopupSelect);
+         }
+      };
+
+      openInMassEditorAction = new Action("Mass Edit", Action.AS_PUSH_BUTTON) {
+         @Override
+         public void run() {
+            if (getSelectedArtifacts().size() == 0) {
+               AWorkbench.popup("Error", "No items selected");
+               return;
+            }
+            MassArtifactEditor.editArtifacts("", getSelectedArtifacts());
          }
       };
 
@@ -409,6 +421,8 @@ public class WorldXViewer extends XViewer {
       mm.insertBefore(MENU_GROUP_PRE, new Separator());
       mm.insertBefore(MENU_GROUP_PRE, openInAtsEditorAction);
       openInAtsEditorAction.setEnabled(getSelectedArtifacts() != null);
+      mm.insertBefore(MENU_GROUP_PRE, openInMassEditorAction);
+      openInMassEditorAction.setEnabled(getSelectedArtifacts() != null);
       if (AtsPlugin.isAtsAdmin()) {
          mm.insertBefore(MENU_GROUP_PRE, openInArtifactEditorAction);
          openInArtifactEditorAction.setEnabled(getSelectedArtifacts() != null);
