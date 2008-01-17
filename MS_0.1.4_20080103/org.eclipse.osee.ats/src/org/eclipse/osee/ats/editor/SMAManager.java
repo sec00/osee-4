@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osee.ats.AtsPlugin;
 import org.eclipse.osee.ats.artifact.ATSAttributes;
 import org.eclipse.osee.ats.artifact.LogItem;
@@ -293,8 +294,11 @@ public class SMAManager {
             return false;
          }
          if (smaMgr.isReleased()) {
-            AWorkbench.popup("ERROR", "Team Workflow\n \"" + teamArt.getDescriptiveName() + "\"\n is already released.");
-            return false;
+            String error = "Team Workflow\n \"" + teamArt.getDescriptiveName() + "\"\n is already released.";
+            if (AtsPlugin.isAtsAdmin() && !MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+                  "Change Version", error + "\n\nOverride?")) {
+               return false;
+            } else if (!AtsPlugin.isAtsAdmin()) AWorkbench.popup("ERROR", error);
          }
          if (teamDefHoldingVersions != null) {
             if (teamDefHoldingVersions != teamArt.getTeamDefinition().getTeamDefinitionHoldingVersions()) {
