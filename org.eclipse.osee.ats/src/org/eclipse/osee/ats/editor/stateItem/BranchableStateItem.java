@@ -43,6 +43,7 @@ public abstract class BranchableStateItem extends AtsStateItem {
     */
    public abstract String getId();
 
+   @Override
    public List<WorkPageService> getServices(SMAManager smaMgr) {
       List<WorkPageService> services = new ArrayList<WorkPageService>();
       services.add(new CreateWorkingBranchService(smaMgr));
