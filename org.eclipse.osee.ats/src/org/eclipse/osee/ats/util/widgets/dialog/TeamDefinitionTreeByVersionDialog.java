@@ -17,7 +17,6 @@ import java.util.HashSet;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.ats.AtsPlugin;
 import org.eclipse.osee.ats.artifact.TeamDefinitionArtifact;
 import org.eclipse.osee.ats.artifact.VersionArtifact;
@@ -67,10 +66,11 @@ public class TeamDefinitionTreeByVersionDialog extends TeamDefinitionTreeDialog 
          public void checkStateChanged(CheckStateChangedEvent event) {
             try {
                Collection<Object> objs = new HashSet<Object>();
-               if (getTreeViewer().getSelection().isEmpty()) return;
-               IStructuredSelection sel = (IStructuredSelection) getTreeViewer().getSelection();
-               for (Artifact art : ((TeamDefinitionArtifact) sel.iterator().next()).getVersionsFromTeamDefHoldingVersions(VersionReleaseType.Both))
-                  objs.add(art);
+               Object objects[] = getTreeViewer().getCheckedElements();
+               for (Object object : objects) {
+                  for (Artifact art : ((TeamDefinitionArtifact) object).getVersionsFromTeamDefHoldingVersions(VersionReleaseType.Both))
+                     objs.add(art);
+               }
                versionList.setInput(objs);
             } catch (SQLException ex) {
                OSEELog.logException(AtsPlugin.class, ex, false);
