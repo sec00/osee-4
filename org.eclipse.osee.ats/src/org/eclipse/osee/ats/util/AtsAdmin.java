@@ -24,7 +24,10 @@ public class AtsAdmin {
    private static boolean searched = false;
 
    public static boolean isAtsAdmin() {
-      if (OseeProperties.getInstance().isAtsAdmin()) return true;
+      OseeProperties.getInstance().setDeveloper(System.getProperty("AtsAdmin") != null);
+      if (System.getProperty("AtsAdmin") != null) {
+         return true;
+      }
       if (!searched) {
          atsAdminArtifact = search.getSingletonArtifact(Artifact.class);
          searched = true;

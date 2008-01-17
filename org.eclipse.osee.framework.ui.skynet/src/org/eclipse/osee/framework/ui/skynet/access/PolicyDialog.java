@@ -122,7 +122,7 @@ public class PolicyDialog extends Dialog {
 
       for (PermissionEnum permission : permissions) {
          if (!permission.equals(PermissionEnum.LOCK)) {
-            cmbPermissionLevel.add(permission.getName());
+            cmbPermissionLevel.add(permission.getName() + " - Rank = " + permission.getRank() + "");
             cmbPermissionLevel.setData(permission.getName(), permission);
          }
       }
@@ -183,6 +183,8 @@ public class PolicyDialog extends Dialog {
       cmbPermissionLevel = new Combo(composite, SWT.NONE);
       btnAdd = new Button(composite, SWT.PUSH);
       btnAdd.setText("Add");
+
+      (new Label(group, SWT.NONE)).setText("  NOTE: Higher permission rank overrides lower rank.");
 
       chkChildrenPermission = new Button(mainComposite, SWT.CHECK);
       chkChildrenPermission.setText("Set permission for artifact's default hierarchy descendents.");
