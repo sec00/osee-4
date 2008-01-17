@@ -38,6 +38,7 @@ import org.eclipse.osee.ats.artifact.IFavoriteableArtifact;
 import org.eclipse.osee.ats.artifact.ISubscribableArtifact;
 import org.eclipse.osee.ats.artifact.StateMachineArtifact;
 import org.eclipse.osee.ats.artifact.TeamWorkFlowArtifact;
+import org.eclipse.osee.ats.artifact.VersionArtifact.VersionReleaseType;
 import org.eclipse.osee.ats.editor.SMAManager;
 import org.eclipse.osee.ats.util.ArtifactEmailWizard;
 import org.eclipse.osee.ats.util.AtsLib;
@@ -156,7 +157,8 @@ public class WorldXViewer extends XViewer {
          @Override
          public void run() {
             try {
-               if (SMAManager.promptChangeVersion(getSelectedTeamWorkflowArtifacts(), true)) {
+               if (SMAManager.promptChangeVersion(getSelectedTeamWorkflowArtifacts(),
+                     (AtsPlugin.isAtsAdmin() ? VersionReleaseType.Both : VersionReleaseType.UnReleased), true)) {
                   update(getSelectedArtifactItemsArray(), null);
                }
             } catch (SQLException ex) {
@@ -720,7 +722,9 @@ public class WorldXViewer extends XViewer {
          SMAManager smaMgr = new SMAManager((StateMachineArtifact) useArt);
          boolean modified = false;
          if (aCol == AtsXColumn.Version_Target_Col)
-            modified = smaMgr.promptChangeVersion(true);
+            modified =
+                  smaMgr.promptChangeVersion(
+                        AtsPlugin.isAtsAdmin() ? VersionReleaseType.Both : VersionReleaseType.UnReleased, true);
          else if (aCol == AtsXColumn.Notes_Col)
             modified = smaMgr.promptChangeAttribute(ATSAttributes.SMA_NOTE_ATTRIBUTE, persist);
          else if (aCol == AtsXColumn.Percent_Rework_Col)

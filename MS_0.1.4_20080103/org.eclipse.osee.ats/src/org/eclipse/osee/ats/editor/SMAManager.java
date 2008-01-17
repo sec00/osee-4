@@ -278,11 +278,12 @@ public class SMAManager {
       return false;
    }
 
-   public boolean promptChangeVersion(boolean persist) throws SQLException {
-      return promptChangeVersion(Arrays.asList(new TeamWorkFlowArtifact[] {(TeamWorkFlowArtifact) sma}), persist);
+   public boolean promptChangeVersion(VersionReleaseType versionReleaseType, boolean persist) throws SQLException {
+      return promptChangeVersion(Arrays.asList(new TeamWorkFlowArtifact[] {(TeamWorkFlowArtifact) sma}),
+            versionReleaseType, persist);
    }
 
-   public static boolean promptChangeVersion(final Collection<? extends TeamWorkFlowArtifact> smas, final boolean persist) throws SQLException {
+   public static boolean promptChangeVersion(final Collection<? extends TeamWorkFlowArtifact> smas, VersionReleaseType versionReleaseType, final boolean persist) throws SQLException {
       TeamDefinitionArtifact teamDefHoldingVersions = null;
       for (TeamWorkFlowArtifact teamArt : smas) {
          SMAManager smaMgr = new SMAManager(teamArt);
@@ -309,10 +310,8 @@ public class SMAManager {
          return false;
       }
       final VersionListDialog vld =
-            new VersionListDialog(
-                  "Select Version",
-                  "Select Version",
-                  teamDefHoldingVersions.getVersionsArtifacts(AtsPlugin.isAtsAdmin() ? VersionReleaseType.Both : VersionReleaseType.UnReleased));
+            new VersionListDialog("Select Version", "Select Version",
+                  teamDefHoldingVersions.getVersionsArtifacts(versionReleaseType));
       if (smas.size() == 1 && smas.iterator().next().getTargetedForVersion() != null) {
          Object[] objs = new Object[1];
          objs[0] = smas.iterator().next().getTargetedForVersion();
