@@ -61,13 +61,4 @@ public class KickoffOseeAutoRunTaskAction extends Action {
       }
    }
 
-   public void kickoffOsee() {
-      //    String command =
-      //    "\"C:\\Program Files\\OSEE\\eclipse.exe\" -product org.eclipse.osee.framework.ui.product.osee" + " -showsplash org.eclipse.osee.framework.ui.product -data C:\\UserData\\workspace_autorun -vmargs -XX:MaxPermSize=256m -Xmx768M -DAtsAdmin -DEmailMe";
-      //try {
-      // Process child = Runtime.getRuntime().exec(command);
-      //} catch (Exception ex) {
-      // OSEELog.logException(AtsPlugin.class, ex, true);
-      //}
-   }
 }
