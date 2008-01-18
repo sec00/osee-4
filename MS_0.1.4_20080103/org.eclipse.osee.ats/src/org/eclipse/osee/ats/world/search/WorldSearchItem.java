@@ -27,13 +27,22 @@ public abstract class WorldSearchItem {
    protected static Set<Artifact> EMPTY_SET = new HashSet<Artifact>();
    protected boolean cancelled = false;
    protected ArtifactPersistenceManager apm = ArtifactPersistenceManager.getInstance();
+   private final LoadView loadView;
+   public static enum LoadView {
+      WorldView, TaskEditor
+   }
    public static enum SearchType {
       Search, ReSearch
    };
 
    public WorldSearchItem(String name) {
+      this(name, LoadView.WorldView);
+   }
+
+   public WorldSearchItem(String name, LoadView loadView) {
       super();
       this.name = name;
+      this.loadView = loadView;
       this.cancelled = false;
    }
 
@@ -97,6 +106,13 @@ public abstract class WorldSearchItem {
 
    public void setCancelled(boolean cancelled) {
       this.cancelled = cancelled;
+   }
+
+   /**
+    * @return the loadView
+    */
+   public LoadView getLoadView() {
+      return loadView;
    }
 
 }

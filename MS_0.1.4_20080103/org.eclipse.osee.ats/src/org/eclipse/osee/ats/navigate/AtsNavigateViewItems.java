@@ -42,6 +42,7 @@ import org.eclipse.osee.ats.report.ExtendedStatusReportItem;
 import org.eclipse.osee.ats.world.search.ActionableItemWorldSearchItem;
 import org.eclipse.osee.ats.world.search.AtsAttributeSearchItem;
 import org.eclipse.osee.ats.world.search.CriteriaSearchItem;
+import org.eclipse.osee.ats.world.search.EditTasksByTeamVersionSearchItem;
 import org.eclipse.osee.ats.world.search.GroupWorldSearchItem;
 import org.eclipse.osee.ats.world.search.MultipleHridSearchItem;
 import org.eclipse.osee.ats.world.search.MyCompletedSearchItem;
@@ -150,6 +151,10 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
             true, true, false));
       new MassEditTeamVersionItem("Show Team Versions", teamItem, "");
       items.add(teamItem);
+
+      XNavigateItem taskItem = new XNavigateItem(null, "Tasks");
+      new SearchNavigateItem(taskItem, new EditTasksByTeamVersionSearchItem(null, true));
+      items.add(taskItem);
 
       XNavigateItem releaseItems = new XNavigateItem(null, "Versions");
       new MassEditTeamVersionItem("Edit Versions", releaseItems, (TeamDefinitionArtifact) null);
