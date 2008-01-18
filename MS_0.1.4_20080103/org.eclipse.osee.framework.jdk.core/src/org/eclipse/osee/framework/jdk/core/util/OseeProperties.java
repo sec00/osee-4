@@ -32,6 +32,7 @@ public class OseeProperties {
    private static final String PRINT_SQL = "PrintSql";
    private static final String DONT_LOG_USAGE = "DontLogUsage";
    private static final String OSEE_DB_CONFIG_INIT_CHOICE = "osee.db.config.init.choice";
+   public static final String OSEE_AUTORUN = "osee.autoRun";
    private static boolean developer = false;
 
    private static OseeProperties instance = null;
@@ -77,6 +78,10 @@ public class OseeProperties {
 
    public String getAuthenticationProviderId() {
       return System.getProperty(OSEE_AUTHENTICATION_PROVIDER_ID);
+   }
+
+   public String getAutoRun() {
+      return System.getProperty(OSEE_AUTORUN);
    }
 
    public boolean isEmailMe() {

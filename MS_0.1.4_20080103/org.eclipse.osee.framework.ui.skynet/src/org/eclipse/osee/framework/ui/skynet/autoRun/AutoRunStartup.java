@@ -35,19 +35,21 @@ public class AutoRunStartup implements IStartup {
     * @see org.eclipse.ui.IStartup#earlyStartup()
     */
    public void earlyStartup() {
+      final String autoRunTaskId = OseeProperties.getInstance().getAutoRun();
       try {
-         logger.log(Level.INFO, "Checking AutoRunStartup");
-         String autoRunTaskId = OseeProperties.getInstance().getAutoRun();
-         if (autoRunTaskId == null) return;
+         if (autoRunTaskId == null) {
+            logger.log(Level.INFO, "Checked AutoRunStartup...Nothing to run.");
+            return;
+         }
 
-         logger.log(Level.INFO, "Running AutoRunStartup...");
+         logger.log(Level.INFO, "Running AutoRunStartup; Id=\"" + autoRunTaskId + "\"");
          AEmail email =
                new AEmail(new String[] {"donald.g.dunne@boeing.com"}, "donald.g.dunne@boeing.com",
-                     "donald.g.dunne@boeing.com", "Auto Run Completed", "Completed");
+                     "donald.g.dunne@boeing.com", "Auto Run Completed; Id=\"" + autoRunTaskId + "\" ", "Completed");
          email.send();
          logger.log(Level.INFO, "Sleeping...");
          Thread.sleep(2000);
-         logger.log(Level.INFO, "Exiting AutoRunStartup...");
+         logger.log(Level.INFO, "Exiting AutoRunStartup; Id=\"" + autoRunTaskId + "\"");
          Displays.ensureInDisplayThread(new Runnable() {
             /* (non-Javadoc)
              * @see java.lang.Runnable#run()
@@ -59,7 +61,8 @@ public class AutoRunStartup implements IStartup {
       } catch (Exception ex) {
          AEmail email =
                new AEmail(new String[] {"donald.g.dunne@boeing.com"}, "donald.g.dunne@boeing.com",
-                     "donald.g.dunne@boeing.com", "Auto Run Exceptioned", "Exception\n\n" + Lib.exceptionToString(ex));
+                     "donald.g.dunne@boeing.com", "Auto Run Exceptioned; Id=\"" + autoRunTaskId + "\" Exceptioned",
+                     "Exception\n\n" + Lib.exceptionToString(ex));
          email.send();
       }
    }
