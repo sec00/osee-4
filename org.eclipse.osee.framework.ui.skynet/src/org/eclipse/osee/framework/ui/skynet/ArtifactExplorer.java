@@ -76,6 +76,7 @@ import org.eclipse.osee.framework.ui.skynet.artifact.editor.ArtifactEditor;
 import org.eclipse.osee.framework.ui.skynet.artifact.massEditor.MassArtifactEditor;
 import org.eclipse.osee.framework.ui.skynet.ats.IActionable;
 import org.eclipse.osee.framework.ui.skynet.ats.OseeAts;
+import org.eclipse.osee.framework.ui.skynet.autoRun.KickoffOseeAutoRunTaskAction;
 import org.eclipse.osee.framework.ui.skynet.branch.BranchLabelProvider;
 import org.eclipse.osee.framework.ui.skynet.history.RevisionHistoryView;
 import org.eclipse.osee.framework.ui.skynet.menu.ArtifactPreviewMenu;
@@ -284,6 +285,7 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
          createShowArtIdsAction();
       }
       createSetDefaultBranchAction();
+      addAutoRunAction();
       OseeAts.addBugToViewToolbar(this, this, SkynetActivator.getInstance(), VIEW_ID, "Artifact Explorer");
 
       getViewSite().getActionBars().getStatusLineManager().add(branchStatusItem);
@@ -445,6 +447,11 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
 
       IMenuManager toolbarManager = getViewSite().getActionBars().getMenuManager();
       toolbarManager.add(showArtType);
+   }
+
+   private void addAutoRunAction() {
+      IMenuManager toolbarManager = getViewSite().getActionBars().getMenuManager();
+      toolbarManager.add(new KickoffOseeAutoRunTaskAction());
    }
 
    private void createNewArtifactExplorerAction() {
