@@ -815,7 +815,7 @@ public final class Lib {
    }
 
    public static String getDateTimeString() {
-      return new SimpleDateFormat("yyyy-MM-dd_hh:mm").format(new Date());
+      return new SimpleDateFormat("yyyy-MM-dd_hh-mm").format(new Date());
    }
 
    public static String getJarPath(Class<Lib> base) {
