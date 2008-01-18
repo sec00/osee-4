@@ -15,6 +15,7 @@ import java.io.File;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
@@ -55,7 +56,16 @@ public class KickoffOseeAutoRunTaskAction extends Action {
             return;
          }
          ILaunchConfiguration config = manager.getLaunchConfiguration(iFile);
-         config.launch(ILaunchManager.RUN_MODE, null);
+         System.out.println("Pre Config " + config.getAttributes());
+         // Get a copy of the config to work with
+         ILaunchConfigurationWorkingCopy copy = config.getWorkingCopy();
+         // Add the AutoRun property to the VM_ARGUEMENTS
+         copy.setAttribute(
+               "org.eclipse.jdt.launching.VM_ARGUMENTS",
+               copy.getAttribute("org.eclipse.jdt.launching.VM_ARGUMENTS", "") + " -D" + OseeProperties.OSEE_AUTORUN + "=autoRun.PopulateUICount");
+         System.out.println("Post Config " + copy.getAttributes());
+         // Launch with the updated config
+         copy.launch(ILaunchManager.RUN_MODE, null);
       } catch (Exception ex) {
          OSEELog.logException(SkynetGuiPlugin.class, ex, true);
       }

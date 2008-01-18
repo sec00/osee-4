@@ -17,6 +17,7 @@
    <extension-point id="HtmlImageHandler" name="HtmlImageHandler" schema="schema/HtmlImageHandler.exsd"/>
    <extension-point id="WebPage" name="WebPage" schema="schema/WebPage.exsd"/>
    <extension-point id="AttributeSaveListener" name="AttributeSaveListener" schema="schema/AttributeSaveListener.exsd"/>
+   <extension-point id="AutoRunTask" name="AutoRunTask" schema="schema/AutoRunTask.exsd"/>
    
       <extension
             id="SkynetDbInit"
