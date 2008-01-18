@@ -27,7 +27,12 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.osee.framework.ui.plugin,
  org.eclipse.osee.framework.ui.swt,
  org.eclipse.nebula.widgets,
- org.eclipse.osee.framework.svn
+ org.eclipse.osee.framework.svn,
+ org.eclipse.jdt.launching,
+ org.eclipse.jdt.debug,
+ org.eclipse.jdt.debug.ui,
+ org.eclipse.debug.core,
+ org.eclipse.debug.ui
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.osee.framework.ui.skynet,
  org.eclipse.osee.framework.ui.skynet.Import,
