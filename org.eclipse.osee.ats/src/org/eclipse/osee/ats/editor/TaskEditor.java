@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osee.ats.AtsPlugin;
 import org.eclipse.osee.ats.artifact.TaskArtifact;
-import org.eclipse.osee.ats.util.DefaultTeamState;
 import org.eclipse.osee.ats.util.widgets.dialog.TaskResOptionDefinition;
 import org.eclipse.osee.ats.util.widgets.task.IXTaskViewer;
 import org.eclipse.osee.ats.world.search.WorldSearchItem;
@@ -186,7 +185,7 @@ public class TaskEditor extends AbstractArtifactEditor implements IDirtiableEdit
     * 
     * @see org.eclipse.osee.ats.util.widgets.task.IXTaskViewer#getOptions()
     */
-   public List<TaskResOptionDefinition> getResOptions() {
+   public List<TaskResOptionDefinition> getResOptions() throws SQLException {
       if (((TaskEditorInput) (IEditorInput) getEditorInput()).getResOptions() != null) return ((TaskEditorInput) (IEditorInput) getEditorInput()).getResOptions();
       return new ArrayList<TaskResOptionDefinition>();
    }
@@ -233,7 +232,12 @@ public class TaskEditor extends AbstractArtifactEditor implements IDirtiableEdit
     * @see org.eclipse.osee.ats.util.widgets.task.IXTaskViewer#isUsingTaskResolutionOptions()
     */
    public boolean isUsingTaskResolutionOptions() {
-      return getResOptions().size() > 0;
+      try {
+         return getResOptions().size() > 0;
+      } catch (Exception ex) {
+         OSEELog.logException(AtsPlugin.class, ex, false);
+      }
+      return false;
    }
 
    /* (non-Javadoc)
@@ -308,10 +312,7 @@ public class TaskEditor extends AbstractArtifactEditor implements IDirtiableEdit
             TaskEditorInput input =
                   new TaskEditorInput(
                         "Tasks for \"" + (searchItem.getSelectedName(searchType) != null ? searchItem.getSelectedName(searchType) : "") + "\"",
-                        taskArts,
-                        taskArts.iterator().next().getParentTeamWorkflow().getSmaMgr().getWorkPage(
-                              DefaultTeamState.Implement.name()).getTaskResDef() != null ? taskArts.iterator().next().getParentTeamWorkflow().getSmaMgr().getWorkPage(
-                              DefaultTeamState.Implement.name()).getTaskResDef().getOptions() : null);
+                        taskArts);
             TaskEditor.editArtifacts(input);
 
          } catch (final Exception ex) {

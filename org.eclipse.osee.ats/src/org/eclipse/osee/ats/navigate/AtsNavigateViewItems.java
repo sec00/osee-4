@@ -154,6 +154,7 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
 
       XNavigateItem taskItem = new XNavigateItem(null, "Tasks");
       new SearchNavigateItem(taskItem, new EditTasksByTeamVersionSearchItem(null, true));
+      new EditTasksBySelectedWorkflows(taskItem);
       items.add(taskItem);
 
       XNavigateItem releaseItems = new XNavigateItem(null, "Versions");

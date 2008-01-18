@@ -128,9 +128,13 @@ public class XTaskViewer extends XWidget implements IEventReceiver, IActionable 
 
       createTaskActionBar(mainComp);
 
-      xViewer =
-            new TaskXViewer(mainComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION, iXTaskViewer.getEditor(),
-                  iXTaskViewer.isUsingTaskResolutionOptions(), iXTaskViewer.getResOptions(), this);
+      try {
+         xViewer =
+               new TaskXViewer(mainComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION, iXTaskViewer.getEditor(),
+                     iXTaskViewer.isUsingTaskResolutionOptions(), iXTaskViewer.getResOptions(), this);
+      } catch (Exception ex) {
+         OSEELog.logException(AtsPlugin.class, ex, true);
+      }
       xViewer.setTasksEditable(iXTaskViewer.isTasksEditable());
       xViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
 
