@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.eclipse.osee.framework.jdk.core.util.AEmail;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
+import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
 import org.eclipse.ui.IStartup;
@@ -35,6 +36,10 @@ public class AutoRunStartup implements IStartup {
     */
    public void earlyStartup() {
       try {
+         logger.log(Level.INFO, "Checking AutoRunStartup");
+         String autoRunTaskId = OseeProperties.getInstance().getAutoRun();
+         if (autoRunTaskId == null) return;
+
          logger.log(Level.INFO, "Running AutoRunStartup...");
          AEmail email =
                new AEmail(new String[] {"donald.g.dunne@boeing.com"}, "donald.g.dunne@boeing.com",
