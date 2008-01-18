@@ -50,6 +50,7 @@ import org.eclipse.osee.framework.jdk.core.util.AHTML;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.transaction.AbstractSkynetTxTemplate;
+import org.eclipse.osee.framework.skynet.core.util.Artifacts;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
@@ -117,6 +118,7 @@ public class WorldXViewer extends XViewer {
    Action editChangeTypeAction;
    Action editPriorityAction;
    Action editTargetVersionAction;
+   Action editAssigneeAction;
    Action editActionableItemsAction;
    Action convertActionableItemsAction;
    Action openInAtsEditorAction, openInMassEditorAction;
@@ -164,6 +166,22 @@ public class WorldXViewer extends XViewer {
                }
             } catch (SQLException ex) {
                OSEELog.logException(AtsPlugin.class, ex, true);
+            }
+         }
+      };
+
+      editAssigneeAction = new Action("Edit Assignee", Action.AS_PUSH_BUTTON) {
+         @Override
+         public void run() {
+            Set<StateMachineArtifact> artifacts = getSelectedSMAArtifacts();
+            if (SMAManager.promptChangeAssignees(artifacts)) {
+               try {
+                  Artifacts.persist(artifacts, false);
+               } catch (Exception ex) {
+                  OSEELog.logException(AtsPlugin.class, ex, true);
+                  return;
+               }
+               update(getSelectedArtifactItemsArray(), null);
             }
          }
       };
@@ -400,6 +418,9 @@ public class WorldXViewer extends XViewer {
 
       mm.insertBefore(MENU_GROUP_PRE, editTargetVersionAction);
       editTargetVersionAction.setEnabled(getSelectedTeamWorkflowArtifacts().size() > 0);
+
+      mm.insertBefore(MENU_GROUP_PRE, editAssigneeAction);
+      editAssigneeAction.setEnabled(getSelectedSMAArtifacts().size() > 0);
 
       mm.insertBefore(MENU_GROUP_PRE, editActionableItemsAction);
       editActionableItemsAction.setEnabled(getSelectedActionArtifacts().size() == 1 || getSelectedTeamWorkflowArtifacts().size() == 1);
