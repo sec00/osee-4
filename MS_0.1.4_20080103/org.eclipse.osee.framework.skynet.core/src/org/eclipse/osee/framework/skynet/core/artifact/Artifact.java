@@ -446,6 +446,8 @@ public class Artifact implements Unique, PersistenceObject, IAdaptable, Comparab
     *            <li>The max occurrences for the named attribute is not equal to 1.</li>
     *            </ul>
     */
+   @Deprecated
+   // use setSoleAttributeValue instead
    public void setAttribute(String attributeName, String value) throws IllegalStateException {
       checkDeleted();
       try {
