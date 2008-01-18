@@ -16,7 +16,11 @@ import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.ui.IStartup;
 
 /**
- * @author Ryan D. Brooks
+ * This class will be kicked off during any normal run of OSEE. It will check for any -DAutoRun=taskId options and
+ * inquire, through extension points, which plugins need to perform tasks for the taskId specified. After tests are
+ * completed, this class will shutdown the workbench.
+ * 
+ * @author Donald G. Dunne
  */
 public class AutoRunStartup implements IStartup {
 
