@@ -143,8 +143,9 @@ public class PolicyDialog extends Dialog {
 
       btnAdd.addSelectionListener(new SelectionAdapter() {
          public void widgetSelected(SelectionEvent e) {
-            Artifact subject = (Artifact) cmbUsers.getData(cmbUsers.getText());
-            PermissionEnum permission = (PermissionEnum) cmbPermissionLevel.getData(cmbPermissionLevel.getText());
+            Artifact subject = (Artifact) cmbUsers.getData(cmbUsers.getText().replaceAll(" - Rank.*", ""));
+            PermissionEnum permission =
+                  (PermissionEnum) cmbPermissionLevel.getData(cmbPermissionLevel.getText().replaceAll(" - Rank.*", ""));
 
             if (subject != null && permission != null) {
                policyTableViewer.addItem(subject, object, permission);
