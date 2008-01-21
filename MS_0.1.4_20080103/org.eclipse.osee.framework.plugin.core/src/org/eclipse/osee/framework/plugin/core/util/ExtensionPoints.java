@@ -71,7 +71,6 @@ public class ExtensionPoints {
     * @return
     */
    public static List<IExtension> getExtensionsByUniqueId(String extensionPointId, Collection<String> extensionPointUniqueIds) {
-      System.out.println("here");
       List<IExtension> extensions = new ArrayList<IExtension>();
       for (String entensionPointUniqueId : extensionPointUniqueIds) {
          IExtension extension = Platform.getExtensionRegistry().getExtension(entensionPointUniqueId);
