@@ -68,6 +68,9 @@ public class KickoffOseeAutoRunTaskAction extends Action {
          copy.setAttribute(
                "org.eclipse.jdt.launching.VM_ARGUMENTS",
                copy.getAttribute("org.eclipse.jdt.launching.VM_ARGUMENTS", "") + " -D" + OseeProperties.OSEE_AUTORUN + "=" + autoRunExtensionUniqueId);
+         copy.setAttribute("org.eclipse.jdt.launching.PROGRAM_ARGUMENTS", copy.getAttribute(
+               "org.eclipse.jdt.launching.PROGRAM_ARGUMENTS", "").replaceFirst("PUT_ID_HERE",
+               autoRunExtensionUniqueId.replaceAll("\\.", "")));
          System.out.println("Post Config " + copy.getAttributes());
          // Launch with the updated config
          System.err.println("Change back to RUN_MODE");
