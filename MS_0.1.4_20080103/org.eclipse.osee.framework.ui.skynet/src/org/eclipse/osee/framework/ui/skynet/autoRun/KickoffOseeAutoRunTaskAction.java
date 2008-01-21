@@ -43,7 +43,8 @@ public class KickoffOseeAutoRunTaskAction extends Action {
    @Override
    public void run() {
       run("lba.ats.config.common.PopulateUICount");
-      run("lba.ats.config.common.UpdateBuildPlanning");
+      //      run("lba.ats.config.common.UpdateBuildPlanning");
+      //      run("lba.ats.config.common.PopulateTraxMetrics");
    }
 
    public void run(String autoRunExtensionUniqueId) {
