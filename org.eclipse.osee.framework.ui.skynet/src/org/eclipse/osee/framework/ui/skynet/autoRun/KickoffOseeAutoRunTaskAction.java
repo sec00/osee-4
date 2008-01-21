@@ -42,6 +42,11 @@ public class KickoffOseeAutoRunTaskAction extends Action {
 
    @Override
    public void run() {
+      run("lba.ats.config.common.PopulateUICount");
+      run("lba.ats.config.common.UpdateBuildPlanning");
+   }
+
+   public void run(String autoRunExtensionUniqueId) {
       try {
          ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
          String launchFile = "org.eclipse.osee.framework.ui.skynet\\AutoRun.launch";
@@ -62,10 +67,11 @@ public class KickoffOseeAutoRunTaskAction extends Action {
          // Add the AutoRun property to the VM_ARGUEMENTS
          copy.setAttribute(
                "org.eclipse.jdt.launching.VM_ARGUMENTS",
-               copy.getAttribute("org.eclipse.jdt.launching.VM_ARGUMENTS", "") + " -D" + OseeProperties.OSEE_AUTORUN + "=autoRun.UpdateBuildPlanning");
+               copy.getAttribute("org.eclipse.jdt.launching.VM_ARGUMENTS", "") + " -D" + OseeProperties.OSEE_AUTORUN + "=" + autoRunExtensionUniqueId);
          System.out.println("Post Config " + copy.getAttributes());
          // Launch with the updated config
-         copy.launch(ILaunchManager.RUN_MODE, null);
+         System.err.println("Change back to RUN_MODE");
+         copy.launch(ILaunchManager.DEBUG_MODE, null);
       } catch (Exception ex) {
          OSEELog.logException(SkynetGuiPlugin.class, ex, true);
       }
