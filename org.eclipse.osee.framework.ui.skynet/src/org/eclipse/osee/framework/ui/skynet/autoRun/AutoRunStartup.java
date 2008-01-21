@@ -10,15 +10,23 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.autoRun;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.osee.framework.jdk.core.util.AEmail;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
+import org.eclipse.osee.framework.plugin.core.util.ExtensionPoints;
+import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
+import org.osgi.framework.Bundle;
 
 /**
  * This class will be kicked off during any normal run of OSEE. It will check for any -DAutoRun=taskId options and
@@ -42,7 +50,11 @@ public class AutoRunStartup implements IStartup {
             return;
          }
 
+         // Run the tasks that match the taskId
          logger.log(Level.INFO, "Running AutoRunStartup; Id=\"" + autoRunTaskId + "\"");
+         run(autoRunTaskId);
+
+         // Send email of completion
          AEmail email =
                new AEmail(new String[] {"donald.g.dunne@boeing.com"}, "donald.g.dunne@boeing.com",
                      "donald.g.dunne@boeing.com", "Auto Run Completed; Id=\"" + autoRunTaskId + "\" ", "Completed");
@@ -64,6 +76,31 @@ public class AutoRunStartup implements IStartup {
                      "donald.g.dunne@boeing.com", "Auto Run Exceptioned; Id=\"" + autoRunTaskId + "\" Exceptioned",
                      "Exception\n\n" + Lib.exceptionToString(ex));
          email.send();
+      }
+   }
+
+   /**
+    * Execute the autoRun.startTasks with the given unique extension id
+    * 
+    * @param autoRunTaskId unique AutoRunTask extension id
+    * @throws Exception
+    */
+   private void run(String autoRunTaskId) throws Exception {
+      System.out.println("");
+      List<IExtension> iExtensions =
+            ExtensionPoints.getExtensionsByUniqueId("org.eclipse.osee.framework.skynet.core.AutoRunTask",
+                  Arrays.asList(new String[] {autoRunTaskId}));
+      for (IExtension iExtension : iExtensions) {
+         for (IConfigurationElement element : iExtension.getConfigurationElements()) {
+            String className = element.getAttribute("classname");
+            String bundleName = element.getContributor().getName();
+            if (className != null && bundleName != null) {
+               Bundle bundle = Platform.getBundle(bundleName);
+               Class<?> interfaceClass = bundle.loadClass(className);
+               IAutoRunTask autoRunTask = (IAutoRunTask) interfaceClass.getConstructor().newInstance();
+               autoRunTask.startTasks();
+            }
+         }
       }
    }
 }

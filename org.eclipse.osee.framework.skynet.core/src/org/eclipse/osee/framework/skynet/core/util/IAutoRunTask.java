@@ -10,7 +10,7 @@ package org.eclipse.osee.framework.skynet.core.util;
  */
 public interface IAutoRunTask {
 
-   public void startTasks(String autoRunTaskId) throws Exception;
+   public void startTasks() throws Exception;
 
    public int getHourStartTime();
 
