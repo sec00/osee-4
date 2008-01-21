@@ -132,6 +132,6 @@ public class OseeDbVersion {
 
    public static void initializeDbVersion(Connection connection) throws SQLException {
       setOseeDbVersion(connection, OseeProductActivator.DEFAULT_DEVELOPMENT_VERSION);
-      setOseeDbCheckVersion(connection, true);
+      setOseeDbCheckVersion(connection, false);
    }
 }
