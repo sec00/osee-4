@@ -10,10 +10,12 @@ package org.eclipse.osee.framework.skynet.core.util;
  */
 public interface IAutoRunTask {
 
-   public void startTasks() throws Exception;
+   public void startTasks(StringBuffer results) throws Exception;
 
    public int getHourStartTime();
 
    public int getMinuteStartTime();
+
+   public String[] getNotificationEmailAddresses();
 
 }

@@ -24,6 +24,7 @@ import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.plugin.core.util.ExtensionPoints;
 import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
+import org.eclipse.osee.framework.ui.skynet.widgets.XDate;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
@@ -44,6 +45,8 @@ public class AutoRunStartup implements IStartup {
     */
    public void earlyStartup() {
       final String autoRunTaskId = OseeProperties.getInstance().getAutoRun();
+      final StringBuffer sb = new StringBuffer();
+      IAutoRunTask autoRunTask = null;
       try {
          if (autoRunTaskId == null) {
             logger.log(Level.INFO, "Checked AutoRunStartup...Nothing to run.");
@@ -52,13 +55,25 @@ public class AutoRunStartup implements IStartup {
 
          // Run the tasks that match the taskId
          logger.log(Level.INFO, "Running AutoRunStartup; Id=\"" + autoRunTaskId + "\"");
-         run(autoRunTaskId);
+         autoRunTask = getAutoRunTask(autoRunTaskId);
+         if (autoRunTask == null) {
+            // Send email of completion
+            AEmail email =
+                  new AEmail(new String[] {"donald.g.dunne@boeing.com"}, "donald.g.dunne@boeing.com",
+                        "donald.g.dunne@boeing.com", "Can't find AutoRunTask; Id=\"" + autoRunTaskId + "\" ", " ");
+            email.send();
+         } else {
+            sb.append("Starting AutoRunTaskId=\"" + autoRunTaskId + "\" - " + XDate.getDateNow() + "\n\n");
+            autoRunTask.startTasks(sb);
+            sb.append("\n\nCompleted AutoRunTaskId=\"" + autoRunTaskId + "\" - " + XDate.getDateNow() + "\n");
 
-         // Send email of completion
-         AEmail email =
-               new AEmail(new String[] {"donald.g.dunne@boeing.com"}, "donald.g.dunne@boeing.com",
-                     "donald.g.dunne@boeing.com", "Auto Run Completed; Id=\"" + autoRunTaskId + "\" ", "Completed");
-         email.send();
+            // Email successful run
+            AEmail email =
+                  new AEmail(autoRunTask.getNotificationEmailAddresses(),
+                        autoRunTask.getNotificationEmailAddresses()[0], autoRunTask.getNotificationEmailAddresses()[0],
+                        "Completed AutoRunTaskId=\"" + autoRunTaskId + "\"", sb.toString());
+            email.send();
+         }
          logger.log(Level.INFO, "Sleeping...");
          Thread.sleep(2000);
          logger.log(Level.INFO, "Exiting AutoRunStartup; Id=\"" + autoRunTaskId + "\"");
@@ -71,10 +86,13 @@ public class AutoRunStartup implements IStartup {
             }
          });
       } catch (Exception ex) {
+         String[] emails = new String[] {"donald.g.dunne@boeing.com"};
+         if (autoRunTask != null) emails = autoRunTask.getNotificationEmailAddresses();
+         // Email exception
          AEmail email =
-               new AEmail(new String[] {"donald.g.dunne@boeing.com"}, "donald.g.dunne@boeing.com",
-                     "donald.g.dunne@boeing.com", "Auto Run Exceptioned; Id=\"" + autoRunTaskId + "\" Exceptioned",
-                     "Exception\n\n" + Lib.exceptionToString(ex));
+               new AEmail(emails, emails[0], emails[0],
+                     "Exception running AutoRunTaskId=\"" + autoRunTaskId + "\" Exceptioned",
+                     "Output:\n\n" + sb.toString() + "\n\nException:\n\n" + Lib.exceptionToString(ex));
          email.send();
       }
    }
@@ -85,7 +103,7 @@ public class AutoRunStartup implements IStartup {
     * @param autoRunTaskId unique AutoRunTask extension id
     * @throws Exception
     */
-   private void run(String autoRunTaskId) throws Exception {
+   private IAutoRunTask getAutoRunTask(String autoRunTaskId) throws Exception {
       List<IExtension> iExtensions =
             ExtensionPoints.getExtensionsByUniqueId("org.eclipse.osee.framework.skynet.core.AutoRunTask",
                   Arrays.asList(new String[] {autoRunTaskId}));
@@ -96,10 +114,10 @@ public class AutoRunStartup implements IStartup {
             if (className != null && bundleName != null) {
                Bundle bundle = Platform.getBundle(bundleName);
                Class<?> interfaceClass = bundle.loadClass(className);
-               IAutoRunTask autoRunTask = (IAutoRunTask) interfaceClass.getConstructor().newInstance();
-               autoRunTask.startTasks();
+               return (IAutoRunTask) interfaceClass.getConstructor().newInstance();
             }
          }
       }
+      return null;
    }
 }
