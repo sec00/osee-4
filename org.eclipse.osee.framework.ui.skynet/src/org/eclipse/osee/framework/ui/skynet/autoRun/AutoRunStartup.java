@@ -86,7 +86,6 @@ public class AutoRunStartup implements IStartup {
     * @throws Exception
     */
    private void run(String autoRunTaskId) throws Exception {
-      System.out.println("");
       List<IExtension> iExtensions =
             ExtensionPoints.getExtensionsByUniqueId("org.eclipse.osee.framework.skynet.core.AutoRunTask",
                   Arrays.asList(new String[] {autoRunTaskId}));
