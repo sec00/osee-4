@@ -62,7 +62,7 @@ public class KickoffOseeAutoRunTaskAction extends Action {
          // Add the AutoRun property to the VM_ARGUEMENTS
          copy.setAttribute(
                "org.eclipse.jdt.launching.VM_ARGUMENTS",
-               copy.getAttribute("org.eclipse.jdt.launching.VM_ARGUMENTS", "") + " -D" + OseeProperties.OSEE_AUTORUN + "=autoRun.PopulateUICount");
+               copy.getAttribute("org.eclipse.jdt.launching.VM_ARGUMENTS", "") + " -D" + OseeProperties.OSEE_AUTORUN + "=autoRun.UpdateBuildPlanning");
          System.out.println("Post Config " + copy.getAttributes());
          // Launch with the updated config
          copy.launch(ILaunchManager.RUN_MODE, null);
