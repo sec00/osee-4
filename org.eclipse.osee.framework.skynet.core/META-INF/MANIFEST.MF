@@ -15,8 +15,7 @@ Require-Bundle: org.apache.xerces,
  org.eclipse.osee.framework.database,
  org.junit,
  org.eclipse.osee.framework.plugin.core,
- org.eclipse.osee.framework.ui.plugin,
- org.eclipse.osee.framework.svn
+ org.eclipse.osee.framework.ui.plugin
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.osee.framework.skynet.core,
  org.eclipse.osee.framework.skynet.core.access,

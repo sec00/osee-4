@@ -11,7 +11,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.team.ui,
  org.polarion.team.svn.core,
  org.polarion.team.svn.ui,
- org.eclipse.osee.framework.jdk.core,
  org.eclipse.osee.framework.plugin.core,
  org.eclipse.team.core
 Eclipse-LazyStart: true
