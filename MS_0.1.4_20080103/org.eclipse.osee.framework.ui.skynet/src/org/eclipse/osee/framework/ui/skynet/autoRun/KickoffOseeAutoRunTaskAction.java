@@ -66,7 +66,7 @@ public class KickoffOseeAutoRunTaskAction extends Action {
             return;
          }
          ILaunchConfiguration config = manager.getLaunchConfiguration(iFile);
-         System.out.println("Pre Config " + config.getAttributes());
+         //         System.out.println("Pre Config " + config.getAttributes());
          // Get a copy of the config to work with
          ILaunchConfigurationWorkingCopy copy = config.getWorkingCopy();
          // Add the AutoRun property to the VM_ARGUEMENTS
@@ -75,7 +75,7 @@ public class KickoffOseeAutoRunTaskAction extends Action {
                copy.getAttribute("org.eclipse.jdt.launching.VM_ARGUMENTS", "") + " -D" + OseeProperties.OSEE_AUTORUN + "=" + autoRunExtensionUniqueId);
          copy.setAttribute("location", copy.getAttribute("location", "").replaceFirst("PUT_ID_HERE",
                autoRunExtensionUniqueId.replaceAll("\\.", "")));
-         System.out.println("Post Config " + copy.getAttributes());
+         //         System.out.println("Post Config " + copy.getAttributes());
          // Launch with the updated config
          System.err.println("Change back to RUN_MODE");
          copy.launch(ILaunchManager.DEBUG_MODE, null);
