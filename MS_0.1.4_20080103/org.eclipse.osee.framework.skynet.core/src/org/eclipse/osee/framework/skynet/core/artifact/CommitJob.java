@@ -233,12 +233,12 @@ class CommitJob extends Job {
             txCompressor.execute();
 
             transactionIdManager.resetEditableTransactionId(newTransactionNumber, toBranch);
+            tagArtifacts(toBranch, fromBranchId, monitor);
 
-            monitor.worked(15);
-            monitor.setTaskName("Tagging artifacts");
+            if (archiveBranch) {
+               fromBranch.archive();
+            }
 
-            tagArtifacts(toBranch, fromBranchId, newTransactionNumber);
-            if (archiveBranch) fromBranch.archive();
          } else {
             throw new IllegalStateException(" A branch can not be commited without any changes made.");
          }
@@ -271,7 +271,10 @@ class CommitJob extends Job {
          success = false;
       }
 
-      private void tagArtifacts(Branch toBranch, int fromBranchId, int commitTransactionId) throws SQLException {
+      private void tagArtifacts(Branch toBranch, int fromBranchId, IProgressMonitor progressMonitor) throws SQLException {
+         progressMonitor.worked(15);
+         progressMonitor.setTaskName("Tagging artifacts");
+
          //Delete toBranch artifact tags
          ConnectionHandler.runPreparedUpdate(DELETE_TO_BRANCH_TAG_DATA, SQL3DataType.INTEGER, toBranch.getBranchId(),
                SQL3DataType.INTEGER, fromBranchId);
