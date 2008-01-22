@@ -25,6 +25,8 @@ import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.plugin.core.util.ExtensionPoints;
 import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
+import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
+import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.XDate;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
@@ -87,21 +89,21 @@ public class AutoRunStartup implements IStartup {
          email.send();
       } finally {
          if (autoRunTask != null) {
-         logger.log(Level.INFO, "Sleeping...");
+            logger.log(Level.INFO, "Sleeping...");
             try {
-         Thread.sleep(2000);
+               Thread.sleep(2000);
             } catch (Exception ex) {
                // do nothing
             }
-         logger.log(Level.INFO, "Exiting AutoRunStartup; Id=\"" + autoRunTaskId + "\"");
-         Displays.ensureInDisplayThread(new Runnable() {
-            /* (non-Javadoc)
-             * @see java.lang.Runnable#run()
-             */
-            public void run() {
-               PlatformUI.getWorkbench().close();
-            }
-         });
+            logger.log(Level.INFO, "Exiting AutoRunStartup; Id=\"" + autoRunTaskId + "\"");
+            Displays.ensureInDisplayThread(new Runnable() {
+               /* (non-Javadoc)
+                * @see java.lang.Runnable#run()
+                */
+               public void run() {
+                  PlatformUI.getWorkbench().close();
+               }
+            });
          }
       }
    }
@@ -135,12 +137,16 @@ public class AutoRunStartup implements IStartup {
       for (IConfigurationElement element : iExtensions) {
          String className = element.getAttribute("classname");
          String bundleName = element.getContributor().getName();
-         if (className != null && bundleName != null) {
-            Bundle bundle = Platform.getBundle(bundleName);
-            Class<?> interfaceClass = bundle.loadClass(className);
-            IAutoRunTask autoRunTask = (IAutoRunTask) interfaceClass.getConstructor().newInstance();
-            autoRunTask.setAutoRunUniqueId(((IConfigurationElement) element.getParent()).getDeclaringExtension().getExtensionPointUniqueIdentifier());
-            tasks.add(autoRunTask);
+         try {
+            if (className != null && bundleName != null) {
+               Bundle bundle = Platform.getBundle(bundleName);
+               Class<?> interfaceClass = bundle.loadClass(className);
+               IAutoRunTask autoRunTask = (IAutoRunTask) interfaceClass.getConstructor().newInstance();
+               autoRunTask.setAutoRunUniqueId(((IConfigurationElement) element.getParent()).getDeclaringExtension().getExtensionPointUniqueIdentifier());
+               tasks.add(autoRunTask);
+            }
+         } catch (Exception ex) {
+            OSEELog.logException(SkynetGuiPlugin.class, ex, false);
          }
       }
       return tasks;
