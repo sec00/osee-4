@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.autoRun;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -86,21 +87,21 @@ public class AutoRunStartup implements IStartup {
          email.send();
       } finally {
          if (autoRunTask != null) {
-            logger.log(Level.INFO, "Sleeping...");
+         logger.log(Level.INFO, "Sleeping...");
             try {
-               Thread.sleep(2000);
+         Thread.sleep(2000);
             } catch (Exception ex) {
                // do nothing
             }
-            logger.log(Level.INFO, "Exiting AutoRunStartup; Id=\"" + autoRunTaskId + "\"");
-            Displays.ensureInDisplayThread(new Runnable() {
-               /* (non-Javadoc)
-                * @see java.lang.Runnable#run()
-                */
-               public void run() {
-                  PlatformUI.getWorkbench().close();
-               }
-            });
+         logger.log(Level.INFO, "Exiting AutoRunStartup; Id=\"" + autoRunTaskId + "\"");
+         Displays.ensureInDisplayThread(new Runnable() {
+            /* (non-Javadoc)
+             * @see java.lang.Runnable#run()
+             */
+            public void run() {
+               PlatformUI.getWorkbench().close();
+            }
+         });
          }
       }
    }
@@ -126,6 +127,23 @@ public class AutoRunStartup implements IStartup {
          }
       }
       return null;
+   }
+
+   public static List<IAutoRunTask> getAutoRunTasks() throws Exception {
+      List<IAutoRunTask> tasks = new ArrayList<IAutoRunTask>();
+      List<IConfigurationElement> iExtensions = ExtensionPoints.getExtensionElements(EXTENSION_POINT, "AutoRunTask");
+      for (IConfigurationElement element : iExtensions) {
+         String className = element.getAttribute("classname");
+         String bundleName = element.getContributor().getName();
+         if (className != null && bundleName != null) {
+            Bundle bundle = Platform.getBundle(bundleName);
+            Class<?> interfaceClass = bundle.loadClass(className);
+            IAutoRunTask autoRunTask = (IAutoRunTask) interfaceClass.getConstructor().newInstance();
+            autoRunTask.setAutoRunUniqueId(((IConfigurationElement) element.getParent()).getDeclaringExtension().getExtensionPointUniqueIdentifier());
+            tasks.add(autoRunTask);
+         }
+      }
+      return tasks;
    }
 
 }

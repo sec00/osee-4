@@ -18,4 +18,8 @@ public interface IAutoRunTask {
 
    public String[] getNotificationEmailAddresses();
 
+   public void setAutoRunUniqueId(String autoRunUniqueId);
+
+   public String getAutoRunUniqueId();
+
 }
