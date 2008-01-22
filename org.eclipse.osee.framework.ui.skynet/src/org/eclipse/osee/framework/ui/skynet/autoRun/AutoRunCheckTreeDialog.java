@@ -35,6 +35,8 @@ public class AutoRunCheckTreeDialog extends CheckedTreeSelectionDialog {
 
    public AutoRunCheckTreeDialog() {
       super(Display.getCurrent().getActiveShell(), labelProvider, treeContentProvider);
+      setTitle("Kickoff Auto Run Tasks");
+      setMessage("Select Auto Run Tasks to kickoff.");
       try {
          setInput(AutoRunStartup.getAutoRunTasks());
       } catch (Exception ex) {
@@ -56,7 +58,8 @@ public class AutoRunCheckTreeDialog extends CheckedTreeSelectionDialog {
          @SuppressWarnings("unchecked")
          @Override
          public int compare(Viewer viewer, Object e1, Object e2) {
-            return getComparator().compare(((Artifact) e1).getDescriptiveName(), ((Artifact) e2).getDescriptiveName());
+            return getComparator().compare(((IAutoRunTask) e1).getAutoRunUniqueId(),
+                  ((IAutoRunTask) e2).getAutoRunUniqueId());
          }
       });
       return c;
