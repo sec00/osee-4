@@ -39,6 +39,7 @@ import org.osgi.framework.Bundle;
 public class AutoRunStartup implements IStartup {
 
    private static final Logger logger = ConfigUtil.getConfigFactory().getLogger(AutoRunStartup.class);
+   public static String EXTENSION_POINT = "org.eclipse.osee.framework.skynet.core.AutoRunTask";
 
    /* (non-Javadoc)
     * @see org.eclipse.ui.IStartup#earlyStartup()
@@ -105,8 +106,7 @@ public class AutoRunStartup implements IStartup {
     */
    private IAutoRunTask getAutoRunTask(String autoRunTaskId) throws Exception {
       List<IExtension> iExtensions =
-            ExtensionPoints.getExtensionsByUniqueId("org.eclipse.osee.framework.skynet.core.AutoRunTask",
-                  Arrays.asList(new String[] {autoRunTaskId}));
+            ExtensionPoints.getExtensionsByUniqueId(EXTENSION_POINT, Arrays.asList(new String[] {autoRunTaskId}));
       for (IExtension iExtension : iExtensions) {
          for (IConfigurationElement element : iExtension.getConfigurationElements()) {
             String className = element.getAttribute("classname");
@@ -120,4 +120,5 @@ public class AutoRunStartup implements IStartup {
       }
       return null;
    }
+
 }

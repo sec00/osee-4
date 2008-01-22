@@ -19,6 +19,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
+import org.eclipse.osee.framework.plugin.core.util.ExtensionPoints;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkspace;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
@@ -42,9 +43,12 @@ public class KickoffOseeAutoRunTaskAction extends Action {
 
    @Override
    public void run() {
-      run("lba.ats.config.common.PopulateUICount");
-      //      run("lba.ats.config.common.UpdateBuildPlanning");
-      //      run("lba.ats.config.common.PopulateTraxMetrics");
+      // For now, simply run through all extension points and kick them off.
+      // In future, this method will schedule for these tasks to be run as per the methods in IAutoRunTask
+      for (String extensionPointUniqueId : ExtensionPoints.getExtensionsPointUniqueIds(AutoRunStartup.EXTENSION_POINT)) {
+         OSEELog.logInfo(SkynetGuiPlugin.class, "Running AutoTask \"" + extensionPointUniqueId + "\"", false);
+         run(extensionPointUniqueId);
+      }
    }
 
    public void run(String autoRunExtensionUniqueId) {
