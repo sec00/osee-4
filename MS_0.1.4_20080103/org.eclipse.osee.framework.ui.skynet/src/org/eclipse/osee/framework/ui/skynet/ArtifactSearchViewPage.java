@@ -393,7 +393,7 @@ public class ArtifactSearchViewPage extends AbstractArtifactSearchViewPage imple
       new AbstractSelectionEnabledHandler(menuManager) {
          @Override
          public Object execute(ExecutionEvent event) throws ExecutionException {
-            RendererManager.getInstance().previewInJob(getSelectedArtifact(viewer), "PREVIEW_ARTIFACT");
+            RendererManager.getInstance().previewInJob(getSelectedArtifacts(viewer), "PREVIEW_ARTIFACT");
             return null;
          }
 
@@ -413,7 +413,7 @@ public class ArtifactSearchViewPage extends AbstractArtifactSearchViewPage imple
       new AbstractSelectionEnabledHandler(menuManager) {
          @Override
          public Object execute(ExecutionEvent event) throws ExecutionException {
-            ArtifactExplorer.revealArtifact(getSelectedArtifact(viewer));
+            RendererManager.getInstance().previewInJob(getSelectedArtifacts(viewer), "PREVIEW_WITH_RECURSE");
             return null;
          }
 
