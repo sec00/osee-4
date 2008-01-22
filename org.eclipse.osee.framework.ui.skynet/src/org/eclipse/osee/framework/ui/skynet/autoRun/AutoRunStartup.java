@@ -75,17 +75,6 @@ public class AutoRunStartup implements IStartup {
                         "Completed AutoRunTaskId=\"" + autoRunTaskId + "\"", sb.toString());
             email.send();
          }
-         logger.log(Level.INFO, "Sleeping...");
-         Thread.sleep(2000);
-         logger.log(Level.INFO, "Exiting AutoRunStartup; Id=\"" + autoRunTaskId + "\"");
-         Displays.ensureInDisplayThread(new Runnable() {
-            /* (non-Javadoc)
-             * @see java.lang.Runnable#run()
-             */
-            public void run() {
-               PlatformUI.getWorkbench().close();
-            }
-         });
       } catch (Exception ex) {
          String[] emails = new String[] {"donald.g.dunne@boeing.com"};
          if (autoRunTask != null) emails = autoRunTask.getNotificationEmailAddresses();
@@ -95,6 +84,22 @@ public class AutoRunStartup implements IStartup {
                      "Exception running AutoRunTaskId=\"" + autoRunTaskId + "\" Exceptioned",
                      "Output:\n\n" + sb.toString() + "\n\nException:\n\n" + Lib.exceptionToString(ex));
          email.send();
+      } finally {
+         logger.log(Level.INFO, "Sleeping...");
+         try {
+            Thread.sleep(2000);
+         } catch (Exception ex) {
+            // do nothing
+         }
+         logger.log(Level.INFO, "Exiting AutoRunStartup; Id=\"" + autoRunTaskId + "\"");
+         Displays.ensureInDisplayThread(new Runnable() {
+            /* (non-Javadoc)
+             * @see java.lang.Runnable#run()
+             */
+            public void run() {
+               PlatformUI.getWorkbench().close();
+            }
+         });
       }
    }
 
