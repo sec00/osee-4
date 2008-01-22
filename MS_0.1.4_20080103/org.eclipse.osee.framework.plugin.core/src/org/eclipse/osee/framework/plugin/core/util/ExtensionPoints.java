@@ -98,7 +98,7 @@ public class ExtensionPoints {
 
       IExtension[] extensions = point.getExtensions();
       for (IExtension extension : extensions) {
-         extensionPointIds.add(extension.getExtensionPointUniqueIdentifier());
+         extensionPointIds.add(extension.getUniqueIdentifier());
       }
       return extensionPointIds;
    }
