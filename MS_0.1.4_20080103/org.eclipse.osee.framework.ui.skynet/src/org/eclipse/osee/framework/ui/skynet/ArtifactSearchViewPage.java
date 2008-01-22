@@ -365,7 +365,7 @@ public class ArtifactSearchViewPage extends AbstractArtifactSearchViewPage imple
       new AbstractSelectionEnabledHandler(menuManager) {
          @Override
          public Object execute(ExecutionEvent event) throws ExecutionException {
-            RendererManager.getInstance().editInJob(getSelectedArtifact(viewer));
+            RendererManager.getInstance().editInJob(getSelectedArtifacts(viewer));
             return null;
          }
 
