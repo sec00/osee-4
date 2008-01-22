@@ -13,12 +13,10 @@ package org.eclipse.osee.ats.editor.service.branch;
 import org.eclipse.jface.action.Action;
 import org.eclipse.osee.ats.editor.SMAManager;
 import org.eclipse.osee.ats.editor.service.WorkPageService;
-import org.eclipse.osee.framework.jdk.core.type.Pair;
 import org.eclipse.osee.framework.skynet.core.event.LocalBranchEvent;
 import org.eclipse.osee.framework.skynet.core.event.LocalBranchToArtifactCacheUpdateEvent;
 import org.eclipse.osee.framework.skynet.core.event.RemoteBranchEvent;
 import org.eclipse.osee.framework.skynet.core.event.SkynetEventManager;
-import org.eclipse.osee.framework.skynet.core.transaction.TransactionId;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionIdManager;
 import org.eclipse.osee.framework.ui.plugin.event.Event;
 import org.eclipse.osee.framework.ui.plugin.event.IEventReceiver;
@@ -68,13 +66,7 @@ public class ShowChangeReportToolbarService extends WorkPageService implements I
    private boolean isEnabled() {
       boolean enabled = false;
       try {
-         if (smaMgr.getBranchMgr().isWorkingBranch()) {
-            Pair<TransactionId, TransactionId> transactionToFrom =
-                  transactionIdManager.getStartEndPoint(smaMgr.getBranchMgr().getWorkingBranch());
-            enabled = !transactionToFrom.getKey().equals(transactionToFrom.getValue());
-         } else {
-            enabled = smaMgr.getBranchMgr().getTransactionId() != null;
-         }
+         enabled = smaMgr.getBranchMgr().isCommittedBranch() || smaMgr.getBranchMgr().isWorkingBranch();
       } catch (Exception ex) {
          // do nothing
       }
