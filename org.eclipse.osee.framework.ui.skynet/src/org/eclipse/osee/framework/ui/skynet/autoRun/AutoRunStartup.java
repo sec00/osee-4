@@ -85,21 +85,23 @@ public class AutoRunStartup implements IStartup {
                      "Output:\n\n" + sb.toString() + "\n\nException:\n\n" + Lib.exceptionToString(ex));
          email.send();
       } finally {
-         logger.log(Level.INFO, "Sleeping...");
-         try {
-            Thread.sleep(2000);
-         } catch (Exception ex) {
-            // do nothing
-         }
-         logger.log(Level.INFO, "Exiting AutoRunStartup; Id=\"" + autoRunTaskId + "\"");
-         Displays.ensureInDisplayThread(new Runnable() {
-            /* (non-Javadoc)
-             * @see java.lang.Runnable#run()
-             */
-            public void run() {
-               PlatformUI.getWorkbench().close();
+         if (autoRunTask != null) {
+            logger.log(Level.INFO, "Sleeping...");
+            try {
+               Thread.sleep(2000);
+            } catch (Exception ex) {
+               // do nothing
             }
-         });
+            logger.log(Level.INFO, "Exiting AutoRunStartup; Id=\"" + autoRunTaskId + "\"");
+            Displays.ensureInDisplayThread(new Runnable() {
+               /* (non-Javadoc)
+                * @see java.lang.Runnable#run()
+                */
+               public void run() {
+                  PlatformUI.getWorkbench().close();
+               }
+            });
+         }
       }
    }
 
