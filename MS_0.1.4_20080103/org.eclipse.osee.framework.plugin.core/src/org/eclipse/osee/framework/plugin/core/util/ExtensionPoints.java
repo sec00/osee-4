@@ -89,6 +89,20 @@ public class ExtensionPoints {
       return extensions;
    }
 
+   public static List<String> getExtensionsPointUniqueIds(String extensionPointId) {
+      List<String> extensionPointIds = new ArrayList<String>();
+      IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(extensionPointId);
+      if (point == null) {
+         throw new IllegalArgumentException("The extension point " + extensionPointId + " does not exist");
+      }
+
+      IExtension[] extensions = point.getExtensions();
+      for (IExtension extension : extensions) {
+         extensionPointIds.add(extension.getExtensionPointUniqueIdentifier());
+      }
+      return extensionPointIds;
+   }
+
    public static IConfigurationElement getExtensionElement(String extensionPointId, String elementName) {
       List<IConfigurationElement> elements = ExtensionPoints.getExtensionElements(extensionPointId, elementName);
 
