@@ -138,12 +138,12 @@ public class AutoRunStartup implements IStartup {
          String className = element.getAttribute("classname");
          String bundleName = element.getContributor().getName();
          try {
-            if (className != null && bundleName != null) {
-               Bundle bundle = Platform.getBundle(bundleName);
-               Class<?> interfaceClass = bundle.loadClass(className);
-               IAutoRunTask autoRunTask = (IAutoRunTask) interfaceClass.getConstructor().newInstance();
-               autoRunTask.setAutoRunUniqueId(((IConfigurationElement) element.getParent()).getDeclaringExtension().getExtensionPointUniqueIdentifier());
-               tasks.add(autoRunTask);
+         if (className != null && bundleName != null) {
+            Bundle bundle = Platform.getBundle(bundleName);
+            Class<?> interfaceClass = bundle.loadClass(className);
+            IAutoRunTask autoRunTask = (IAutoRunTask) interfaceClass.getConstructor().newInstance();
+            autoRunTask.setAutoRunUniqueId(element.getDeclaringExtension().getExtensionPointUniqueIdentifier());
+            tasks.add(autoRunTask);
             }
          } catch (Exception ex) {
             OSEELog.logException(SkynetGuiPlugin.class, ex, false);
