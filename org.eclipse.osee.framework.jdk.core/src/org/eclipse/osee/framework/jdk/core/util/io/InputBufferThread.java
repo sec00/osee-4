@@ -10,13 +10,9 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.jdk.core.util.io;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
-import java.io.PrintStream;
-import java.nio.CharBuffer;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -172,9 +168,8 @@ public class InputBufferThread extends Thread {
       }
       return result ? matcher.toMatchResult() : null;
    }
-   
+
    /**
-    * 
     * @param millis
     * @return true if a transmission occurred false otherwise
     * @throws InterruptedException
@@ -183,12 +178,12 @@ public class InputBufferThread extends Thread {
       if (shouldStopRunning) {
          throw new IllegalStateException("stream processing terminated");
       }
-      
+
       long currentTime = System.currentTimeMillis();
       long savedLastRead = lastRead;
       while (savedLastRead != lastRead) {
          wait(millis);
-           // make sure we did not reach ourr timeout limit, also we need to handle potential 'spurious' wakeups
+         // make sure we did not reach ourr timeout limit, also we need to handle potential 'spurious' wakeups
          long next = System.currentTimeMillis();
          millis -= next - currentTime;
          currentTime = next;
