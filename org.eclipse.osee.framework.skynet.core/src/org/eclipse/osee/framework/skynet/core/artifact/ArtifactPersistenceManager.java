@@ -1107,29 +1107,26 @@ public class ArtifactPersistenceManager implements PersistenceManager {
    /**
     * @param artifact
     * @param transaction
+    * @throws SQLException
     */
-   public synchronized void doDelete(Artifact artifact, SkynetTransaction transaction, SkynetTransactionBuilder builder) {
+   public synchronized void doDelete(Artifact artifact, SkynetTransaction transaction, SkynetTransactionBuilder builder) throws SQLException {
       if (!artifact.isInDb()) return;
 
-      try {
-         LinkManager linkManager = artifact.getLinkManager();
+      LinkManager linkManager = artifact.getLinkManager();
 
-         processTransactionForArtifact(artifact, SkynetDatabase.ModificationType.DELETE, transaction,
-               SkynetDatabase.getNextGammaId());
+      processTransactionForArtifact(artifact, SkynetDatabase.ModificationType.DELETE, transaction,
+            SkynetDatabase.getNextGammaId());
 
-         transaction.addRemoteEvent(new NetworkArtifactDeletedEvent(artifact.getBranch().getBranchId(),
-               transaction.getTransactionNumber(), artifact.getArtId(), artifact.getArtTypeId(),
-               artifact.getFactory().getClass().getCanonicalName(),
-               SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId()));
-         transaction.addLocalEvent(new TransactionArtifactModifiedEvent(artifact.getGuid(), artifact.getBranch(),
-               ModType.Deleted, this));
+      transaction.addRemoteEvent(new NetworkArtifactDeletedEvent(artifact.getBranch().getBranchId(),
+            transaction.getTransactionNumber(), artifact.getArtId(), artifact.getArtTypeId(),
+            artifact.getFactory().getClass().getCanonicalName(),
+            SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId()));
+      transaction.addLocalEvent(new TransactionArtifactModifiedEvent(artifact.getGuid(), artifact.getBranch(),
+            ModType.Deleted, this));
 
-         linkManager.deleteAllLinks();
-         linkManager.traceLinks(false, builder);
-         tagManager.clearTags(artifact, SystemTagDescriptor.AUTO_INDEXED.getDescriptor());
-      } catch (SQLException ex) {
-         logger.log(Level.SEVERE, ex.toString(), ex);
-      }
+      linkManager.deleteAllLinks();
+      linkManager.traceLinks(false, builder);
+      tagManager.clearTags(artifact, SystemTagDescriptor.AUTO_INDEXED.getDescriptor());
    }
 
    /**
