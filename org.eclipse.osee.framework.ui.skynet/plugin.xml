@@ -495,4 +495,13 @@
 		<DatabaseTask classname="org.eclipse.osee.framework.ui.skynet.dbinit.AddCommonBranch">
          </DatabaseTask>
 	</extension>
+	<extension
+       point="org.eclipse.ui.preferencePages">
+    <page
+          category="org.eclipse.osee.framework.ui.skynet.OseePreferencePage"
+          class="org.eclipse.osee.framework.ui.skynet.preferences.HttpServerPreferences"
+          id="org.eclipse.osee.framework.ui.skynet.preferences.HttpServerPreferences"
+          name="Http Server">
+    </page>
+ </extension>
 </plugin>
