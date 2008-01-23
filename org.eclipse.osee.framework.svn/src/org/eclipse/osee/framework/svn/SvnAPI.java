@@ -102,7 +102,6 @@ public class SvnAPI {
          ISVNConnector proxy = CoreExtensionsManager.instance().getSVNConnectorFactory().newInstance();
          try {
 			proxy.status(file.getAbsolutePath(), 1, 0, new ISVNEntryStatusCallback(){
-				@Override
 				public void next(SVNChangeStatus status) {
 					entry.setModifiedFlag(getDescription(status.textStatus));
 				}}, new SVNNullProgressMonitor());
