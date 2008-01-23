@@ -12,7 +12,6 @@ package org.eclipse.osee.framework.ui.skynet.httpRequests;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -31,7 +30,7 @@ import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.linking.HttpRequest;
 import org.eclipse.osee.framework.skynet.core.linking.HttpResponse;
-import org.eclipse.osee.framework.skynet.core.linking.HttpServer;
+import org.eclipse.osee.framework.skynet.core.linking.HttpUrlBuilder;
 import org.eclipse.osee.framework.skynet.core.linking.IHttpServerRequest;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionId;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionIdManager;
@@ -46,15 +45,13 @@ import org.eclipse.osee.framework.ui.skynet.render.RendererManager;
  * @author Roberto E. Escobar
  */
 public class ArtifactRequest implements IHttpServerRequest {
-   private static final long POLL_STARTING_WAIT_TIME = 1000;
-   private static final double RETRY_MULTIPLIER = 1.8;
-   private static final long RETRY_TIMEOUT = 120000;
    private static final String GUID_KEY = "guid";
    private static final String BRANCH_NAME_KEY = "branch";
    private static final String BRANCH_ID_KEY = "branchId";
    private static final String TRANSACTION_NUMBER_KEY = "transaction";
    private static final String FORCE_KEY = "force";
    private static final String FORMAT_KEY = "format";
+   private static final HttpUrlBuilder urlBuilder = HttpUrlBuilder.getInstance();
    private static final ArtifactRequest instance = new ArtifactRequest();
    private static final Logger logger = ConfigUtil.getConfigFactory().getLogger(ArtifactRequest.class);
 
@@ -69,23 +66,23 @@ public class ArtifactRequest implements IHttpServerRequest {
       return instance;
    }
 
-   public String getUrl(Artifact artifact, boolean includeRevision) {
+   private Map<String, String> getParameters(Artifact artifact, boolean includeRevision) {
       Map<String, String> keyValues = new HashMap<String, String>();
       String guid = artifact.getGuid();
       int branch = artifact.getBranch().getBranchId();
-      try {
-         if (Strings.isValid(guid)) {
-            keyValues.put(GUID_KEY, URLEncoder.encode(guid, "UTF-8"));
-         }
-         keyValues.put(BRANCH_ID_KEY, URLEncoder.encode(Integer.toString(branch), "UTF-8"));
-         if (includeRevision) {
-            int txNumber = artifact.getPersistenceMemo().getTransactionNumber();
-            keyValues.put(TRANSACTION_NUMBER_KEY, URLEncoder.encode(Integer.toString(txNumber), "UTF-8"));
-         }
-      } catch (UnsupportedEncodingException ex) {
-         logger.log(Level.SEVERE, ex.toString(), ex);
+      if (Strings.isValid(guid)) {
+         keyValues.put(GUID_KEY, guid);
       }
-      return HttpServer.getUrl(this, keyValues);
+      keyValues.put(BRANCH_ID_KEY, Integer.toString(branch));
+      if (includeRevision) {
+         int txNumber = artifact.getPersistenceMemo().getTransactionNumber();
+         keyValues.put(TRANSACTION_NUMBER_KEY, Integer.toString(txNumber));
+      }
+      return keyValues;
+   }
+
+   public String getUrl(Artifact artifact, boolean includeRevision) {
+      return urlBuilder.getUrlForLocalSkynetHttpServer(getRequestType(), getParameters(artifact, includeRevision));
    }
 
    /*
@@ -118,9 +115,8 @@ public class ArtifactRequest implements IHttpServerRequest {
                break;
          }
       } catch (Exception ex) {
-         String message = String.format("Get Artifact Error: [%s]", httpRequest.getParametersAsString());
-         logger.log(Level.WARNING, message, ex);
-         httpResponse.outputStandardError(404, message);
+         logger.log(Level.WARNING, String.format("Get Artifact Error: [%s]", httpRequest.getParametersAsString()), ex);
+         httpResponse.outputStandardError(400, "Exception handling request");
       }
    }
 
@@ -199,28 +195,12 @@ public class ArtifactRequest implements IHttpServerRequest {
       try {
          transactionId = transactionIdManager.getPossiblyEditableTransactionIfFromCache(transactioNumber);
       } catch (Exception ex) {
-         long start = System.currentTimeMillis();
-         long waitTime = POLL_STARTING_WAIT_TIME;
-         while (transactionId == null && elapsedTime(start) < RETRY_TIMEOUT) {
-            try {
-               Thread.sleep(waitTime);
-               transactionId = transactionIdManager.getPossiblyEditableTransactionId(transactioNumber);
-            } catch (Exception ex2) {
-            }
-            if (transactionId == null) {
-               waitTime = computeNewWaitTime(waitTime);
-            }
+         try {
+            Thread.sleep(1000);
+         } catch (Exception ex1) {
          }
-         logger.log(Level.INFO, String.format("Found Artifact After Re-try for: %s ", elapsedTime(start)));
+         transactionId = transactionIdManager.getPossiblyEditableTransactionId(transactioNumber);
       }
       return ArtifactPersistenceManager.getInstance().getArtifact(guid, transactionId);
-   }
-
-   private long elapsedTime(long start) {
-      return System.currentTimeMillis() - start;
-   }
-
-   private long computeNewWaitTime(long old) {
-      return (long) (old * RETRY_MULTIPLIER);
    }
 }
