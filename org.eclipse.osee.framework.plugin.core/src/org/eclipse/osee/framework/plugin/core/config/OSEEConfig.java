@@ -382,7 +382,7 @@ public class OSEEConfig {
    }
 
    public String getRemoteHttpServer() {
-      return remoteHttpServer;
+      return remoteHttpServer != null ? remoteHttpServer : "";
    }
 
    //   public URL getBookmark(String name) throws MalformedURLException {
