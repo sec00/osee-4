@@ -33,6 +33,9 @@ public class OseeProperties {
    private static final String DONT_LOG_USAGE = "DontLogUsage";
    public static final String OSEE_AUTORUN = "osee.autoRun";
    private static final String OSEE_DB_CONFIG_INIT_CHOICE = "osee.db.config.init.choice";
+   private static final String OSEE_REMOTE_HTTP_SERVER = "osee.remote.http.server";
+   private static final String OSEE_REMOTE_HTTP_UPLOAD_PATH = "osee.remote.http.upload.path";
+
    private static boolean developer = false;
 
    private static OseeProperties instance = null;
@@ -118,5 +121,13 @@ public class OseeProperties {
 
    public void setDBConfigInitChoice(String value) {
       System.setProperty(OSEE_DB_CONFIG_INIT_CHOICE, value);
+   }
+
+   public String getRemoteHttpServer() {
+      return System.getProperty(OSEE_REMOTE_HTTP_SERVER, "");
+   }
+
+   public String getRemoteHttpServerUploadPath() {
+      return System.getProperty(OSEE_REMOTE_HTTP_UPLOAD_PATH, "");
    }
 }
