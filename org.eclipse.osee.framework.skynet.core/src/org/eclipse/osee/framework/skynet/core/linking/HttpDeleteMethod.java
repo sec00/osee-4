@@ -18,7 +18,9 @@ import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
  */
 public class HttpDeleteMethod implements IHttpMethod {
 
+   @SuppressWarnings("unused")
    private static final String FILENAME_KEY = "filename";
+   @SuppressWarnings("unused")
    private HttpFileHandler fileHandler;
 
    protected HttpDeleteMethod() {
