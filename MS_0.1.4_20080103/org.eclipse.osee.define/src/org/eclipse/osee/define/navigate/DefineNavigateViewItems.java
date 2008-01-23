@@ -81,7 +81,5 @@ public class DefineNavigateViewItems extends XNavigateViewItems {
             }
          }
       }
-
    }
-
 }
