@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
+import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.framework.jdk.core.util.xml.Jaxp;
 import org.eclipse.osee.framework.plugin.core.config.data.DbInformation;
 import org.eclipse.osee.framework.plugin.core.config.data.ServerConfigUtil;
@@ -52,6 +53,7 @@ public class OSEEConfig {
    private String[][] bookmarks;
    //   private String mySqlInstallLocation;
    private String authenticationProvider;
+   private String remoteHttpServer;
 
    private static Logger logger = ConfigUtil.getConfigFactory().getLogger(OSEEConfig.class);
 
@@ -82,6 +84,7 @@ public class OSEEConfig {
          getDefaultClientData();
          parseWebServers(rootElement);
          parseAuthenticationScheme(rootElement);
+         parseHttpServer(rootElement);
 
          serviceGroups = JiniPlugin.getInstance().getJiniVersion();
          String[] filterGroups = OseeProperties.getInstance().getOseeJiniServiceGroups();
@@ -240,6 +243,26 @@ public class OSEEConfig {
       }
    }
 
+   private void parseHttpServer(Element rootElement) {
+      String addressToUse = OseeProperties.getInstance().getRemoteHttpServer();
+      if (Strings.isValid(addressToUse) != true) {
+         NodeList list = rootElement.getElementsByTagName("HttpServer");
+         for (int i = 0; i < list.getLength(); i++) {
+            Element element = (Element) list.item(i);
+            if (element != null) {
+               String value = element.getAttribute("address");
+               String port = element.getAttribute("port");
+               if (Strings.isValid(value) && Strings.isValid(port)) {
+                  addressToUse = value + ":" + port;
+               }
+            }
+         }
+      }
+      if (Strings.isValid(addressToUse)) {
+         remoteHttpServer = addressToUse;
+      }
+   }
+
    private void parseAuthenticationScheme(Element rootElement) {
       if (OseeProperties.getInstance().getAuthenticationProviderId() != null) {
          authenticationProvider = OseeProperties.getInstance().getAuthenticationProviderId();
@@ -356,6 +379,10 @@ public class OSEEConfig {
 
    public String[][] getBookmarks() {
       return bookmarks;
+   }
+
+   public String getRemoteHttpServer() {
+      return remoteHttpServer;
    }
 
    //   public URL getBookmark(String name) throws MalformedURLException {
