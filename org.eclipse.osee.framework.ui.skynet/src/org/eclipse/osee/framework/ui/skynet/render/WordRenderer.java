@@ -449,10 +449,15 @@ public class WordRenderer extends FileRenderer {
 
    @SuppressWarnings("unchecked")
    private String getTemplate(Artifact artifact, PresentationType presentationType, String option, Branch branch) throws SQLException, IOException, ClassNotFoundException {
+      HashMap<String, String> templateMap = null;
       Artifact document = getDocumentArtifact(presentationType, branch);
-      JavaObjectAttribute javaAttribute =
-            (JavaObjectAttribute) document.getAttributeManager("Template Map").getSoleAttribute();
-      HashMap<String, String> templateMap = (HashMap<String, String>) javaAttribute.getObject();
+      if (document != null) {
+         JavaObjectAttribute javaAttribute =
+               (JavaObjectAttribute) document.getAttributeManager("Template Map").getSoleAttribute();
+         templateMap = (HashMap<String, String>) javaAttribute.getObject();
+      } else {
+         templateMap = new HashMap<String, String>();
+      }
       String template = null;
 
       if (option != null) {
@@ -473,18 +478,25 @@ public class WordRenderer extends FileRenderer {
 
    @SuppressWarnings("unchecked")
    public void addTemplate(PresentationType presentationType, String bundleName, String templateName, String templatePath, Branch branch) throws SQLException, IOException, ClassNotFoundException {
+      HashMap<String, String> templateMap = null;
+      JavaObjectAttribute javaAttribute = null;
       Artifact document = getDocumentArtifact(presentationType, branch);
-      JavaObjectAttribute javaAttribute =
-            (JavaObjectAttribute) document.getAttributeManager("Template Map").getSoleAttribute();
-      HashMap<String, String> templateMap = (HashMap<String, String>) javaAttribute.getObject();
+      if (document != null) {
+         javaAttribute = (JavaObjectAttribute) document.getAttributeManager("Template Map").getSoleAttribute();
+         templateMap = (HashMap<String, String>) javaAttribute.getObject();
+      }
+
       if (templateMap == null) {
          templateMap = new HashMap<String, String>();
       }
 
       addTemplateToMap(templateMap, bundleName, templateName, templatePath);
-
-      javaAttribute.setObject(templateMap);
-      document.persistAttributes();
+      if (javaAttribute != null) {
+         javaAttribute.setObject(templateMap);
+      }
+      if (document != null) {
+         document.persistAttributes();
+      }
    }
 
    private void addTemplateToMap(HashMap<String, String> templateMap, String bundleName, String templateName, String templatePath) throws IOException {
