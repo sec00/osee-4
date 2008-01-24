@@ -5,7 +5,6 @@
  */
 package org.eclipse.osee.framework.ui.skynet.commandHandlers;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,7 +14,6 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
-import org.eclipse.osee.framework.skynet.core.artifact.ArtifactPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.skynet.ArtifactExplorer;
@@ -26,8 +24,6 @@ import org.eclipse.ui.PlatformUI;
  */
 public class RevealInArtifactExplorer extends AbstractSelectionChangedHandler {
    private static final BranchPersistenceManager branchPersistenceManager = BranchPersistenceManager.getInstance();
-   private static final ArtifactPersistenceManager artifactPersistenceManager =
-         ArtifactPersistenceManager.getInstance();
    private static final Logger logger = ConfigUtil.getConfigFactory().getLogger(AbstractSelectionChangedHandler.class);
    private Artifact artifact;
 
@@ -37,9 +33,8 @@ public class RevealInArtifactExplorer extends AbstractSelectionChangedHandler {
    @Override
    public Object execute(ExecutionEvent arg0) throws ExecutionException {
       try {
-         ArtifactExplorer.revealArtifact(artifactPersistenceManager.getArtifact(artifact.getGuid(),
-               artifact.getBranch()));
-      } catch (SQLException ex) {
+         ArtifactExplorer.revealArtifact(artifact.getGuid(), artifact.getBranch());
+      } catch (Exception ex) {
          logger.log(Level.SEVERE, ex.toString(), ex);
       }
       return null;

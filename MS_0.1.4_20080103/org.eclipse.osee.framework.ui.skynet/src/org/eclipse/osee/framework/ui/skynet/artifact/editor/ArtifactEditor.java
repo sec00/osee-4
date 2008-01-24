@@ -81,8 +81,6 @@ public class ArtifactEditor extends MultiPageEditorPart implements IDirtiableEdi
    private static final Logger logger = ConfigUtil.getConfigFactory().getLogger(ArtifactEditor.class);
    private static final SkynetEventManager eventManager = SkynetEventManager.getInstance();
    private static final BranchPersistenceManager branchManager = BranchPersistenceManager.getInstance();
-   private static final ArtifactPersistenceManager artifactPersistenceManager =
-         ArtifactPersistenceManager.getInstance();
    private int previewPageIndex;
    private int attributesPageIndex;
    private int relationsPageIndex;
@@ -307,9 +305,8 @@ public class ArtifactEditor extends MultiPageEditorPart implements IDirtiableEdi
          public void widgetSelected(SelectionEvent e) {
             Artifact artifact = getEditorInput().getArtifact();
             try {
-               ArtifactExplorer.revealArtifact(artifactPersistenceManager.getArtifact(artifact.getGuid(),
-                     artifact.getBranch()));
-            } catch (SQLException ex) {
+               ArtifactExplorer.revealArtifact(artifact.getGuid(), artifact.getBranch());
+            } catch (Exception ex) {
                OSEELog.logException(getClass(), ex, true);
             }
          }
