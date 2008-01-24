@@ -121,10 +121,7 @@ public class ArtifactPersistenceManager implements PersistenceManager {
 
    private static final String SELECT_ARTIFACT_TYPE_NAME =
          "SELECT name FROM " + ARTIFACT_TYPE_TABLE + " WHERE art_type_id = ?";
-   // private static final String SELECT_ATTRIBUTE = "SELECT art_id FROM " + ATTRIBUTE_TABLE + "
-   // WHERE art_id = ?";
-   // private static final String DELETE_ATTRIBUTE = "DELETE FROM " + ATTRIBUTE_TABLE + " WHERE
-   // art_id = ? AND tag_id = ?";
+
    private static final String PURGE_ARTIFACT = "DELETE FROM " + ARTIFACT_TABLE + " WHERE art_id = ?";
    private static final String PURGE_ARTIFACT_GAMMAS =
          "DELETE" + " FROM " + TRANSACTIONS_TABLE + " WHERE gamma_id IN" + "(SELECT gamma_id" + " FROM " + ATTRIBUTE_VERSION_TABLE + " WHERE art_id = ? UNION " + "(SELECT gamma_id" + " FROM " + RELATION_LINK_VERSION_TABLE + " where a_art_id = ? " + " UNION SELECT gamma_id " + " FROM " + RELATION_LINK_VERSION_TABLE + " WHERE b_art_id = ?))";
@@ -132,11 +129,6 @@ public class ArtifactPersistenceManager implements PersistenceManager {
    private static final String PURGE_ATTRIBUTE = "DELETE FROM " + ATTRIBUTE_VERSION_TABLE + " WHERE attr_id = ?";
    private static final String PURGE_ATTRIBUTE_GAMMAS =
          "DELETE" + " FROM " + TRANSACTIONS_TABLE + " WHERE gamma_id IN" + "(SELECT gamma_id" + " FROM " + ATTRIBUTE_VERSION_TABLE + " WHERE attr_id = ?)";
-
-   // private static final String PURGE_EMPTY_TRANSACTIONS = "DELETE" + " FROM " +
-   // TRANSACTION_DETAIL_TABLE
-   // + " WHERE NOT EXISTS" + "(SELECT 'x' from " + TRANSACTIONS_TABLE + " WHERE "
-   // + TRANSACTION_DETAIL_TABLE.join(TRANSACTIONS_TABLE, "transaction_id") + ")";
 
    private static final String SELECT_ARTIFACT_FOR_INIT =
          "SELECT art1.art_type_id, txs3.gamma_id FROM OSEE_DEFINE_ARTIFACT art1, OSEE_DEFINE_ARTIFACT_VERSION arv2, OSEE_DEFINE_TXS txs3 WHERE art1.art_id = ? AND art1.art_id=arv2.art_id AND arv2.modification_id<>? AND arv2.gamma_id=txs3.gamma_id AND txs3.transaction_id=(SELECT max(txs5.transaction_id) FROM OSEE_DEFINE_ARTIFACT_VERSION arv4, OSEE_DEFINE_TXS txs5, OSEE_DEFINE_TX_DETAILS txd6 WHERE arv4.art_id=arv2.art_id AND arv4.gamma_id=txs5.gamma_id AND txs5.transaction_id<=? AND txs5.transaction_id=txd6.transaction_id AND txd6.branch_id=?)";
@@ -1169,24 +1161,21 @@ public class ArtifactPersistenceManager implements PersistenceManager {
     * will also be removed from the database).
     * 
     * @param artifact
+    * @throws SQLException
     */
-   public void purgeArtifact(final Artifact artifact) {
+   public void purgeArtifact(final Artifact artifact) throws SQLException {
       artifact.checkDeleted();
 
-      try {
-         purgeArtifact(artifact.getArtId());
+      purgeArtifact(artifact.getArtId());
 
-         System.out.println("number of children:" + artifact.getChildren().size());
-         for (Artifact child : artifact.getChildren()) {
-            purgeArtifact(child);
-         }
-
-         artifact.getLinkManager().purge();
-         artifact.setDeleted();
-         SkynetEventManager.getInstance().kick(new TransactionArtifactModifiedEvent(artifact, ModType.Purged, this));
-      } catch (SQLException ex) {
-         logger.log(Level.SEVERE, ex.toString(), ex);
+      System.out.println("number of children:" + artifact.getChildren().size());
+      for (Artifact child : artifact.getChildren()) {
+         purgeArtifact(child);
       }
+
+      artifact.getLinkManager().purge();
+      artifact.setDeleted();
+      SkynetEventManager.getInstance().kick(new TransactionArtifactModifiedEvent(artifact, ModType.Purged, this));
    }
 
    public Artifact getDefaultHierarchyRootArtifact(Branch branch, boolean createIfNecessary) throws SQLException {

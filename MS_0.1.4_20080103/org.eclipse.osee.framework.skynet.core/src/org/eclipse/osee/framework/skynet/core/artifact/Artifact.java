@@ -1034,8 +1034,10 @@ public class Artifact implements Unique, PersistenceObject, IAdaptable, Comparab
 
    /**
     * Remove artifact from the database
+    * 
+    * @throws SQLException
     */
-   public void purge() {
+   public void purge() throws SQLException {
       checkDeleted();
 
       artifactManager.purgeArtifact(this);
