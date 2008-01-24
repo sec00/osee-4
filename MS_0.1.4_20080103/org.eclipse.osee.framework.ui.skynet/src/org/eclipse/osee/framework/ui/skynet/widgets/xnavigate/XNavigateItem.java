@@ -22,7 +22,7 @@ public class XNavigateItem {
 
    private List<XNavigateItem> children = new ArrayList<XNavigateItem>();
    private String name;
-   private final XNavigateItem parent;
+   private XNavigateItem parent;
    private final Image image;
 
    public XNavigateItem(XNavigateItem parent, String name) {
@@ -67,5 +67,12 @@ public class XNavigateItem {
    }
 
    public void run() throws SQLException {
+   }
+
+   /**
+    * @param parent the parent to set
+    */
+   public void setParent(XNavigateItem parent) {
+      this.parent = parent;
    }
 }
