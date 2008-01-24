@@ -491,6 +491,7 @@ public final class Lib {
             new IOOutputThread(output, new BufferedReader(new InputStreamReader(proc.getErrorStream())));
 
       InputBufferThread outThread = new InputBufferThread(proc.getInputStream());
+
       errThread.setName("err");
       outThread.setName("out");
       errThread.start();
@@ -676,13 +677,13 @@ public final class Lib {
       }
    }
 
-   public static List<File> recursivelyListFilesAndDirectories(ArrayList<File> fileList, File rootPath, Pattern fileNameP, boolean includeDirectories) {
+   public static List<File> recursivelyListFilesAndDirectories(ArrayList<File> fileList, File rootPath, Pattern filePathP, boolean includeDirectories) {
       LinkedList<File> dirList = new LinkedList<File>();
       dirList.add(rootPath);
 
       Matcher fileNameM = null;
-      if (fileNameP != null) {
-         fileNameM = fileNameP.matcher("");
+      if (filePathP != null) {
+         fileNameM = filePathP.matcher("");
       }
 
       while (!dirList.isEmpty()) {
@@ -731,8 +732,8 @@ public final class Lib {
     * @param fileNameP
     * @return List
     */
-   public static List<File> recursivelyListFiles(ArrayList<File> fileList, File rootPath, Pattern fileNameP) {
-      return recursivelyListFilesAndDirectories(fileList, rootPath, fileNameP, false);
+   public static List<File> recursivelyListFiles(ArrayList<File> fileList, File rootPath, Pattern filePathP) {
+      return recursivelyListFilesAndDirectories(fileList, rootPath, filePathP, false);
    }
 
    public static List<File> recursivelyListFiles(File rootPath, Pattern fileNameP) {
