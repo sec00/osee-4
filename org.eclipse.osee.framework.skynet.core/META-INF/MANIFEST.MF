@@ -4,8 +4,7 @@ Bundle-Name: Skynet Plug-in (Incubation)
 Bundle-SymbolicName: org.eclipse.osee.framework.skynet.core;singleton:=true
 Bundle-Version: 0.1.0.qualifier
 Bundle-Activator: org.eclipse.osee.framework.skynet.core.SkynetActivator
-Require-Bundle: org.apache.xerces,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.osee.framework.jdk.core,
  org.eclipse.ui,
  org.eclipse.core.resources,
