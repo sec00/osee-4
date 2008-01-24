@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -44,6 +46,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.osee.framework.jdk.core.type.Pair;
 import org.eclipse.osee.framework.jdk.core.util.Collections;
 import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
+import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
 import org.eclipse.osee.framework.skynet.core.access.PermissionEnum;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -136,6 +139,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class ChangeReportView extends ViewPart implements IActionable, IEventReceiver {
    public static final String VIEW_ID = "org.eclipse.osee.framework.ui.skynet.changeReport.ChangeReportView";
+   private static final Logger logger = ConfigUtil.getConfigFactory().getLogger(ChangeReportView.class);
    private static final String INPUT = "input";
 
    private static final ArtifactClipboard artifactClipboard = new ArtifactClipboard(VIEW_ID);
@@ -862,7 +866,13 @@ public class ChangeReportView extends ViewPart implements IActionable, IEventRec
          @Override
          public void widgetSelected(SelectionEvent e) {
             for (Artifact artifact : getHeadArtifactsForSelection()) {
-               ArtifactExplorer.revealArtifact(artifact);
+               try {
+                  ArtifactExplorer.revealArtifact(artifact.getGuid(), artifact.getBranch());
+               } catch (PartInitException ex) {
+                  logger.log(Level.SEVERE, ex.toString(), ex);
+               } catch (SQLException ex) {
+                  logger.log(Level.SEVERE, ex.toString(), ex);
+               }
             }
          }
       });

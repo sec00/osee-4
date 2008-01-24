@@ -88,6 +88,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.menus.CommandContributionItem;
@@ -612,7 +613,14 @@ public class ArtifactSearchViewPage extends AbstractArtifactSearchViewPage imple
       new AbstractSelectionEnabledHandler(menuManager) {
          @Override
          public Object execute(ExecutionEvent event) throws ExecutionException {
-            ArtifactExplorer.revealArtifact(getSelectedArtifact(viewer));
+            Artifact artifact = getSelectedArtifact(viewer);
+            try {
+               ArtifactExplorer.revealArtifact(artifact.getGuid(), artifact.getBranch());
+            } catch (PartInitException ex) {
+               throw new ExecutionException(ex.getLocalizedMessage());
+            } catch (SQLException ex) {
+               throw new ExecutionException(ex.getLocalizedMessage());
+            }
             return null;
          }
 

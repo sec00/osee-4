@@ -300,16 +300,16 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
 
    /**
     * Reveal an artifact in the viewer and select it.
+    * 
+    * @throws SQLException
+    * @throws PartInitException
     */
-   public static void revealArtifact(Artifact artifact) {
+   public static void revealArtifact(String guid, Branch branch) throws SQLException, PartInitException {
+      Artifact artifact = ArtifactPersistenceManager.getInstance().getArtifact(guid, branch);
       IWorkbenchPage page = AWorkbench.getActivePage();
       ArtifactExplorer artifactExplorer;
-      try {
-         artifactExplorer = (ArtifactExplorer) page.showView(ArtifactExplorer.VIEW_ID);
-         artifactExplorer.treeViewer.setSelection(new StructuredSelection(artifact), true);
-      } catch (Exception ex) {
-         throw new RuntimeException(ex);
-      }
+      artifactExplorer = (ArtifactExplorer) page.showView(ArtifactExplorer.VIEW_ID);
+      artifactExplorer.treeViewer.setSelection(new StructuredSelection(artifact), true);
    }
 
    private void setupPopupMenu() {
@@ -1048,7 +1048,6 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
          goIntoMenuItem.setEnabled(permiss.isReadPermission());
          copyMenuItem.setEnabled(permiss.isReadPermission());
          pasteMenuItem.setEnabled(permiss.isWritePermission());
-
       }
    }
 
