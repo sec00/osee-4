@@ -124,8 +124,8 @@ public class ExtractTestRelations {
       if (testArtifact == null) {
          testArtifact =
                configurationPersistenceManager.getArtifactSubtypeDescriptor("Test Script", branch).makeNewArtifact();
-         testArtifact.setAttribute("Name", testArtifactFile.getName());
-         testArtifact.setAttribute("Content URL", testArtifactFile.getFullPath().toString());
+         testArtifact.setSoleAttributeValue("Name", testArtifactFile.getName());
+         testArtifact.setSoleAttributeValue("Content URL", testArtifactFile.getFullPath().toString());
          testArtifact.persistAttributes();
       }
       return testArtifact;

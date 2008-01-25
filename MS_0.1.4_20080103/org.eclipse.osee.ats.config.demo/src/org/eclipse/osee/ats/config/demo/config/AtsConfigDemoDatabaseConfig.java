@@ -156,7 +156,8 @@ public class AtsConfigDemoDatabaseConfig extends DbInitializationTask {
                      VersionArtifact.ARTIFACT_NAME, BranchPersistenceManager.getInstance().getAtsBranch()).makeNewArtifact();
          ver.setDescriptiveName(verName);
          if (verName.contains("1")) ver.setReleased(true);
-         if (verName.contains("2")) ver.setAttribute(ATSAttributes.NEXT_VERSION_ATTRIBUTE.getStoreName(), "yes");
+         if (verName.contains("2")) ver.setSoleBooleanAttributeValue(
+               ATSAttributes.NEXT_VERSION_ATTRIBUTE.getStoreName(), true);
          DemoTeams.getInstance().getTeamDef(Team.SAW_SW).relate(RelationSide.TeamDefinitionToVersion_Version, ver);
          ver.persist(true);
       }
@@ -169,7 +170,8 @@ public class AtsConfigDemoDatabaseConfig extends DbInitializationTask {
                      VersionArtifact.ARTIFACT_NAME, BranchPersistenceManager.getInstance().getAtsBranch()).makeNewArtifact();
          ver.setDescriptiveName(verName);
          if (verName.contains("1")) ver.setReleased(true);
-         if (verName.contains("2")) ver.setAttribute(ATSAttributes.NEXT_VERSION_ATTRIBUTE.getStoreName(), "yes");
+         if (verName.contains("2")) ver.setSoleBooleanAttributeValue(
+               ATSAttributes.NEXT_VERSION_ATTRIBUTE.getStoreName(), true);
          DemoTeams.getInstance().getTeamDef(Team.CIS_SW).relate(RelationSide.TeamDefinitionToVersion_Version, ver);
          ver.persist(true);
       }

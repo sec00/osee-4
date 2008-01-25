@@ -233,7 +233,7 @@ public class RoughArtifact {
 
    public void updateValues(Artifact artifact) throws SQLException, FileNotFoundException {
       for (NameAndVal value : attributes) {
-         artifact.setAttribute(value.getName(), value.getValue());
+         artifact.setSoleAttributeValue(value.getName(), value.getValue());
       }
 
       setFileAttributes(artifact);
