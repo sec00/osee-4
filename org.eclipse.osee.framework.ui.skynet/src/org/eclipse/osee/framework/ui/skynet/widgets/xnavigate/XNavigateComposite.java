@@ -11,7 +11,6 @@
 
 package org.eclipse.osee.framework.ui.skynet.widgets.xnavigate;
 
-import java.sql.SQLException;
 import java.util.List;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
@@ -109,7 +108,7 @@ public class XNavigateComposite extends Composite {
       } else {
          try {
             item.run();
-         } catch (SQLException ex) {
+         } catch (Exception ex) {
             OSEELog.logException(SkynetGuiPlugin.class, ex, true);
          }
       }
