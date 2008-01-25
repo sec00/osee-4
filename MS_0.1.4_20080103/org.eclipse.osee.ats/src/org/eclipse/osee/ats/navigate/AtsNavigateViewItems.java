@@ -62,6 +62,7 @@ import org.eclipse.osee.ats.world.search.UnReleasedTeamWorldSearchItem;
 import org.eclipse.osee.ats.world.search.UserCommunitySearchItem;
 import org.eclipse.osee.ats.world.search.VersionTargetedForTeamSearchItem;
 import org.eclipse.osee.ats.world.search.WorldSearchItem;
+import org.eclipse.osee.ats.world.search.WorldSearchItem.LoadView;
 import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactTypeSearch;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ISearchPrimitive;
@@ -113,7 +114,10 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
 
       XNavigateItem otherItems = new XNavigateItem(null, "Other My Searches");
       new SearchNavigateItem(otherItems, new MyTeamWFSearchItem("My Team Workflows", skynetAuth.getAuthenticatedUser()));
-      new SearchNavigateItem(otherItems, new MyTaskSearchItem("My Task", skynetAuth.getAuthenticatedUser()));
+      new SearchNavigateItem(otherItems, new MyTaskSearchItem("My Task (WorldView)", skynetAuth.getAuthenticatedUser(),
+            LoadView.WorldView));
+      new SearchNavigateItem(otherItems, new MyTaskSearchItem("My Task (Editor)", skynetAuth.getAuthenticatedUser(),
+            LoadView.TaskEditor));
       new SearchNavigateItem(otherItems, new MySubscribedSearchItem("My Subscribed", skynetAuth.getAuthenticatedUser()));
       new SearchNavigateItem(otherItems, new MyOrigSearchItem("My Originator - InWork",
             skynetAuth.getAuthenticatedUser(), true));
@@ -127,7 +131,8 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
       new SearchNavigateItem(otherItems, new MyOrigSearchItem("User's Originator - InWork", null, true));
       new SearchNavigateItem(otherItems, new MyOrigSearchItem("User's Originator - All", null, false));
       new SearchNavigateItem(otherItems, new MyTeamWFSearchItem("User's Team Workflows"));
-      new SearchNavigateItem(otherItems, new MyTaskSearchItem("User's Tasks"));
+      new SearchNavigateItem(otherItems, new MyTaskSearchItem("User's Tasks (WorldView)", LoadView.WorldView));
+      new SearchNavigateItem(otherItems, new MyTaskSearchItem("User's Tasks (Editor)", LoadView.TaskEditor));
       new SearchNavigateItem(otherItems, new MyCompletedSearchItem("User's Completed"));
       new SearchNavigateItem(otherItems, new MyFavoritesSearchItem("User's Favorites"));
       new SearchNavigateItem(otherItems, new MySubscribedSearchItem("User's Subscribed"));
@@ -155,6 +160,7 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
       XNavigateItem taskItem = new XNavigateItem(null, "Tasks");
       new SearchNavigateItem(taskItem, new EditTasksByTeamVersionSearchItem(null, true));
       new EditTasksBySelectedWorkflows(taskItem);
+      new SearchNavigateItem(taskItem, new MyTaskSearchItem("Edit Tasks by User", LoadView.TaskEditor));
       items.add(taskItem);
 
       XNavigateItem releaseItems = new XNavigateItem(null, "Versions");

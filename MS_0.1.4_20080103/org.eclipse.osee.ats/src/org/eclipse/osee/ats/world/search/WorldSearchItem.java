@@ -27,7 +27,7 @@ public abstract class WorldSearchItem {
    protected static Set<Artifact> EMPTY_SET = new HashSet<Artifact>();
    protected boolean cancelled = false;
    protected ArtifactPersistenceManager apm = ArtifactPersistenceManager.getInstance();
-   private final LoadView loadView;
+   private LoadView loadView;
    public static enum LoadView {
       WorldView, TaskEditor
    }
@@ -113,6 +113,13 @@ public abstract class WorldSearchItem {
     */
    public LoadView getLoadView() {
       return loadView;
+   }
+
+   /**
+    * @param loadView the loadView to set
+    */
+   public void setLoadView(LoadView loadView) {
+      this.loadView = loadView;
    }
 
 }
