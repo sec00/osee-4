@@ -923,16 +923,17 @@ public class ActionArtifact extends ATSArtifact implements IWorldViewArtifact {
     */
    public static void setArtifactIdentifyData(Artifact art, String title, String desc, ChangeType changeType, PriorityType priority, Collection<String> userComms, boolean validationRequired, Date needByDate) throws SQLException {
       art.setDescriptiveName(title);
-      if (!desc.equals("")) art.setAttribute(ATSAttributes.DESCRIPTION_ATTRIBUTE.getStoreName(), desc);
-      art.setAttribute(ATSAttributes.CHANGE_TYPE_ATTRIBUTE.getStoreName(), changeType.name());
+      if (!desc.equals("")) art.setSoleAttributeValue(ATSAttributes.DESCRIPTION_ATTRIBUTE.getStoreName(), desc);
+      art.setSoleAttributeValue(ATSAttributes.CHANGE_TYPE_ATTRIBUTE.getStoreName(), changeType.name());
       DynamicAttributeManager dam = art.getAttributeManager(ATSAttributes.USER_COMMUNITY_ATTRIBUTE.getStoreName());
       for (String comm : userComms)
          dam.getNewAttribute().setStringData(comm);
-      if (priority != null) art.setAttribute(ATSAttributes.PRIORITY_TYPE_ATTRIBUTE.getStoreName(),
+      if (priority != null) art.setSoleAttributeValue(ATSAttributes.PRIORITY_TYPE_ATTRIBUTE.getStoreName(),
             priority.getShortName());
-      if (needByDate != null) art.setAttribute(ATSAttributes.DEADLINE_ATTRIBUTE.getStoreName(),
-            needByDate.getTime() + "");
-      if (validationRequired) art.setAttribute(ATSAttributes.VALIDATION_REQUIRED_ATTRIBUTE.getStoreName(), "yes");
+      if (needByDate != null) art.setSoleDateAttributeValue(ATSAttributes.DEADLINE_ATTRIBUTE.getStoreName(),
+            needByDate);
+      if (validationRequired) art.setSoleBooleanAttributeValue(
+            ATSAttributes.VALIDATION_REQUIRED_ATTRIBUTE.getStoreName(), true);
    }
 
    /*

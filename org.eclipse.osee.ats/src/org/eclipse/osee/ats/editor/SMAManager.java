@@ -472,7 +472,7 @@ public class SMAManager {
                for (StateMachineArtifact sma : smas) {
                   sma.getCurrentStateDam().setHoursSpent(hours + sma.getCurrentStateDam().getState().getHoursSpent());
                   sma.getCurrentStateDam().setPercentComplete(tsd.getPercent().getInt());
-                  sma.setAttribute(ATSAttributes.RESOLUTION_ATTRIBUTE.getStoreName(),
+                  sma.setSoleAttributeValue(ATSAttributes.RESOLUTION_ATTRIBUTE.getStoreName(),
                         tsd.getSelectedOptionDef().getName());
                   sma.statusChanged();
                }
@@ -583,8 +583,8 @@ public class SMAManager {
                         verArt.getReleaseDate());
             if (verArt.getReleaseDate() != null) diag.setSelectedDate(verArt.getReleaseDate());
             if (diag.open() == 0) {
-               verArt.setAttribute(ATSAttributes.RELEASE_DATE_ATTRIBUTE.getStoreName(),
-                     diag.getSelectedDate().getTime() + "");
+               verArt.setSoleDateAttributeValue(ATSAttributes.RELEASE_DATE_ATTRIBUTE.getStoreName(),
+                     diag.getSelectedDate());
                verArt.persistAttributes();
                return true;
             }
@@ -619,8 +619,8 @@ public class SMAManager {
                         verArt.getEstimatedReleaseDate());
             if (verArt.getEstimatedReleaseDate() != null) diag.setSelectedDate(verArt.getEstimatedReleaseDate());
             if (diag.open() == 0) {
-               verArt.setAttribute(ATSAttributes.ESTIMATED_RELEASE_DATE_ATTRIBUTE.getStoreName(),
-                     diag.getSelectedDate().getTime() + "");
+               verArt.setSoleDateAttributeValue(ATSAttributes.ESTIMATED_RELEASE_DATE_ATTRIBUTE.getStoreName(),
+                     diag.getSelectedDate());
                verArt.persistAttributes();
                return true;
             }
@@ -632,8 +632,8 @@ public class SMAManager {
                         sma.getWorldViewEstimatedReleaseDate());
             if (getSma().getWorldViewEstimatedReleaseDate() != null) diag.setSelectedDate(sma.getWorldViewEstimatedReleaseDate());
             if (diag.open() == 0) {
-               sma.setSoleAttributeValue(ATSAttributes.ESTIMATED_RELEASE_DATE_ATTRIBUTE.getStoreName(),
-                     diag.getSelectedDate().getTime() + "");
+               sma.setSoleDateAttributeValue(ATSAttributes.ESTIMATED_RELEASE_DATE_ATTRIBUTE.getStoreName(),
+                     diag.getSelectedDate());
                sma.persistAttributes();
                return true;
             }

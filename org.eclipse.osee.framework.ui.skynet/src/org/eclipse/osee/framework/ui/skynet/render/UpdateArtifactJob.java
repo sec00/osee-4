@@ -175,7 +175,7 @@ public class UpdateArtifactJob extends UpdateJob {
                containsOleData = !artifact.getSoleAttributeValue(WordAttribute.OLE_DATA_NAME).equals("");
 
                if (oleDataElement == null && containsOleData) {
-                  artifact.setAttribute(WordAttribute.OLE_DATA_NAME, "");
+                  artifact.setSoleAttributeValue(WordAttribute.OLE_DATA_NAME, "");
                } else if (oleDataElement != null && singleArtifact) {
                   artifact.setAttribute(WordAttribute.OLE_DATA_NAME, new ByteArrayInputStream(
                         WordRenderer.getFormattedContent(oleDataElement)));
@@ -218,7 +218,7 @@ public class UpdateArtifactJob extends UpdateJob {
                   content = stringBuffer.toString();
                }
 
-               artifact.setAttribute(WordAttribute.CONTENT_NAME, content);
+               artifact.setSoleAttributeValue(WordAttribute.CONTENT_NAME, content);
                if (artifact.isDirty()) {
                   artifact.persistAttributes();
                   changedArtifacts.add(artifact);
