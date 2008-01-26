@@ -28,8 +28,8 @@ public class AddTemplate implements BlamOperation {
    public void runOperation(BlamVariableMap variableMap, IProgressMonitor monitor) throws Exception {
       String presentationType = variableMap.getString("Presentation Type"); // PREVIEW
       String bundleName = variableMap.getString("Bundle Name"); // org.eclipse.osee.framework.ui.skynet
-      String templateName = variableMap.getString("Template Name"); // My Template
-      String templatePath = variableMap.getString("Template Path"); // support/templates/My_Template.xml
+      String templateName = variableMap.getString("Template Name"); // Default
+      String templatePath = variableMap.getString("Template Path"); // support\templates\PREVIEW_ALL.xml
       Branch branch = variableMap.getBranch("Branch");
 
       WordRenderer wordRenderer =
