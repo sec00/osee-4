@@ -141,8 +141,8 @@ public class ArtifactSnapshotFactory {
     * @param snapshotData snapshot containing image links
     */
    private void processImageLinks(ArtifactSnapshot snapshotData) {
-      String original = snapshotData.getRenderedData();
-      if (Strings.isValid(original)) {
+      if (snapshotData.isDataValid() != false) {
+         String original = snapshotData.getRenderedData();
          String tag = httpImageProcessor.getImageProcessingMarker();
          Pattern pattern = Pattern.compile("(" + tag + ".*?)\"");
          Matcher matcher = pattern.matcher(original);
