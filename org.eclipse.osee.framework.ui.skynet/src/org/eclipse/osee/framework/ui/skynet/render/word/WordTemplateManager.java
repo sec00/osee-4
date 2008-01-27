@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.ui.skynet.render.word;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
@@ -42,7 +40,7 @@ public class WordTemplateManager {
       programRoot.persist(true);
    }
 
-   private static void createDocumentTemplates(Artifact documentFolder, ArtifactSubtypeDescriptor documentDescriptor) throws SQLException, IOException {
+   private static void createDocumentTemplates(Artifact documentFolder, ArtifactSubtypeDescriptor documentDescriptor) throws Exception {
       WordRenderer wordRenderer =
             (WordRenderer) RendererManager.getInstance().getRendererById("org.eclipse.osee.framework.ui.skynet.word");
       for (PresentationType presentationType : PresentationType.values()) {
