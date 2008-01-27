@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,27 +30,20 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.osee.framework.jdk.core.type.DoubleKeyHashMap;
 import org.eclipse.osee.framework.jdk.core.util.AFile;
 import org.eclipse.osee.framework.jdk.core.util.Collections;
 import org.eclipse.osee.framework.jdk.core.util.GUID;
-import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.jdk.core.util.io.streams.StreamCatcher;
 import org.eclipse.osee.framework.jdk.core.util.xml.Jaxp;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
-import org.eclipse.osee.framework.plugin.core.util.ExtensionPoints;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
-import org.eclipse.osee.framework.skynet.core.artifact.ArtifactPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.WordArtifact;
-import org.eclipse.osee.framework.skynet.core.attribute.JavaObjectAttribute;
 import org.eclipse.osee.framework.skynet.core.attribute.WordAttribute;
 import org.eclipse.osee.framework.skynet.core.util.WordConverter;
 import org.eclipse.osee.framework.ui.plugin.OseeUiActivator;
@@ -61,9 +53,9 @@ import org.eclipse.osee.framework.ui.plugin.util.OseeData;
 import org.eclipse.osee.framework.ui.skynet.ArtifactExplorer;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
+import org.eclipse.osee.framework.ui.skynet.render.TemplateProvider.TemplateLocation;
 import org.eclipse.osee.framework.ui.skynet.render.word.WordTemplateProcessor;
 import org.eclipse.swt.program.Program;
-import org.osgi.framework.Bundle;
 import org.w3c.dom.Element;
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
@@ -86,7 +78,7 @@ public class WordRenderer extends FileRenderer {
    private static final OseeUiActivator plugin = SkynetGuiPlugin.getInstance();
    private static final QName fo = new QName("ns0", "unused_localname", ARTIFACT_SCHEMA);
    private static final Logger logger = ConfigUtil.getConfigFactory().getLogger(WordRenderer.class);
-   private static final ArtifactPersistenceManager artifactManager = ArtifactPersistenceManager.getInstance();
+
    private static final BranchPersistenceManager branchManager = BranchPersistenceManager.getInstance();
    private static final Pattern pattern =
          Pattern.compile("<v:imagedata[^>]*src=\"wordml://(\\d+\\.\\w+)\"[^>]*>",
@@ -94,11 +86,11 @@ public class WordRenderer extends FileRenderer {
    // We need MS Word, so look for the program that is for .doc files
    private static final Program wordApp = Program.findProgram("doc");
    private WordTemplateProcessor templateProcessor;
-   private final DoubleKeyHashMap<Branch, PresentationType, Artifact> documentMap;
+   private TemplateProvider templateProvider;
 
    public WordRenderer() throws TransformerConfigurationException, IOException, TransformerFactoryConfigurationError {
-      templateProcessor = new WordTemplateProcessor();
-      documentMap = new DoubleKeyHashMap<Branch, PresentationType, Artifact>();
+      this.templateProcessor = new WordTemplateProcessor();
+      this.templateProvider = new TemplateProvider();
    }
 
    /**
@@ -417,11 +409,11 @@ public class WordRenderer extends FileRenderer {
 
       if (artifacts.isEmpty()) {
          //  Still need to get a default template with a null artifact list
-         template = getTemplate(null, presentationType, option, branchManager.getCommonBranch());
+         template = getTemplate(branchManager.getCommonBranch(), null, presentationType, option);
       } else {
          boolean isSingleEdit = artifacts.size() == 1;
          Artifact firstArtifact = artifacts.iterator().next();
-         template = getTemplate(firstArtifact, presentationType, option, firstArtifact.getBranch());
+         template = getTemplate(firstArtifact.getBranch(), firstArtifact, presentationType, option);
 
          if (isSingleEdit) {
             if (!firstArtifact.getSoleAttributeValue(WordAttribute.OLE_DATA_NAME).equals("")) {
@@ -447,99 +439,16 @@ public class WordRenderer extends FileRenderer {
       return templateProcessor.applyTemplate(variableMap, template, null);
    }
 
-   @SuppressWarnings("unchecked")
-   private String getTemplate(Artifact artifact, PresentationType presentationType, String option, Branch branch) throws SQLException, IOException, ClassNotFoundException {
-      Artifact document = getDocumentArtifact(presentationType, branch);
-      JavaObjectAttribute javaAttribute =
-            (JavaObjectAttribute) document.getAttributeManager("Template Map").getSoleAttribute();
-      HashMap<String, String> templateMap = (HashMap<String, String>) javaAttribute.getObject();
-      String template = null;
-
-      if (option != null) {
-         template = templateMap.get(option);
-      }
-      if (template == null && artifact != null) {
-         template = templateMap.get(artifact.getArtifactTypeName());
-      }
-
-      if (template == null) {
-         template = templateMap.get("default");
-         if (template == null) {
-            throw new IllegalArgumentException("No default template found on the artifact: " + document);
-         }
-      }
-      return template;
-   }
-
-   @SuppressWarnings("unchecked")
    public void addTemplate(PresentationType presentationType, String bundleName, String templateName, String templatePath, Branch branch) throws SQLException, IOException, ClassNotFoundException {
-      Artifact document = getDocumentArtifact(presentationType, branch);
-      JavaObjectAttribute javaAttribute =
-            (JavaObjectAttribute) document.getAttributeManager("Template Map").getSoleAttribute();
-      HashMap<String, String> templateMap = (HashMap<String, String>) javaAttribute.getObject();
-      if (templateMap == null) {
-         templateMap = new HashMap<String, String>();
-      }
-
-      addTemplateToMap(templateMap, bundleName, templateName, templatePath);
-
-      javaAttribute.setObject(templateMap);
-      document.persistAttributes();
+      TemplateLocation templateLocation = templateProvider.createLocation(bundleName, templateName, templatePath);
+      templateProvider.addTemplate(getId(), branch, presentationType, templateLocation);
    }
 
-   private void addTemplateToMap(HashMap<String, String> templateMap, String bundleName, String templateName, String templatePath) throws IOException {
-      Bundle bundle = Platform.getBundle(bundleName);
-      InputStream inputStream = bundle.getEntry(templatePath).openStream();
-      String template = Lib.inputStreamToString(inputStream);
-      templateMap.put(templateName, template);
+   public void setDefaultTemplates(Artifact document, PresentationType presentationType, Branch branch) throws Exception {
+      templateProvider.setDefaultTemplates(getId(), document, presentationType, branch);
    }
 
-   private Artifact getDocumentArtifact(PresentationType presentationType, Branch branch) throws SQLException {
-      Artifact document = documentMap.get(branch, presentationType);
-      if (document == null) {
-         try {
-            document =
-                  artifactManager.getArtifactFromTypeName("Document", getId() + " " + presentationType.name(), branch);
-         } catch (IllegalStateException ex) {
-            if (branch == branchManager.getCommonBranch()) {
-               document = null;
-            } else if (branch.getParentBranch() == null) {
-               document = getDocumentArtifact(presentationType, branchManager.getCommonBranch());
-            } else {
-               document = getDocumentArtifact(presentationType, branch.getParentBranch());
-            }
-         }
-
-         documentMap.put(branch, presentationType, document);
-      }
-
-      return document;
-   }
-
-   public void setDefaultTemplates(Artifact document, PresentationType presentationType, Branch branch) throws SQLException, IOException {
-      if (document == null) {
-         document = getDocumentArtifact(presentationType, branch);
-      } else {
-         document.setDescriptiveName("org.eclipse.osee.framework.ui.skynet.word " + presentationType);
-      }
-
-      JavaObjectAttribute javaAttribute =
-            (JavaObjectAttribute) document.getAttributeManager("Template Map").getSoleAttribute();
-      HashMap<String, String> templateMap = new HashMap<String, String>();
-
-      List<IConfigurationElement> elements =
-            ExtensionPoints.getExtensionElements("org.eclipse.osee.framework.ui.skynet.ArtifactRendererTemplate",
-                  "Template");
-
-      for (IConfigurationElement element : elements) {
-         String bundleName = element.getContributor().getName();
-         String templateName = element.getAttribute("templateName");
-         String templatePath = element.getAttribute("templateFile");
-
-         addTemplateToMap(templateMap, bundleName, templateName, templatePath);
-      }
-
-      javaAttribute.setObject(templateMap);
-      document.persistAttributes();
+   private String getTemplate(Branch branch, Artifact artifact, PresentationType presentationType, String option) throws Exception {
+      return templateProvider.getTemplate(getId(), branch, artifact, presentationType, option);
    }
 }
