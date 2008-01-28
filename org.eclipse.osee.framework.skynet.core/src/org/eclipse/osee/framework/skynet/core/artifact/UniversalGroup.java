@@ -33,13 +33,11 @@ import org.eclipse.osee.framework.skynet.core.transaction.AbstractSkynetTxTempla
 public class UniversalGroup {
    public static final String ARTIFACT_TYPE_NAME = "Universal Group";
    private static final Logger logger = ConfigUtil.getConfigFactory().getLogger(UniversalGroup.class);
-   private static final ArtifactPersistenceManager artifactManager = ArtifactPersistenceManager.getInstance();
-   private static final BranchPersistenceManager branchManager = BranchPersistenceManager.getInstance();
 
-   public static Collection<Artifact> getGroups() {
+   public static Collection<Artifact> getGroups(Branch branch) {
       Collection<Artifact> artifacts = null;
       try {
-         artifacts = artifactManager.getArtifactsFromSubtypeName(ARTIFACT_TYPE_NAME, branchManager.getCommonBranch());
+         artifacts = ArtifactPersistenceManager.getInstance().getArtifactsFromSubtypeName(ARTIFACT_TYPE_NAME, branch);
       } catch (SQLException ex) {
          logger.log(Level.SEVERE, ex.getMessage(), ex);
          artifacts = new LinkedList<Artifact>();
@@ -47,24 +45,24 @@ public class UniversalGroup {
       return artifacts;
    }
 
-   public static Collection<Artifact> getGroups(String groupName) {
+   public static Collection<Artifact> getGroups(String groupName, Branch branch) {
       try {
          List<ISearchPrimitive> criteria = new LinkedList<ISearchPrimitive>();
          criteria.add(new ArtifactTypeSearch(ARTIFACT_TYPE_NAME, EQUAL));
          criteria.add(new AttributeValueSearch("Name", groupName, EQUAL));
 
-         return artifactManager.getArtifacts(criteria, true, branchManager.getCommonBranch());
+         return ArtifactPersistenceManager.getInstance().getArtifacts(criteria, true, branch);
       } catch (SQLException ex) {
          logger.log(Level.SEVERE, ex.getMessage(), ex);
       }
       return new ArrayList<Artifact>();
    }
 
-   public static Artifact addGroup(String name) throws Exception {
-      if (getGroups(name).size() > 0) throw new IllegalArgumentException("Group Already Exists");
+   public static Artifact addGroup(String name, Branch branch) throws Exception {
+      if (getGroups(name, branch).size() > 0) throw new IllegalArgumentException("Group Already Exists");
 
       AddGroupTx addGroupTx = null;
-      addGroupTx = new AddGroupTx(branchManager.getCommonBranch(), name);
+      addGroupTx = new AddGroupTx(branch, name);
       addGroupTx.execute();
       return addGroupTx.getGroupArtifact();
    }

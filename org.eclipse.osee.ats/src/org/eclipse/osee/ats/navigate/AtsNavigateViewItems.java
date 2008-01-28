@@ -160,6 +160,7 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
       XNavigateItem taskItem = new XNavigateItem(null, "Tasks");
       new SearchNavigateItem(taskItem, new EditTasksByTeamVersionSearchItem(null, true));
       new EditTasksBySelectedWorkflows(taskItem);
+      new EditTasksByGroup(taskItem);
       new SearchNavigateItem(taskItem, new MyTaskSearchItem("Edit Tasks by User", LoadView.TaskEditor));
       items.add(taskItem);
 

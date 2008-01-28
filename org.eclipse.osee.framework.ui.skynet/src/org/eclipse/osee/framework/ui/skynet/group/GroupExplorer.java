@@ -272,7 +272,7 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
                   MessageDialog.QUESTION, new String[] {"OK", "Cancel"}, 0);
       if (ed.open() == 0) {
          try {
-            UniversalGroup.addGroup(ed.getEntry());
+            UniversalGroup.addGroup(ed.getEntry(), BranchPersistenceManager.getInstance().getDefaultBranch());
             treeViewer.refresh();
          } catch (Exception ex) {
             OSEELog.logException(SkynetGuiPlugin.class, ex, true);
