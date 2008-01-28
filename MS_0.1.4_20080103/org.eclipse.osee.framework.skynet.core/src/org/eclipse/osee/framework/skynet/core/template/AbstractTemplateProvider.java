@@ -60,10 +60,7 @@ public abstract class AbstractTemplateProvider implements ITemplateProvider {
    public void setDefaultTemplates(String rendererId, Artifact document, String presentationType, Branch branch) throws Exception {
       if (document == null) {
          document = getDocumentArtifact(rendererId, presentationType, branch);
-      } else {
-         document.setDescriptiveName("org.eclipse.osee.framework.ui.skynet.word " + presentationType);
       }
-
       HashMap<String, String> defaultMap = getDefaultTemplateMap();
       JavaObjectAttribute javaAttribute = getJavaObjectAttribute(document);
       javaAttribute.setObject(defaultMap);
