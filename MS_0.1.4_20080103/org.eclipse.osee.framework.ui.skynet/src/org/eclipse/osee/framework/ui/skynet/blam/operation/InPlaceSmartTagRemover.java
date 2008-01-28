@@ -21,7 +21,7 @@ import org.eclipse.osee.framework.skynet.core.attribute.DynamicAttributeManager;
 import org.eclipse.osee.framework.skynet.core.attribute.WordAttribute;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionId;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionIdManager;
-import org.eclipse.osee.framework.skynet.core.util.WordUtil;
+import org.eclipse.osee.framework.skynet.core.word.WordUtil;
 import org.eclipse.osee.framework.ui.plugin.sql.SQL3DataType;
 import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandler;
 import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
