@@ -69,10 +69,10 @@ public class UniversalGroup {
 
    public static Artifact getTopUniversalGroupArtifact(Branch branch) throws SQLException {
       return ArtifactPersistenceManager.getInstance().getArtifactFromTypeName(UniversalGroup.ARTIFACT_TYPE_NAME,
-            ArtifactPersistenceManager.ROOT_ARTIFACT_TYPE_NAME, branch);
+            ArtifactPersistenceManager.ROOT_ARTIFACT_TYPE_NAME, branch, false);
    }
 
-   public static void createTopUniversalGroupArtifact(Branch branch) throws SQLException {
+   public static Artifact createTopUniversalGroupArtifact(Branch branch) throws SQLException {
       ArtifactTypeNameSearch srch =
             new ArtifactTypeNameSearch(UniversalGroup.ARTIFACT_TYPE_NAME,
                   ArtifactPersistenceManager.ROOT_ARTIFACT_TYPE_NAME, branch);
@@ -81,7 +81,9 @@ public class UniversalGroup {
                ConfigurationPersistenceManager.getInstance().getArtifactSubtypeDescriptor(ARTIFACT_TYPE_NAME, branch).makeNewArtifact();
          art.setDescriptiveName(ArtifactPersistenceManager.ROOT_ARTIFACT_TYPE_NAME);
          art.persistAttributes();
+         return art;
       }
+      return srch.getArtifacts(Artifact.class).iterator().next();
    }
 
    static private final class AddGroupTx extends AbstractSkynetTxTemplate {
@@ -105,6 +107,12 @@ public class UniversalGroup {
          groupArt.setDescriptiveName(name);
          groupArt.persistAttributes();
          Artifact groupRoot = getTopUniversalGroupArtifact(getTxBranch());
+         if (groupRoot == null) {
+            groupRoot = createTopUniversalGroupArtifact(getTxBranch());
+            if (groupRoot == null) {
+               throw new IllegalStateException("Could not create top universal group artifact.");
+            }
+         }
          groupRoot.relate(RelationSide.UNIVERSAL_GROUPING__MEMBERS, groupArt, true);
       }
 

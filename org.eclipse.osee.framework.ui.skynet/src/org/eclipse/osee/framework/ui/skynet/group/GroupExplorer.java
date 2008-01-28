@@ -15,20 +15,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactData;
-import org.eclipse.osee.framework.skynet.core.artifact.ArtifactPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactTransfer;
-import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.DefaultBranchChangedEvent;
 import org.eclipse.osee.framework.skynet.core.artifact.UniversalGroup;
@@ -48,10 +43,11 @@ import org.eclipse.osee.framework.ui.plugin.event.Event;
 import org.eclipse.osee.framework.ui.plugin.event.IEventReceiver;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.skynet.DefineHttpServerRequest;
+import org.eclipse.osee.framework.ui.skynet.SkynetContributionItem;
+import org.eclipse.osee.framework.ui.skynet.SkynetDefaultBranchContributionItem;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.ats.IActionable;
 import org.eclipse.osee.framework.ui.skynet.ats.OseeAts;
-import org.eclipse.osee.framework.ui.skynet.branch.BranchLabelProvider;
 import org.eclipse.osee.framework.ui.skynet.render.RendererManager;
 import org.eclipse.osee.framework.ui.skynet.util.DbConnectionExceptionComposite;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
@@ -79,30 +75,19 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.IMemento;
-import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.texteditor.StatusLineContributionItem;
 
 /**
  * @author Donald G. Dunne
  */
 public class GroupExplorer extends ViewPart implements IEventReceiver, IActionable {
    public static final String VIEW_ID = "org.eclipse.osee.framework.ui.skynet.group.GroupExplorer";
-   private static final String ROOT_GUID = "group.explorer.last.root_guid";
    private TreeViewer treeViewer;
    private Artifact rootArt;
    private UniversalGroupItem rootItem;
    private static UniversalGroupItem selected;
-   private StatusLineContributionItem branchStatusItem;
-
-   private Branch branch;
 
    public GroupExplorer() {
-      branchStatusItem = new StatusLineContributionItem("skynet.branch", true, 30);
-      branchStatusItem.setImage(SkynetGuiPlugin.getInstance().getImage("branch.gif"));
-      branchStatusItem.setToolTipText("The branch that the artifacts in the explorer are from.");
    }
 
    /*
@@ -127,8 +112,6 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
       parent.setLayout(gridLayout);
       parent.setLayoutData(gridData);
 
-      getViewSite().getActionBars().getStatusLineManager().add(branchStatusItem);
-
       treeViewer = new TreeViewer(parent);
       treeViewer.setContentProvider(new GroupContentProvider(this));
       treeViewer.setLabelProvider(new GroupLabelProvider());
@@ -145,16 +128,9 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
             if (event.button == 3) getPopupMenu().setVisible(true);
          }
       });
-      treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         /*
-          * (non-Javadoc)
-          * 
-          * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-          */
-         public void selectionChanged(SelectionChangedEvent event) {
-            updateStatusLabel();
-         }
-      });
+
+      SkynetDefaultBranchContributionItem.addTo(this, false);
+      SkynetContributionItem.addTo(this, true);
 
       SkynetEventManager.getInstance().register(LocalTransactionEvent.class, this);
       SkynetEventManager.getInstance().register(RemoteTransactionEvent.class, this);
@@ -163,11 +139,10 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
       SkynetEventManager.getInstance().register(DefaultBranchChangedEvent.class, this);
 
       getSite().setSelectionProvider(treeViewer);
-      addExploreSelection();
       setupDragAndDropSupport();
       parent.layout();
-
       createActions();
+      refresh();
    }
 
    private void handleDoubleClick() {
@@ -291,15 +266,16 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
          if (item.isUniversalGroup()) names += String.format("%s\n", item.getArtifact().getDescriptiveName());
       if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), "Remove From Group",
             "Remove From Group - (Artifacts will not be deleted)\n\n" + names + "\nAre you sure?")) {
-         AbstractSkynetTxTemplate unrelateTx = new AbstractSkynetTxTemplate(branch) {
-            @Override
-            protected void handleTxWork() throws Exception {
-               for (UniversalGroupItem item : items) {
-                  item.getArtifact().unrelate(RelationSide.UNIVERSAL_GROUPING__GROUP,
-                        item.getParentItem().getArtifact(), true);
-               }
-            }
-         };
+         AbstractSkynetTxTemplate unrelateTx =
+               new AbstractSkynetTxTemplate(BranchPersistenceManager.getInstance().getDefaultBranch()) {
+                  @Override
+                  protected void handleTxWork() throws Exception {
+                     for (UniversalGroupItem item : items) {
+                        item.getArtifact().unrelate(RelationSide.UNIVERSAL_GROUPING__GROUP,
+                              item.getParentItem().getArtifact(), true);
+                     }
+                  }
+               };
 
          try {
             unrelateTx.execute();
@@ -321,14 +297,15 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
       if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), "Delete Groups",
             "Delete Groups - (Contained Artifacts will not be deleted)\n\n" + names + "\nAre you sure?")) {
 
-         AbstractSkynetTxTemplate deleteUniversalGroupTx = new AbstractSkynetTxTemplate(branch) {
-            @Override
-            protected void handleTxWork() throws Exception {
-               for (UniversalGroupItem item : items) {
-                  item.getArtifact().delete();
-               }
-            }
-         };
+         AbstractSkynetTxTemplate deleteUniversalGroupTx =
+               new AbstractSkynetTxTemplate(BranchPersistenceManager.getInstance().getDefaultBranch()) {
+                  @Override
+                  protected void handleTxWork() throws Exception {
+                     for (UniversalGroupItem item : items) {
+                        item.getArtifact().delete();
+                     }
+                  }
+               };
 
          try {
             deleteUniversalGroupTx.execute();
@@ -345,7 +322,7 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
    }
 
    public void restoreSelection() {
-      if (selected != null) {
+      if (selected != null && rootItem != null) {
          UniversalGroupItem selItem = rootItem.getItem(selected.getArtifact());
          ArrayList<UniversalGroupItem> selected = new ArrayList<UniversalGroupItem>();
          selected.add(selItem);
@@ -440,17 +417,18 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
                AWorkbench.popup("ERROR", "Artifact already related.");
                return;
             }
-            AbstractSkynetTxTemplate relateArtifactTx = new AbstractSkynetTxTemplate(branch) {
+            AbstractSkynetTxTemplate relateArtifactTx =
+                  new AbstractSkynetTxTemplate(BranchPersistenceManager.getInstance().getDefaultBranch()) {
 
-               @Override
-               protected void handleTxWork() throws Exception {
-                  for (Artifact art : artsToRelate) {
-                     if (!item.contains(art)) {
-                        item.getArtifact().relate(RelationSide.UNIVERSAL_GROUPING__MEMBERS, art, true);
+                     @Override
+                     protected void handleTxWork() throws Exception {
+                        for (Artifact art : artsToRelate) {
+                           if (!item.contains(art)) {
+                              item.getArtifact().relate(RelationSide.UNIVERSAL_GROUPING__MEMBERS, art, true);
+                           }
+                        }
                      }
-                  }
-               }
-            };
+                  };
 
             try {
                relateArtifactTx.execute();
@@ -505,37 +483,17 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
    public void setFocus() {
    }
 
-   public void explore(Artifact artifact) throws CoreException, IllegalArgumentException, SQLException {
-      if (rootItem != null) {
-         rootItem.dispose();
-      }
-      branch = artifact.getBranch();
-      rootArt = artifact;
-      rootItem = new UniversalGroupItem(treeViewer, rootArt, null, this);
-      rootItem.getGroupItems();
-
-      setPartName("Group Explorer");
-
-      if (treeViewer != null) treeViewer.setInput(rootItem);
-
-      restoreSelection();
-   }
-
-   /**
-    * Add the selection from the define explorer
-    */
-   private void addExploreSelection() {
-      if (rootArt != null) {
-         refresh();
-      }
-   }
-
    public void onEvent(final Event event) {
       try {
          if (event instanceof TransactionEvent) {
-            EventData ed =
-                  ((TransactionEvent) event).getEventData(UniversalGroup.getTopUniversalGroupArtifact(BranchPersistenceManager.getInstance().getDefaultBranch()));
-            if (ed.isRelChange()) {
+            Artifact topArt =
+                  UniversalGroup.getTopUniversalGroupArtifact(BranchPersistenceManager.getInstance().getDefaultBranch());
+            if (topArt == null) {
+               refresh();
+               return;
+            }
+            EventData ed = ((TransactionEvent) event).getEventData(topArt);
+            if (ed.isHasEvent()) {
                refresh();
             }
          } else if (event instanceof DefaultBranchChangedEvent) {
@@ -544,8 +502,8 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
             refresh();
          } else
             OSEELog.logInfo(SkynetGuiPlugin.class, "Unexpected event => " + event, true);
-      } catch (SQLException ex) {
-         OSEELog.logException(SkynetGuiPlugin.class, ex, true);
+      } catch (Exception ex) {
+         OSEELog.logException(SkynetGuiPlugin.class, ex, false);
       }
    }
 
@@ -568,59 +526,29 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
    }
 
    public void refresh() {
+      if (rootItem != null) {
+         rootItem.dispose();
+      }
+
+      Artifact topArt = null;
       try {
-         refresh(UniversalGroup.getTopUniversalGroupArtifact(BranchPersistenceManager.getInstance().getDefaultBranch()));
+         topArt =
+               UniversalGroup.getTopUniversalGroupArtifact(BranchPersistenceManager.getInstance().getDefaultBranch());
       } catch (Exception ex) {
-         OSEELog.logException(SkynetGuiPlugin.class, ex, true);
+         OSEELog.logException(SkynetGuiPlugin.class, ex, false);
       }
-   }
-
-   public void refresh(Artifact topUniversalGroupArtifact) throws IllegalArgumentException, CoreException, SQLException {
-      explore(topUniversalGroupArtifact);
-      updateStatusLabel();
-   }
-
-   private void updateStatusLabel() {
-      if (treeViewer != null && !treeViewer.getTree().isDisposed()) {
-         Artifact root = ((UniversalGroupItem) treeViewer.getInput()).getArtifact();
-         if (root != null && root.getPersistenceMemo() != null) {
-            Branch branch = root.getPersistenceMemo().getTransactionId().getBranch();
-            branchStatusItem.setText(branch.getDisplayName());
-            branchStatusItem.setImage(BranchLabelProvider.getBranchImage(branch));
-         } else {
-            branchStatusItem.setText("");
-            branchStatusItem.setImage(SkynetGuiPlugin.getInstance().getImage("branch.gif"));
-         }
+      if (topArt == null) {
+         rootArt = null;
+         rootItem = null;
+      } else {
+         rootArt = topArt;
+         rootItem = new UniversalGroupItem(treeViewer, rootArt, null, this);
+         rootItem.getGroupItems();
       }
-   }
 
-   @Override
-   public void init(IViewSite site, IMemento memento) throws PartInitException {
-      try {
-         super.init(site, memento);
-         if (memento == null) {
-            refresh();
-         } else {
-            Artifact previousArtifact =
-                  ArtifactPersistenceManager.getInstance().getArtifact(memento.getString(ROOT_GUID),
-                        BranchPersistenceManager.getInstance().getDefaultBranch());
-            if (previousArtifact == null) {
-               refresh();
-            } else {
-               refresh(previousArtifact);
-            }
-         }
-      } catch (Exception ex) {
-         OSEELog.logException(SkynetGuiPlugin.class, ex, true);
-      }
-   }
+      if (treeViewer != null) treeViewer.setInput(rootItem);
 
-   @Override
-   public void saveState(IMemento memento) {
-      super.saveState(memento);
-      if (rootArt != null) {
-         memento.putString(ROOT_GUID, rootArt.getGuid());
-      }
+      restoreSelection();
    }
 
    /*

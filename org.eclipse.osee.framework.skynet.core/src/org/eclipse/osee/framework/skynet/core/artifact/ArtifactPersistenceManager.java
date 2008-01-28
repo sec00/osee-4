@@ -1200,17 +1200,22 @@ public class ArtifactPersistenceManager implements PersistenceManager {
    }
 
    public Artifact getArtifactFromTypeName(String artType, String nameValue, Branch branch) throws SQLException {
+      return getArtifactFromTypeName(artType, nameValue, branch, true);
+   }
+
+   public Artifact getArtifactFromTypeName(String artType, String nameValue, Branch branch, boolean existenceRequired) throws SQLException {
       List<ISearchPrimitive> criteria = new LinkedList<ISearchPrimitive>();
       criteria.add(new ArtifactTypeSearch(artType, EQUAL));
       criteria.add(new AttributeValueSearch("Name", nameValue, EQUAL));
 
       Collection<Artifact> artifacts = getArtifacts(criteria, true, branch);
 
-      if (artifacts.size() != 1) {
+      if (artifacts.size() == 1) return artifacts.iterator().next();
+      if (artifacts.size() != 1 && existenceRequired) {
          throw new IllegalStateException(String.format(
                "There must be exactly one \"%s\" artifact named \"%s\" - not %d", artType, nameValue, artifacts.size()));
       }
-      return artifacts.iterator().next();
+      return null;
    }
 
    /**
