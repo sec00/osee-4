@@ -131,7 +131,7 @@ public class ArtifactPersistenceManager implements PersistenceManager {
          "DELETE" + " FROM " + TRANSACTIONS_TABLE + " WHERE gamma_id IN" + "(SELECT gamma_id" + " FROM " + ATTRIBUTE_VERSION_TABLE + " WHERE attr_id = ?)";
 
    private static final String SELECT_ARTIFACT_FOR_INIT =
-         "SELECT art1.art_type_id, txs3.gamma_id FROM OSEE_DEFINE_ARTIFACT art1, OSEE_DEFINE_ARTIFACT_VERSION arv2, OSEE_DEFINE_TXS txs3 WHERE art1.art_id = ? AND art1.art_id=arv2.art_id AND arv2.modification_id<>? AND arv2.gamma_id=txs3.gamma_id AND txs3.transaction_id=(SELECT max(txs5.transaction_id) FROM OSEE_DEFINE_ARTIFACT_VERSION arv4, OSEE_DEFINE_TXS txs5, OSEE_DEFINE_TX_DETAILS txd6 WHERE arv4.art_id=arv2.art_id AND arv4.gamma_id=txs5.gamma_id AND txs5.transaction_id<=? AND txs5.transaction_id=txd6.transaction_id AND txd6.branch_id=?)";
+         "SELECT art1.art_type_id, txs3.gamma_id, arv2.modification_id FROM osee_define_artifact art1, osee_define_artifact_version arv2, osee_define_txs txs3 WHERE art1.art_id = ? AND art1.art_id = arv2.art_id AND arv2.gamma_id = txs3.gamma_id AND txs3.transaction_id = (SELECT MAX(txs5.transaction_id) FROM osee_define_txs txs5, osee_define_tx_details txd6 WHERE arv2.gamma_id = txs5.gamma_id AND txs5.transaction_id <= ? AND txs5.transaction_id = txd6.transaction_id AND txd6.branch_id = ?)";
 
    private static final String SELECT_ARTIFACT_BY_GUID =
          "SELECT " + ARTIFACT_TABLE.columns("art_id", "art_type_id", "guid", "human_readable_id") + ", " + ARTIFACT_TYPE_TABLE.columns(
@@ -771,14 +771,14 @@ public class ArtifactPersistenceManager implements PersistenceManager {
     * @param branch The tag to get the data for.
     * @throws SQLException
     */
-   protected void setAttributesOnArtifact(Artifact artifact, Branch branch) throws SQLException {
+   protected void setAttributesOnArtifact(Artifact artifact) throws SQLException {
       HashMap<Integer, DynamicAttributeManager> typeHash = new HashMap<Integer, DynamicAttributeManager>();
       TransactionId transactionId;
 
       if (artifact.getPersistenceMemo() != null)
          transactionId = artifact.getPersistenceMemo().getTransactionId();
       else
-         transactionId = transactionIdManager.getEditableTransactionId(branch);
+         transactionId = transactionIdManager.getEditableTransactionId(artifact.getBranch());
 
       DynamicAttributeManager attributeManager;
 
@@ -847,7 +847,7 @@ public class ArtifactPersistenceManager implements PersistenceManager {
 
    /**
     * Place all of the information from the database for an artifact into the artifact. It is expected that the artifact
-    * already have the appropriate guid and branch for this call to succeed.
+    * already has the appropriate GUID and branch for this call to succeed.
     * 
     * @param artifact
     * @throws SQLException
@@ -858,21 +858,22 @@ public class ArtifactPersistenceManager implements PersistenceManager {
       try {
          chStmt =
                ConnectionHandler.runPreparedQuery(SELECT_ARTIFACT_FOR_INIT, SQL3DataType.INTEGER, artId,
-                     SQL3DataType.INTEGER, ModificationType.DELETE.getValue(), SQL3DataType.INTEGER,
-                     transactionId.getTransactionNumber(), SQL3DataType.INTEGER,
+                     SQL3DataType.INTEGER, transactionId.getTransactionNumber(), SQL3DataType.INTEGER,
                      transactionId.getBranch().getBranchId());
 
-         if (chStmt.getRset().next()) {
-
-            artifact.setPersistenceMemo(new ArtifactPersistenceMemo(transactionId, artId, chStmt.getRset().getInt(
-                  "gamma_id")));
-            artifact.setDescriptor(configurationPersistenceManager.getArtifactSubtypeDescriptor(
-                  chStmt.getRset().getInt("art_type_id"), transactionId));
-
-            setAttributesOnArtifact(artifact, artifact.getBranch());
-         } else {
+         ResultSet rSet = chStmt.getRset();
+         if (!rSet.next()) {
             throw new IllegalStateException(
-                  "The artifact with id " + artId + " does not exist (might be deleted) for transaction \"" + transactionId + "\"");
+                  "The artifact with id " + artId + " does not exist for transaction \"" + transactionId + "\"");
+         } else if (rSet.getInt("modification_id") == ModificationType.DELETE.getValue()) {
+            throw new IllegalStateException(
+                  "The artifact with id " + artId + " is deleted for transaction \"" + transactionId + "\"");
+         } else {
+            artifact.setPersistenceMemo(new ArtifactPersistenceMemo(transactionId, artId, rSet.getInt("gamma_id")));
+            artifact.setDescriptor(configurationPersistenceManager.getArtifactSubtypeDescriptor(
+                  rSet.getInt("art_type_id"), transactionId));
+
+            setAttributesOnArtifact(artifact);
          }
       } finally {
          DbUtil.close(chStmt);
