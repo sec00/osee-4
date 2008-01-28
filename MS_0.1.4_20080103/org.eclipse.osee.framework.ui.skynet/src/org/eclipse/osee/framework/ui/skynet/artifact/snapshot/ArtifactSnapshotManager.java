@@ -26,7 +26,7 @@ import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.SnapshotPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
-import org.eclipse.osee.framework.skynet.core.util.WordConverter;
+import org.eclipse.osee.framework.skynet.core.word.WordConverter;
 import org.eclipse.osee.framework.ui.skynet.artifact.snapshot.ArtifactSnapshotFactory.KeyGenerator;
 import org.osgi.framework.Bundle;
 

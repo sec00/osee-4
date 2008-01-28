@@ -11,7 +11,7 @@
 
 package org.eclipse.osee.framework.ui.skynet.render.word;
 
-import static org.eclipse.osee.framework.skynet.core.util.WordUtil.textOnly;
+import static org.eclipse.osee.framework.skynet.core.word.WordUtil.textOnly;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.CharacterCodingException;
