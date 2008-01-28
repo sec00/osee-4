@@ -578,7 +578,7 @@ public class Artifact implements Unique, PersistenceObject, IAdaptable, Comparab
             }
          }
       } catch (SQLException ex) {
-
+         logger.log(Level.SEVERE, ex.toString(), ex);
       }
       return "";
    }

@@ -421,6 +421,9 @@
 	<extension id="AddTemplate" name="Add Word Template" point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
 		<Operation className="org.eclipse.osee.framework.ui.skynet.blam.operation.AddTemplate"/>
 	</extension>
+	<extension id="InPlaceSmartTagRemover" name="In-Place Smart Tag Remover" point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
+		<Operation className="org.eclipse.osee.framework.ui.skynet.blam.operation.InPlaceSmartTagRemover"/>
+	</extension>
 	<extension id="UpdateAttributeValues" name="Update Attribute Values" point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
 		<Operation className="org.eclipse.osee.framework.ui.skynet.blam.operation.UpdateAttributeValues"/>
 	</extension>
