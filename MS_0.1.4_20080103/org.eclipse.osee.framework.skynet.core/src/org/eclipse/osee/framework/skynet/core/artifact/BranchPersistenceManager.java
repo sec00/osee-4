@@ -614,9 +614,10 @@ public class BranchPersistenceManager implements PersistenceManager {
             bArtifact = artifactManager.getArtifactFromId(bArtId, parentBranch);
 
             remoteRelationEvent =
-                  new NetworkRelationLinkModifiedEvent(gammaId, parentBranch.getBranchId(), newTransactionNumber, relId,
-                        aArtifact.getArtId(), aArtifact.getArtTypeId(), bArtifact.getArtId(), bArtifact.getArtTypeId(),
-                        rationale, aOrderValue, bOrderValue, aArtifact.getFactory().getClass().getCanonicalName(),
+                  new NetworkRelationLinkModifiedEvent(gammaId, parentBranch.getBranchId(), newTransactionNumber,
+                        relId, aArtifact.getArtId(), aArtifact.getArtTypeId(), bArtifact.getArtId(),
+                        bArtifact.getArtTypeId(), rationale, aOrderValue, bOrderValue,
+                        aArtifact.getFactory().getClass().getCanonicalName(),
                         bArtifact.getFactory().getClass().getCanonicalName(),
                         SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId());
          } else if (modType == SkynetDatabase.ModificationType.NEW.getValue()) {
@@ -901,23 +902,12 @@ public class BranchPersistenceManager implements PersistenceManager {
          MasterSkynetTypesImport.getInstance().importSkynetDbTypes(ConnectionHandler.getConnection(),
                skynetTypesImportExtensionsIds, branch);
       }
-
       // Initialize branch with common artifacts
-      if (initialize) intializeBranch(branch);
+      if (initialize) {
+         RootBranchInitializer rootInitializer = new RootBranchInitializer();
+         rootInitializer.initialize(branch);
+      }
       return branch;
-   }
-
-   /**
-    * Add the common artifacts that should belong on all created branches
-    * 
-    * @param branch
-    */
-   public void intializeBranch(Branch branch) throws SQLException {
-      // Create necessary default hierarchy root artifact
-      ArtifactPersistenceManager.getInstance().getDefaultHierarchyRootArtifact(branch, true);
-
-      // Create necessary top universal group artifact
-      UniversalGroup.createTopUniversalGroupArtifact(branch);
    }
 
    public List<Branch> getRootBranches() throws SQLException {
