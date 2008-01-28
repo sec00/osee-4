@@ -796,7 +796,7 @@ public class Artifact implements Unique, PersistenceObject, IAdaptable, Comparab
 
    private void acquireAttributes(boolean force) throws SQLException {
       if (force || attributes == null) {
-         artifactManager.setAttributesOnArtifact(this, branch);
+         artifactManager.setAttributesOnArtifact(this);
       }
    }
 
