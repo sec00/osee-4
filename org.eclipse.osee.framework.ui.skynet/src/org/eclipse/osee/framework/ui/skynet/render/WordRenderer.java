@@ -15,7 +15,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -45,7 +44,8 @@ import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.WordArtifact;
 import org.eclipse.osee.framework.skynet.core.attribute.WordAttribute;
-import org.eclipse.osee.framework.skynet.core.util.WordConverter;
+import org.eclipse.osee.framework.skynet.core.template.TemplateLocator;
+import org.eclipse.osee.framework.skynet.core.word.WordConverter;
 import org.eclipse.osee.framework.ui.plugin.OseeUiActivator;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
 import org.eclipse.osee.framework.ui.plugin.util.Jobs;
@@ -53,7 +53,6 @@ import org.eclipse.osee.framework.ui.plugin.util.OseeData;
 import org.eclipse.osee.framework.ui.skynet.ArtifactExplorer;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
-import org.eclipse.osee.framework.ui.skynet.render.TemplateProvider.TemplateLocation;
 import org.eclipse.osee.framework.ui.skynet.render.word.WordTemplateProcessor;
 import org.eclipse.swt.program.Program;
 import org.w3c.dom.Element;
@@ -86,11 +85,11 @@ public class WordRenderer extends FileRenderer {
    // We need MS Word, so look for the program that is for .doc files
    private static final Program wordApp = Program.findProgram("doc");
    private WordTemplateProcessor templateProcessor;
-   private TemplateProvider templateProvider;
+   private WordTemplateProvider templateProvider;
 
    public WordRenderer() throws TransformerConfigurationException, IOException, TransformerFactoryConfigurationError {
       this.templateProcessor = new WordTemplateProcessor();
-      this.templateProvider = new TemplateProvider();
+      this.templateProvider = WordTemplateProvider.getInstance();
    }
 
    /**
@@ -439,16 +438,16 @@ public class WordRenderer extends FileRenderer {
       return templateProcessor.applyTemplate(variableMap, template, null);
    }
 
-   public void addTemplate(PresentationType presentationType, String bundleName, String templateName, String templatePath, Branch branch) throws SQLException, IOException, ClassNotFoundException {
-      TemplateLocation templateLocation = templateProvider.createLocation(bundleName, templateName, templatePath);
-      templateProvider.addTemplate(getId(), branch, presentationType, templateLocation);
+   public void addTemplate(PresentationType presentationType, String bundleName, String templateName, String templatePath, Branch branch) throws Exception {
+      TemplateLocator templateLocation = new TemplateLocator(bundleName, templateName, templatePath);
+      templateProvider.addTemplate(getId(), branch, presentationType.name(), templateLocation);
    }
 
    public void setDefaultTemplates(Artifact document, PresentationType presentationType, Branch branch) throws Exception {
-      templateProvider.setDefaultTemplates(getId(), document, presentationType, branch);
+      templateProvider.setDefaultTemplates(getId(), document, presentationType.name(), branch);
    }
 
    private String getTemplate(Branch branch, Artifact artifact, PresentationType presentationType, String option) throws Exception {
-      return templateProvider.getTemplate(getId(), branch, artifact, presentationType, option);
+      return templateProvider.getTemplate(getId(), branch, artifact, presentationType.name(), option);
    }
 }

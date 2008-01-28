@@ -436,6 +436,14 @@
             point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
          <Operation className="org.eclipse.osee.framework.ui.skynet.blam.operation.DeleteErroneousTagsFromWorkingBranches"/>
       </extension>
+       <extension
+             id="ArtifactSnapshotAllItems"
+             name="Regenerate Artifact Preview Snapshots For All Items"
+             point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
+          <Operation
+                className="org.eclipse.osee.framework.ui.skynet.blam.operation.ArtifactSnapshotAllItems">
+          </Operation>
+       </extension>
 	<extension id="native" point="org.eclipse.osee.framework.ui.skynet.ArtifactRenderer">
 		<Renderer classname="org.eclipse.osee.framework.ui.skynet.render.NativeRenderer"/>
 	</extension>
@@ -509,5 +517,11 @@
           id="org.eclipse.osee.framework.ui.skynet.preferences.HttpServerPreferences"
           name="Http Server">
     </page>
+ </extension>
+ <extension
+       point="org.eclipse.osee.framework.skynet.core.TemplateProvider">
+    <TemplateProvider
+          classname="org.eclipse.osee.framework.ui.skynet.render.WordTemplateProvider">
+    </TemplateProvider>
  </extension>
 </plugin>

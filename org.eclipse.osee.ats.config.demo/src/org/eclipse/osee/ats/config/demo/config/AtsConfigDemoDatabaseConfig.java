@@ -31,7 +31,6 @@ import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.attribute.ArtifactSubtypeDescriptor;
 import org.eclipse.osee.framework.skynet.core.attribute.ConfigurationPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.relation.RelationSide;
-import org.eclipse.osee.framework.ui.skynet.render.word.WordTemplateManager;
 
 /**
  * Initialization class that will load configuration information for a sample DB.
@@ -138,12 +137,7 @@ public class AtsConfigDemoDatabaseConfig extends DbInitializationTask {
       skynetTypeImport.add("org.eclipse.osee.framework.skynet.core.ProgramBranch");
       skynetTypeImport.add("org.eclipse.osee.ats.config.demo.Demo_Program_Skynet_Types");
 
-      Branch branch =
-            BranchPersistenceManager.getInstance().createRootBranch(null, branchName, branchName, skynetTypeImport,
-                  true);
-
-      WordTemplateManager.addWordTemplates(branch);
-
+      BranchPersistenceManager.getInstance().createRootBranch(null, branchName, branchName, skynetTypeImport, true);
    }
 
    private void createVersionArtifacts() throws Exception {

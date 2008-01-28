@@ -283,7 +283,7 @@ public class BranchView extends ViewPart implements IActionable, IEventReceiver 
    private void createTableViewer(Composite parent) {
       ITableLabelProvider labelProvider = new BranchLabelProvider(null);
 
-      branchTable = new TreeViewer(parent, SWT.FULL_SELECTION | SWT.MULTI);
+      branchTable = new TreeViewer(parent, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
       branchTable.setContentProvider(new BranchContentProvider());
       branchTable.setLabelProvider(labelProvider);
       branchTable.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
