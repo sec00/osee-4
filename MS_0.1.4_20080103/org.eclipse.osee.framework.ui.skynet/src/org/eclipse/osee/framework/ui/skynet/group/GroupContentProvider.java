@@ -37,7 +37,7 @@ public class GroupContentProvider implements ITreeContentProvider, ArtifactChang
    }
 
    public Object[] getChildren(Object parentElement) {
-      if (parentElement instanceof UniversalGroupItem) return ((UniversalGroupItem) parentElement).getGroupItems().toArray();
+      if (parentElement instanceof GroupExplorerItem) return ((GroupExplorerItem) parentElement).getGroupItems().toArray();
       return new Object[] {};
    }
 
@@ -45,7 +45,7 @@ public class GroupContentProvider implements ITreeContentProvider, ArtifactChang
     * @see ITreeContentProvider#getParent(Object)
     */
    public Object getParent(Object element) {
-      if (element instanceof UniversalGroupItem) return ((UniversalGroupItem) element).getParentItem();
+      if (element instanceof GroupExplorerItem) return ((GroupExplorerItem) element).getParentItem();
       return null;
    }
 
