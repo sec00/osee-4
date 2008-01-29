@@ -491,7 +491,7 @@ public class BranchPersistenceManager implements PersistenceManager {
       String ATTRIBUTE_CONFLICT =
             "SELECT 'x' from osee_define_txs t1, osee_Define_tx_details t2, osee_define_attribute t3," + " (SELECT MAX(t4.transaction_id) AS" + " transaction_id," + " t6.attr_id" + " FROM osee_define_txs t4," + " osee_define_tx_details t5," + " osee_define_attribute t6" + " WHERE t4.gamma_id = t6.gamma_id" + " AND t4.transaction_id = t5.transaction_id" + " AND t5.branch_id = ?" + " GROUP BY t6.attr_id" + " ORDER BY transaction_id) t44" + " where t1.transaction_id = t2.transaction_id" + (hasBranch ? " AND t2.transaction_id > ? AND t2.branch_id = ?" : "t2.transaction_id = ?") + " AND t1.gamma_id = t3.gamma_id and t3.attr_id = t44.attr_id  AND exists (SELECT txs.gamma_id  FROM osee_define_txs txs, osee_define_attribute attr WHERE attr.attr_id = t44.attr_id AND attr.gamma_id = txs.gamma_id AND txs.transaction_id = t44.transaction_id and t3.gamma_id <> txs.gamma_id and txs.gamma_id not in (select gamma_id from osee_define_txs where transaction_id = ?))";
 
-      String DELETE_ARTIFACT_CONFLICT =
+      String ARTIFACT_CONFLICT =
             " SELECT t1.gamma_id from osee_define_txs t1, osee_Define_tx_details t2, osee_define_artifact_version t3," + " (SELECT MAX(t4.transaction_id) AS" + " transaction_id," + " t6.art_id" + " FROM osee_define_txs t4," + " osee_define_tx_details t5," + " osee_define_artifact_version t6" + " WHERE t4.gamma_id = t6.gamma_id" + " and t6.modification_id = 3" + " AND t4.transaction_id = t5.transaction_id" + " AND t5.branch_id = ?" + " GROUP BY t6.art_id" + " ORDER BY transaction_id) t44" + " where t1.transaction_id = t2.transaction_id" + (hasBranch ? " AND t2.transaction_id > ? AND t2.branch_id = ?" : "t2.transaction_id = ?") + " AND t1.gamma_id = t3.gamma_id and t3.art_id = t44.art_id and exists (select txs.gamma_id from osee_define_txs txs, osee_define_artifact_version attr where attr.art_id = t44.art_id and attr.gamma_id = txs.gamma_id and txs.transaction_id = t44.transaction_id and t3.gamma_id <> txs.gamma_id and txs.gamma_id not in (select gamma_id from osee_define_txs where transaction_id = ?))";
 
       String RELATION_CONFLICT =
@@ -528,8 +528,8 @@ public class BranchPersistenceManager implements PersistenceManager {
          conflicts = chStmt.next();
 
          if (!conflicts) {
-            // Check for artifact delete conflicts
-            chStmt = ConnectionHandler.runPreparedQuery(DELETE_ARTIFACT_CONFLICT, datas.toArray());
+            // Check for artifact work on delete conflicts
+            chStmt = ConnectionHandler.runPreparedQuery(ARTIFACT_CONFLICT, datas.toArray());
             conflicts = chStmt.next();
          }
          if (!conflicts) {
@@ -902,6 +902,7 @@ public class BranchPersistenceManager implements PersistenceManager {
          MasterSkynetTypesImport.getInstance().importSkynetDbTypes(ConnectionHandler.getConnection(),
                skynetTypesImportExtensionsIds, branch);
       }
+
       // Initialize branch with common artifacts
       if (initialize) {
          RootBranchInitializer rootInitializer = new RootBranchInitializer();
