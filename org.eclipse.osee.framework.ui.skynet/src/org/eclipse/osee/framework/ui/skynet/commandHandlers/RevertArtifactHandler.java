@@ -42,6 +42,7 @@ import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.plugin.util.Jobs;
 import org.eclipse.osee.framework.ui.plugin.util.db.AbstractDbTxTemplate;
 import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandler;
+import org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase.ModificationType;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
@@ -71,8 +72,10 @@ public class RevertArtifactHandler extends AbstractSelectionChangedHandler {
             "Confirm Revert of " + artifactChange.getName(),
             "All attribute changes for the artifact and all link changes that involve the artifact on this branch will be reverted." + "\n\nTHIS IS IRREVERSIBLE" + "\n\nOSEE must be restarted after all reverting is finished to see the results")) {
 
+         TransactionId toTransactionId =
+               artifactChange.getModType() == ModificationType.DELETE ? artifactChange.getDeletedTransactionId() : artifactChange.getToTransactionId();
          Jobs.startJob(new RevertJob(artifactChange.getName(), artifactChange.getArtId(),
-               artifactChange.getFromTransactionId(), artifactChange.getToTransactionId()));
+               artifactChange.getFromTransactionId(), toTransactionId));
       }
       return null;
    }
