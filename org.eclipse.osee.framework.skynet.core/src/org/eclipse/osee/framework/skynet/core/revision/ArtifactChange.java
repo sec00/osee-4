@@ -50,6 +50,7 @@ public class ArtifactChange extends RevisionChange {
    transient private Artifact conflictingModArtifact;
    private int conflictingArtId;
    private TransactionId conflictingArtTransactionId;
+   private TransactionId deletedTransactionId;
 
    /**
     * Constructor for serialization.
@@ -77,9 +78,11 @@ public class ArtifactChange extends RevisionChange {
     * @param name The last name for the Artifact before it was deleted.
     * @param descriptor The descriptor for the Artifact.
     */
-   public ArtifactChange(ChangeType changeType, String name, ArtifactSubtypeDescriptor descriptor, int artId, int gammaId, TransactionId baseParentTransactionId, TransactionId headParentTransactionId, TransactionId lastGoodTransactionId) {
+   public ArtifactChange(ChangeType changeType, String name, ArtifactSubtypeDescriptor descriptor, int artId, int gammaId, TransactionId baseParentTransactionId, TransactionId headParentTransactionId, TransactionId lastGoodTransactionId, TransactionId deletedTransactionId) {
       this(changeType, DELETE, name, descriptor, null, baseParentTransactionId, headParentTransactionId,
             lastGoodTransactionId, lastGoodTransactionId, lastGoodTransactionId, artId, gammaId, lastGoodTransactionId);
+      
+      this.deletedTransactionId = deletedTransactionId;
    }
 
    /**
@@ -258,5 +261,12 @@ public class ArtifactChange extends RevisionChange {
          return this;
       }
       return null;
+   }
+
+   /**
+    * @return the deletedTransactionId
+    */
+   public TransactionId getDeletedTransactionId() {
+      return deletedTransactionId;
    }
 }
