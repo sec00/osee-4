@@ -103,6 +103,9 @@ public class RelationPersistenceManager implements PersistenceManager {
    public enum Direction {
       Back, Forward
    };
+   public enum InsertLocation {
+      BeforeTarget, AfterTarget
+   }
 
    private IRelationLinkDescriptorCache relationLinkDescriptorCache;
 
@@ -200,9 +203,10 @@ public class RelationPersistenceManager implements PersistenceManager {
          relationLink.getPersistenceMemo().setGammaId(gammaId);
          linkId = memo.getLinkId();
 
-         transaction.addRemoteEvent(new NetworkRelationLinkModifiedEvent(relationLink.getPersistenceMemo().getGammaId(),
-               relationLink.getBranch().getBranchId(), transaction.getTransactionNumber(), linkId, aArtId, aArtTypeId,
-               bArtId, bArtTypeId, relationLink.getRationale(), relationLink.getAOrder(), relationLink.getBOrder(),
+         transaction.addRemoteEvent(new NetworkRelationLinkModifiedEvent(
+               relationLink.getPersistenceMemo().getGammaId(), relationLink.getBranch().getBranchId(),
+               transaction.getTransactionNumber(), linkId, aArtId, aArtTypeId, bArtId, bArtTypeId,
+               relationLink.getRationale(), relationLink.getAOrder(), relationLink.getBOrder(),
                aArtifact.getFactory().getClass().getCanonicalName(),
                bArtifact.getFactory().getClass().getCanonicalName(),
                SkynetAuthentication.getInstance().getAuthenticatedUser().getArtId()));
@@ -661,6 +665,38 @@ public class RelationPersistenceManager implements PersistenceManager {
    }
 
    public void setRelatedManagers() {
+   }
+
+   public void insertObjectsOnSideB(Artifact sideAArt, Artifact targetArt, Collection<Artifact> insertArtifacts, RelationSide relSide, InsertLocation insertLocation) throws SQLException {
+      // Ensure all insertArts exist first; if not, add them
+      Set<Artifact> bSideArts = sideAArt.getArtifacts(relSide);
+      for (Artifact insertArtifact : insertArtifacts) {
+         if (!bSideArts.contains(insertArtifact)) sideAArt.relate(relSide, insertArtifact, true);
+      }
+
+      // For each insertArt
+      for (Artifact insertArt : insertArtifacts) {
+
+         // Find targetLink; re-do this every time in case it moves/changes
+         IRelationLink targetLink = null;
+         if (sideAArt.getRelations(relSide, targetArt).size() == 1)
+            targetLink = sideAArt.getRelations(relSide, targetArt).iterator().next();
+         else
+            logger.log(Level.SEVERE, "More than one link exists for sideBArt");
+
+         // Find insertArtLink
+         IRelationLink insertLink = null;
+         if (sideAArt.getRelations(relSide, insertArt).size() == 1)
+            insertLink = sideAArt.getRelations(relSide, insertArt).iterator().next();
+         else
+            logger.log(Level.SEVERE, "More than one link exists for sideBArt");
+
+         // Move insertArtLink to insertLocation
+         RelationLinkGroup group = sideAArt.getLinkManager().getGroup(RelationSide.UNIVERSAL_GROUPING__MEMBERS);
+         group.moveLink(targetLink, insertLink, insertLocation != InsertLocation.AfterTarget);
+         sideAArt.persist(true);
+      }
+
    }
 
    public void moveObjectB(Artifact sideAArt, Artifact sideBArt, RelationSide relSide, Direction dir) throws SQLException {
