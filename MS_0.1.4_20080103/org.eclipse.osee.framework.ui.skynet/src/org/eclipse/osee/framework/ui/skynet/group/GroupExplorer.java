@@ -13,8 +13,10 @@ package org.eclipse.osee.framework.ui.skynet.group;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -23,7 +25,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactData;
-import org.eclipse.osee.framework.skynet.core.artifact.ArtifactTransfer;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.DefaultBranchChangedEvent;
 import org.eclipse.osee.framework.skynet.core.artifact.UniversalGroup;
@@ -38,11 +39,11 @@ import org.eclipse.osee.framework.skynet.core.event.TransactionEvent.EventData;
 import org.eclipse.osee.framework.skynet.core.relation.RelationPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.relation.RelationSide;
 import org.eclipse.osee.framework.skynet.core.relation.RelationPersistenceManager.Direction;
+import org.eclipse.osee.framework.skynet.core.relation.RelationPersistenceManager.InsertLocation;
 import org.eclipse.osee.framework.skynet.core.transaction.AbstractSkynetTxTemplate;
 import org.eclipse.osee.framework.ui.plugin.event.Event;
 import org.eclipse.osee.framework.ui.plugin.event.IEventReceiver;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
-import org.eclipse.osee.framework.ui.skynet.DefineHttpServerRequest;
 import org.eclipse.osee.framework.ui.skynet.SkynetContributionItem;
 import org.eclipse.osee.framework.ui.skynet.SkynetDefaultBranchContributionItem;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
@@ -55,15 +56,7 @@ import org.eclipse.osee.framework.ui.skynet.util.SkynetDragAndDrop;
 import org.eclipse.osee.framework.ui.skynet.widgets.dialog.EntryDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.dnd.DragSource;
-import org.eclipse.swt.dnd.DragSourceEvent;
-import org.eclipse.swt.dnd.DragSourceListener;
-import org.eclipse.swt.dnd.DropTarget;
-import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
-import org.eclipse.swt.dnd.FileTransfer;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -143,7 +136,6 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
       new GroupExplorerDragAndDrop(treeViewer.getTree(), VIEW_ID);
 
       getSite().setSelectionProvider(treeViewer);
-      //      setupDragAndDropSupport();
       parent.layout();
       createActions();
       refresh();
@@ -354,96 +346,6 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
       return null;
    }
 
-   private void setupDragAndDropSupport() {
-      DragSource source = new DragSource(treeViewer.getTree(), DND.DROP_COPY);
-      source.setTransfer(new Transfer[] {ArtifactTransfer.getInstance()});
-      source.addDragListener(new DragSourceListener() {
-
-         public void dragFinished(DragSourceEvent event) {
-         }
-
-         public void dragSetData(DragSourceEvent event) {
-            IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
-            Iterator<?> i = selection.iterator();
-
-            String item = "work";
-
-            if (i.hasNext()) {
-               Artifact artifact = (Artifact) i.next();
-               item = DefineHttpServerRequest.getInstance().getUrl(artifact);
-            }
-            Object[] objects = selection.toArray();
-            Artifact[] artifacts = new Artifact[objects.length];
-
-            for (int index = 0; index < objects.length; index++)
-               artifacts[index] = (Artifact) objects[index];
-
-            event.data = new ArtifactData(artifacts, item, VIEW_ID);
-         }
-
-         public void dragStart(DragSourceEvent event) {
-         }
-      });
-
-      DropTarget target = new DropTarget(treeViewer.getTree(), DND.DROP_COPY);
-      target.setTransfer(new Transfer[] {FileTransfer.getInstance(), TextTransfer.getInstance(),
-            ArtifactTransfer.getInstance()});
-      target.addDropListener(new DropTargetAdapter() {
-
-         public void drop(DropTargetEvent event) {
-            performDrop(event);
-         }
-
-         public void dragOver(DropTargetEvent event) {
-            TreeItem selected = treeViewer.getTree().getItem(treeViewer.getTree().toControl(event.x, event.y));
-
-            if (selected != null && selected.getData() instanceof GroupExplorerItem) {
-               if (((GroupExplorerItem) selected.getData()).isUniversalGroup()) event.detail = DND.DROP_COPY;
-            } else
-               event.detail = DND.DROP_NONE;
-         }
-
-         public void dropAccept(DropTargetEvent event) {
-         }
-      });
-   }
-
-   private void performDrop(DropTargetEvent e) {
-      TreeItem selected = treeViewer.getTree().getItem(treeViewer.getTree().toControl(e.x, e.y));
-
-      if (selected.getData() instanceof GroupExplorerItem) {
-         final GroupExplorerItem item = (GroupExplorerItem) selected.getData();
-         if (!item.isUniversalGroup()) return;
-
-         if (e.data instanceof ArtifactData) {
-            final Artifact[] artsToRelate = ((ArtifactData) e.data).getArtifacts();
-            if (artsToRelate.length == 1 && item.contains(artsToRelate[0])) {
-               AWorkbench.popup("ERROR", "Artifact already related.");
-               return;
-            }
-            AbstractSkynetTxTemplate relateArtifactTx =
-                  new AbstractSkynetTxTemplate(BranchPersistenceManager.getInstance().getDefaultBranch()) {
-
-                     @Override
-                     protected void handleTxWork() throws Exception {
-                        for (Artifact art : artsToRelate) {
-                           if (!item.contains(art)) {
-                              item.getArtifact().relate(RelationSide.UNIVERSAL_GROUPING__MEMBERS, art, true);
-                           }
-                        }
-                     }
-                  };
-
-            try {
-               relateArtifactTx.execute();
-            } catch (Exception ex) {
-               OSEELog.logException(SkynetGuiPlugin.class, ex, true);
-            }
-         }
-         treeViewer.refresh(item);
-      }
-   }
-
    private ArrayList<GroupExplorerItem> getSelectedUniversalGroupItems() {
       ArrayList<GroupExplorerItem> arts = new ArrayList<GroupExplorerItem>();
       Iterator<?> i = ((IStructuredSelection) treeViewer.getSelection()).iterator();
@@ -581,14 +483,12 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
       public Artifact[] getArtifacts() {
          IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
          Iterator<?> i = selection.iterator();
-         Artifact[] artifacts = new Artifact[selection.toArray().length];
-         int x = 0;
-         if (i.hasNext()) {
+         List<Artifact> artifacts = new ArrayList<Artifact>();
+         while (i.hasNext()) {
             Object object = i.next();
-            if ((object instanceof GroupExplorerItem) && !((GroupExplorerItem) object).isUniversalGroup()) artifacts[x++] =
-                  ((GroupExplorerItem) object).getArtifact();
+            if ((object instanceof GroupExplorerItem) && !((GroupExplorerItem) object).isUniversalGroup()) artifacts.add(((GroupExplorerItem) object).getArtifact());
          }
-         return artifacts;
+         return artifacts.toArray(new Artifact[artifacts.size()]);
       }
 
       @Override
@@ -651,101 +551,108 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
       }
 
       @Override
-      public void performDrop(DropTargetEvent e) {
-         TreeItem dragOverTreeITem = treeViewer.getTree().getItem(treeViewer.getTree().toControl(e.x, e.y));
+      public void performDrop(DropTargetEvent event) {
+         try {
+            TreeItem dragOverTreeITem = treeViewer.getTree().getItem(treeViewer.getTree().toControl(event.x, event.y));
 
-         // This should always be true as all items are Group Explorer Items
-         if (dragOverTreeITem.getData() instanceof GroupExplorerItem) {
-            final GroupExplorerItem dragOverExplorerItem = (GroupExplorerItem) dragOverTreeITem.getData();
+            // This should always be true as all items are Group Explorer Items
+            if (dragOverTreeITem.getData() instanceof GroupExplorerItem) {
+               final GroupExplorerItem dragOverExplorerItem = (GroupExplorerItem) dragOverTreeITem.getData();
 
-            // Drag item dropped ON universal group item 
-            if (dragOverExplorerItem.isUniversalGroup()) {
+               // Drag item dropped ON universal group item 
+               if (dragOverExplorerItem.isUniversalGroup()) {
 
-               // Drag item came from inside Group Explorer
-               if (e.data instanceof GroupExplorerItem) {
-                  AWorkbench.popup("ERROR", "Drag item came from inside Group Explorer: Not implemented yet.");
-               }
-
-               // Drag item came from outside Group Explorer
-               else if (e.data instanceof ArtifactData) {
-                  // Items dropped on Group; simply add items to group
-                  final Artifact[] artsToRelate = ((ArtifactData) e.data).getArtifacts();
-                  if (artsToRelate.length == 1 && dragOverExplorerItem.contains(artsToRelate[0])) {
-                     AWorkbench.popup("ERROR", "Artifact already related.");
-                     return;
+                  // Drag item came from inside Group Explorer
+                  if (event.item.getData() instanceof GroupExplorerItem) {
+                     // If ctrl is down, this is a copy; add items to group
+                     if (isCtrlPressed(event)) {
+                        copyArtifactsToGroup(event, dragOverExplorerItem);
+                     }
+                     // Else this is a move
+                     else {
+                        //    Remove items from old group
+                        //    Add items to new group
+                     }
                   }
-                  AbstractSkynetTxTemplate relateArtifactTx =
-                        new AbstractSkynetTxTemplate(BranchPersistenceManager.getInstance().getDefaultBranch()) {
 
-                           @Override
-                           protected void handleTxWork() throws Exception {
-                              for (Artifact art : artsToRelate) {
-                                 if (!dragOverExplorerItem.contains(art)) {
-                                    dragOverExplorerItem.getArtifact().relate(RelationSide.UNIVERSAL_GROUPING__MEMBERS,
-                                          art, true);
-                                 }
-                              }
-                           }
-                        };
-
-                  try {
-                     relateArtifactTx.execute();
-                  } catch (Exception ex) {
-                     OSEELog.logException(SkynetGuiPlugin.class, ex, true);
+                  // Drag item came from outside Group Explorer
+                  else if (event.data instanceof ArtifactData) {
+                     copyArtifactsToGroup(event, dragOverExplorerItem);
                   }
                }
+               // Drag item dropped before or after group member
+               else if (!dragOverExplorerItem.isUniversalGroup()) {
+
+                  // Drag item came from inside Group Explorer
+                  if (event.item.getData() instanceof GroupExplorerItem) {
+                     IStructuredSelection selectedItem = (IStructuredSelection) treeViewer.getSelection();
+                     Iterator<?> iterator = selectedItem.iterator();
+                     Set<Artifact> insertArts = new HashSet<Artifact>();
+                     while (iterator.hasNext()) {
+                        Object obj = iterator.next();
+                        if (obj instanceof GroupExplorerItem) {
+                           insertArts.add(((GroupExplorerItem) obj).getArtifact());
+                        }
+                     }
+                     GroupExplorerItem parentUnivGroupItem =
+                           ((GroupExplorerItem) selectedItem.getFirstElement()).getParentItem();
+                     Artifact parentArtifact = parentUnivGroupItem.getArtifact();
+                     Artifact targetArtifact = dragOverExplorerItem.getArtifact();
+
+                     RelationPersistenceManager.getInstance().insertObjectsOnSideB(parentArtifact, targetArtifact,
+                           insertArts, RelationSide.UNIVERSAL_GROUPING__MEMBERS,
+                           isFeedbackAfter ? InsertLocation.AfterTarget : InsertLocation.BeforeTarget);
+
+                  }
+                  // Drag item came from outside Group Explorer
+                  else if (event.data instanceof ArtifactData) {
+                     AWorkbench.popup("ERROR", "Drag item came from outside Group Explorer: Not implemented yet");
+                  }
+
+               }
+               treeViewer.refresh(dragOverExplorerItem);
             }
-            // Drag item dropped before or after group member
-            else if (!dragOverExplorerItem.isUniversalGroup()) {
 
-               // Drag item came from inside Group Explorer
-               if (e.data instanceof GroupExplorerItem) {
-                  IStructuredSelection selectedItem = (IStructuredSelection) treeViewer.getSelection();
-                  Object obj = selectedItem.getFirstElement();
-                  if (obj instanceof GroupExplorerItem) {
-                     GroupExplorerItem droppingGroupExplorerItem = (GroupExplorerItem) obj;
-                     AWorkbench.popup("ERROR", "Drag item came from inside Group Explorer: Not implemented yet");
-                  }
-                  // Add item to UniversalGroup that is parent of item over
-                  // AND put it at the location it was dropped
-               }
-               // Drag item came from outside Group Explorer
-               else if (e.data instanceof ArtifactData) {
-                  AWorkbench.popup("ERROR", "Drag item came from outside Group Explorer: Not implemented yet");
-               }
-
-            }
-            treeViewer.refresh(dragOverExplorerItem);
+            isFeedbackAfter = false;
+         } catch (Exception ex) {
+            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
          }
-         //         UniversalGroupItem dragOverGroupItem = (UniversalGroupItem) object;
+      }
 
-         //         if (object instanceof IRelationLink) {
-         //            IRelationLink targetLink = (IRelationLink) object;
-         //            Artifact transferredArtifact = ((ArtifactData) event.data).getArtifacts()[0];
-         //            IRelationLink dropLink = artifactToLinkMap.remove(transferredArtifact.getArtId());
-         //            RelationLinkGroup group;
-         //
-         //            try {
-         //               group =
-         //                     artifact.getLinkManager().getSideGroup(dropLink.getLinkDescriptor(),
-         //                           transferredArtifact.equals(dropLink.getArtifactA()));
-         //
-         //               group.moveLink(targetLink, dropLink, !isFeedbackAfter);
-         //               treeViewer.refresh();
-         //               editor.onDirtied();
-         //            } catch (SQLException ex) {
-         //               logger.log(Level.SEVERE, ex.toString(), true);
-         //            }
-         //         } else {
-         //            RelationLinkGroup group = (RelationLinkGroup) selected.getData();
-         //            RelationExplorerWindow window = new RelationExplorerWindow(treeViewer, group);
-         //
-         //            ArtifactDragDropSupport.performDragDrop(event, window,
-         //                  PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-         //            window.createArtifactInformationBox(null);
-         //         }
+      public void copyArtifactsToGroup(DropTargetEvent event, final GroupExplorerItem dragOverExplorerItem) {
+         // Items dropped on Group; simply add items to group
+         final Artifact[] artsToRelate = ((ArtifactData) event.data).getArtifacts();
+         boolean alreadyRelated = true;
+         for (Artifact artifact : artsToRelate) {
+            if (!dragOverExplorerItem.contains(artifact)) {
+               alreadyRelated = false;
+               break;
+            }
+         }
+         if (alreadyRelated) {
+            AWorkbench.popup("ERROR", "Artifact(s) already related.");
+            return;
+         }
+         AbstractSkynetTxTemplate relateArtifactTx =
+               new AbstractSkynetTxTemplate(BranchPersistenceManager.getInstance().getDefaultBranch()) {
 
-         isFeedbackAfter = false;
+                  @Override
+                  protected void handleTxWork() throws Exception {
+                     for (Artifact art : artsToRelate) {
+                        if (!dragOverExplorerItem.contains(art)) {
+                           dragOverExplorerItem.getArtifact().relate(RelationSide.UNIVERSAL_GROUPING__MEMBERS, art,
+                                 true);
+                        }
+                     }
+                  }
+               };
+
+         try {
+            relateArtifactTx.execute();
+         } catch (Exception ex) {
+            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
+         }
+
       }
    }
 
