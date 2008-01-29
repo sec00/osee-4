@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.jdk.core.util.StringFormat;
 import org.eclipse.osee.framework.messaging.event.skynet.NetworkRenameBranchEvent;
 import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
@@ -287,6 +288,21 @@ public class Branch implements Comparable<Branch>, IAdaptable {
    public String getDisplayName() {
       return getBranchShortName() != null && getBranchShortName().length() > 0 ? getBranchShortName() : StringFormat.truncate(
             getBranchName(), 22);
+   }
+
+   public String asFolderName() {
+      String branchName = this.getBranchShortestName();
+
+      // Remove illegal filename characters
+      // NOTE: The current program.launch has a tokenizing bug that causes an error if consecutive spaces are in the name
+      branchName = branchName.replaceAll("[^A-Za-z0-9]", "_");
+      branchName = StringFormat.truncate(branchName, 20).trim();
+
+      return String.format("%s.%s", branchName.toLowerCase(), this.getBranchId());
+   }
+
+   public static int getBranchIdFromBranchFolderName(String folderName) throws Exception {
+      return Integer.parseInt(Lib.getExtension(folderName));
    }
 
    /*

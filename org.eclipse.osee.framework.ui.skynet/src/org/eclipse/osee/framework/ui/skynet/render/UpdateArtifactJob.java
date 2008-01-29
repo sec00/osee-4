@@ -82,13 +82,11 @@ public class UpdateArtifactJob extends UpdateJob {
       return Status.OK_STATUS;
    }
 
-   private void processUpdate() throws SQLException, IllegalStateException, IOException, ParserConfigurationException, SAXException {
+   private void processUpdate() throws Exception {
       String guid;
-      String branchCandidate = workingFile.getParentFile().getName();
-      branchCandidate = branchCandidate.substring(0, branchCandidate.indexOf('-')).trim();
       Artifact artifact;
 
-      int branchId = Integer.parseInt(branchCandidate);
+      int branchId = Branch.getBranchIdFromBranchFolderName(workingFile.getParentFile().getName());
       Branch branch = BranchPersistenceManager.getInstance().getBranch(branchId);
       Matcher singleEditMatcher = guidPattern.matcher(workingFile.getName());
       Matcher multiEditMatcher = multiPattern.matcher(workingFile.getName());
