@@ -501,7 +501,10 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
 
          // Set as COPY if drag item over group and ctrl is pressed, otherwise, move
          if (dragOverTreeItem != null && ((GroupExplorerItem) dragOverTreeItem.getData()).isUniversalGroup()) {
-            event.detail = DND.DROP_COPY;
+            if (isCtrlPressed(event))
+               event.detail = DND.DROP_COPY;
+            else
+               event.detail = DND.DROP_MOVE;
             tree.setInsertMark(null, false);
          }
          // Handle re-ordering within same group
@@ -565,13 +568,46 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
                   // Drag item came from inside Group Explorer
                   if (event.item.getData() instanceof GroupExplorerItem) {
                      // If ctrl is down, this is a copy; add items to group
-                     if (isCtrlPressed(event)) {
+                     if (event.detail == DND.DROP_COPY) {
                         copyArtifactsToGroup(event, dragOverExplorerItem);
                      }
                      // Else this is a move
                      else {
-                        //    Remove items from old group
-                        //    Add items to new group
+                        IStructuredSelection selectedItem = (IStructuredSelection) treeViewer.getSelection();
+                        Iterator<?> iterator = selectedItem.iterator();
+                        final Set<Artifact> insertArts = new HashSet<Artifact>();
+                        while (iterator.hasNext()) {
+                           Object obj = iterator.next();
+                           if (obj instanceof GroupExplorerItem) {
+                              insertArts.add(((GroupExplorerItem) obj).getArtifact());
+                           }
+                        }
+                        GroupExplorerItem parentUnivGroupItem =
+                              ((GroupExplorerItem) selectedItem.getFirstElement()).getParentItem();
+                        final Artifact parentArtifact = parentUnivGroupItem.getArtifact();
+                        final Artifact targetArtifact = dragOverExplorerItem.getArtifact();
+
+                        AbstractSkynetTxTemplate relateArtifactTx =
+                              new AbstractSkynetTxTemplate(BranchPersistenceManager.getInstance().getDefaultBranch()) {
+
+                                 @Override
+                                 protected void handleTxWork() throws Exception {
+                                    for (Artifact artifact : insertArts) {
+                                       // Remove item from old group
+                                       parentArtifact.unrelate(RelationSide.UNIVERSAL_GROUPING__MEMBERS, artifact, true);
+                                       // Add items to new group
+                                       targetArtifact.relate(RelationSide.UNIVERSAL_GROUPING__MEMBERS, artifact, true);
+                                    }
+                                    parentArtifact.persist(true);
+                                    targetArtifact.persist(true);
+                                 }
+                              };
+
+                        try {
+                           relateArtifactTx.execute();
+                        } catch (Exception ex) {
+                           OSEELog.logException(SkynetGuiPlugin.class, ex, true);
+                        }
                      }
                   }
 
