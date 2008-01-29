@@ -363,6 +363,22 @@ public class RevisionManager implements PersistenceManager, IEventReceiver {
       return changes;
    }
 
+   public void getConflictsPerBranch(Branch source, Branch destination, TransactionId baselineTRansaction) {
+      String ATTRIBUTE_CONFLICTS =
+      //45sec
+            "SELECT t3.art_id, t3.value, t1.gamma_id as source_gamma, t1.tx_type as source_change t9.value, t9.gamma_id as dest_gamma FROM osee_define_txs t1, osee_define_attribute t9, osee_define_tx_details t2, osee_define_attribute t3, (SELECT MAX(t4.transaction_id) AS transaction_id, t6.attr_id FROM osee_define_txs t4, osee_define_tx_details t5, osee_define_attribute t6 WHERE t4.gamma_id = t6.gamma_id AND t4.transaction_id = t5.transaction_id AND t5.branch_id = 2 GROUP BY t6.attr_id ORDER BY transaction_id) t44 WHERE t1.transaction_id = t2.transaction_id AND t2.transaction_id > 343 AND t2.branch_id = 9 AND t1.gamma_id = t3.gamma_id AND t3.attr_id = t44.attr_id AND EXISTS (SELECT txs.gamma_id FROM osee_define_txs txs, osee_define_attribute attr WHERE attr.attr_id = t44.attr_id AND attr.gamma_id = txs.gamma_id AND txs.transaction_id = t44.transaction_id and t9.gamma_id = txs.gamma_id AND t3.gamma_id <> txs.gamma_id AND txs.gamma_id NOT IN (SELECT gamma_id FROM osee_define_txs WHERE transaction_id = 343))";
+      String ARTIFACT_CONFLICTS =
+      //12sec   
+            "SELECT t3.art_id, t1.gamma_id AS source_gamma, t1.tx_type AS source_change, t9.gamma_id AS dest_gamma FROM osee_define_txs t1, osee_define_attribute t9, osee_define_tx_details t2, osee_define_artifact_version t3, (SELECT MAX(t4.transaction_id) AS transaction_id, t6.art_id FROM osee_define_txs t4, osee_define_tx_details t5, osee_define_artifact_version t6 WHERE t4.gamma_id = t6.gamma_id AND t4.transaction_id = t5.transaction_id AND t5.branch_id = 2 GROUP BY t6.art_id ORDER BY transaction_id) t44 WHERE t1.transaction_id = t2.transaction_id AND t2.transaction_id > 343 AND t2.branch_id = 9 AND t1.gamma_id = t3.gamma_id AND t3.art_id = t44.art_id AND EXISTS (SELECT txs.gamma_id FROM osee_define_txs txs, osee_define_artifact_version artver WHERE artver.art_id = t44.art_id AND artver.gamma_id = txs.gamma_id AND txs.transaction_id = t44.transaction_id AND t9.gamma_id = txs.gamma_id AND t3.gamma_id <> txs.gamma_id AND txs.gamma_id NOT IN (SELECT gamma_id FROM osee_define_txs WHERE transaction_id = 343))";
+      String A_RELATION_CONFLICTS = "";
+      String B_RELATION_CONFLICTS = "";
+
+      //get artifact
+      //add artifact to temp cache as artifact change
+      //add attr changes to art change
+      //add rel changes to art change
+   }
+
    private Collection<AttributeChange> getAttributeChanges(ChangeType changeType, int fromTransactionNumber, int toTransactionNumber, int artId) {
 
       Collection<AttributeChange> revisions = new LinkedList<AttributeChange>();
@@ -515,8 +531,8 @@ public class RevisionManager implements PersistenceManager, IEventReceiver {
          String sql =
                "SELECT " + TRANSACTION_DETAIL_ALIAS_1.columns("branch_id") + "," + ATTRIBUTE_VERSION_TABLE.column("value") + " AS name," + ARTIFACT_TABLE.column("art_id") + "," + ARTIFACT_TYPE_TABLE.column("name") + " AS type_name," + ARTIFACT_VERSION_ALIAS_1.column("modification_id") + ", " + ARTIFACT_VERSION_ALIAS_1.column("gamma_id") + "," + Table.alias(
                      "(SELECT MAX(" + TRANSACTION_DETAIL_ALIAS_2.column("transaction_id") + ")" + " FROM " + ARTIFACT_VERSION_ALIAS_2 + "," + TRANSACTIONS_ALIAS_2 + "," + TRANSACTION_DETAIL_ALIAS_2 + " WHERE " + ARTIFACT_VERSION_ALIAS_2.column("art_id") + "=" + ARTIFACT_VERSION_ALIAS_1.column("art_id") + " AND " + ARTIFACT_VERSION_ALIAS_2.column("modification_id") + "<> " + ModificationType.DELETE.getValue() + " AND " + ARTIFACT_VERSION_ALIAS_2.column("gamma_id") + "=" + TRANSACTIONS_ALIAS_2.column("gamma_id") + " AND " + TRANSACTIONS_ALIAS_2.column("transaction_id") + "=" + TRANSACTION_DETAIL_ALIAS_2.column("transaction_id") + " AND " + TRANSACTION_DETAIL_ALIAS_2.column("branch_id") + "=" + TRANSACTION_DETAIL_ALIAS_1.column("branch_id") + " AND " + TRANSACTION_DETAIL_ALIAS_2.column("transaction_id") + "<" + TRANSACTION_DETAIL_ALIAS_1.column("transaction_id") + ")",
-                     "last_good_transaction") + " FROM " + ARTIFACT_TABLE + "," + ARTIFACT_TYPE_TABLE + "," + ARTIFACT_VERSION_ALIAS_1 + "," + ATTRIBUTE_VERSION_TABLE + "," + TRANSACTIONS_ALIAS_1 + "," + TRANSACTION_DETAIL_ALIAS_1 + "," + Table.alias(
-                     "(SELECT MAX(" + ATTRIBUTE_VERSION_TABLE.column("gamma_id") + ")", "gamma_id") + " FROM " + ATTRIBUTE_VERSION_TABLE + "," + ATTRIBUTE_TYPE_TABLE + " WHERE " + ATTRIBUTE_VERSION_TABLE.column("attr_type_id") + "=" + ATTRIBUTE_TYPE_TABLE.column("attr_type_id") + " AND " + ATTRIBUTE_TYPE_TABLE.column("name") + "=?" + " GROUP BY " + ATTRIBUTE_VERSION_TABLE.column("art_id") + ") ATTR_GAMMA" + " WHERE " + TRANSACTION_DETAIL_ALIAS_1.column("branch_id") + "=?" + " AND " + TRANSACTION_DETAIL_ALIAS_1.column("transaction_id") + "=" + TRANSACTIONS_ALIAS_1.column("transaction_id") + " AND " + (fromTransactionId == toTransactionId ? TRANSACTIONS_ALIAS_1.column("transaction_id") + " = ?" : TRANSACTIONS_ALIAS_1.column("transaction_id") + " > ? " + " AND " + TRANSACTIONS_ALIAS_1.column("transaction_id") + " <= ?") + " AND " + TRANSACTIONS_ALIAS_1.column("gamma_id") + "=" + ARTIFACT_VERSION_ALIAS_1.column("gamma_id") + " AND " + ARTIFACT_VERSION_ALIAS_1.column("art_id") + "=" + ARTIFACT_TABLE.column("art_id") + " AND " + ARTIFACT_VERSION_ALIAS_1.column("modification_id") + "=?" + " AND " + ARTIFACT_TABLE.column("art_type_id") + "=" + ARTIFACT_TYPE_TABLE.column("art_type_id") + " AND " + ARTIFACT_TABLE.column("art_id") + "=" + ATTRIBUTE_VERSION_TABLE.column("art_id") + " AND " + ATTRIBUTE_VERSION_TABLE.column("gamma_id") + "= ATTR_GAMMA.gamma_id";
+                     "last_good_transaction") + ", txs.transaction_id as deleted_transaction FROM osee_define_txs txs," + ARTIFACT_TABLE + "," + ARTIFACT_TYPE_TABLE + "," + ARTIFACT_VERSION_ALIAS_1 + "," + ATTRIBUTE_VERSION_TABLE + "," + TRANSACTIONS_ALIAS_1 + "," + TRANSACTION_DETAIL_ALIAS_1 + "," + Table.alias(
+                     "(SELECT MAX(" + ATTRIBUTE_VERSION_TABLE.column("gamma_id") + ")", "gamma_id") + " FROM " + ATTRIBUTE_VERSION_TABLE + "," + ATTRIBUTE_TYPE_TABLE + " WHERE " + ATTRIBUTE_VERSION_TABLE.column("attr_type_id") + "=" + ATTRIBUTE_TYPE_TABLE.column("attr_type_id") + " AND " + ATTRIBUTE_TYPE_TABLE.column("name") + "=?" + " GROUP BY " + ATTRIBUTE_VERSION_TABLE.column("art_id") + ") ATTR_GAMMA" + " WHERE txs.gamma_id = " + ARTIFACT_VERSION_ALIAS_1.column("gamma_id") + " AND " + TRANSACTION_DETAIL_ALIAS_1.column("branch_id") + "=?" + " AND " + TRANSACTION_DETAIL_ALIAS_1.column("transaction_id") + "=" + TRANSACTIONS_ALIAS_1.column("transaction_id") + " AND " + (fromTransactionId == toTransactionId ? TRANSACTIONS_ALIAS_1.column("transaction_id") + " = ?" : TRANSACTIONS_ALIAS_1.column("transaction_id") + " > ? " + " AND " + TRANSACTIONS_ALIAS_1.column("transaction_id") + " <= ?") + " AND " + TRANSACTIONS_ALIAS_1.column("gamma_id") + "=" + ARTIFACT_VERSION_ALIAS_1.column("gamma_id") + " AND " + ARTIFACT_VERSION_ALIAS_1.column("art_id") + "=" + ARTIFACT_TABLE.column("art_id") + " AND " + ARTIFACT_VERSION_ALIAS_1.column("modification_id") + "=?" + " AND " + ARTIFACT_TABLE.column("art_type_id") + "=" + ARTIFACT_TYPE_TABLE.column("art_type_id") + " AND " + ARTIFACT_TABLE.column("art_id") + "=" + ATTRIBUTE_VERSION_TABLE.column("art_id") + " AND " + ATTRIBUTE_VERSION_TABLE.column("gamma_id") + "= ATTR_GAMMA.gamma_id";
 
          Collection<Object> dataList = new LinkedList<Object>();
          dataList.add(SQL3DataType.VARCHAR);
@@ -721,8 +737,16 @@ public class RevisionManager implements PersistenceManager, IEventReceiver {
             if (artifactNameDescriptorCache != null) artifactNameDescriptorCache.cache(set.getInt("art_id"), name,
                   descriptor);
 
-            return new ArtifactChange(OUTGOING, name, descriptor, set.getInt("art_id"), set.getInt("gamma_id"),
-                  baseParentTransactionId, headParentTransactionId, lastGoodTransactionId);
+            return new ArtifactChange(
+                  OUTGOING,
+                  name,
+                  descriptor,
+                  set.getInt("art_id"),
+                  set.getInt("gamma_id"),
+                  baseParentTransactionId,
+                  headParentTransactionId,
+                  lastGoodTransactionId,
+                  TransactionIdManager.getInstance().getPossiblyEditableTransactionId(set.getInt("deleted_transaction")));
          } else {
             TransactionId transactionId =
                   TransactionIdManager.getInstance().getPossiblyEditableTransactionIfFromCache(
