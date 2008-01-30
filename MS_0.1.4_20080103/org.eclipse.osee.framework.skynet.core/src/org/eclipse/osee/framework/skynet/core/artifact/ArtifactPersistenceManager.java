@@ -83,8 +83,8 @@ import org.eclipse.osee.framework.skynet.core.transaction.TransactionIdManager;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionType;
 import org.eclipse.osee.framework.skynet.core.transaction.data.ArtifactTransactionData;
 import org.eclipse.osee.framework.skynet.core.transaction.data.AttributeTransactionData;
-import org.eclipse.osee.framework.skynet.core.word.WordUtil;
 import org.eclipse.osee.framework.skynet.core.utility.RemoteArtifactEventFactory;
+import org.eclipse.osee.framework.skynet.core.word.WordUtil;
 import org.eclipse.osee.framework.ui.plugin.event.Event;
 import org.eclipse.osee.framework.ui.plugin.sql.SQL3DataType;
 import org.eclipse.osee.framework.ui.plugin.util.Jobs;
@@ -131,7 +131,7 @@ public class ArtifactPersistenceManager implements PersistenceManager {
          "DELETE" + " FROM " + TRANSACTIONS_TABLE + " WHERE gamma_id IN" + "(SELECT gamma_id" + " FROM " + ATTRIBUTE_VERSION_TABLE + " WHERE attr_id = ?)";
 
    private static final String SELECT_ARTIFACT_FOR_INIT =
-         "SELECT art1.art_type_id, txs3.gamma_id, arv2.modification_id FROM osee_define_artifact art1, osee_define_artifact_version arv2, osee_define_txs txs3 WHERE art1.art_id = ? AND art1.art_id = arv2.art_id AND arv2.gamma_id = txs3.gamma_id AND txs3.transaction_id = (SELECT MAX(txs5.transaction_id) FROM osee_define_txs txs5, osee_define_tx_details txd6 WHERE arv2.gamma_id = txs5.gamma_id AND txs5.transaction_id <= ? AND txs5.transaction_id = txd6.transaction_id AND txd6.branch_id = ?)";
+         "SELECT art1.art_type_id, arv2.gamma_id, arv2.modification_id FROM osee_define_artifact art1, osee_define_artifact_version arv2, osee_define_txs txs3, osee_define_tx_details txd4 WHERE art1.art_id = ? AND art1.art_id = arv2.art_id AND arv2.gamma_id = txs3.gamma_id AND txs3.transaction_id <= ? AND txs3.transaction_id = txd4.transaction_id AND txd4.branch_id = ? order by txs3.transaction_id desc";
 
    private static final String SELECT_ARTIFACT_BY_GUID =
          "SELECT " + ARTIFACT_TABLE.columns("art_id", "art_type_id", "guid", "human_readable_id") + ", " + ARTIFACT_TYPE_TABLE.columns(
@@ -857,7 +857,7 @@ public class ArtifactPersistenceManager implements PersistenceManager {
       ConnectionHandlerStatement chStmt = null;
       try {
          chStmt =
-               ConnectionHandler.runPreparedQuery(SELECT_ARTIFACT_FOR_INIT, SQL3DataType.INTEGER, artId,
+               ConnectionHandler.runPreparedQuery(1, SELECT_ARTIFACT_FOR_INIT, SQL3DataType.INTEGER, artId,
                      SQL3DataType.INTEGER, transactionId.getTransactionNumber(), SQL3DataType.INTEGER,
                      transactionId.getBranch().getBranchId());
 
