@@ -227,7 +227,7 @@ public class BranchPersistenceManager implements PersistenceManager {
 
          ConnectionHandlerStatement chStmt = null;
          try {
-            chStmt = ConnectionHandler.runPreparedQuery(200, READ_BRANCH_TABLE);
+            chStmt = ConnectionHandler.runPreparedQuery(500, READ_BRANCH_TABLE);
             ResultSet rSet = chStmt.getRset();
             while (chStmt.next()) {
                int branchId = rSet.getInt("branch_id");
@@ -257,7 +257,7 @@ public class BranchPersistenceManager implements PersistenceManager {
       Collection<Branch> archivedBranches = new ArrayList<Branch>(100);
       ConnectionHandlerStatement chStmt = null;
       try {
-         chStmt = ConnectionHandler.runPreparedQuery(200, READ_BRANCH_TABLE);
+         chStmt = ConnectionHandler.runPreparedQuery(500, READ_BRANCH_TABLE);
          ResultSet rSet = chStmt.getRset();
          while (chStmt.next()) {
             if (rSet.getInt("archived") == 1) {
@@ -902,7 +902,6 @@ public class BranchPersistenceManager implements PersistenceManager {
          MasterSkynetTypesImport.getInstance().importSkynetDbTypes(ConnectionHandler.getConnection(),
                skynetTypesImportExtensionsIds, branch);
       }
-
       // Initialize branch with common artifacts
       if (initialize) {
          RootBranchInitializer rootInitializer = new RootBranchInitializer();
