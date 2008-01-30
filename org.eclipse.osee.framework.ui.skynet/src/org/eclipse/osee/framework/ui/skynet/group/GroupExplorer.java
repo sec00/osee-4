@@ -13,6 +13,7 @@ package org.eclipse.osee.framework.ui.skynet.group;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -616,32 +617,40 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
                // Drag item dropped before or after group member
                else if (!dragOverExplorerItem.isUniversalGroup()) {
 
-                  // Drag item came from inside Group Explorer
-                  if (event.item.getData() instanceof GroupExplorerItem) {
-                     IStructuredSelection selectedItem = (IStructuredSelection) treeViewer.getSelection();
-                     Iterator<?> iterator = selectedItem.iterator();
-                     Set<Artifact> insertArts = new HashSet<Artifact>();
-                     while (iterator.hasNext()) {
-                        Object obj = iterator.next();
-                        if (obj instanceof GroupExplorerItem) {
-                           insertArts.add(((GroupExplorerItem) obj).getArtifact());
+                  if (event.data instanceof ArtifactData) {
+
+                     // Drag item came from inside Group Explorer
+                     if (((ArtifactData) event.data).getSource().equals(VIEW_ID)) {
+                        IStructuredSelection selectedItem = (IStructuredSelection) treeViewer.getSelection();
+                        Iterator<?> iterator = selectedItem.iterator();
+                        Set<Artifact> insertArts = new HashSet<Artifact>();
+                        while (iterator.hasNext()) {
+                           Object obj = iterator.next();
+                           if (obj instanceof GroupExplorerItem) {
+                              insertArts.add(((GroupExplorerItem) obj).getArtifact());
+                           }
                         }
+                        GroupExplorerItem parentUnivGroupItem =
+                              ((GroupExplorerItem) selectedItem.getFirstElement()).getParentItem();
+                        Artifact parentArtifact = parentUnivGroupItem.getArtifact();
+                        Artifact targetArtifact = dragOverExplorerItem.getArtifact();
+
+                        RelationPersistenceManager.getInstance().insertObjectsOnSideB(parentArtifact, targetArtifact,
+                              insertArts, RelationSide.UNIVERSAL_GROUPING__MEMBERS,
+                              isFeedbackAfter ? InsertLocation.AfterTarget : InsertLocation.BeforeTarget);
                      }
-                     GroupExplorerItem parentUnivGroupItem =
-                           ((GroupExplorerItem) selectedItem.getFirstElement()).getParentItem();
-                     Artifact parentArtifact = parentUnivGroupItem.getArtifact();
-                     Artifact targetArtifact = dragOverExplorerItem.getArtifact();
+                     // Drag item came from outside Group Explorer
+                     else {
+                        List<Artifact> insertArts = Arrays.asList(((ArtifactData) event.data).getArtifacts());
+                        GroupExplorerItem parentUnivGroupItem = dragOverExplorerItem.getParentItem();
+                        Artifact parentArtifact = parentUnivGroupItem.getArtifact();
+                        Artifact targetArtifact = dragOverExplorerItem.getArtifact();
 
-                     RelationPersistenceManager.getInstance().insertObjectsOnSideB(parentArtifact, targetArtifact,
-                           insertArts, RelationSide.UNIVERSAL_GROUPING__MEMBERS,
-                           isFeedbackAfter ? InsertLocation.AfterTarget : InsertLocation.BeforeTarget);
-
+                        RelationPersistenceManager.getInstance().insertObjectsOnSideB(parentArtifact, targetArtifact,
+                              insertArts, RelationSide.UNIVERSAL_GROUPING__MEMBERS,
+                              isFeedbackAfter ? InsertLocation.AfterTarget : InsertLocation.BeforeTarget);
+                     }
                   }
-                  // Drag item came from outside Group Explorer
-                  else if (event.data instanceof ArtifactData) {
-                     AWorkbench.popup("ERROR", "Drag item came from outside Group Explorer: Not implemented yet");
-                  }
-
                }
                treeViewer.refresh(dragOverExplorerItem);
             }
