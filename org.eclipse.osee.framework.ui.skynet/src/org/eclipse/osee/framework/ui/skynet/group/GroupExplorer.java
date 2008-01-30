@@ -81,6 +81,7 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
    private Artifact rootArt;
    private GroupExplorerItem rootItem;
    private static GroupExplorerItem selected;
+   private boolean isCtrlPressed = false;
 
    public GroupExplorer() {
    }
@@ -425,9 +426,11 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
          if (e.keyCode == 'x' && e.stateMask == SWT.CONTROL) {
             expandAll((IStructuredSelection) treeViewer.getSelection());
          }
+         isCtrlPressed = (e.keyCode == SWT.CONTROL);
       }
 
       public void keyReleased(KeyEvent e) {
+         isCtrlPressed = !(e.keyCode == SWT.CONTROL);
       }
    }
 
@@ -499,12 +502,9 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
          event.feedback = DND.FEEDBACK_EXPAND;
          event.detail = DND.DROP_NONE;
 
-         // Set as COPY if drag item over group and ctrl is pressed, otherwise, move
+         // Set as COPY if drag item over group (copy versus move will be determined on drop
          if (dragOverTreeItem != null && ((GroupExplorerItem) dragOverTreeItem.getData()).isUniversalGroup()) {
-            if (isCtrlPressed(event))
-               event.detail = DND.DROP_COPY;
-            else
-               event.detail = DND.DROP_MOVE;
+            event.detail = DND.DROP_COPY;
             tree.setInsertMark(null, false);
          }
          // Handle re-ordering within same group
@@ -566,9 +566,11 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
                if (dragOverExplorerItem.isUniversalGroup()) {
 
                   // Drag item came from inside Group Explorer
-                  if (event.item.getData() instanceof GroupExplorerItem) {
-                     // If ctrl is down, this is a copy; add items to group
-                     if (event.detail == DND.DROP_COPY) {
+                  if (event.data instanceof ArtifactData) {
+                     // If event originated outside, it's a copy event;
+                     // OR if event is inside and ctrl is down, this is a copy; add items to group
+                     if (!((ArtifactData) event.data).getSource().equals(VIEW_ID) || (((ArtifactData) event.data).getSource().equals(
+                           VIEW_ID) && isCtrlPressed)) {
                         copyArtifactsToGroup(event, dragOverExplorerItem);
                      }
                      // Else this is a move
@@ -609,11 +611,6 @@ public class GroupExplorer extends ViewPart implements IEventReceiver, IActionab
                            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
                         }
                      }
-                  }
-
-                  // Drag item came from outside Group Explorer
-                  else if (event.data instanceof ArtifactData) {
-                     copyArtifactsToGroup(event, dragOverExplorerItem);
                   }
                }
                // Drag item dropped before or after group member
