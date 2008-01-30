@@ -57,6 +57,7 @@ import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
 import org.eclipse.osee.framework.ui.plugin.util.db.ConnectionHandler;
 import org.eclipse.osee.framework.ui.skynet.SkynetContributionItem;
+import org.eclipse.osee.framework.ui.skynet.SkynetDefaultBranchContributionItem;
 import org.eclipse.osee.framework.ui.skynet.ats.IActionable;
 import org.eclipse.osee.framework.ui.skynet.ats.OseeAts;
 import org.eclipse.osee.framework.ui.skynet.util.DbConnectionExceptionComposite;
@@ -270,7 +271,8 @@ public class WorldView extends ViewPart implements IEventReceiver, IPartListener
 
       parent.layout();
       createActions();
-      SkynetContributionItem.addTo(this, true);
+      SkynetDefaultBranchContributionItem.addTo(this, false);
+      SkynetContributionItem.addTo(this, false);
       setupDragAndDropSupport();
 
       eventManager.register(LocalTransactionEvent.class, this);

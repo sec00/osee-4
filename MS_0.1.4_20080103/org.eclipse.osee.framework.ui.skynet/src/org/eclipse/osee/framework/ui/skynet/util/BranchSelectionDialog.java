@@ -109,7 +109,8 @@ public class BranchSelectionDialog extends MessageDialog {
 
    private Branch getSelectedBranch() {
       IStructuredSelection sel = (IStructuredSelection) oseeFilteredTree.getViewer().getSelection();
-      if (!sel.isEmpty()) selected = (Branch) ((JobbedNode) sel.getFirstElement()).getBackingData();
+      if (!sel.isEmpty() && (((JobbedNode) sel.getFirstElement()).getBackingData() instanceof Branch)) selected =
+            (Branch) ((JobbedNode) sel.getFirstElement()).getBackingData();
       return selected;
    }
 

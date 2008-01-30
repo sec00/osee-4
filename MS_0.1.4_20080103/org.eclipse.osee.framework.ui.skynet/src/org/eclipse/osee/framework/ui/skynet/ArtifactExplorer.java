@@ -77,7 +77,6 @@ import org.eclipse.osee.framework.ui.skynet.artifact.massEditor.MassArtifactEdit
 import org.eclipse.osee.framework.ui.skynet.ats.IActionable;
 import org.eclipse.osee.framework.ui.skynet.ats.OseeAts;
 import org.eclipse.osee.framework.ui.skynet.autoRun.KickoffOseeAutoRunTaskAction;
-import org.eclipse.osee.framework.ui.skynet.branch.BranchLabelProvider;
 import org.eclipse.osee.framework.ui.skynet.history.RevisionHistoryView;
 import org.eclipse.osee.framework.ui.skynet.menu.ArtifactPreviewMenu;
 import org.eclipse.osee.framework.ui.skynet.menu.ArtifactTreeViewerGlobalMenuHelper;
@@ -131,7 +130,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ExportResourcesAction;
 import org.eclipse.ui.actions.ImportResourcesAction;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.texteditor.StatusLineContributionItem;
 
 /**
  * @author Ryan D. Brooks
@@ -160,7 +158,6 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
    private MenuItem pasteMenuItem;
    private NeedArtifactMenuListener needArtifactListener;
    private NeedProjectMenuListener needProjectListener;
-   private final StatusLineContributionItem branchStatusItem;
    private Action showArtIds;
    private Action showArtType;
    private Action newArtifactExplorer;
@@ -173,8 +170,6 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
    private StackLayout stackLayout;
 
    public ArtifactExplorer() {
-      branchStatusItem = new StatusLineContributionItem("skynet.branch", true, 60);
-      branchStatusItem.setToolTipText("The branch that the artifacts in the explorer are from.");
    }
 
    public static void explore(Collection<Artifact> artifacts) {
@@ -288,7 +283,7 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
       addAutoRunAction();
       OseeAts.addBugToViewToolbar(this, this, SkynetActivator.getInstance(), VIEW_ID, "Artifact Explorer");
 
-      getViewSite().getActionBars().getStatusLineManager().add(branchStatusItem);
+      SkynetDefaultBranchContributionItem.addTo(this, false);
       SkynetContributionItem.addTo(this, false);
       getViewSite().getActionBars().updateActionBars();
 
@@ -940,11 +935,8 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
          if (editMenuItem != null) {
             editMenuItem.setText("Edit (" + StringFormat.truncate(branch.getBranchName(), 25) + ")");
          }
-         branchStatusItem.setText(branch.getDisplayName());
-         branchStatusItem.setImage(BranchLabelProvider.getBranchImage(branch));
       } else {
          if (editMenuItem != null) editMenuItem.setText("Edit");
-         branchStatusItem.setText("");
       }
    }
 
