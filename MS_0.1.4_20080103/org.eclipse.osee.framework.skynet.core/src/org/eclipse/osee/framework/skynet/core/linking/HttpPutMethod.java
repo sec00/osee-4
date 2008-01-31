@@ -71,7 +71,7 @@ final class HttpPutMethod implements IHttpMethod {
       String headerEntry = httpRequest.getHttpHeaderEntry("Content-Length");
       if (Strings.isValid(headerEntry)) {
          int totalBytes = Integer.parseInt(headerEntry);
-         result = fileHandler.receivedUpload(destination, totalBytes, httpRequest.getInputStream());
+         result = fileHandler.receivedUpload(destination, totalBytes, httpRequest);
       }
       return result;
    }
