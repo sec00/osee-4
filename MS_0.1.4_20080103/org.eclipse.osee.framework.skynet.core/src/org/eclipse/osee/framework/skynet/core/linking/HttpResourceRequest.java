@@ -74,7 +74,7 @@ public class HttpResourceRequest implements IHttpMethod {
 
    private URL findResource(String urlRequested) {
       URL resource = null;
-      if (Strings.isValid(urlRequested)) {
+      if (Strings.isValid(urlRequested) && urlRequested.equals("/") != true) {
          String uploadPath = OseeProperties.getInstance().getRemoteHttpServerUploadPath();
          if (Strings.isValid(uploadPath)) {
             try {
