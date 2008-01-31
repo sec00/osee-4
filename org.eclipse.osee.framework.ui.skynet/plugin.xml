@@ -437,6 +437,14 @@
          <Operation className="org.eclipse.osee.framework.ui.skynet.blam.operation.DeleteErroneousTagsFromWorkingBranches"/>
       </extension>
        <extension
+             id="CopyTransactionDataToBaseline"
+             name="Copy Transaction Data To Baseline"
+             point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
+          <Operation
+                className="org.eclipse.osee.framework.ui.skynet.blam.operation.CopyTransactionDataToBaseline">
+          </Operation>
+       </extension>
+       <extension
              id="ArtifactSnapshotAllItems"
              name="Regenerate Artifact Preview Snapshots For All Items"
              point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
