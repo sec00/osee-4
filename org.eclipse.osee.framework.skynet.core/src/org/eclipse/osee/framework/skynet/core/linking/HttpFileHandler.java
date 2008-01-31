@@ -69,22 +69,29 @@ public class HttpFileHandler {
       return path;
    }
 
-   public int receivedUpload(File file, int totalBytes, InputStream inputStream) throws Exception {
+   public int receivedUpload(File file, int totalBytes, HttpRequest httpRequest) throws Exception {
       int result = HttpURLConnection.HTTP_INTERNAL_ERROR;
       FileOutputStream destination = null;
       int amountToRead = 0;
       int count = 0;
       try {
+         InputStream inputStream = httpRequest.getInputStream();
          destination = new FileOutputStream(file);
-         while ((amountToRead = inputStream.available()) > 0 && count < totalBytes) {
+         httpRequest.getSocket().setSoTimeout(30000);
+
+         while (count < totalBytes) {
             int size = amountToRead - 1;
             if (size <= 0) {
                size = 1;
             }
             byte[] buf = new byte[size];
-            count += inputStream.read(buf);
-            destination.write(buf);
-            logger.log(Level.FINEST, String.format("Upload Received: [%s of %s]", count, totalBytes));
+            try {
+               count += inputStream.read(buf);
+               destination.write(buf);
+            } catch (IOException ex) {
+               logger.log(Level.INFO, "Timed out during a read.");
+            }
+            logger.log(Level.INFO, String.format("Upload Received: [%s of %s]", count, totalBytes));
          }
          logger.log(Level.INFO, String.format("Upload Received: [%s of %s]", count, totalBytes));
          result = HttpURLConnection.HTTP_CREATED;
