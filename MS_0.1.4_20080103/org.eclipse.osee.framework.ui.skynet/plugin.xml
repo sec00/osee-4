@@ -532,4 +532,12 @@
           classname="org.eclipse.osee.framework.ui.skynet.render.WordTemplateProvider">
     </TemplateProvider>
  </extension>
+ <extension
+       id="DeleteArchivedBranches"
+       name="Delete Archived Branches"
+       point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
+    <Operation
+          className="org.eclipse.osee.framework.ui.skynet.blam.operation.DeleteArchivedBranches">
+    </Operation>
+ </extension>
 </plugin>
