@@ -114,7 +114,7 @@ public class TeamVersionWorldSearchItem extends WorldSearchItem {
       Set<TeamDefinitionArtifact> srchTeamDefs = new HashSet<TeamDefinitionArtifact>();
       for (TeamDefinitionArtifact teamDef : (teamDefs != null ? teamDefs : selectedTeamDefs))
          srchTeamDefs.add(teamDef);
-      if (recurseChildren) {
+      if (selectedRecurseChildren) {
          for (TeamDefinitionArtifact teamDef : (teamDefs != null ? teamDefs : selectedTeamDefs)) {
             Artifacts.getChildrenOfType(teamDef, srchTeamDefs, TeamDefinitionArtifact.class, true);
          }
@@ -150,7 +150,7 @@ public class TeamVersionWorldSearchItem extends WorldSearchItem {
       allProductCriteria.add(teamWorkflowSearch);
       if (selectedVersion != null) allProductCriteria.add(new InRelationSearch(versionWorkflowSearch,
             RelationSide.TeamWorkflowTargetedForVersion_Workflow));
-      if (!showFinished) {
+      if (!selectedShowFinished) {
          allProductCriteria.add(new AttributeValueSearch(ATSAttributes.CURRENT_STATE_ATTRIBUTE.getStoreName(),
                DefaultTeamState.Cancelled.name() + ";;;", Operator.NOT_EQUAL));
          allProductCriteria.add(new AttributeValueSearch(ATSAttributes.CURRENT_STATE_ATTRIBUTE.getStoreName(),
@@ -162,7 +162,7 @@ public class TeamVersionWorldSearchItem extends WorldSearchItem {
       }
       FromArtifactsSearch allTeamWorkflows = new FromArtifactsSearch(allProductCriteria, true);
 
-      if (!showAction) {
+      if (!selectedShowAction) {
          if (isCancelled()) return EMPTY_SET;
          Collection<Artifact> arts =
                ArtifactPersistenceManager.getInstance().getArtifacts(allProductCriteria, true,
@@ -183,6 +183,10 @@ public class TeamVersionWorldSearchItem extends WorldSearchItem {
       return arts;
    }
 
+   boolean selectedShowFinished = false;
+   boolean selectedShowAction = false;
+   boolean selectedRecurseChildren = false;
+
    @Override
    public void performUI(SearchType searchType) {
       super.performUI(searchType);
@@ -195,10 +199,10 @@ public class TeamVersionWorldSearchItem extends WorldSearchItem {
       diag.setRecurseChildren(recurseChildren);
       int result = diag.open();
       if (result == 0) {
-         showFinished = diag.isShowFinished();
-         showAction = diag.isShowAction();
+         selectedShowFinished = diag.isShowFinished();
+         selectedShowAction = diag.isShowAction();
+         selectedRecurseChildren = diag.isRecurseChildren();
          selectedVersion = diag.getSelectedVersion();
-         recurseChildren = diag.isRecurseChildren();
          if (selectedTeamDefs == null)
             selectedTeamDefs = new HashSet<TeamDefinitionArtifact>();
          else
