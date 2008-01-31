@@ -24,18 +24,23 @@ public class AtsAdmin {
    private static boolean searched = false;
 
    public static boolean isAtsAdmin() {
-      OseeProperties.getInstance().setDeveloper(System.getProperty("AtsAdmin") != null);
+      boolean atsAdmin = false;
       if (System.getProperty("AtsAdmin") != null) {
-         return true;
+         atsAdmin = true;
       }
-      if (!searched) {
-         atsAdminArtifact = search.getSingletonArtifact(Artifact.class);
-         searched = true;
+      if (!atsAdmin) {
+         if (!searched) {
+            atsAdminArtifact = search.getSingletonArtifact(Artifact.class);
+            searched = true;
+         }
+         if (atsAdminArtifact != null) {
+            atsAdmin =
+                  AccessControlManager.getInstance().checkObjectPermission(
+                        SkynetAuthentication.getInstance().getAuthenticatedUser(), atsAdminArtifact,
+                        PermissionEnum.FULLACCESS);
+         }
       }
-      if (atsAdminArtifact != null) {
-         return AccessControlManager.getInstance().checkObjectPermission(
-               SkynetAuthentication.getInstance().getAuthenticatedUser(), atsAdminArtifact, PermissionEnum.FULLACCESS);
-      }
-      return false;
+      OseeProperties.getInstance().setDeveloper(atsAdmin);
+      return atsAdmin;
    }
 }
