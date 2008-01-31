@@ -84,7 +84,7 @@ public class TeamDefinitionTreeByVersionDialog extends TeamDefinitionTreeDialog 
 
       versionList.setLabelProvider(new VersionArtifactLabelProvider());
       versionList.setContentProvider(new ArrayContentProvider());
-      versionList.setSorter(new ArtifactViewerSorter());
+      versionList.setSorter(new ArtifactViewerSorter(true));
       versionList.setGrabHorizontal(true);
       versionList.setMultiSelect(false);
       versionList.createWidgets(comp, 2);
