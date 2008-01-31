@@ -867,7 +867,7 @@ public class ArtifactPersistenceManager implements PersistenceManager {
                   "The artifact with id " + artId + " does not exist for transaction \"" + transactionId + "\"");
          } else if (rSet.getInt("modification_id") == ModificationType.DELETE.getValue()) {
             throw new IllegalStateException(
-                  "The artifact with id " + artId + " is deleted for transaction \"" + transactionId + "\"");
+                  "The artifact with id " + artId + " was deleted in or before the (transactionId) \"" + transactionId + "\"");
          } else {
             artifact.setPersistenceMemo(new ArtifactPersistenceMemo(transactionId, artId, rSet.getInt("gamma_id")));
             artifact.setDescriptor(configurationPersistenceManager.getArtifactSubtypeDescriptor(
