@@ -147,8 +147,7 @@ public class SkynetAuthentication implements PersistenceManager {
                            currentUser =
                                  createUser(oseeAuthentication.getCredentials().getField(UserCredentialEnum.Name),
                                        "spawnedBySkynet", userId, true);
-                           persistUser(currentUser); // this is done outside of the crateUser call
-                           // to avoid recursion
+                           persistUser(currentUser); // this is done outside of the crateUser call to avoid recursion
                         }
                      }
                   }
@@ -157,8 +156,7 @@ public class SkynetAuthentication implements PersistenceManager {
                }
             }
          }
-         firstTimeThrough = false; // firstTimeThrough must be set false after last use of its
-         // value
+         firstTimeThrough = false; // firstTimeThrough must be set false after last use of its value
       }
 
       return currentUser;
