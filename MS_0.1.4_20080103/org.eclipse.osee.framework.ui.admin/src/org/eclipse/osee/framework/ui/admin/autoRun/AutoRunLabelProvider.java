@@ -111,8 +111,8 @@ public class AutoRunLabelProvider implements ITableLabelProvider {
    private Image getRunImage(IAutoRunTask autoRunTask) {
       Result result = AutoRunStartup.validateAutoRunExecution(autoRunTask);
       if (result.isFalse()) return SkynetGuiPlugin.getInstance().getImage("chkbox_redslash.gif");
-      return treeViewer.isRun(autoRunTask) ? SkynetGuiPlugin.getInstance().getImage("chkbox_enabled") : SkynetGuiPlugin.getInstance().getImage(
-            "chkbox_disabled");
+      return treeViewer.isRun(autoRunTask) ? SkynetGuiPlugin.getInstance().getImage("chkbox_enabled.gif") : SkynetGuiPlugin.getInstance().getImage(
+            "chkbox_disabled.gif");
    }
 
 }
