@@ -78,7 +78,8 @@ public class BackupBranchesJob extends EmailableJob {
             String backupName = StringFormat.truncate(branch.getBranchName(), 25);
             backupName = backupName.replaceAll("\\W+", "_");
             File xmlFile =
-                  new File(path + "/OSEE_Branch_Backup_" + XDate.getDateNow("yyyy_MM_dd_") + backupName + ".xml");
+                  new File(
+                        path + "/OSEE_Branch_Backup__" + XDate.getDateNow("yyyy_MM_dd_HH_MM__") + backupName + ".xml");
             if (xmlFile != null) {
                Job job = new ExportBranchJob(xmlFile, branch, false);
                job.setUser(true);
