@@ -11,7 +11,7 @@ package org.eclipse.osee.framework.skynet.core.util;
 public interface IAutoRunTask {
 
    public enum RunDb {
-      Production_Db, Test_Db, Both
+      Production_Db, Test_Db
    };
 
    public enum TaskType {
