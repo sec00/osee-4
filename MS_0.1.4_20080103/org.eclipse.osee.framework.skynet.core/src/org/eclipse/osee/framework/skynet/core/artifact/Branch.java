@@ -14,10 +14,10 @@ package org.eclipse.osee.framework.skynet.core.artifact;
 import static org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase.BRANCH_TABLE;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.jdk.core.util.StringFormat;
@@ -187,10 +187,22 @@ public class Branch implements Comparable<Branch>, IAdaptable {
    }
 
    public Collection<Branch> getChildBranches() throws SQLException {
-      List<Branch> children = new ArrayList<Branch>();
-      for (Branch branch : BranchPersistenceManager.getInstance().getBranches())
-         if (branch.getParentBranchId() == getBranchId()) children.add(branch);
+      return getChildBranches(false);
+   }
+
+   public Collection<Branch> getChildBranches(boolean recurse) throws SQLException {
+      Set<Branch> children = new HashSet<Branch>();
+      getChildBranches(this, children);
       return children;
+   }
+
+   private void getChildBranches(Branch parentBranch, Collection<Branch> children) throws SQLException {
+      for (Branch branch : BranchPersistenceManager.getInstance().getBranches()) {
+         if (branch.getParentBranchId() == parentBranch.getBranchId()) {
+            children.add(branch);
+            getChildBranches(branch, children);
+         }
+      }
    }
 
    /**
