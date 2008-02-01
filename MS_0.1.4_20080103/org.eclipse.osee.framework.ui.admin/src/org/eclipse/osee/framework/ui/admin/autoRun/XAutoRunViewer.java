@@ -151,17 +151,19 @@ public class XAutoRunViewer extends XWidget {
       try {
          StringBuffer sb = new StringBuffer("Launch Auto Tasks:\n\n");
          for (IAutoRunTask autoRunTask : xViewer.getRunList())
-            sb.append(" - " + autoRunTask.getAutoRunUniqueId() + "\n");
+            sb.append(" - " + autoRunTask.getAutoRunUniqueId() + " against " + getDefaultDbConnection(autoRunTask) + "\n");
          sb.append("\nNOTE: Time scheduling not implemeted yet, all will kickoff immediately");
          if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), "Launch Auto Tasks", sb.toString())) {
             for (IAutoRunTask autoRunTask : xViewer.getRunList())
-               LaunchAutoRunWorkbench.launch(
-                     autoRunTask,
-                     autoRunTask.getRunDb() == RunDb.Production_Db ? autoRunTab.getProdDbConfigText().getText() : autoRunTab.getTestDbConfigText().getText());
+               LaunchAutoRunWorkbench.launch(autoRunTask, getDefaultDbConnection(autoRunTask));
          }
       } catch (Exception ex) {
          OSEELog.logException(AdminPlugin.class, ex, true);
       }
+   }
+
+   private String getDefaultDbConnection(IAutoRunTask autoRunTask) {
+      return autoRunTask.getRunDb() == RunDb.Production_Db ? autoRunTab.getProdDbConfigText().getText() : autoRunTab.getTestDbConfigText().getText();
    }
 
    public void loadTable() {
