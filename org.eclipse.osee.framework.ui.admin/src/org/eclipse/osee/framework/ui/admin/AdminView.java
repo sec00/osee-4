@@ -22,6 +22,7 @@ import org.eclipse.osee.framework.messaging.event.skynet.event.NetworkBroadcastE
 import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
 import org.eclipse.osee.framework.skynet.core.User;
 import org.eclipse.osee.framework.skynet.core.remoteEvent.RemoteEventManager;
+import org.eclipse.osee.framework.ui.admin.autoRun.AutoRunTab;
 import org.eclipse.osee.framework.ui.admin.dbtabletab.DbItem;
 import org.eclipse.osee.framework.ui.admin.dbtabletab.DbTableTab;
 import org.eclipse.osee.framework.ui.admin.dbtabletab.SiteGssflRpcr;
@@ -165,6 +166,7 @@ public class AdminView extends ViewPart implements IActionable {
 
       // ModeChecker.check(parent);
       new OseeClientsTab(tabFolder);
+      new AutoRunTab(tabFolder);
       new DbTableTab(tabFolder);
 
       parent.layout();
