@@ -67,9 +67,9 @@ public class AutoRunStartup implements IStartup {
                         "donald.g.dunne@boeing.com", "Can't find AutoRunTask; Id=\"" + autoRunTaskId + "\" ", " ");
             email.send();
          } else {
-            sb.append("Starting AutoRunTaskId=\"" + autoRunTaskId + "\" - " + XDate.getDateNow() + "\n\n");
+            sb.append("Starting AutoRunTaskId=\"" + autoRunTaskId + "\" - " + XDate.getDateNow(XDate.MMDDYYHHMM) + "\n\n");
             autoRunTask.startTasks(sb);
-            sb.append("\n\nCompleted AutoRunTaskId=\"" + autoRunTaskId + "\" - " + XDate.getDateNow() + "\n");
+            sb.append("\n\nCompleted AutoRunTaskId=\"" + autoRunTaskId + "\" - " + XDate.getDateNow(XDate.MMDDYYHHMM) + "\n");
 
             // Email successful run
             AEmail email =
