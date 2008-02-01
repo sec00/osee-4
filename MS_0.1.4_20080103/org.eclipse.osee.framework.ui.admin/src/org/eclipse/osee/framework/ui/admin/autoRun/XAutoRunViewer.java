@@ -16,6 +16,7 @@ import java.util.Iterator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask;
+import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask.RunDb;
 import org.eclipse.osee.framework.ui.admin.AdminPlugin;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.autoRun.AutoRunStartup;
@@ -43,12 +44,14 @@ public class XAutoRunViewer extends XWidget {
 
    private AutoRunXViewer xViewer;
    private Label extraInfoLabel;
+   private final AutoRunTab autoRunTab;
 
    /**
     * @param label
     */
-   public XAutoRunViewer() {
+   public XAutoRunViewer(AutoRunTab autoRunTab) {
       super("Auto Run Tasks");
+      this.autoRunTab = autoRunTab;
    }
 
    /*
@@ -149,9 +152,12 @@ public class XAutoRunViewer extends XWidget {
          StringBuffer sb = new StringBuffer("Launch Auto Tasks:\n\n");
          for (IAutoRunTask autoRunTask : xViewer.getRunList())
             sb.append(" - " + autoRunTask.getAutoRunUniqueId() + "\n");
+         sb.append("\nNOTE: Time scheduling not implemeted yet, all will kickoff immediately");
          if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), "Launch Auto Tasks", sb.toString())) {
             for (IAutoRunTask autoRunTask : xViewer.getRunList())
-               LaunchAutoRunWorkbench.launch(autoRunTask);
+               LaunchAutoRunWorkbench.launch(
+                     autoRunTask,
+                     autoRunTask.getRunDb() == RunDb.Production_Db ? autoRunTab.getProdDbConfigText().getText() : autoRunTab.getTestDbConfigText().getText());
          }
       } catch (Exception ex) {
          OSEELog.logException(AdminPlugin.class, ex, true);

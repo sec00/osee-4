@@ -18,8 +18,8 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.action.Action;
-import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
 import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask;
+import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask.RunDb;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkspace;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
 
@@ -32,11 +32,14 @@ import org.eclipse.osee.framework.ui.plugin.util.Result;
  */
 public class LaunchAutoRunWorkbench extends Action {
 
-   public static Result launch(IAutoRunTask autoRunTask) throws Exception {
-      return launch(autoRunTask.getAutoRunUniqueId());
+   public static Result launch(IAutoRunTask autoRunTask, String defaultDbConnection) throws Exception {
+      if (autoRunTask.getRunDb() != RunDb.Production_Db && defaultDbConnection.equals("oracle7")) {
+         throw new IllegalArgumentException("Can't run non-production task on production.");
+      }
+      return launch(autoRunTask.getAutoRunUniqueId(), defaultDbConnection);
    }
 
-   public static Result launch(String autoRunExtensionUniqueId) throws Exception {
+   public static Result launch(String autoRunExtensionUniqueId, String defaultDbConnection) throws Exception {
       ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
       String launchFile = "org.eclipse.osee.framework.ui.skynet\\AutoRun.launch";
       File file = AWorkspace.getWorkspaceFile(launchFile);
@@ -52,16 +55,16 @@ public class LaunchAutoRunWorkbench extends Action {
       // Get a copy of the config to work with
       ILaunchConfigurationWorkingCopy copy = config.getWorkingCopy();
       // Add the AutoRun property to the VM_ARGUEMENTS
-      copy.setAttribute(
-            "org.eclipse.jdt.launching.VM_ARGUMENTS",
-            copy.getAttribute("org.eclipse.jdt.launching.VM_ARGUMENTS", "") + " -D" + OseeProperties.OSEE_AUTORUN + "=" + autoRunExtensionUniqueId);
+      copy.setAttribute("org.eclipse.jdt.launching.VM_ARGUMENTS", copy.getAttribute(
+            "org.eclipse.jdt.launching.VM_ARGUMENTS", "").replaceFirst("PUT_AUTORUN_ID_HERE", autoRunExtensionUniqueId));
+      copy.setAttribute("org.eclipse.jdt.launching.VM_ARGUMENTS", copy.getAttribute(
+            "org.eclipse.jdt.launching.VM_ARGUMENTS", "").replaceFirst("PUT_DB_CONNECTION_HERE", defaultDbConnection));
       copy.setAttribute("location", copy.getAttribute("location", "").replaceFirst("PUT_ID_HERE",
             autoRunExtensionUniqueId.replaceAll("\\.", "")));
-      //         System.out.println("Post Config " + copy.getAttributes());
+      System.out.println("Launching: " + copy.getAttributes());
       // Launch with the updated config
       System.err.println("Change back to RUN_MODE");
       copy.launch(ILaunchManager.DEBUG_MODE, null);
       return Result.TrueResult;
    }
-
 }
