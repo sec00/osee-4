@@ -10,10 +10,10 @@ package org.eclipse.osee.framework.skynet.core.util;
  */
 public abstract class AutoRunTask implements IAutoRunTask {
 
-   private String autoRunUniqueId;
-
    public AutoRunTask() {
    }
+
+   private String autoRunUniqueId;
 
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.skynet.core.util.IAutoRunTask#getName()
