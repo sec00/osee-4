@@ -96,7 +96,7 @@ public class AutoRunStartup implements IStartup {
                      "Output:\n\n" + sb.toString() + "\n\nException:\n\n" + Lib.exceptionToString(ex));
          email.send();
       } finally {
-         if (autoRunTask != null) {
+         if (autoRunTaskId != null) {
             logger.log(Level.INFO, "Sleeping...");
             try {
                Thread.sleep(2000);
