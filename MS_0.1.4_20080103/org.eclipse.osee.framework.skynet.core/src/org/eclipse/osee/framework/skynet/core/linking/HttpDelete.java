@@ -81,17 +81,14 @@ public class HttpDelete {
          subMonitor.beginTask(String.format("Delete Remote File: [%s]", fileName), 3);
          connection = setupConnection(urlRequest);
          subMonitor.worked(1);
-         if (monitor.isCanceled() != true) {
-            connection.connect();
-            subMonitor.worked(2);
-            toReturn = handleResponse(connection);
-            subMonitor.worked(3);
-         }
+         connection.connect();
+         subMonitor.worked(2);
+         toReturn = handleResponse(connection);
+         subMonitor.worked(3);
       } catch (Exception ex) {
          String message = String.format("Error deleting remote file: [%s]", urlRequest);
          logger.log(Level.SEVERE, message, ex);
          throw new Exception(message, ex);
-
       } finally {
          if (connection != null) {
             connection.disconnect();
