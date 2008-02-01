@@ -18,7 +18,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
@@ -44,16 +43,11 @@ public class AutoRunTab {
       tab.setControl(mainComposite);
       tab.setText("Auto Run");
 
-      Group group = new Group(mainComposite, SWT.NONE);
-      group.setLayout(new GridLayout());
-      group.setText("Issue Shutdown Request");
-      group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
       if (true != isUserAllowedToOperate(whoAmI)) {
-         OseeClientsTab.createDefaultWarning(group);
+         OseeClientsTab.createDefaultWarning(mainComposite);
       } else {
          XAutoRunViewer xTaskViewer = new XAutoRunViewer();
-         xTaskViewer.createWidgets(group, 1);
+         xTaskViewer.createWidgets(mainComposite, 1);
       }
    }
 

@@ -165,8 +165,8 @@ public class AdminView extends ViewPart implements IActionable {
       tabFolder.setLayoutData(gridData);
 
       // ModeChecker.check(parent);
-      new OseeClientsTab(tabFolder);
       new AutoRunTab(tabFolder);
+      new OseeClientsTab(tabFolder);
       new DbTableTab(tabFolder);
 
       parent.layout();

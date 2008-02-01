@@ -18,13 +18,16 @@ import java.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.osee.framework.database.DatabaseActivator;
 import org.eclipse.osee.framework.jdk.core.util.AEmail;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.plugin.core.util.ExtensionPoints;
 import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask;
+import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask.RunDb;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
+import org.eclipse.osee.framework.ui.plugin.util.Result;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.XDate;
@@ -67,9 +70,14 @@ public class AutoRunStartup implements IStartup {
                         "donald.g.dunne@boeing.com", "Can't find AutoRunTask; Id=\"" + autoRunTaskId + "\" ", " ");
             email.send();
          } else {
-            sb.append("Starting AutoRunTaskId=\"" + autoRunTaskId + "\" - " + XDate.getDateNow(XDate.MMDDYYHHMM) + "\n\n");
-            autoRunTask.startTasks(sb);
-            sb.append("\n\nCompleted AutoRunTaskId=\"" + autoRunTaskId + "\" - " + XDate.getDateNow(XDate.MMDDYYHHMM) + "\n");
+            Result result = validateAutoRunExecution(autoRunTask);
+            if (result.isFalse()) {
+               sb.append("Auto Run Task invalid to run: " + result.getText());
+            } else {
+               sb.append("Starting AutoRunTaskId=\"" + autoRunTaskId + "\" - " + XDate.getDateNow(XDate.MMDDYYHHMM) + "\n\n");
+               autoRunTask.startTasks(sb);
+               sb.append("\n\nCompleted AutoRunTaskId=\"" + autoRunTaskId + "\" - " + XDate.getDateNow(XDate.MMDDYYHHMM) + "\n");
+            }
 
             // Email successful run
             AEmail email =
@@ -106,6 +114,16 @@ public class AutoRunStartup implements IStartup {
             });
          }
       }
+   }
+
+   public static Result validateAutoRunExecution(IAutoRunTask autoRunTask) {
+      if (DatabaseActivator.getInstance().isProductionDb()) {
+         if (autoRunTask.getRunDb() == RunDb.Test_Db) return new Result("Task should only be run on Test DB");
+      } else {
+         if (autoRunTask.getRunDb() == RunDb.Production_Db) return new Result(
+               "Task should only be run on Production DB");
+      }
+      return Result.TrueResult;
    }
 
    /**

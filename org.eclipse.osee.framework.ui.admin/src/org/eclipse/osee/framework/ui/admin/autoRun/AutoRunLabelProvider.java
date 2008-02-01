@@ -13,7 +13,9 @@ package org.eclipse.osee.framework.ui.admin.autoRun;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask;
+import org.eclipse.osee.framework.ui.plugin.util.Result;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
+import org.eclipse.osee.framework.ui.skynet.autoRun.AutoRunStartup;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewerColumn;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -22,8 +24,6 @@ public class AutoRunLabelProvider implements ITableLabelProvider {
    Font font = null;
 
    private final AutoRunXViewer treeViewer;
-   private static Image uncheckedImage = SkynetGuiPlugin.getInstance().getImage("chkbox_disabled.gif");
-   private static Image checkedImage = SkynetGuiPlugin.getInstance().getImage("chkbox_enabled.gif");
 
    public AutoRunLabelProvider(AutoRunXViewer treeViewer) {
       super();
@@ -60,13 +60,18 @@ public class AutoRunLabelProvider implements ITableLabelProvider {
     */
    public String getColumnText(Object element, int columnIndex, IAutoRunTask autoRunTask, XViewerColumn xCol, AutoRunColumn aCol) {
       if (!xCol.isShow()) return ""; // Since not shown, don't display
-      if (aCol == AutoRunColumn.Run_Col) return "";
-      if (aCol == AutoRunColumn.Name_Col) {
-         String str = autoRunTask.getAutoRunUniqueId();
-         System.out.println(str);
+      if (aCol == AutoRunColumn.Run_Col) {
+         Result result = AutoRunStartup.validateAutoRunExecution(autoRunTask);
+         if (result.isFalse()) return result.getText();
+         return "";
       }
+      if (aCol == AutoRunColumn.Name_Col) return autoRunTask.getAutoRunUniqueId();
       if (aCol == AutoRunColumn.Hour_Scheduled) return autoRunTask.getHourStartTime() + "";
       if (aCol == AutoRunColumn.Minute_Scheduled) return autoRunTask.getMinuteStartTime() + "";
+      if (aCol == AutoRunColumn.Run_Db) return autoRunTask.getRunDb().name();
+      if (aCol == AutoRunColumn.Task_Type) return autoRunTask.getTaskType().name();
+      if (aCol == AutoRunColumn.Description) return autoRunTask.getDescription();
+      if (aCol == AutoRunColumn.Category) return autoRunTask.getCategory();
       return "Unhandled Column";
    }
 
@@ -104,7 +109,10 @@ public class AutoRunLabelProvider implements ITableLabelProvider {
     * Returns the image with the given key, or <code>null</code> if not found.
     */
    private Image getRunImage(IAutoRunTask autoRunTask) {
-      return treeViewer.isRun(autoRunTask) ? checkedImage : uncheckedImage;
+      Result result = AutoRunStartup.validateAutoRunExecution(autoRunTask);
+      if (result.isFalse()) return SkynetGuiPlugin.getInstance().getImage("chkbox_redslash.gif");
+      return treeViewer.isRun(autoRunTask) ? SkynetGuiPlugin.getInstance().getImage("chkbox_enabled") : SkynetGuiPlugin.getInstance().getImage(
+            "chkbox_disabled");
    }
 
 }

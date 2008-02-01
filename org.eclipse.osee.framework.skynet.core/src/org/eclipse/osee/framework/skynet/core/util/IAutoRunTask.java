@@ -10,6 +10,14 @@ package org.eclipse.osee.framework.skynet.core.util;
  */
 public interface IAutoRunTask {
 
+   public enum RunDb {
+      Production_Db, Test_Db, Both
+   };
+
+   public enum TaskType {
+      Regression, Db_Health_Check, Data_Exchange, Backup
+   }
+
    public void startTasks(StringBuffer results) throws Exception;
 
    public int getHourStartTime();
@@ -22,4 +30,11 @@ public interface IAutoRunTask {
 
    public String getAutoRunUniqueId();
 
+   public TaskType getTaskType();
+
+   public String getDescription();
+
+   public RunDb getRunDb();
+
+   public String getCategory();
 }
