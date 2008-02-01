@@ -13,9 +13,7 @@ package org.eclipse.osee.framework.ui.admin.autoRun;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask;
-import org.eclipse.osee.framework.ui.plugin.util.Result;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
-import org.eclipse.osee.framework.ui.skynet.autoRun.AutoRunStartup;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewerColumn;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -60,11 +58,7 @@ public class AutoRunLabelProvider implements ITableLabelProvider {
     */
    public String getColumnText(Object element, int columnIndex, IAutoRunTask autoRunTask, XViewerColumn xCol, AutoRunColumn aCol) {
       if (!xCol.isShow()) return ""; // Since not shown, don't display
-      if (aCol == AutoRunColumn.Run_Col) {
-         Result result = AutoRunStartup.validateAutoRunExecution(autoRunTask);
-         if (result.isFalse()) return result.getText();
-         return "";
-      }
+      if (aCol == AutoRunColumn.Run_Col) return "";
       if (aCol == AutoRunColumn.Name_Col) return autoRunTask.getAutoRunUniqueId();
       if (aCol == AutoRunColumn.Hour_Scheduled) return autoRunTask.getHourStartTime() + "";
       if (aCol == AutoRunColumn.Minute_Scheduled) return autoRunTask.getMinuteStartTime() + "";
@@ -101,18 +95,9 @@ public class AutoRunLabelProvider implements ITableLabelProvider {
       if (xCol == null) return null;
       AutoRunColumn aCol = AutoRunColumn.getAtsXColumn(xCol);
       if (!xCol.isShow()) return null; // Since not shown, don't display
-      if (aCol == AutoRunColumn.Run_Col) return getRunImage(autoRunTask);
+      if (aCol == AutoRunColumn.Run_Col) return treeViewer.isRun(autoRunTask) ? SkynetGuiPlugin.getInstance().getImage(
+            "chkbox_enabled.gif") : SkynetGuiPlugin.getInstance().getImage("chkbox_disabled.gif");
       return null;
-   }
-
-   /**
-    * Returns the image with the given key, or <code>null</code> if not found.
-    */
-   private Image getRunImage(IAutoRunTask autoRunTask) {
-      Result result = AutoRunStartup.validateAutoRunExecution(autoRunTask);
-      if (result.isFalse()) return SkynetGuiPlugin.getInstance().getImage("chkbox_redslash.gif");
-      return treeViewer.isRun(autoRunTask) ? SkynetGuiPlugin.getInstance().getImage("chkbox_enabled.gif") : SkynetGuiPlugin.getInstance().getImage(
-            "chkbox_disabled.gif");
    }
 
 }
