@@ -64,6 +64,10 @@ public class AutoRunXViewer extends XViewer {
          runList.remove(autoRunTask);
    }
 
+   public Collection<IAutoRunTask> getRunList() {
+      return runList;
+   }
+
    public void toggleRun(IAutoRunTask autoRunTask) {
       setRun(autoRunTask, !isRun(autoRunTask));
    }

@@ -13,11 +13,13 @@ package org.eclipse.osee.framework.ui.admin.autoRun;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask;
-import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
+import org.eclipse.osee.framework.ui.admin.AdminPlugin;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.autoRun.AutoRunStartup;
+import org.eclipse.osee.framework.ui.skynet.autoRun.LaunchAutoRunWorkbench;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.XWidget;
 import org.eclipse.osee.framework.ui.swt.ALayout;
@@ -28,6 +30,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -141,8 +144,18 @@ public class XAutoRunViewer extends XWidget {
       });
    }
 
-   public void run() {
-      AWorkbench.popup("ERROR", "Not implemented yet");
+   private void run() {
+      try {
+         StringBuffer sb = new StringBuffer("Launch Auto Tasks:\n\n");
+         for (IAutoRunTask autoRunTask : xViewer.getRunList())
+            sb.append(" - " + autoRunTask.getAutoRunUniqueId() + "\n");
+         if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), "Launch Auto Tasks", sb.toString())) {
+            for (IAutoRunTask autoRunTask : xViewer.getRunList())
+               LaunchAutoRunWorkbench.launch(autoRunTask);
+         }
+      } catch (Exception ex) {
+         OSEELog.logException(AdminPlugin.class, ex, true);
+      }
    }
 
    public void loadTable() {
