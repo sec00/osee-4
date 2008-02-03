@@ -45,6 +45,7 @@ import org.eclipse.osee.framework.skynet.core.attribute.WordAttribute;
 import org.eclipse.osee.framework.skynet.core.event.SkynetEventManager;
 import org.eclipse.osee.framework.skynet.core.event.VisitorEvent;
 import org.eclipse.osee.framework.skynet.core.transaction.AbstractSkynetTxTemplate;
+import org.eclipse.osee.framework.skynet.core.word.WordUtil;
 import org.eclipse.osee.framework.ui.skynet.render.word.WordTemplateProcessor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -83,27 +84,38 @@ public class UpdateArtifactJob extends UpdateJob {
    }
 
    private void processUpdate() throws Exception {
+      int branchId = Branch.getBranchIdFromBranchFolderName(workingFile.getParentFile().getName());
+      Branch branch = BranchPersistenceManager.getInstance().getBranch(branchId);
+      FileInputStream myFileInputStream = new FileInputStream(workingFile);
+      String guid = WordUtil.getGUIDFromFileInputStream(myFileInputStream);
+      if (guid == null) {
+         processNonWholeDocumentUpdates(branch);
+      } else {
+         Artifact myArtifact = persistenceManager.getArtifact(guid, branch);
+         updateWholeDocumentArtifact(myArtifact);
+      }
+   }
+
+   private void processNonWholeDocumentUpdates(Branch myBranch) throws Exception {
       String guid;
       Artifact artifact;
 
-      int branchId = Branch.getBranchIdFromBranchFolderName(workingFile.getParentFile().getName());
-      Branch branch = BranchPersistenceManager.getInstance().getBranch(branchId);
       Matcher singleEditMatcher = guidPattern.matcher(workingFile.getName());
       Matcher multiEditMatcher = multiPattern.matcher(workingFile.getName());
 
       if (singleEditMatcher.matches()) {
          guid = singleEditMatcher.group(1);
-         artifact = persistenceManager.getArtifact(guid, branch);
+         artifact = persistenceManager.getArtifact(guid, myBranch);
 
          if (artifact instanceof WordArtifact) {
-            updateWordArtifact(branch);
+            updateWordArtifact(myBranch);
          } else if (artifact instanceof NativeArtifact) {
             updateNativeArtifact(artifact);
          } else {
             throw new IllegalArgumentException("Artifact must be of type WordArtifact or NativeArtifact.");
          }
       } else if (multiEditMatcher.matches()) {
-         updateWordArtifact(branch);
+         updateWordArtifact(myBranch);
       } else {
          throw new IllegalArgumentException("File name did not contain the artifact guid");
       }
@@ -120,6 +132,13 @@ public class UpdateArtifactJob extends UpdateJob {
 
    private void updateNativeArtifact(Artifact artifact) throws IllegalStateException, FileNotFoundException, SQLException {
       artifact.setAttribute(NativeArtifact.CONTENT_NAME, new FileInputStream(workingFile));
+
+      artifact.persistAttributes();
+      eventManager.kick(new VisitorEvent(artifact, this));
+   }
+
+   private void updateWholeDocumentArtifact(Artifact artifact) throws IllegalStateException, FileNotFoundException, SQLException {
+      artifact.setAttribute(WordAttribute.CONTENT_NAME, new FileInputStream(workingFile));
 
       artifact.persistAttributes();
       eventManager.kick(new VisitorEvent(artifact, this));
