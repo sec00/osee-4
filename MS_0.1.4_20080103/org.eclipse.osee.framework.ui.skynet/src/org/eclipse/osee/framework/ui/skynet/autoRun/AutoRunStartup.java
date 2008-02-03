@@ -36,7 +36,7 @@ import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 
 /**
- * This class will be kicked off during any normal run of OSEE. It will check for any -DAutoRun=taskId options and
+ * This class will be kicked off during any normal run of OSEE. It will check for any -Dosee.autoRun=taskId options and
  * inquire, through extension points, which plugins need to perform tasks for the taskId specified. After tests are
  * completed, this class will shutdown the workbench.
  * 
