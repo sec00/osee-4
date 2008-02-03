@@ -14,6 +14,7 @@ package org.eclipse.osee.framework.skynet.core.word;
 import static org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase.ATTRIBUTE_VERSION_TABLE;
 import static org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase.TRANSACTIONS_TABLE;
 import static org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase.TRANSACTION_DETAIL_TABLE;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
@@ -30,6 +31,7 @@ import org.eclipse.osee.framework.jdk.core.text.change.ChangeSet;
 import org.eclipse.osee.framework.jdk.core.type.Pair;
 import org.eclipse.osee.framework.jdk.core.util.GUID;
 import org.eclipse.osee.framework.jdk.core.util.io.Streams;
+import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.skynet.core.attribute.ConfigurationPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.attribute.DynamicAttributeDescriptor;
@@ -43,6 +45,7 @@ import org.eclipse.osee.framework.ui.plugin.util.db.DbUtil;
  * Provides utility methods for parsing wordML.
  * 
  * @author Jeff C. Phillips
+ * @author Paul K. Waldfogel
  */
 public class WordUtil {
    private static final String SELECT_WORD_VALUES =
@@ -187,6 +190,39 @@ public class WordUtil {
          wordMarkup3 = myStringBuilder.toString();
       }
       return wordMarkup3;
+   }
+
+   public final static String addGUIDToDocument(String myGuid, String wholeDocumentWordMarkup) {
+      String adjustedWordContentString = null;
+      if (wholeDocumentWordMarkup.indexOf(Artifact.BEFORE_GUID_STRING) > 0) {
+         adjustedWordContentString =
+               wholeDocumentWordMarkup.replaceAll(Artifact.BEFORE_GUID_STRING + "(.*)" + Artifact.AFTER_GUID_STRING,
+                     Artifact.BEFORE_GUID_STRING + myGuid + Artifact.AFTER_GUID_STRING);
+      } else {
+         adjustedWordContentString =
+               wholeDocumentWordMarkup.replaceAll(
+                     "w:wordDocument ",
+                     "w:wordDocument " + "xmlns:ForGUID='http:/" + Artifact.BEFORE_GUID_STRING + myGuid + Artifact.AFTER_GUID_STRING + "' ");
+      }
+      return adjustedWordContentString;
+   }
+
+   public final static String getGUIDFromFileInputStream(FileInputStream myFileInputStream) {
+      String guid = null;
+      try {
+         byte[] myBytes = new byte[4096];
+         myFileInputStream.read(myBytes);
+         String leadingPartOfFile = new String(myBytes);
+         myFileInputStream = null;
+         String[] splitsBeforeAndAfter =
+               leadingPartOfFile.split(Artifact.BEFORE_GUID_STRING + "|" + Artifact.AFTER_GUID_STRING);
+         if (splitsBeforeAndAfter.length == 3) {
+            guid = splitsBeforeAndAfter[1];
+         }
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
+      return guid;
    }
 
 }
