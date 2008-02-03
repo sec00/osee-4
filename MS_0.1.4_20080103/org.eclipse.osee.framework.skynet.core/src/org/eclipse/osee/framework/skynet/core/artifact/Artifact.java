@@ -69,6 +69,8 @@ import org.osgi.framework.Bundle;
 
 public class Artifact implements Unique, PersistenceObject, IAdaptable, Comparable<Artifact> {
    public static final String UNNAMED = "Unnamed";
+   public static final String BEFORE_GUID_STRING = "/BeforeGUID/PrePend";
+   public static final String AFTER_GUID_STRING = "/AfterGUID";
    public static final Artifact[] EMPTY_ARRAY = new Artifact[0];
    protected static final ArtifactPersistenceManager artifactManager = ArtifactPersistenceManager.getInstance();
    protected static final ConfigurationPersistenceManager configurationPersistenceManager =
