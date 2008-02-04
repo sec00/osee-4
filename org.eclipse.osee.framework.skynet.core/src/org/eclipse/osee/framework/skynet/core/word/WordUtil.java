@@ -15,6 +15,7 @@ import static org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabas
 import static org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase.TRANSACTIONS_TABLE;
 import static org.eclipse.osee.framework.ui.plugin.util.db.schemas.SkynetDatabase.TRANSACTION_DETAIL_TABLE;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
@@ -207,22 +208,17 @@ public class WordUtil {
       return adjustedWordContentString;
    }
 
-   public final static String getGUIDFromFileInputStream(FileInputStream myFileInputStream) {
+   public final static String getGUIDFromFileInputStream(FileInputStream myFileInputStream) throws IOException {
       String guid = null;
-      try {
-         byte[] myBytes = new byte[4096];
-         myFileInputStream.read(myBytes);
-         String leadingPartOfFile = new String(myBytes);
-         myFileInputStream = null;
-         String[] splitsBeforeAndAfter =
-               leadingPartOfFile.split(Artifact.BEFORE_GUID_STRING + "|" + Artifact.AFTER_GUID_STRING);
-         if (splitsBeforeAndAfter.length == 3) {
-            guid = splitsBeforeAndAfter[1];
-         }
-      } catch (Exception e) {
-         e.printStackTrace();
+      byte[] myBytes = new byte[4096];
+      myFileInputStream.read(myBytes);
+      String leadingPartOfFile = new String(myBytes);
+      myFileInputStream = null;
+      String[] splitsBeforeAndAfter =
+            leadingPartOfFile.split(Artifact.BEFORE_GUID_STRING + "|" + Artifact.AFTER_GUID_STRING);
+      if (splitsBeforeAndAfter.length == 3) {
+         guid = splitsBeforeAndAfter[1];
       }
       return guid;
    }
-
 }
