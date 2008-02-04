@@ -67,9 +67,9 @@ public class OseeDbVersion {
       String query = null;
       String currentValue = getDatabaseValue(connection, key);
       if (currentValue == null)
-         query = "INSERT INTO OSEE.OSEE_INFO (OSEE_KEY, OSEE_VALUE) VALUES ( \'" + key + "\',\'" + value + "\')";
+         query = "INSERT INTO OSEE_INFO (OSEE_KEY, OSEE_VALUE) VALUES ( \'" + key + "\',\'" + value + "\')";
       else
-         query = "UPDATE OSEE.OSEE_INFO SET OSEE_VALUE = \'" + value + "\' WHERE OSEE_KEY = \'" + key + "\'";
+         query = "UPDATE OSEE_INFO SET OSEE_VALUE = \'" + value + "\' WHERE OSEE_KEY = \'" + key + "\'";
 
       Statement statement = connection.createStatement();
       statement.executeUpdate(query);
