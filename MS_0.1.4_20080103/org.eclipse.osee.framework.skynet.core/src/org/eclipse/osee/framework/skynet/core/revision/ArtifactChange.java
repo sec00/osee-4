@@ -52,6 +52,11 @@ public class ArtifactChange extends RevisionChange {
    private TransactionId conflictingArtTransactionId;
    private TransactionId deletedTransactionId;
 
+   @Override
+   public String toString() {
+      return "ArtId: " + getArtId() + " Type: " + getChangeType() + " Gamma: " + getGammaId() + " - " + getName();
+   }
+
    /**
     * Constructor for serialization.
     */
@@ -81,7 +86,7 @@ public class ArtifactChange extends RevisionChange {
    public ArtifactChange(ChangeType changeType, String name, ArtifactSubtypeDescriptor descriptor, int artId, int gammaId, TransactionId baseParentTransactionId, TransactionId headParentTransactionId, TransactionId lastGoodTransactionId, TransactionId deletedTransactionId) {
       this(changeType, DELETE, name, descriptor, null, baseParentTransactionId, headParentTransactionId,
             lastGoodTransactionId, lastGoodTransactionId, lastGoodTransactionId, artId, gammaId, lastGoodTransactionId);
-      
+
       this.deletedTransactionId = deletedTransactionId;
    }
 
