@@ -17,38 +17,35 @@ public class XmlUtility {
 
    public static String removeNotUTF8Characters(String contentString) {
       String resultString = contentString;
-      try {
-         String[][] nonUTF8CharactersOfInterest = { {"–", "-"}, {"’", "'"}, {"’", "'"}, {"“", "\""}, {"”", "\""}};//Wider than usual dash , smaller than usual bullet
-         for (int i = 0; i < nonUTF8CharactersOfInterest.length; i++) {
-            String[] splitsOfNonUTF8 = resultString.split(nonUTF8CharactersOfInterest[i][0]);//Wider than usual dash or bullet
-            if (splitsOfNonUTF8.length > 1) {
-               StringBuffer myStringBuffer = new StringBuffer();
-               for (int j = 0; j < splitsOfNonUTF8.length; j++) {
-                  myStringBuffer.append(splitsOfNonUTF8[j]);
-                  if (splitsOfNonUTF8[j].length() > 0 && j < splitsOfNonUTF8.length - 1) {
-                     myStringBuffer.append(nonUTF8CharactersOfInterest[i][1]);
-                  }
-               }
-               resultString = myStringBuffer.toString();
-            }
-         }
-         String[] splits = resultString.split("[^\\p{Space}\\p{Graph}]");
-         int stringPosition = 0;
-         if (splits.length > 1) {
+      String[][] nonUTF8CharactersOfInterest = { {"–", "-"}, {"’", "'"}, {"’", "'"}, {"“", "\""}, {"”", "\""}};//Wider than usual dash , smaller than usual bullet
+      for (int i = 0; i < nonUTF8CharactersOfInterest.length; i++) {
+         String[] splitsOfNonUTF8 = resultString.split(nonUTF8CharactersOfInterest[i][0]);//Wider than usual dash or bullet
+         if (splitsOfNonUTF8.length > 1) {
             StringBuffer myStringBuffer = new StringBuffer();
-            for (int i = 0; i < splits.length; i++) {
-               stringPosition = stringPosition + splits[i].length();
-               myStringBuffer.append(splits[i]);
-               stringPosition = stringPosition + 1;
-               if (splits[i].length() > 0 && i < splits.length - 1) {
-                  myStringBuffer.append("-");
+            for (int j = 0; j < splitsOfNonUTF8.length; j++) {
+               myStringBuffer.append(splitsOfNonUTF8[j]);
+               if (splitsOfNonUTF8[j].length() > 0 && j < splitsOfNonUTF8.length - 1) {
+                  myStringBuffer.append(nonUTF8CharactersOfInterest[i][1]);
                }
             }
             resultString = myStringBuffer.toString();
          }
-      } catch (Exception e) {
-         e.printStackTrace();
       }
+      String[] splits = resultString.split("[^\\p{Space}\\p{Graph}]");
+      int stringPosition = 0;
+      if (splits.length > 1) {
+         StringBuffer myStringBuffer = new StringBuffer();
+         for (int i = 0; i < splits.length; i++) {
+            stringPosition = stringPosition + splits[i].length();
+            myStringBuffer.append(splits[i]);
+            stringPosition = stringPosition + 1;
+            if (splits[i].length() > 0 && i < splits.length - 1) {
+               myStringBuffer.append("-");
+            }
+         }
+         resultString = myStringBuffer.toString();
+      }
+
       return resultString;
    }
 }
