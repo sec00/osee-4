@@ -24,13 +24,16 @@ import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.plugin.core.util.ExtensionPoints;
-import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask;
-import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask.RunDb;
+import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
+import org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask.RunDb;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.XDate;
+import org.eclipse.osee.framework.ui.skynet.widgets.xresults.XResultData;
+import org.eclipse.osee.framework.ui.skynet.widgets.xresults.XResultPage;
+import org.eclipse.osee.framework.ui.skynet.widgets.xresults.XResultPage.Manipulations;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
@@ -52,7 +55,7 @@ public class AutoRunStartup implements IStartup {
     */
    public void earlyStartup() {
       final String autoRunTaskId = OseeProperties.getInstance().getAutoRun();
-      final StringBuffer sb = new StringBuffer();
+      final XResultData resultData = new XResultData(SkynetGuiPlugin.getLogger());
       IAutoRunTask autoRunTask = null;
       try {
          if (autoRunTaskId == null) {
@@ -72,29 +75,47 @@ public class AutoRunStartup implements IStartup {
          } else {
             Result result = validateAutoRunExecution(autoRunTask);
             if (result.isFalse()) {
-               sb.append("Auto Run Task invalid to run: " + result.getText());
+               resultData.log("Auto Run Task invalid to run: " + result.getText());
             } else {
-               sb.append("Starting AutoRunTaskId=\"" + autoRunTaskId + "\" - " + XDate.getDateNow(XDate.MMDDYYHHMM) + "\n\n");
-               autoRunTask.startTasks(sb);
-               sb.append("\n\nCompleted AutoRunTaskId=\"" + autoRunTaskId + "\" - " + XDate.getDateNow(XDate.MMDDYYHHMM) + "\n");
+               resultData.log("Starting AutoRunTaskId=\"" + autoRunTaskId + "\" - " + XDate.getDateNow(XDate.MMDDYYHHMM) + "\n\n");
+               autoRunTask.startTasks(resultData);
+               resultData.log("\n\nCompleted AutoRunTaskId=\"" + autoRunTaskId + "\" - " + XDate.getDateNow(XDate.MMDDYYHHMM) + "\n");
             }
 
             // Email successful run
-            AEmail email =
+            String subject = "Completed AutoRunTaskId=\"" + autoRunTaskId + "\"";
+            XResultPage page =
+                  resultData.getReport("AutoRunTaskId=\"" + autoRunTaskId + "\"", Manipulations.ALL,
+                        Manipulations.ERROR_WARNING_HEADER);
+            String htmlBody = page.getManipulatedHtml();
+            AEmail emailMessage =
                   new AEmail(autoRunTask.getNotificationEmailAddresses(),
-                        autoRunTask.getNotificationEmailAddresses()[0], autoRunTask.getNotificationEmailAddresses()[0],
-                        "Completed AutoRunTaskId=\"" + autoRunTaskId + "\"", sb.toString());
-            email.send();
+                        SkynetAuthentication.getInstance().getAuthenticatedUser().getEmail(),
+                        SkynetAuthentication.getInstance().getAuthenticatedUser().getEmail(), subject);
+            emailMessage.setSubject(subject);
+            emailMessage.addHTMLBody(htmlBody);
+            emailMessage.send();
          }
       } catch (Exception ex) {
          String[] emails = new String[] {"donald.g.dunne@boeing.com"};
          if (autoRunTask != null) emails = autoRunTask.getNotificationEmailAddresses();
          // Email exception
-         AEmail email =
-               new AEmail(emails, emails[0], emails[0],
-                     "Exception running AutoRunTaskId=\"" + autoRunTaskId + "\" Exceptioned",
-                     "Output:\n\n" + sb.toString() + "\n\nException:\n\n" + Lib.exceptionToString(ex));
-         email.send();
+         String subject = "Exception running AutoRunTaskId=\"" + autoRunTaskId + "\" Exceptioned";
+         XResultPage page =
+               resultData.getReport("AutoRunTaskId=\"" + autoRunTaskId + "\"", Manipulations.ALL,
+                     Manipulations.ERROR_WARNING_HEADER);
+         String htmlBody = "Output:\n\n" + page.getManipulatedHtml() + "\n\nException:\n\n" + Lib.exceptionToString(ex);
+         AEmail emailMessage =
+               new AEmail(autoRunTask.getNotificationEmailAddresses(),
+                     SkynetAuthentication.getInstance().getAuthenticatedUser().getEmail(),
+                     SkynetAuthentication.getInstance().getAuthenticatedUser().getEmail(), subject);
+         try {
+            emailMessage.setSubject(subject);
+            emailMessage.addHTMLBody(htmlBody);
+            emailMessage.send();
+         } catch (Exception ex2) {
+            OSEELog.logException(SkynetGuiPlugin.class, ex2, false);
+         }
       } finally {
          if (autoRunTaskId != null) {
             logger.log(Level.INFO, "Sleeping...");

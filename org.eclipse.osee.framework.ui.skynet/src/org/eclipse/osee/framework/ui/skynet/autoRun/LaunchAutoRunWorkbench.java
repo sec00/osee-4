@@ -18,10 +18,9 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.action.Action;
-import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask;
-import org.eclipse.osee.framework.skynet.core.util.IAutoRunTask.RunDb;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkspace;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
+import org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask.RunDb;
 
 /**
  * This Action (kicked off from Artifact Explorer pulldown toolbar menu) will kickoff an event task that will in turn
