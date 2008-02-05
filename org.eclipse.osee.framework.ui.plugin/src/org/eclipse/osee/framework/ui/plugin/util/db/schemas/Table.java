@@ -31,6 +31,16 @@ public class Table {
    }
 
    /**
+    * Remove all PUT_TABLE_ALIAS_HERE tags and replace with table alias specific to this DB
+    * 
+    * @param sql string with replace tag PUT_TABLE_ALIAS_HERE embedded
+    * @return sql with corresponding table alias replaced
+    */
+   public static String generateTableAliasedSql(String sql) {
+      return sql.replaceAll("PUT_TABLE_ALIAS_HERE", aliassyntax);
+   }
+
+   /**
     * @param name
     */
    public Table(String name) {
