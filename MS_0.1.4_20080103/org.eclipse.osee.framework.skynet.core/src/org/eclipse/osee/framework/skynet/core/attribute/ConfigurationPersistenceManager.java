@@ -367,6 +367,16 @@ public class ConfigurationPersistenceManager implements PersistenceManager {
                   descriptor.getImageDescriptor().getData()));
    }
 
+   public static void updateArtifactTypeImage(ArtifactSubtypeDescriptor descriptor, InputStreamImageDescriptor imageDescriptor) throws SQLException {
+      // Update DB
+      ConnectionHandler.runPreparedUpdate("UPDATE " + ARTIFACT_TYPE_TABLE + " SET image = ? where art_type_id = ?",
+            SQL3DataType.BLOB, new ByteArrayInputStream(imageDescriptor.getData()), SQL3DataType.INTEGER,
+            descriptor.getArtTypeId());
+
+      // TODO Update descriptor's cached copy of image
+      descriptor.setImageDescriptor(imageDescriptor);
+   }
+
    /**
     * Persists that a particular user defined attribute is valid for some artifact type.
     * 
