@@ -186,7 +186,7 @@ public class ConfigurationPersistenceManager implements PersistenceManager {
       if (baPhrasing == null || baPhrasing.equals("")) throw new IllegalArgumentException(
             "The baPhrasing can not be null or empty");
       if (shortName == null || shortName.equals("")) throw new IllegalArgumentException(
-            "The baPhrasing can not be null or empty");
+            "The shortName can not be null or empty");
 
       checkTransaction();
 
