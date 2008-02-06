@@ -73,6 +73,7 @@ public class ImportTraceabilityJob extends Job {
    private final CharBackedInputStream charBak;
    private final ISheetWriter excelWriter;
    private int pathPrefixLength;
+   private Collection<Artifact> softwareReqList;
 
    public ImportTraceabilityJob(File file, Branch branch) throws IllegalArgumentException, CoreException, SQLException, IOException {
       super("Importing Traceability");
@@ -100,7 +101,11 @@ public class ImportTraceabilityJob extends Job {
          monitor.worked(1);
 
          monitor.subTask("Aquiring Software Requirements"); // bulk load for performance reasons
-         for (Artifact artifact : artifactManager.getArtifactsFromSubtypeName("Software Requirement", branch)) {
+         if (softwareReqList == null) {
+            softwareReqList = artifactManager.getArtifactsFromSubtypeName("Software Requirement", branch);
+         }
+
+         for (Artifact artifact : softwareReqList) {
             softwareReqs.put(getCanonicalReqName(artifact.getDescriptiveName()), artifact);
          }
          monitor.worked(30);
@@ -291,5 +296,12 @@ public class ImportTraceabilityJob extends Job {
     */
    public HashSet<String> getCodeUnits() {
       return codeUnits;
+   }
+
+   /**
+    * @param softwareReqList the softwareReqList to set
+    */
+   public void setSoftwareReqList(Collection<Artifact> softwareReqList) {
+      this.softwareReqList = softwareReqList;
    }
 }
