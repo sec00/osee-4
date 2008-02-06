@@ -502,7 +502,7 @@ public class ArtifactExplorer extends ViewPart implements IEventReceiver, IActio
       }
    }
 
-   public String getSelectedAttributeData(Artifact artifact) {
+   public String getSelectedAttributeData(Artifact artifact) throws Exception {
       return attributesAction.getSelectedAttributeData(artifact);
    }
 
