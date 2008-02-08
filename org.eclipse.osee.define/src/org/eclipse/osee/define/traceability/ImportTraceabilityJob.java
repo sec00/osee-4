@@ -74,6 +74,7 @@ public class ImportTraceabilityJob extends Job {
    private final ISheetWriter excelWriter;
    private int pathPrefixLength;
    private Collection<Artifact> softwareReqList;
+   private Collection<Artifact> indirectSoftwareReqList;
 
    public ImportTraceabilityJob(File file, Branch branch) throws IllegalArgumentException, CoreException, SQLException, IOException {
       super("Importing Traceability");
@@ -91,6 +92,17 @@ public class ImportTraceabilityJob extends Job {
       scriptReqTraceMatcher = scriptReqTraceP.matcher("");
    }
 
+   private void getReqs(String artifactTypeName, Collection<Artifact> requirementsList, HashMap<String, Artifact> artifactMap, IProgressMonitor monitor) throws SQLException {
+      monitor.subTask("Aquiring" + artifactTypeName + "s"); // bulk load for performance reasons
+      if (requirementsList == null) {
+         requirementsList = artifactManager.getArtifactsFromSubtypeName(artifactTypeName, branch);
+      }
+
+      for (Artifact artifact : requirementsList) {
+         artifactMap.put(getCanonicalReqName(artifact.getDescriptiveName()), artifact);
+      }
+   }
+
    /*
     * (non-Javadoc)
     * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
@@ -100,20 +112,10 @@ public class ImportTraceabilityJob extends Job {
          monitor.beginTask("Importing From " + file.getName(), 100);
          monitor.worked(1);
 
-         monitor.subTask("Aquiring Software Requirements"); // bulk load for performance reasons
-         if (softwareReqList == null) {
-            softwareReqList = artifactManager.getArtifactsFromSubtypeName("Software Requirement", branch);
-         }
-
-         for (Artifact artifact : softwareReqList) {
-            softwareReqs.put(getCanonicalReqName(artifact.getDescriptiveName()), artifact);
-         }
+         getReqs("Software Requirement", softwareReqList, softwareReqs, monitor);
          monitor.worked(30);
 
-         monitor.subTask("Aquiring Indirect Software Requirements");
-         for (Artifact artifact : artifactManager.getArtifactsFromSubtypeName("Indirect Software Requirement", branch)) {
-            indirectReqs.put(getCanonicalReqName(artifact.getDescriptiveName()), artifact);
-         }
+         getReqs("Indirect Software Requirement", indirectSoftwareReqList, indirectReqs, monitor);
          monitor.worked(7);
 
          excelWriter.startSheet("srs <--> code units", 6);
@@ -301,7 +303,8 @@ public class ImportTraceabilityJob extends Job {
    /**
     * @param softwareReqList the softwareReqList to set
     */
-   public void setSoftwareReqList(Collection<Artifact> softwareReqList) {
+   public void setSoftwareReqLists(Collection<Artifact> softwareReqList, Collection<Artifact> indirectSoftwareReqList) {
       this.softwareReqList = softwareReqList;
+      this.indirectSoftwareReqList = indirectSoftwareReqList;
    }
 }
