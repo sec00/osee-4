@@ -43,15 +43,20 @@ import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactTypeNameSe
 import org.eclipse.osee.framework.skynet.core.attribute.ArtifactSubtypeDescriptor;
 import org.eclipse.osee.framework.skynet.core.attribute.ConfigurationPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.dbinit.SkynetDbInit;
+import org.eclipse.osee.framework.skynet.core.event.LocalCommitBranchEvent;
+import org.eclipse.osee.framework.skynet.core.event.LocalNewBranchEvent;
+import org.eclipse.osee.framework.skynet.core.event.SkynetEventManager;
 import org.eclipse.osee.framework.skynet.core.relation.RelationSide;
 import org.eclipse.osee.framework.skynet.core.transaction.AbstractSkynetTxTemplate;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionIdManager;
 import org.eclipse.osee.framework.skynet.core.user.UserEnum;
-import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
+import org.eclipse.osee.framework.ui.plugin.event.Event;
+import org.eclipse.osee.framework.ui.plugin.event.IEventReceiver;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
 import org.eclipse.osee.framework.ui.skynet.Import.ArtifactExtractor;
 import org.eclipse.osee.framework.ui.skynet.Import.ArtifactImportJob;
 import org.eclipse.osee.framework.ui.skynet.Import.IArtifactImportResolver;
+import org.eclipse.osee.framework.ui.skynet.Import.NewArtifactImportResolver;
 import org.eclipse.osee.framework.ui.skynet.Import.WordOutlineExtractor;
 import org.eclipse.osee.framework.ui.skynet.handler.GeneralWordOutlineHandler;
 import org.eclipse.osee.framework.ui.skynet.util.ChangeType;
@@ -67,7 +72,7 @@ import org.eclipse.swt.widgets.Display;
  * 
  * @author Donald G. Dunne
  */
-public class PopulateDemoActions extends XNavigateItemAction {
+public class PopulateDemoActions extends XNavigateItemAction implements IEventReceiver {
 
    private String[] TITLE_PREFIX =
          new String[] {"Problem with the", "Can't see the", "Button A doesn't work on", "Add to the",
@@ -92,10 +97,12 @@ public class PopulateDemoActions extends XNavigateItemAction {
       SAW_Requirements,
       SAW_SW_Design,
       Adapter;
+
       public String getAIName() {
          return name().replaceAll("_", " ");
       }
    }
+   private Thread theCurrentThread;
 
    public PopulateDemoActions(XNavigateItem parent) {
       super(parent, "Populate Demo Actions");
@@ -103,282 +110,301 @@ public class PopulateDemoActions extends XNavigateItemAction {
 
    @Override
    public void run() throws SQLException {
+      SkynetEventManager.getInstance().register(LocalNewBranchEvent.class, this);
+      SkynetEventManager.getInstance().register(LocalCommitBranchEvent.class, this);
       if (SkynetDbInit.isDbInit() || (!SkynetDbInit.isDbInit() && MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(), getName(), getName()))) {
-         PopulateTx populateTx =
-               new PopulateTx(BranchPersistenceManager.getInstance().getAtsBranch(), !SkynetDbInit.isDbInit());
          try {
-            populateTx.execute();
+            ImportRequirementsTx importTx =
+                  new ImportRequirementsTx(BranchPersistenceManager.getInstance().getAtsBranch(),
+                        !SkynetDbInit.isDbInit());
+            importTx.execute();
+
+            CreateMainWorkingBranchTx saw2BranchTx =
+                  new CreateMainWorkingBranchTx(BranchPersistenceManager.getInstance().getAtsBranch(),
+                        !SkynetDbInit.isDbInit());
+            saw2BranchTx.execute();
+
+            // Create SawBld2 actions
+            createSawBld2ReqChangeDemoActions();
+
+            // importOtherRequirements();
+            // createNonReqChangeDemoActions();
+
          } catch (Exception ex) {
             OSEELog.logException(OseeAtsConfigDemoPlugin.class, ex, false);
          }
       }
    }
 
-   public class PopulateTx extends AbstractSkynetTxTemplate {
-      int total = (getNonReqSawActionData().size() * 3) + getGenericActionData().size();
-      int currNum = 1;
-
-      public PopulateTx(Branch branch, boolean popup) {
+   public class ImportRequirementsTx extends AbstractSkynetTxTemplate {
+      public ImportRequirementsTx(Branch branch, boolean popup) {
          super(branch);
       }
 
       @Override
       protected void handleTxWork() throws Exception {
-         populateDemoActions(false);
-      }
-
-      public void populateDemoActions(boolean popup) {
          try {
             AtsPlugin.setEmailEnabled(false);
-
             importSoftwareRequirementsToSawBld1();
-            //
-            // Create SAW_Bld_2 branch off SAW_Bld_1
-            createChildMainWorkingBranch(SawBuilds.SAW_Bld_1.name(), SawBuilds.SAW_Bld_2.name());
-
-            //            // Map team definitions versions to their related branches
-            AtsConfigDemoDatabaseConfig.mapTeamVersionToBranch(DemoTeams.getInstance().getTeamDef(Team.SAW_SW),
-                  SawBuilds.SAW_Bld_2.name(), SawBuilds.SAW_Bld_2.name());
-            //
-            //            // Sleep to wait for the persist of the version artifact
-            Thread.sleep(3000);
-            //            
-            //            // Create SawBld2 actions
-            createSawBld2ReqChangeDemoActions();
-
-            // importOtherRequirements();
-            // createNonReqChangeDemoActions();
-
-            if (popup) AWorkbench.popup(getName(), getName() + " Completed");
          } catch (Exception ex) {
             OSEELog.logException(OseeAtsConfigDemoPlugin.class, ex, false);
          } finally {
             AtsPlugin.setEmailEnabled(true);
          }
       }
+   }
 
-      private Branch createChildMainWorkingBranch(String parentBrachName, String childBranchName) throws Exception {
-         Branch parentBranch = BranchPersistenceManager.getInstance().getKeyedBranch(parentBrachName);
-
-         Branch childBranch =
-               BranchPersistenceManager.getInstance().createWorkingBranch(
-                     TransactionIdManager.getInstance().getEditableTransactionId(parentBranch), childBranchName,
-                     childBranchName, SkynetAuthentication.getInstance().getUser(UserEnum.NoOne));
-         return childBranch;
+   public class CreateMainWorkingBranchTx extends AbstractSkynetTxTemplate {
+      public CreateMainWorkingBranchTx(Branch branch, boolean popup) {
+         super(branch);
       }
 
-      private void createSawBld2ReqChangeDemoActions() throws Exception {
-         Set<ActionArtifact> actionArts =
-               createActions(getReqSawActionsData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_2.toString(), null);
+      @Override
+      protected void handleTxWork() throws Exception {
+         try {
+            AtsPlugin.setEmailEnabled(false);
+            // Create SAW_Bld_2 branch off SAW_Bld_1
+            createChildMainWorkingBranch(SawBuilds.SAW_Bld_1.name(), SawBuilds.SAW_Bld_2.name());
+            Thread.sleep(5000);
+            // Map team definitions versions to their related branches
+            AtsConfigDemoDatabaseConfig.mapTeamVersionToBranch(DemoTeams.getInstance().getTeamDef(Team.SAW_SW),
+                  SawBuilds.SAW_Bld_2.name(), SawBuilds.SAW_Bld_2.name());
+         } catch (Exception ex) {
+            OSEELog.logException(OseeAtsConfigDemoPlugin.class, ex, false);
+         } finally {
+            AtsPlugin.setEmailEnabled(true);
+         }
+      }
+   }
 
-         // Sleep to wait for the persist of the actions
-         Thread.sleep(3000);
+   private Branch createChildMainWorkingBranch(String parentBrachName, String childBranchName) throws Exception {
+      Branch parentBranch = BranchPersistenceManager.getInstance().getKeyedBranch(parentBrachName);
 
-         Iterator<ActionArtifact> iter = actionArts.iterator();
-         makeAction1ReqChanges(iter.next());
-         makeAction2ReqChanges(iter.next());
+      Branch childBranch =
+            BranchPersistenceManager.getInstance().createWorkingBranch(
+                  TransactionIdManager.getInstance().getEditableTransactionId(parentBranch), childBranchName,
+                  childBranchName, SkynetAuthentication.getInstance().getUser(UserEnum.NoOne));
+      return childBranch;
+   }
+
+   private void createSawBld2ReqChangeDemoActions() throws Exception {
+      Set<ActionArtifact> actionArts =
+            createActions(getReqSawActionsData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_2.toString(), null);
+
+      // Sleep to wait for the persist of the actions
+      Thread.sleep(3000);
+
+      Iterator<ActionArtifact> iter = actionArts.iterator();
+      makeAction1ReqChanges(iter.next());
+      makeAction2ReqChanges(iter.next());
+   }
+
+   private void makeAction1ReqChanges(ActionArtifact actionArt) throws Exception {
+      TeamWorkFlowArtifact reqTeam = null;
+      for (TeamWorkFlowArtifact team : actionArt.getTeamWorkFlowArtifacts()) {
+         if (team.getTeamDefinition().getDescriptiveName().contains("Req")) reqTeam = team;
       }
 
-      private void makeAction1ReqChanges(ActionArtifact actionArt) throws Exception {
-         TeamWorkFlowArtifact reqTeam = null;
-         for (TeamWorkFlowArtifact team : actionArt.getTeamWorkFlowArtifacts()) {
-            if (team.getTeamDefinition().getDescriptiveName().contains("Req")) reqTeam = team;
-         }
-         if (reqTeam == null) throw new IllegalArgumentException("Can't locate Req team.");
+      if (reqTeam == null) throw new IllegalArgumentException("Can't locate Req team.");
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Creating working branch", false);
+      Result result = reqTeam.getSmaMgr().getBranchMgr().createWorkingBranch(null, false);
+      if (result.isFalse()) throw new IllegalArgumentException(
+            (new StringBuilder("Error creating working branch: ")).append(result.getText()).toString());
 
-         // Create branch; pend to wait for completion
-         OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Creating working branch", false);
-         Result result = reqTeam.getSmaMgr().getBranchMgr().createWorkingBranch(null, false);
-         if (result.isFalse()) throw new IllegalArgumentException("Error creating working branch: " + result.getText());
-         synchronized (reqTeam.getSmaMgr().getBranchMgr()) {
-            reqTeam.getSmaMgr().getBranchMgr().wait();
-         }
+      theCurrentThread = Thread.currentThread();
+      //         theCurrentThread.suspend();
+      theCurrentThread.sleep(5000);
 
-         // Set Default Branch
-         Branch branch = BranchPersistenceManager.getInstance().getBranch(SawBuilds.SAW_Bld_2.name());
-         BranchPersistenceManager.getInstance().setDefaultBranch(branch);
+      BranchPersistenceManager.getInstance().setDefaultBranch(reqTeam.getSmaMgr().getBranchMgr().getWorkingBranch());
+      Thread.sleep(2000L);
 
-         // Make artifact changes
-         for (Artifact art : getRobotSoftwareRequirements()) {
-            OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Modifying artifact => " + art, false);
-            art.setSoleAttributeValue(ProgramAttributes.CSCI.name(), Cscis.Navigation.name());
-            art.setSoleAttributeValue(ProgramAttributes.Safety_Criticality.name(), "A");
-            art.setSoleAttributeValue(ProgramAttributes.Subsystem.name(), Subsystems.Navigation.name());
-
-            ArtifactTypeNameSearch srch =
-                  new ArtifactTypeNameSearch("Component", "Navigation",
-                        BranchPersistenceManager.getInstance().getDefaultBranch());
-            art.relate(RelationSide.ALLOCATION__COMPONENT, srch.getSingletonArtifactOrException(Artifact.class));
-         }
-
-         // Make artifact changes
-         for (Artifact art : getEventSoftwareRequirements()) {
-            OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Modifying artifact => " + art, false);
-            art.setSoleAttributeValue(ProgramAttributes.CSCI.name(), Cscis.Interface.name());
-            art.setSoleAttributeValue(ProgramAttributes.Safety_Criticality.name(), "D");
-            art.setSoleAttributeValue(ProgramAttributes.Subsystem.name(), Subsystems.Communications.name());
-
-            ArtifactTypeNameSearch srch =
-                  new ArtifactTypeNameSearch("Component", "Robot API",
-                        BranchPersistenceManager.getInstance().getDefaultBranch());
-            art.relate(RelationSide.ALLOCATION__COMPONENT, srch.getSingletonArtifactOrException(Artifact.class));
-         }
-
-         // Commit branch
-         OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Committing branch", false);
-         result = reqTeam.getSmaMgr().getBranchMgr().commitWorkingBranch(false, true);
-         if (result.isFalse()) throw new IllegalArgumentException(
-               "Error committing working branch: " + result.getText());
-         synchronized (reqTeam.getSmaMgr().getBranchMgr()) {
-            reqTeam.getSmaMgr().getBranchMgr().wait();
-         }
-
-         // Complete action
-         OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Completing Action", false);
-      }
-
-      private Set<Artifact> getRobotSoftwareRequirements() {
+      for (Artifact art : getRobotSoftwareRequirements()) {
+         OSEELog.logInfo(OseeAtsConfigDemoPlugin.class,
+               (new StringBuilder("Modifying artifact => ")).append(art).toString(), false);
+         art.setSoleAttributeValue(ProgramAttributes.CSCI.name(), Cscis.Navigation.name());
+         art.setSoleAttributeValue(ProgramAttributes.Safety_Criticality.name(), "A");
+         art.setSoleAttributeValue(ProgramAttributes.Subsystem.name(), Subsystems.Navigation.name());
          ArtifactTypeNameSearch srch =
-               new ArtifactTypeNameSearch("Software Requirement", "Robot", AtsPlugin.getAtsBranch(),
-                     SearchOperator.LIKE);
-         return srch.getArtifacts(Artifact.class);
+               new ArtifactTypeNameSearch("Component", "Navigation",
+                     BranchPersistenceManager.getInstance().getDefaultBranch());
+         art.relate(RelationSide.ALLOCATION__COMPONENT, srch.getSingletonArtifactOrException(Artifact.class));
+         art.persist(true);
       }
 
-      private Set<Artifact> getEventSoftwareRequirements() {
+      for (Artifact art : getEventSoftwareRequirements()) {
+         OSEELog.logInfo(OseeAtsConfigDemoPlugin.class,
+               (new StringBuilder("Modifying artifact => ")).append(art).toString(), false);
+         art.setSoleAttributeValue(ProgramAttributes.CSCI.name(), Cscis.Interface.name());
+         art.setSoleAttributeValue(ProgramAttributes.Safety_Criticality.name(), "D");
+         art.setSoleAttributeValue(ProgramAttributes.Subsystem.name(), Subsystems.Communications.name());
          ArtifactTypeNameSearch srch =
-               new ArtifactTypeNameSearch("Software Requirement", "Event", AtsPlugin.getAtsBranch(),
-                     SearchOperator.LIKE);
-         return srch.getArtifacts(Artifact.class);
+               new ArtifactTypeNameSearch("Component", "Robot API",
+                     BranchPersistenceManager.getInstance().getDefaultBranch());
+         art.relate(RelationSide.ALLOCATION__COMPONENT, srch.getSingletonArtifactOrException(Artifact.class));
+         art.persist(true);
       }
 
-      private void makeAction2ReqChanges(ActionArtifact actionArt) throws Exception {
+      Thread.sleep(2000L);
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Committing branch", false);
+      result = reqTeam.getSmaMgr().getBranchMgr().commitWorkingBranch(false, true);
+      if (result.isFalse()) throw new IllegalArgumentException(
+            (new StringBuilder("Error committing working branch: ")).append(result.getText()).toString());
 
-      }
+      theCurrentThread = Thread.currentThread();
+      theCurrentThread.sleep(10000);
 
-      //      private void createNonReqChangeDemoActions() throws Exception {
-      //         createActions(getNonReqSawActionData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_3.toString(), null);
-      //         createActions(getNonReqSawActionData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_2.toString(), null);
-      //         createActions(getNonReqSawActionData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_1.toString(),
-      //               DefaultTeamState.Completed);
-      //         createActions(getGenericActionData(), null, null);
-      //      }
-      //
-      //      private void importOtherRequirements() throws Exception {
-      //         // Import Requirements
-      //         importRequirements(SawBuilds.SAW_Bld_1.name(), "System Requirements", "System Requirement",
-      //               "support/SAW-SystemRequirements.xml");
-      //         importRequirements(SawBuilds.SAW_Bld_1.name(), "Subsystem Requirements", "Subsystem Requirement",
-      //               "support/SAW-SubsystemRequirements.xml");
-      //      }
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Completing Action", false);
+   }
 
-      private void importSoftwareRequirementsToSawBld1() throws Exception {
-         // Import Requirements
-         importRequirements(SawBuilds.SAW_Bld_1.name(), "Software Requirements", "Software Requirement",
-               "support/SAW-SoftwareRequirements.xml");
-      }
+   private Set<Artifact> getRobotSoftwareRequirements() {
+      ArtifactTypeNameSearch srch =
+            new ArtifactTypeNameSearch("Software Requirement", "Robot",
+                  BranchPersistenceManager.getInstance().getDefaultBranch(), SearchOperator.LIKE);
+      return srch.getArtifacts(Artifact.class);
+   }
 
-      private void importRequirements(String buildName, String rootArtifactName, String requirementArtifactName, String filename) throws Exception {
-         Branch branch = BranchPersistenceManager.getInstance().getKeyedBranch(buildName);
-         ArtifactTypeNameSearch srch = new ArtifactTypeNameSearch("Folder", rootArtifactName, branch);
-         Artifact systemReq = srch.getSingletonArtifactOrException(Artifact.class);
-         File file = OseeAtsConfigDemoPlugin.getInstance().getPluginFile(filename);
-         IArtifactImportResolver artifactResolver = null;
-         ArtifactSubtypeDescriptor mainDescriptor =
-               ConfigurationPersistenceManager.getInstance().getArtifactSubtypeDescriptor(requirementArtifactName);
-         ArtifactExtractor extractor =
-               new WordOutlineExtractor(mainDescriptor, branch, 0, new GeneralWordOutlineHandler());
-         Job job = new ArtifactImportJob(file, systemReq, extractor, branch, artifactResolver);
-         job.setPriority(Job.LONG);
-         job.schedule();
-         job.join();
-      }
+   private Set<Artifact> getEventSoftwareRequirements() {
+      ArtifactTypeNameSearch srch =
+            new ArtifactTypeNameSearch("Software Requirement", "Event",
+                  BranchPersistenceManager.getInstance().getDefaultBranch(), SearchOperator.LIKE);
+      return srch.getArtifacts(Artifact.class);
+   }
 
-      private Set<ActionArtifact> createActions(Set<ActionData> actionDatas, String versionStr, DefaultTeamState toStateOverride) throws Exception {
-         Set<ActionArtifact> actionArts = new HashSet<ActionArtifact>();
-         for (ActionData aData : actionDatas) {
-            OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Creating " + currNum++ + "/" + total, false);
-            int x = 0;
-            for (String prefixTitle : aData.prefixTitles) {
-               ActionArtifact actionArt =
-                     NewActionJob.createAction(null, prefixTitle + " " + aData.postFixTitle,
-                           TITLE_PREFIX[x] + " " + aData.postFixTitle, CHANGE_TYPE[x], PriorityType.Priority_1,
-                           aData.getUserCommunities(), false, null, aData.getActionableItems());
-               actionArts.add(actionArt);
-               for (TeamWorkFlowArtifact teamWf : actionArt.getTeamWorkFlowArtifacts()) {
-                  DefaultTeamWorkflowManager dtwm = new DefaultTeamWorkflowManager(teamWf);
-                  dtwm.transitionTo((toStateOverride != null ? toStateOverride : aData.toState), null, false);
+   private void makeAction2ReqChanges(ActionArtifact actionArt) throws Exception {
+
+   }
+
+   //      private void createNonReqChangeDemoActions() throws Exception {
+   //         createActions(getNonReqSawActionData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_3.toString(), null);
+   //         createActions(getNonReqSawActionData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_2.toString(), null);
+   //         createActions(getNonReqSawActionData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_1.toString(),
+   //               DefaultTeamState.Completed);
+   //         createActions(getGenericActionData(), null, null);
+   //      }
+   //
+   //      private void importOtherRequirements() throws Exception {
+   //         // Import Requirements
+   //         importRequirements(SawBuilds.SAW_Bld_1.name(), "System Requirements", "System Requirement",
+   //               "support/SAW-SystemRequirements.xml");
+   //         importRequirements(SawBuilds.SAW_Bld_1.name(), "Subsystem Requirements", "Subsystem Requirement",
+   //               "support/SAW-SubsystemRequirements.xml");
+   //      }
+
+   private void importSoftwareRequirementsToSawBld1() throws Exception {
+      // Import Requirements
+      importRequirements(SawBuilds.SAW_Bld_1.name(), "Software Requirements", "Software Requirement",
+            "support/SAW-SoftwareRequirements.xml");
+   }
+
+   private void importRequirements(String buildName, String rootArtifactName, String requirementArtifactName, String filename) throws Exception {
+
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class,
+            "Importing \"" + rootArtifactName + "\" requirements on branch \"" + buildName + "\"", false);
+      Branch branch = BranchPersistenceManager.getInstance().getKeyedBranch(buildName);
+      ArtifactTypeNameSearch srch = new ArtifactTypeNameSearch("Folder", rootArtifactName, branch);
+      Artifact systemReq = srch.getSingletonArtifactOrException(Artifact.class);
+      File file = OseeAtsConfigDemoPlugin.getInstance().getPluginFile(filename);
+      IArtifactImportResolver artifactResolver = new NewArtifactImportResolver();
+      ArtifactSubtypeDescriptor mainDescriptor =
+            ConfigurationPersistenceManager.getInstance().getArtifactSubtypeDescriptor(requirementArtifactName);
+      ArtifactExtractor extractor =
+            new WordOutlineExtractor(mainDescriptor, branch, 0, new GeneralWordOutlineHandler());
+      Job job = new ArtifactImportJob(file, systemReq, extractor, branch, artifactResolver);
+      job.setPriority(Job.LONG);
+      job.schedule();
+      job.join();
+      // Validate that something was imported
+      if (systemReq.getChildren().size() == 0) throw new IllegalStateException("Artifacts were not imported");
+
+   }
+
+   private Set<ActionArtifact> createActions(Set<ActionData> actionDatas, String versionStr, DefaultTeamState toStateOverride) throws Exception {
+      Set<ActionArtifact> actionArts = new HashSet<ActionArtifact>();
+      int currNum = 0;
+      for (ActionData aData : actionDatas) {
+         OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Creating " + currNum++ + "/" + actionDatas.size(), false);
+         int x = 0;
+         for (String prefixTitle : aData.prefixTitles) {
+            ActionArtifact actionArt =
+                  NewActionJob.createAction(null, prefixTitle + " " + aData.postFixTitle,
+                        TITLE_PREFIX[x] + " " + aData.postFixTitle, CHANGE_TYPE[x], PriorityType.Priority_1,
+                        aData.getUserCommunities(), false, null, aData.getActionableItems());
+            actionArts.add(actionArt);
+            for (TeamWorkFlowArtifact teamWf : actionArt.getTeamWorkFlowArtifacts()) {
+               DefaultTeamWorkflowManager dtwm = new DefaultTeamWorkflowManager(teamWf);
+               dtwm.transitionTo((toStateOverride != null ? toStateOverride : aData.toState), null, false);
+               teamWf.persist(true);
+               if (versionStr != null && !versionStr.equals("")) {
+                  VersionArtifact verArt =
+                        ((new ArtifactTypeNameSearch(VersionArtifact.ARTIFACT_NAME, versionStr,
+                              BranchPersistenceManager.getInstance().getAtsBranch())).getSingletonArtifactOrException(VersionArtifact.class));
+                  teamWf.relate(RelationSide.TeamWorkflowTargetedForVersion_Version, verArt);
                   teamWf.persist(true);
-                  if (versionStr != null && !versionStr.equals("")) {
-                     VersionArtifact verArt =
-                           ((new ArtifactTypeNameSearch(VersionArtifact.ARTIFACT_NAME, versionStr,
-                                 BranchPersistenceManager.getInstance().getAtsBranch())).getSingletonArtifactOrException(VersionArtifact.class));
-                     teamWf.relate(RelationSide.TeamWorkflowTargetedForVersion_Version, verArt);
-                     teamWf.persist(true);
-                  }
                }
             }
          }
-         return actionArts;
       }
+      return actionArts;
+   }
 
-      private Set<ActionData> getReqSawActionsData() {
-         Set<ActionData> actionDatas = new HashSet<ActionData>();
-         actionDatas.add(new ActionData(new String[] {"Req Changes for"}, "Diagram View", PriorityType.Priority_1,
-               new String[] {DemoAIs.SAW_Requirements.getAIName(), DemoAIs.SAW_Code.getAIName(),
-                     DemoAIs.SAW_Test.getAIName()}, new Integer[] {1}, DefaultTeamState.Implement, false, false, false));
-         actionDatas.add(new ActionData(new String[] {"More Req Changes for"}, "Diagram View", PriorityType.Priority_3,
-               new String[] {DemoAIs.SAW_Code.getAIName(), DemoAIs.SAW_SW_Design.getAIName(),
-                     DemoAIs.SAW_Requirements.getAIName(), DemoAIs.SAW_Test.getAIName()}, new Integer[] {1},
-               DefaultTeamState.Implement, false, false, false));
-         return actionDatas;
-      }
+   private Set<ActionData> getReqSawActionsData() {
+      Set<ActionData> actionDatas = new HashSet<ActionData>();
+      actionDatas.add(new ActionData(new String[] {"Req Changes for"}, "Diagram View", PriorityType.Priority_1,
+            new String[] {DemoAIs.SAW_Requirements.getAIName(), DemoAIs.SAW_Code.getAIName(),
+                  DemoAIs.SAW_Test.getAIName()}, new Integer[] {1}, DefaultTeamState.Implement, false, false, false));
+      actionDatas.add(new ActionData(new String[] {"More Req Changes for"}, "Diagram View", PriorityType.Priority_3,
+            new String[] {DemoAIs.SAW_Code.getAIName(), DemoAIs.SAW_SW_Design.getAIName(),
+                  DemoAIs.SAW_Requirements.getAIName(), DemoAIs.SAW_Test.getAIName()}, new Integer[] {1},
+            DefaultTeamState.Implement, false, false, false));
+      return actionDatas;
+   }
 
-      private Set<ActionData> getNonReqSawActionData() {
-         Set<ActionData> actionDatas = new HashSet<ActionData>();
-         actionDatas.add(new ActionData(new String[] {"Workaround for", "Window problems"}, "Graph View",
-               PriorityType.Priority_1, new String[] {DemoAIs.Adapter.getAIName(), DemoAIs.SAW_Code.getAIName()},
-               new Integer[] {1}, DefaultTeamState.Implement, false, false, false));
-         actionDatas.add(new ActionData(new String[] {"Working with"}, "Diagram Tree", PriorityType.Priority_3,
-               new String[] {DemoAIs.SAW_Code.getAIName(), DemoAIs.SAW_SW_Design.getAIName(),
-                     DemoAIs.SAW_Requirements.getAIName(), DemoAIs.SAW_Test.getAIName()}, new Integer[] {0, 2},
-               DefaultTeamState.Endorse, false, false, false));
-         actionDatas.add(new ActionData(new String[] {"Problem with the", "Can't see the", "Button A doesn't work on"},
-               "Situation Page", PriorityType.Priority_3, new String[] {DemoAIs.SAW_Code.getAIName(),
-                     DemoAIs.SAW_SW_Design.getAIName(), DemoAIs.SAW_Requirements.getAIName(),
-                     DemoAIs.SAW_Test.getAIName()}, new Integer[] {1, 4}, DefaultTeamState.Analyze, false, false, false));
-         return actionDatas;
-      }
+   private Set<ActionData> getNonReqSawActionData() {
+      Set<ActionData> actionDatas = new HashSet<ActionData>();
+      actionDatas.add(new ActionData(new String[] {"Workaround for", "Window problems"}, "Graph View",
+            PriorityType.Priority_1, new String[] {DemoAIs.Adapter.getAIName(), DemoAIs.SAW_Code.getAIName()},
+            new Integer[] {1}, DefaultTeamState.Implement, false, false, false));
+      actionDatas.add(new ActionData(new String[] {"Working with"}, "Diagram Tree", PriorityType.Priority_3,
+            new String[] {DemoAIs.SAW_Code.getAIName(), DemoAIs.SAW_SW_Design.getAIName(),
+                  DemoAIs.SAW_Requirements.getAIName(), DemoAIs.SAW_Test.getAIName()}, new Integer[] {0, 2},
+            DefaultTeamState.Endorse, false, false, false));
+      actionDatas.add(new ActionData(new String[] {"Problem with the", "Can't see the", "Button A doesn't work on"},
+            "Situation Page", PriorityType.Priority_3,
+            new String[] {DemoAIs.SAW_Code.getAIName(), DemoAIs.SAW_SW_Design.getAIName(),
+                  DemoAIs.SAW_Requirements.getAIName(), DemoAIs.SAW_Test.getAIName()}, new Integer[] {1, 4},
+            DefaultTeamState.Analyze, false, false, false));
+      return actionDatas;
+   }
 
-      private Set<ActionData> getGenericActionData() {
-         Set<ActionData> actionDatas = new HashSet<ActionData>();
-         actionDatas.add(new ActionData(new String[] {"Problem with the", "Can't see the", "Button A doesn't work on",
-               "Add to the", "Make new Button for ", "User can't load "}, "Graph View", PriorityType.Priority_1,
-               new String[] {DemoAIs.Adapter.getAIName(), DemoAIs.CIS_Code.getAIName()}, new Integer[] {1},
-               DefaultTeamState.Implement, false, false, false));
-         actionDatas.add(new ActionData(new String[] {"Problem in", "Can't load", "Button K doesn't work on",
-               "Add more in", "Make same Button for "}, "Diagram Tree", PriorityType.Priority_3, new String[] {
-               DemoAIs.CIS_Code.getAIName(), DemoAIs.CIS_SW_Design.getAIName(), DemoAIs.CIS_Requirements.getAIName(),
-               DemoAIs.CIS_Test.getAIName()}, new Integer[] {0, 2}, DefaultTeamState.Endorse, false, false, false));
-         actionDatas.add(new ActionData(new String[] {"Button W doesn't work on", "Pusing the", "Can't do report"},
-               "Situation Page", PriorityType.Priority_3, new String[] {DemoAIs.CIS_Code.getAIName(),
-                     DemoAIs.CIS_SW_Design.getAIName(), DemoAIs.CIS_Requirements.getAIName(),
-                     DemoAIs.CIS_Test.getAIName()}, new Integer[] {0, 2}, DefaultTeamState.Analyze, false, false, false));
-         actionDatas.add(new ActionData(new String[] {"Problem with the"}, "user window", PriorityType.Priority_4,
-               new String[] {DemoAIs.Timesheet.getAIName()}, new Integer[] {1}, DefaultTeamState.Implement, false,
-               false, false));
-         actionDatas.add(new ActionData(new String[] {"Problem with the"}, "dialog", PriorityType.Priority_2,
-               new String[] {DemoAIs.Reviews.getAIName()}, new Integer[] {1}, DefaultTeamState.Implement, false, false,
-               false));
-         actionDatas.add(new ActionData(new String[] {"Problem with the"}, "results", PriorityType.Priority_3,
-               new String[] {DemoAIs.Timesheet.getAIName()}, new Integer[] {1}, DefaultTeamState.Analyze, false, false,
-               false));
-         actionDatas.add(new ActionData(new String[] {"Button S doesn't work on", "Pusing wont cause",
-               "Reporting needs"}, "help", PriorityType.Priority_3, new String[] {DemoAIs.Reader.getAIName()},
-               new Integer[] {1}, DefaultTeamState.Completed, false, false, false));
-         return actionDatas;
-      }
-
+   private Set<ActionData> getGenericActionData() {
+      Set<ActionData> actionDatas = new HashSet<ActionData>();
+      actionDatas.add(new ActionData(new String[] {"Problem with the", "Can't see the", "Button A doesn't work on",
+            "Add to the", "Make new Button for ", "User can't load "}, "Graph View", PriorityType.Priority_1,
+            new String[] {DemoAIs.Adapter.getAIName(), DemoAIs.CIS_Code.getAIName()}, new Integer[] {1},
+            DefaultTeamState.Implement, false, false, false));
+      actionDatas.add(new ActionData(new String[] {"Problem in", "Can't load", "Button K doesn't work on",
+            "Add more in", "Make same Button for "}, "Diagram Tree", PriorityType.Priority_3, new String[] {
+            DemoAIs.CIS_Code.getAIName(), DemoAIs.CIS_SW_Design.getAIName(), DemoAIs.CIS_Requirements.getAIName(),
+            DemoAIs.CIS_Test.getAIName()}, new Integer[] {0, 2}, DefaultTeamState.Endorse, false, false, false));
+      actionDatas.add(new ActionData(new String[] {"Button W doesn't work on", "Pusing the", "Can't do report"},
+            "Situation Page", PriorityType.Priority_3,
+            new String[] {DemoAIs.CIS_Code.getAIName(), DemoAIs.CIS_SW_Design.getAIName(),
+                  DemoAIs.CIS_Requirements.getAIName(), DemoAIs.CIS_Test.getAIName()}, new Integer[] {0, 2},
+            DefaultTeamState.Analyze, false, false, false));
+      actionDatas.add(new ActionData(new String[] {"Problem with the"}, "user window", PriorityType.Priority_4,
+            new String[] {DemoAIs.Timesheet.getAIName()}, new Integer[] {1}, DefaultTeamState.Implement, false, false,
+            false));
+      actionDatas.add(new ActionData(new String[] {"Problem with the"}, "dialog", PriorityType.Priority_2,
+            new String[] {DemoAIs.Reviews.getAIName()}, new Integer[] {1}, DefaultTeamState.Implement, false, false,
+            false));
+      actionDatas.add(new ActionData(new String[] {"Problem with the"}, "results", PriorityType.Priority_3,
+            new String[] {DemoAIs.Timesheet.getAIName()}, new Integer[] {1}, DefaultTeamState.Analyze, false, false,
+            false));
+      actionDatas.add(new ActionData(new String[] {"Button S doesn't work on", "Pusing wont cause", "Reporting needs"},
+            "help", PriorityType.Priority_3, new String[] {DemoAIs.Reader.getAIName()}, new Integer[] {1},
+            DefaultTeamState.Completed, false, false, false));
+      return actionDatas;
    }
 
    public class ActionData {
@@ -427,4 +453,35 @@ public class PopulateDemoActions extends XNavigateItemAction {
          return aias;
       }
    }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.eclipse.osee.framework.jdk.core.event.IEventReceiver#onEvent(org.eclipse.osee.framework.jdk.core.event.Event)
+    */
+   @SuppressWarnings("deprecation")
+   public void onEvent(Event event) {
+      try {
+         if (event instanceof LocalNewBranchEvent) {
+            Thread.sleep(2000);
+            if (theCurrentThread != null) theCurrentThread.resume();
+         }
+         if (event instanceof LocalCommitBranchEvent) {
+            Thread.sleep(2000);
+            if (theCurrentThread != null) theCurrentThread.resume();
+         }
+      } catch (Exception ex) {
+         OSEELog.logException(AtsConfigDemoDatabaseConfig.class, ex, false);
+      }
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see org.eclipse.osee.framework.jdk.core.event.IEventReceiver#runOnEventInDisplayThread()
+    */
+   public boolean runOnEventInDisplayThread() {
+      return true;
+   }
+
 }
