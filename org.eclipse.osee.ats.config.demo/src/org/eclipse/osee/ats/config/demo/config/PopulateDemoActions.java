@@ -43,16 +43,11 @@ import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactTypeNameSe
 import org.eclipse.osee.framework.skynet.core.attribute.ArtifactSubtypeDescriptor;
 import org.eclipse.osee.framework.skynet.core.attribute.ConfigurationPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.dbinit.SkynetDbInit;
-import org.eclipse.osee.framework.skynet.core.event.LocalCommitBranchEvent;
-import org.eclipse.osee.framework.skynet.core.event.LocalNewBranchEvent;
-import org.eclipse.osee.framework.skynet.core.event.SkynetEventManager;
 import org.eclipse.osee.framework.skynet.core.relation.RelationSide;
 import org.eclipse.osee.framework.skynet.core.transaction.AbstractSkynetTxTemplate;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionIdManager;
 import org.eclipse.osee.framework.skynet.core.user.UserEnum;
 import org.eclipse.osee.framework.skynet.core.util.Requirements;
-import org.eclipse.osee.framework.ui.plugin.event.Event;
-import org.eclipse.osee.framework.ui.plugin.event.IEventReceiver;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
 import org.eclipse.osee.framework.ui.skynet.Import.ArtifactExtractor;
 import org.eclipse.osee.framework.ui.skynet.Import.ArtifactImportJob;
@@ -73,7 +68,7 @@ import org.eclipse.swt.widgets.Display;
  * 
  * @author Donald G. Dunne
  */
-public class PopulateDemoActions extends XNavigateItemAction implements IEventReceiver {
+public class PopulateDemoActions extends XNavigateItemAction {
 
    private String[] TITLE_PREFIX =
          new String[] {"Problem with the", "Can't see the", "Button A doesn't work on", "Add to the",
@@ -81,7 +76,6 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
    private ChangeType[] CHANGE_TYPE =
          new ChangeType[] {ChangeType.Problem, ChangeType.Problem, ChangeType.Problem, ChangeType.Improvement,
                ChangeType.Improvement, ChangeType.Support, ChangeType.Improvement, ChangeType.Support};
-   private Thread theCurrentThread;
 
    public PopulateDemoActions(XNavigateItem parent) {
       super(parent, "Populate Demo Actions");
@@ -90,8 +84,6 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
    @Override
    public void run() throws SQLException {
       AtsPlugin.setEmailEnabled(false);
-      SkynetEventManager.getInstance().register(LocalNewBranchEvent.class, this);
-      SkynetEventManager.getInstance().register(LocalCommitBranchEvent.class, this);
       if (SkynetDbInit.isDbInit() || (!SkynetDbInit.isDbInit() && MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(), getName(), getName()))) {
          try {
@@ -113,7 +105,7 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
                         null);
 
             // Sleep to wait for the persist of the actions
-            Thread.sleep(3000);
+            sleep(3000);
 
             Iterator<ActionArtifact> iter = actionArts.iterator();
             // Working Branch off SAW_Bld_2, Make Changes, Commit
@@ -162,7 +154,7 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
             OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Creating SAW_Bld_2 branch off SAW_Bld_1", false);
             // Create SAW_Bld_2 branch off SAW_Bld_1
             createChildMainWorkingBranch(SawBuilds.SAW_Bld_1.name(), SawBuilds.SAW_Bld_2.name());
-            Thread.sleep(5000);
+            sleep(5000);
             // Map team definitions versions to their related branches
             AtsConfigDemoDatabaseConfig.mapTeamVersionToBranch(DemoTeams.getInstance().getTeamDef(Team.SAW_SW),
                   SawBuilds.SAW_Bld_2.name(), SawBuilds.SAW_Bld_2.name());
@@ -195,7 +187,7 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
       if (result.isFalse()) throw new IllegalArgumentException(
             (new StringBuilder("Error creating working branch: ")).append(result.getText()).toString());
 
-      Thread.sleep(20000);
+      sleep(40000);
 
       setDefaultBranch(reqTeam.getSmaMgr().getBranchMgr().getWorkingBranch());
 
@@ -248,16 +240,21 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
          parentArt.persist(true);
       }
 
-      Thread.sleep(2000L);
+      sleep(2000L);
       OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Committing branch", false);
       result = reqTeam.getSmaMgr().getBranchMgr().commitWorkingBranch(false, true);
       if (result.isFalse()) throw new IllegalArgumentException(
             (new StringBuilder("Error committing working branch: ")).append(result.getText()).toString());
 
-      theCurrentThread = Thread.currentThread();
-      theCurrentThread.suspend();
+      sleep(40000);
 
       OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Completing Action", false);
+   }
+
+   private void sleep(long milliseconds) throws Exception {
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Sleeping " + milliseconds, false);
+      Thread.sleep(milliseconds);
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Awake", false);
    }
 
    private void makeAction2ReqChanges(ActionArtifact actionArt) throws Exception {
@@ -272,7 +269,7 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
       if (result.isFalse()) throw new IllegalArgumentException(
             (new StringBuilder("Error creating working branch: ")).append(result.getText()).toString());
 
-      Thread.sleep(20000);
+      sleep(40000);
 
       setDefaultBranch(reqTeam.getSmaMgr().getBranchMgr().getWorkingBranch());
 
@@ -347,7 +344,7 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
    private void setDefaultBranch(Branch branch) throws Exception {
       OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Setting default branch to \"" + branch + "\".", false);
       BranchPersistenceManager.getInstance().setDefaultBranch(branch);
-      Thread.sleep(2000L);
+      sleep(2000L);
       Branch defaultBranch = BranchPersistenceManager.getInstance().getDefaultBranch();
       OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Current Default == \"" + defaultBranch + "\".", false);
    }
@@ -376,7 +373,7 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
 
    private Set<ActionArtifact> createActions(Set<ActionData> actionDatas, String versionStr, DefaultTeamState toStateOverride) throws Exception {
       Set<ActionArtifact> actionArts = new HashSet<ActionArtifact>();
-      int currNum = 0;
+      int currNum = 1;
       for (ActionData aData : actionDatas) {
          OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Creating " + currNum++ + "/" + actionDatas.size(), false);
          int x = 0;
@@ -507,32 +504,6 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
          }
          return aias;
       }
-   }
-
-   /*
-    * (non-Javadoc)
-    * 
-    * @see org.eclipse.osee.framework.jdk.core.event.IEventReceiver#onEvent(org.eclipse.osee.framework.jdk.core.event.Event)
-    */
-   @SuppressWarnings("deprecation")
-   public void onEvent(Event event) {
-      try {
-         if (event instanceof LocalCommitBranchEvent) {
-            Thread.sleep(2000);
-            if (theCurrentThread != null) theCurrentThread.resume();
-         }
-      } catch (Exception ex) {
-         OSEELog.logException(AtsConfigDemoDatabaseConfig.class, ex, false);
-      }
-   }
-
-   /*
-    * (non-Javadoc)
-    * 
-    * @see org.eclipse.osee.framework.jdk.core.event.IEventReceiver#runOnEventInDisplayThread()
-    */
-   public boolean runOnEventInDisplayThread() {
-      return true;
    }
 
    private enum DemoAIs {
