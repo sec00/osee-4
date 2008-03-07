@@ -280,7 +280,7 @@
     <child ID="436" label="SAW Code" x="-330.94748" y="0.9427185"
         width="151.1" height="31.349998" strokeWidth="1.0"
         autoSized="true" xsi:type="node">
-        <notes>Lead:Jason Baker%nl;Lead:Steven Joan%nl;AtsTeamUsesVersions%nl;StaticId:saw.code%nl;WorkflowId:demo_code_workflow</notes>
+        <notes>Lead:Joe Smith%nl;Lead:Steven Joan%nl;AtsTeamUsesVersions%nl;StaticId:saw.code%nl;WorkflowId:demo_code_workflow</notes>
         <fillColor>#a7c2e9</fillColor>
         <strokeColor>#776d6d</strokeColor>
         <font>Arial-plain-14</font>
@@ -291,7 +291,7 @@
     <child ID="437" label="SAW Requirements" x="-184.53745"
         y="43.577698" width="211.14" height="34.690002"
         strokeWidth="1.0" autoSized="true" xsi:type="node">
-        <notes>Lead:Bill Michael%nl;Lead:Terry Stevens%nl;AtsTeamUsesVersions%nl;StaticId:saw.requirements%nl;WorkflowId:demo_req_workflow</notes>
+        <notes>Lead:Bill Michael%nl;Lead:Joe Smith%nl;AtsTeamUsesVersions%nl;StaticId:saw.requirements%nl;WorkflowId:demo_req_workflow</notes>
         <fillColor>#a7c2e9</fillColor>
         <strokeColor>#776d6d</strokeColor>
         <font>Arial-plain-14</font>
@@ -637,7 +637,7 @@
     <child ID="498" label="CIS Requirements" x="229.57254"
         y="-46.475266" width="211.14" height="34.690002"
         strokeWidth="1.0" autoSized="true" xsi:type="node">
-        <notes>Lead:Bill Michael%nl;Lead:Terry Stevens%nl;WorkflowId:demo_req_workflow%nl;AtsTeamUsesVersions%nl;StaticId:cis.requirements</notes>
+        <notes>Lead:Bill Michael%nl;Lead:Joe Smith%nl;WorkflowId:demo_req_workflow%nl;AtsTeamUsesVersions%nl;StaticId:cis.requirements</notes>
         <fillColor>#a7c2e9</fillColor>
         <strokeColor>#776d6d</strokeColor>
         <font>Arial-plain-14</font>
