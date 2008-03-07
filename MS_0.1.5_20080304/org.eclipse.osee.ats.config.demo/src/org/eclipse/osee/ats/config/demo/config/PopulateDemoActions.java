@@ -50,6 +50,7 @@ import org.eclipse.osee.framework.skynet.core.relation.RelationSide;
 import org.eclipse.osee.framework.skynet.core.transaction.AbstractSkynetTxTemplate;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionIdManager;
 import org.eclipse.osee.framework.skynet.core.user.UserEnum;
+import org.eclipse.osee.framework.skynet.core.util.Requirements;
 import org.eclipse.osee.framework.ui.plugin.event.Event;
 import org.eclipse.osee.framework.ui.plugin.event.IEventReceiver;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
@@ -80,28 +81,6 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
    private ChangeType[] CHANGE_TYPE =
          new ChangeType[] {ChangeType.Problem, ChangeType.Problem, ChangeType.Problem, ChangeType.Improvement,
                ChangeType.Improvement, ChangeType.Support, ChangeType.Improvement, ChangeType.Support};
-   private enum DemoAIs {
-      Computers,
-      Network,
-      Config_Mgmt,
-      Reviews,
-      Timesheet,
-      Website,
-      Reader,
-      CIS_Code,
-      CIS_Test,
-      CIS_Requirements,
-      CIS_SW_Design,
-      SAW_Code,
-      SAW_Test,
-      SAW_Requirements,
-      SAW_SW_Design,
-      Adapter;
-
-      public String getAIName() {
-         return name().replaceAll("_", " ");
-      }
-   }
    private Thread theCurrentThread;
 
    public PopulateDemoActions(XNavigateItem parent) {
@@ -110,33 +89,48 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
 
    @Override
    public void run() throws SQLException {
+      AtsPlugin.setEmailEnabled(false);
       SkynetEventManager.getInstance().register(LocalNewBranchEvent.class, this);
       SkynetEventManager.getInstance().register(LocalCommitBranchEvent.class, this);
       if (SkynetDbInit.isDbInit() || (!SkynetDbInit.isDbInit() && MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(), getName(), getName()))) {
          try {
+            // Import all requirements on SAW_Bld_1 Branch
             ImportRequirementsTx importTx =
                   new ImportRequirementsTx(BranchPersistenceManager.getInstance().getAtsBranch(),
                         !SkynetDbInit.isDbInit());
             importTx.execute();
 
+            // Create SAW_Bld_2 Child Main Working Branch off SAW_Bld_1
             CreateMainWorkingBranchTx saw2BranchTx =
                   new CreateMainWorkingBranchTx(BranchPersistenceManager.getInstance().getAtsBranch(),
                         !SkynetDbInit.isDbInit());
             saw2BranchTx.execute();
 
-            // Create SawBld2 actions
-            createSawBld2ReqChangeDemoActions();
+            // Create SAW_Bld_2 Actions 
+            Set<ActionArtifact> actionArts =
+                  createActions(getReqSawActionsData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_2.toString(),
+                        null);
 
-            // importOtherRequirements();
-            // createNonReqChangeDemoActions();
+            // Sleep to wait for the persist of the actions
+            Thread.sleep(3000);
+
+            Iterator<ActionArtifact> iter = actionArts.iterator();
+            // Working Branch off SAW_Bld_2, Make Changes, Commit
+            makeAction1ReqChanges(iter.next());
+
+            // Working Branch off SAW_Bld_2, Make Changes, DON'T Commit
+            makeAction2ReqChanges(iter.next());
+
+            createNonReqChangeDemoActions();
+
+            OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Populate Complete", false);
 
          } catch (Exception ex) {
             OSEELog.logException(OseeAtsConfigDemoPlugin.class, ex, false);
          }
       }
    }
-
    public class ImportRequirementsTx extends AbstractSkynetTxTemplate {
       public ImportRequirementsTx(Branch branch, boolean popup) {
          super(branch);
@@ -145,12 +139,14 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
       @Override
       protected void handleTxWork() throws Exception {
          try {
-            AtsPlugin.setEmailEnabled(false);
-            importSoftwareRequirementsToSawBld1();
+            importRequirements(SawBuilds.SAW_Bld_1.name(), Requirements.SOFTWARE_REQUIREMENT + "s",
+                  Requirements.SOFTWARE_REQUIREMENT, "support/SAW-SoftwareRequirements.xml");
+            importRequirements(SawBuilds.SAW_Bld_1.name(), Requirements.SYSTEM_REQUREMENT + "s",
+                  Requirements.SYSTEM_REQUREMENT, "support/SAW-SystemRequirements.xml");
+            importRequirements(SawBuilds.SAW_Bld_1.name(), Requirements.SUBSYSTEM_REQUIREMENT + "s",
+                  Requirements.SUBSYSTEM_REQUIREMENT, "support/SAW-SubsystemRequirements.xml");
          } catch (Exception ex) {
             OSEELog.logException(OseeAtsConfigDemoPlugin.class, ex, false);
-         } finally {
-            AtsPlugin.setEmailEnabled(true);
          }
       }
    }
@@ -163,7 +159,7 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
       @Override
       protected void handleTxWork() throws Exception {
          try {
-            AtsPlugin.setEmailEnabled(false);
+            OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Creating SAW_Bld_2 branch off SAW_Bld_1", false);
             // Create SAW_Bld_2 branch off SAW_Bld_1
             createChildMainWorkingBranch(SawBuilds.SAW_Bld_1.name(), SawBuilds.SAW_Bld_2.name());
             Thread.sleep(5000);
@@ -172,8 +168,6 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
                   SawBuilds.SAW_Bld_2.name(), SawBuilds.SAW_Bld_2.name());
          } catch (Exception ex) {
             OSEELog.logException(OseeAtsConfigDemoPlugin.class, ex, false);
-         } finally {
-            AtsPlugin.setEmailEnabled(true);
          }
       }
    }
@@ -188,19 +182,8 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
       return childBranch;
    }
 
-   private void createSawBld2ReqChangeDemoActions() throws Exception {
-      Set<ActionArtifact> actionArts =
-            createActions(getReqSawActionsData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_2.toString(), null);
-
-      // Sleep to wait for the persist of the actions
-      Thread.sleep(3000);
-
-      Iterator<ActionArtifact> iter = actionArts.iterator();
-      makeAction1ReqChanges(iter.next());
-      makeAction2ReqChanges(iter.next());
-   }
-
    private void makeAction1ReqChanges(ActionArtifact actionArt) throws Exception {
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Making Action 1 Requirement Changes", false);
       TeamWorkFlowArtifact reqTeam = null;
       for (TeamWorkFlowArtifact team : actionArt.getTeamWorkFlowArtifacts()) {
          if (team.getTeamDefinition().getDescriptiveName().contains("Req")) reqTeam = team;
@@ -212,37 +195,57 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
       if (result.isFalse()) throw new IllegalArgumentException(
             (new StringBuilder("Error creating working branch: ")).append(result.getText()).toString());
 
-      theCurrentThread = Thread.currentThread();
-      //         theCurrentThread.suspend();
-      theCurrentThread.sleep(5000);
+      Thread.sleep(20000);
 
-      BranchPersistenceManager.getInstance().setDefaultBranch(reqTeam.getSmaMgr().getBranchMgr().getWorkingBranch());
-      Thread.sleep(2000L);
+      setDefaultBranch(reqTeam.getSmaMgr().getBranchMgr().getWorkingBranch());
 
-      for (Artifact art : getRobotSoftwareRequirements()) {
+      for (Artifact art : getSoftwareRequirements(SoftwareRequirementStrs.Robot)) {
          OSEELog.logInfo(OseeAtsConfigDemoPlugin.class,
                (new StringBuilder("Modifying artifact => ")).append(art).toString(), false);
          art.setSoleAttributeValue(ProgramAttributes.CSCI.name(), Cscis.Navigation.name());
          art.setSoleAttributeValue(ProgramAttributes.Safety_Criticality.name(), "A");
          art.setSoleAttributeValue(ProgramAttributes.Subsystem.name(), Subsystems.Navigation.name());
          ArtifactTypeNameSearch srch =
-               new ArtifactTypeNameSearch("Component", "Navigation",
+               new ArtifactTypeNameSearch(Requirements.COMPONENT, "Navigation",
                      BranchPersistenceManager.getInstance().getDefaultBranch());
          art.relate(RelationSide.ALLOCATION__COMPONENT, srch.getSingletonArtifactOrException(Artifact.class));
          art.persist(true);
       }
 
-      for (Artifact art : getEventSoftwareRequirements()) {
+      for (Artifact art : getSoftwareRequirements(SoftwareRequirementStrs.Event)) {
          OSEELog.logInfo(OseeAtsConfigDemoPlugin.class,
                (new StringBuilder("Modifying artifact => ")).append(art).toString(), false);
          art.setSoleAttributeValue(ProgramAttributes.CSCI.name(), Cscis.Interface.name());
          art.setSoleAttributeValue(ProgramAttributes.Safety_Criticality.name(), "D");
          art.setSoleAttributeValue(ProgramAttributes.Subsystem.name(), Subsystems.Communications.name());
          ArtifactTypeNameSearch srch =
-               new ArtifactTypeNameSearch("Component", "Robot API",
+               new ArtifactTypeNameSearch(Requirements.COMPONENT, "Robot API",
                      BranchPersistenceManager.getInstance().getDefaultBranch());
          art.relate(RelationSide.ALLOCATION__COMPONENT, srch.getSingletonArtifactOrException(Artifact.class));
          art.persist(true);
+      }
+
+      // Delete two artifacts
+      for (Artifact art : getSoftwareRequirements(SoftwareRequirementStrs.daVinci)) {
+         OSEELog.logInfo(OseeAtsConfigDemoPlugin.class,
+               (new StringBuilder("Deleting artifact => ")).append(art).toString(), false);
+         art.delete();
+      }
+
+      // Add three new artifacts
+      Artifact parentArt = getInterfaceInitializationSoftwareRequirement();
+      for (int x = 1; x < 4; x++) {
+         String name = "Robot Interface Init " + x;
+         OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Adding artifact => " + name, false);
+         Artifact newArt =
+               ConfigurationPersistenceManager.getInstance().getArtifactSubtypeDescriptor(
+                     Requirements.SOFTWARE_REQUIREMENT).makeNewArtifact(parentArt.getBranch());
+         newArt.setDescriptiveName(name);
+         newArt.setSoleAttributeValue(ProgramAttributes.Safety_Criticality.name(), "D");
+         newArt.setSoleAttributeValue(ProgramAttributes.Subsystem.name(), Subsystems.Communications.name());
+         newArt.persist(true);
+         parentArt.addChild(newArt);
+         parentArt.persist(true);
       }
 
       Thread.sleep(2000L);
@@ -252,49 +255,101 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
             (new StringBuilder("Error committing working branch: ")).append(result.getText()).toString());
 
       theCurrentThread = Thread.currentThread();
-      theCurrentThread.sleep(10000);
+      theCurrentThread.suspend();
 
       OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Completing Action", false);
    }
 
-   private Set<Artifact> getRobotSoftwareRequirements() {
-      ArtifactTypeNameSearch srch =
-            new ArtifactTypeNameSearch("Software Requirement", "Robot",
-                  BranchPersistenceManager.getInstance().getDefaultBranch(), SearchOperator.LIKE);
-      return srch.getArtifacts(Artifact.class);
-   }
-
-   private Set<Artifact> getEventSoftwareRequirements() {
-      ArtifactTypeNameSearch srch =
-            new ArtifactTypeNameSearch("Software Requirement", "Event",
-                  BranchPersistenceManager.getInstance().getDefaultBranch(), SearchOperator.LIKE);
-      return srch.getArtifacts(Artifact.class);
-   }
-
    private void makeAction2ReqChanges(ActionArtifact actionArt) throws Exception {
+      TeamWorkFlowArtifact reqTeam = null;
+      for (TeamWorkFlowArtifact team : actionArt.getTeamWorkFlowArtifacts()) {
+         if (team.getTeamDefinition().getDescriptiveName().contains("Req")) reqTeam = team;
+      }
+
+      if (reqTeam == null) throw new IllegalArgumentException("Can't locate Req team.");
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Creating working branch", false);
+      Result result = reqTeam.getSmaMgr().getBranchMgr().createWorkingBranch(null, false);
+      if (result.isFalse()) throw new IllegalArgumentException(
+            (new StringBuilder("Error creating working branch: ")).append(result.getText()).toString());
+
+      Thread.sleep(20000);
+
+      setDefaultBranch(reqTeam.getSmaMgr().getBranchMgr().getWorkingBranch());
+
+      for (Artifact art : getSoftwareRequirements(SoftwareRequirementStrs.Functional)) {
+         OSEELog.logInfo(OseeAtsConfigDemoPlugin.class,
+               (new StringBuilder("Modifying artifact => ")).append(art).toString(), false);
+         art.setSoleAttributeValue(ProgramAttributes.CSCI.name(), Cscis.Interface.name());
+         art.setSoleAttributeValue(ProgramAttributes.Safety_Criticality.name(), "D");
+         art.setSoleAttributeValue(ProgramAttributes.Subsystem.name(), Subsystems.Communications.name());
+         ArtifactTypeNameSearch srch =
+               new ArtifactTypeNameSearch(Requirements.COMPONENT, "Robot API",
+                     BranchPersistenceManager.getInstance().getDefaultBranch());
+         art.relate(RelationSide.ALLOCATION__COMPONENT, srch.getSingletonArtifactOrException(Artifact.class));
+         art.persist(true);
+      }
+
+      // Delete one artifacts
+      for (Artifact art : getSoftwareRequirements(SoftwareRequirementStrs.CISST)) {
+         OSEELog.logInfo(OseeAtsConfigDemoPlugin.class,
+               (new StringBuilder("Deleting artifact => ")).append(art).toString(), false);
+         art.delete();
+      }
+
+      // Add two new artifacts
+      Artifact parentArt = getInterfaceInitializationSoftwareRequirement();
+      for (int x = 15; x < 17; x++) {
+         String name = "Claw Interface Init " + x;
+         OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Adding artifact => " + name, false);
+         Artifact newArt =
+               ConfigurationPersistenceManager.getInstance().getArtifactSubtypeDescriptor(
+                     Requirements.SOFTWARE_REQUIREMENT).makeNewArtifact(parentArt.getBranch());
+         newArt.setDescriptiveName(name);
+         newArt.setSoleAttributeValue(ProgramAttributes.Safety_Criticality.name(), "D");
+         newArt.setSoleAttributeValue(ProgramAttributes.Subsystem.name(), Subsystems.Communications.name());
+         newArt.persist(true);
+         parentArt.addChild(newArt);
+         parentArt.persist(true);
+      }
 
    }
 
-   //      private void createNonReqChangeDemoActions() throws Exception {
-   //         createActions(getNonReqSawActionData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_3.toString(), null);
-   //         createActions(getNonReqSawActionData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_2.toString(), null);
-   //         createActions(getNonReqSawActionData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_1.toString(),
-   //               DefaultTeamState.Completed);
-   //         createActions(getGenericActionData(), null, null);
-   //      }
-   //
-   //      private void importOtherRequirements() throws Exception {
-   //         // Import Requirements
-   //         importRequirements(SawBuilds.SAW_Bld_1.name(), "System Requirements", "System Requirement",
-   //               "support/SAW-SystemRequirements.xml");
-   //         importRequirements(SawBuilds.SAW_Bld_1.name(), "Subsystem Requirements", "Subsystem Requirement",
-   //               "support/SAW-SubsystemRequirements.xml");
-   //      }
+   private enum SoftwareRequirementStrs {
+      Robot, CISST, daVinci, Functional, Event
+   };
 
-   private void importSoftwareRequirementsToSawBld1() throws Exception {
-      // Import Requirements
-      importRequirements(SawBuilds.SAW_Bld_1.name(), "Software Requirements", "Software Requirement",
-            "support/SAW-SoftwareRequirements.xml");
+   private Set<Artifact> getSoftwareRequirements(SoftwareRequirementStrs str) {
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Getting \"" + str + "\" requirement(s).", false);
+      ArtifactTypeNameSearch srch =
+            new ArtifactTypeNameSearch(Requirements.SOFTWARE_REQUIREMENT, str.name(),
+                  BranchPersistenceManager.getInstance().getDefaultBranch(), SearchOperator.LIKE);
+      return srch.getArtifacts(Artifact.class);
+   }
+
+   private static String INTERFACE_INITIALIZATION = "Interface Initialization";
+
+   private Artifact getInterfaceInitializationSoftwareRequirement() {
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Getting \"" + INTERFACE_INITIALIZATION + "\" requirement.", false);
+      ArtifactTypeNameSearch srch =
+            new ArtifactTypeNameSearch(Requirements.SOFTWARE_REQUIREMENT, INTERFACE_INITIALIZATION,
+                  BranchPersistenceManager.getInstance().getDefaultBranch(), SearchOperator.EQUAL);
+      return srch.getArtifacts(Artifact.class).iterator().next();
+   }
+
+   private void createNonReqChangeDemoActions() throws Exception {
+      createActions(getNonReqSawActionData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_3.toString(), null);
+      createActions(getNonReqSawActionData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_2.toString(), null);
+      createActions(getNonReqSawActionData(), AtsConfigDemoDatabaseConfig.SawBuilds.SAW_Bld_1.toString(),
+            DefaultTeamState.Completed);
+      createActions(getGenericActionData(), null, null);
+   }
+
+   private void setDefaultBranch(Branch branch) throws Exception {
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Setting default branch to \"" + branch + "\".", false);
+      BranchPersistenceManager.getInstance().setDefaultBranch(branch);
+      Thread.sleep(2000L);
+      Branch defaultBranch = BranchPersistenceManager.getInstance().getDefaultBranch();
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Current Default == \"" + defaultBranch + "\".", false);
    }
 
    private void importRequirements(String buildName, String rootArtifactName, String requirementArtifactName, String filename) throws Exception {
@@ -462,10 +517,6 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
    @SuppressWarnings("deprecation")
    public void onEvent(Event event) {
       try {
-         if (event instanceof LocalNewBranchEvent) {
-            Thread.sleep(2000);
-            if (theCurrentThread != null) theCurrentThread.resume();
-         }
          if (event instanceof LocalCommitBranchEvent) {
             Thread.sleep(2000);
             if (theCurrentThread != null) theCurrentThread.resume();
@@ -482,6 +533,29 @@ public class PopulateDemoActions extends XNavigateItemAction implements IEventRe
     */
    public boolean runOnEventInDisplayThread() {
       return true;
+   }
+
+   private enum DemoAIs {
+      Computers,
+      Network,
+      Config_Mgmt,
+      Reviews,
+      Timesheet,
+      Website,
+      Reader,
+      CIS_Code,
+      CIS_Test,
+      CIS_Requirements,
+      CIS_SW_Design,
+      SAW_Code,
+      SAW_Test,
+      SAW_Requirements,
+      SAW_SW_Design,
+      Adapter;
+
+      public String getAIName() {
+         return name().replaceAll("_", " ");
+      }
    }
 
 }
