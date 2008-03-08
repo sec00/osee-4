@@ -18,6 +18,7 @@ import org.eclipse.osee.ats.AtsPlugin;
 import org.eclipse.osee.ats.artifact.ATSAttributes;
 import org.eclipse.osee.ats.artifact.TeamDefinitionArtifact;
 import org.eclipse.osee.ats.artifact.VersionArtifact;
+import org.eclipse.osee.ats.config.AtsDatabaseConfig;
 import org.eclipse.osee.ats.config.ImportWorkflowAction;
 import org.eclipse.osee.ats.config.LoadAIsAndTeamsAction;
 import org.eclipse.osee.ats.config.demo.OseeAtsConfigDemoPlugin;
@@ -49,6 +50,8 @@ public class AtsConfigDemoDatabaseConfig extends DbInitializationTask {
       // Creates Actionable Items and Teams
       // Teams are related to workflow by id specified in team object in VUE diagram
       (new LoadAIsAndTeamsAction(false, OseeAtsConfigDemoPlugin.PLUGIN_ID)).run();
+      // Link review and task workflows
+      AtsDatabaseConfig.linkHeadTeamDefinitionWithReviewsAndTaskWorkflowDiagrams();
       // Create initial version artifacts for Widget teams
       createVersionArtifacts();
       // Create SAW_Bld_1 branch
