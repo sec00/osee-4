@@ -402,10 +402,15 @@ public class PopulateDemoActions extends XNavigateItemAction {
 
    private Set<ActionData> getReqSawActionsData() {
       Set<ActionData> actionDatas = new HashSet<ActionData>();
-      actionDatas.add(new ActionData(new String[] {"Req Changes for"}, "Diagram View", PriorityType.Priority_1,
-            new String[] {DemoAIs.SAW_Requirements.getAIName(), DemoAIs.SAW_Code.getAIName(),
+      actionDatas.add(new ActionData(new String[] {"SAW Requirement (committed) Changes for"}, "Diagram View",
+            PriorityType.Priority_1, new String[] {DemoAIs.SAW_Requirements.getAIName(), DemoAIs.SAW_Code.getAIName(),
                   DemoAIs.SAW_Test.getAIName()}, new Integer[] {1}, DefaultTeamState.Implement, false, false, false));
-      actionDatas.add(new ActionData(new String[] {"More Req Changes for"}, "Diagram View", PriorityType.Priority_3,
+      actionDatas.add(new ActionData(new String[] {"SAW More Requirement (uncommitted) Changes for"}, "Diagram View",
+            PriorityType.Priority_3, new String[] {DemoAIs.SAW_Code.getAIName(), DemoAIs.SAW_SW_Design.getAIName(),
+                  DemoAIs.SAW_Requirements.getAIName(), DemoAIs.SAW_Test.getAIName()}, new Integer[] {1},
+            DefaultTeamState.Implement, false, false, false));
+      actionDatas.add(new ActionData(new String[] {"SAW Even More Requirement (no-branch) Changes for"},
+            "Diagram View", PriorityType.Priority_3,
             new String[] {DemoAIs.SAW_Code.getAIName(), DemoAIs.SAW_SW_Design.getAIName(),
                   DemoAIs.SAW_Requirements.getAIName(), DemoAIs.SAW_Test.getAIName()}, new Integer[] {1},
             DefaultTeamState.Implement, false, false, false));
@@ -414,48 +419,35 @@ public class PopulateDemoActions extends XNavigateItemAction {
 
    private Set<ActionData> getNonReqSawActionData() {
       Set<ActionData> actionDatas = new HashSet<ActionData>();
-      actionDatas.add(new ActionData(new String[] {"Workaround for", "Window problems"}, "Graph View",
-            PriorityType.Priority_1, new String[] {DemoAIs.Adapter.getAIName(), DemoAIs.SAW_Code.getAIName()},
-            new Integer[] {1}, DefaultTeamState.Implement, false, false, false));
+      actionDatas.add(new ActionData(new String[] {"Workaround for"}, "Graph View", PriorityType.Priority_1,
+            new String[] {DemoAIs.Adapter.getAIName(), DemoAIs.SAW_Code.getAIName()}, new Integer[] {1},
+            DefaultTeamState.Implement, false, false, false));
       actionDatas.add(new ActionData(new String[] {"Working with"}, "Diagram Tree", PriorityType.Priority_3,
             new String[] {DemoAIs.SAW_Code.getAIName(), DemoAIs.SAW_SW_Design.getAIName(),
                   DemoAIs.SAW_Requirements.getAIName(), DemoAIs.SAW_Test.getAIName()}, new Integer[] {0, 2},
             DefaultTeamState.Endorse, false, false, false));
-      actionDatas.add(new ActionData(new String[] {"Problem with the", "Can't see the", "Button A doesn't work on"},
-            "Situation Page", PriorityType.Priority_3,
-            new String[] {DemoAIs.SAW_Code.getAIName(), DemoAIs.SAW_SW_Design.getAIName(),
-                  DemoAIs.SAW_Requirements.getAIName(), DemoAIs.SAW_Test.getAIName()}, new Integer[] {1, 4},
-            DefaultTeamState.Analyze, false, false, false));
       return actionDatas;
    }
 
    private Set<ActionData> getGenericActionData() {
       Set<ActionData> actionDatas = new HashSet<ActionData>();
-      actionDatas.add(new ActionData(new String[] {"Problem with the", "Can't see the", "Button A doesn't work on",
-            "Add to the", "Make new Button for ", "User can't load "}, "Graph View", PriorityType.Priority_1,
-            new String[] {DemoAIs.Adapter.getAIName(), DemoAIs.CIS_Code.getAIName()}, new Integer[] {1},
-            DefaultTeamState.Implement, false, false, false));
-      actionDatas.add(new ActionData(new String[] {"Problem in", "Can't load", "Button K doesn't work on",
-            "Add more in", "Make same Button for "}, "Diagram Tree", PriorityType.Priority_3, new String[] {
-            DemoAIs.CIS_Code.getAIName(), DemoAIs.CIS_SW_Design.getAIName(), DemoAIs.CIS_Requirements.getAIName(),
-            DemoAIs.CIS_Test.getAIName()}, new Integer[] {0, 2}, DefaultTeamState.Endorse, false, false, false));
-      actionDatas.add(new ActionData(new String[] {"Button W doesn't work on", "Pusing the", "Can't do report"},
-            "Situation Page", PriorityType.Priority_3,
-            new String[] {DemoAIs.CIS_Code.getAIName(), DemoAIs.CIS_SW_Design.getAIName(),
+      actionDatas.add(new ActionData(new String[] {"Problem with the", "Can't see the"}, "Graph View",
+            PriorityType.Priority_1, new String[] {DemoAIs.Adapter.getAIName(), DemoAIs.CIS_Code.getAIName()},
+            new Integer[] {1}, DefaultTeamState.Implement, false, false, false));
+      actionDatas.add(new ActionData(new String[] {"Problem in", "Can't load"}, "Diagram Tree",
+            PriorityType.Priority_3, new String[] {DemoAIs.CIS_Code.getAIName(), DemoAIs.CIS_SW_Design.getAIName(),
+                  DemoAIs.CIS_Requirements.getAIName(), DemoAIs.CIS_Test.getAIName()}, new Integer[] {0, 2},
+            DefaultTeamState.Endorse, false, false, false));
+      actionDatas.add(new ActionData(new String[] {"Button W doesn't work on"}, "Situation Page",
+            PriorityType.Priority_3, new String[] {DemoAIs.CIS_Code.getAIName(), DemoAIs.CIS_SW_Design.getAIName(),
                   DemoAIs.CIS_Requirements.getAIName(), DemoAIs.CIS_Test.getAIName()}, new Integer[] {0, 2},
             DefaultTeamState.Analyze, false, false, false));
       actionDatas.add(new ActionData(new String[] {"Problem with the"}, "user window", PriorityType.Priority_4,
             new String[] {DemoAIs.Timesheet.getAIName()}, new Integer[] {1}, DefaultTeamState.Implement, false, false,
             false));
-      actionDatas.add(new ActionData(new String[] {"Problem with the"}, "dialog", PriorityType.Priority_2,
-            new String[] {DemoAIs.Reviews.getAIName()}, new Integer[] {1}, DefaultTeamState.Implement, false, false,
+      actionDatas.add(new ActionData(new String[] {"Button S doesn't work on"}, "help", PriorityType.Priority_3,
+            new String[] {DemoAIs.Reader.getAIName()}, new Integer[] {1}, DefaultTeamState.Completed, false, false,
             false));
-      actionDatas.add(new ActionData(new String[] {"Problem with the"}, "results", PriorityType.Priority_3,
-            new String[] {DemoAIs.Timesheet.getAIName()}, new Integer[] {1}, DefaultTeamState.Analyze, false, false,
-            false));
-      actionDatas.add(new ActionData(new String[] {"Button S doesn't work on", "Pusing wont cause", "Reporting needs"},
-            "help", PriorityType.Priority_3, new String[] {DemoAIs.Reader.getAIName()}, new Integer[] {1},
-            DefaultTeamState.Completed, false, false, false));
       return actionDatas;
    }
 
