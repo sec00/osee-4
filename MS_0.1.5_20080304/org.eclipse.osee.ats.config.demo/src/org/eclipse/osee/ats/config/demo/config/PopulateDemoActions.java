@@ -14,7 +14,6 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -93,6 +92,12 @@ public class PopulateDemoActions extends XNavigateItemAction {
                         !SkynetDbInit.isDbInit());
             importTx.execute();
 
+            // Create traceability between System, Subsystem and Software requirements
+            CreateTraceabilityTx traceTx =
+                  new CreateTraceabilityTx(BranchPersistenceManager.getInstance().getAtsBranch(),
+                        !SkynetDbInit.isDbInit());
+            traceTx.execute();
+
             // Create SAW_Bld_2 Child Main Working Branch off SAW_Bld_1
             CreateMainWorkingBranchTx saw2BranchTx =
                   new CreateMainWorkingBranchTx(BranchPersistenceManager.getInstance().getAtsBranch(),
@@ -107,13 +112,17 @@ public class PopulateDemoActions extends XNavigateItemAction {
             // Sleep to wait for the persist of the actions
             sleep(3000);
 
-            Iterator<ActionArtifact> iter = actionArts.iterator();
-            // Working Branch off SAW_Bld_2, Make Changes, Commit
-            makeAction1ReqChanges(iter.next());
+            for (ActionArtifact actionArt : actionArts) {
+               if (actionArt.getDescriptiveName().contains("(committed)")) {
+                  // Working Branch off SAW_Bld_2, Make Changes, Commit
+                  makeAction1ReqChanges(actionArt);
+               } else if (actionArt.getDescriptiveName().contains("(uncommitted)")) {
+                  // Working Branch off SAW_Bld_2, Make Changes, DON'T Commit
+                  makeAction2ReqChanges(actionArt);
+               }
+            }
 
-            // Working Branch off SAW_Bld_2, Make Changes, DON'T Commit
-            makeAction2ReqChanges(iter.next());
-
+            // Create actions against non-requirement AIs and Teams
             createNonReqChangeDemoActions();
 
             OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Populate Complete", false);
@@ -123,6 +132,55 @@ public class PopulateDemoActions extends XNavigateItemAction {
          }
       }
    }
+
+   public class CreateTraceabilityTx extends AbstractSkynetTxTemplate {
+      public CreateTraceabilityTx(Branch branch, boolean popup) {
+         super(branch);
+      }
+
+      @Override
+      protected void handleTxWork() throws Exception {
+         try {
+            Collection<Artifact> systemArts = getArtTypeRequirements(Requirements.SYSTEM_REQUREMENT, "Robot");
+
+            Collection<Artifact> component = getArtTypeRequirements(Requirements.COMPONENT, "API");
+            component.addAll(getArtTypeRequirements(Requirements.COMPONENT, "Hardware"));
+            component.addAll(getArtTypeRequirements(Requirements.COMPONENT, "Sensor"));
+
+            Collection<Artifact> subSystemArts = getArtTypeRequirements(Requirements.SUBSYSTEM_REQUIREMENT, "Robot");
+            subSystemArts.addAll(getArtTypeRequirements(Requirements.SUBSYSTEM_REQUIREMENT, "Video"));
+            subSystemArts.addAll(getArtTypeRequirements(Requirements.SUBSYSTEM_REQUIREMENT, "Interface"));
+
+            Collection<Artifact> softArts = getArtTypeRequirements(Requirements.SOFTWARE_REQUIREMENT, "Robot");
+            softArts.addAll(getArtTypeRequirements(Requirements.SOFTWARE_REQUIREMENT, "Video"));
+            softArts.addAll(getArtTypeRequirements(Requirements.SOFTWARE_REQUIREMENT, "Interface"));
+
+            // Relate System to SubSystem to Software Requirements
+            for (Artifact systemArt : systemArts) {
+               systemArt.relate(RelationSide.REQUIREMENT_TRACE__LOWER_LEVEL, subSystemArts, true);
+
+               for (Artifact subSystemArt : subSystemArts) {
+                  subSystemArt.relate(RelationSide.REQUIREMENT_TRACE__LOWER_LEVEL, softArts, true);
+               }
+            }
+
+            // Relate System, SubSystem and Software Requirements to Componets
+            for (Artifact art : systemArts)
+               art.relate(RelationSide.ALLOCATION__COMPONENT, component, true);
+            for (Artifact art : subSystemArts)
+               art.relate(RelationSide.ALLOCATION__COMPONENT, component, true);
+            for (Artifact art : softArts)
+               art.relate(RelationSide.ALLOCATION__COMPONENT, component, true);
+
+            // Relate Software Artifacts to Test 
+            System.err.println("Add trace to test artifacts (once talk to Ryan)");
+
+         } catch (Exception ex) {
+            OSEELog.logException(OseeAtsConfigDemoPlugin.class, ex, false);
+         }
+      }
+   }
+
    public class ImportRequirementsTx extends AbstractSkynetTxTemplate {
       public ImportRequirementsTx(Branch branch, boolean popup) {
          super(branch);
@@ -316,9 +374,13 @@ public class PopulateDemoActions extends XNavigateItemAction {
    };
 
    private Set<Artifact> getSoftwareRequirements(SoftwareRequirementStrs str) {
-      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Getting \"" + str + "\" requirement(s).", false);
+      return getArtTypeRequirements(Requirements.SOFTWARE_REQUIREMENT, str.name());
+   }
+
+   private Set<Artifact> getArtTypeRequirements(String artifactType, String artifactNameStr) {
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Getting \"" + artifactNameStr + "\" requirement(s).", false);
       ArtifactTypeNameSearch srch =
-            new ArtifactTypeNameSearch(Requirements.SOFTWARE_REQUIREMENT, str.name(),
+            new ArtifactTypeNameSearch(artifactType, artifactNameStr,
                   BranchPersistenceManager.getInstance().getDefaultBranch(), SearchOperator.LIKE);
       return srch.getArtifacts(Artifact.class);
    }
