@@ -11,44 +11,53 @@
 
 package org.eclipse.osee.framework.ui.skynet;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.skynet.core.tagging.TagManager;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 
 /**
  * @author Donald G. Dunne
  */
-public class TagArtifactsJob extends Job {
+public class TagBranchesJob extends Job {
 
    private static final TagManager tagManager = TagManager.getInstance();
-   private Collection<Artifact> artifacts;
+   private Collection<Branch> branches;
 
-   public TagArtifactsJob(Collection<Artifact> artifacts) {
-      super("Tag Artifacts");
-      this.artifacts = artifacts;
+   public TagBranchesJob(Collection<Branch> branches) {
+      super("Tag Brances");
+      this.branches = branches;
    }
 
    @Override
    protected IStatus run(IProgressMonitor monitor) {
-      monitor.beginTask("Tag Artifacts", artifacts.size());
-      for (Artifact artifact : artifacts) {
-         monitor.subTask(artifact.getDescriptiveName());
+      monitor.beginTask("Tag Brances", branches.size());
+      for (Branch branch : branches) {
          try {
-            tagManager.autoTag(true, artifact);
-         } catch (Exception ex) {
+            Collection<Artifact> arts = branch.getArtifacts();
+            monitor.subTask("Tagging " + arts.size() + " artifacts from " + branch.getBranchName());
+            for (Artifact artifact : arts) {
+               try {
+                  tagManager.autoTag(true, artifact);
+               } catch (Exception ex) {
+                  OSEELog.logException(SkynetGuiPlugin.class, ex, false);
+               }
+
+               if (monitor.isCanceled()) {
+                  monitor.done();
+                  return Status.CANCEL_STATUS;
+               }
+            }
+         } catch (SQLException ex) {
             OSEELog.logException(SkynetGuiPlugin.class, ex, false);
          }
          monitor.worked(1);
-
-         if (monitor.isCanceled()) {
-            monitor.done();
-            return Status.CANCEL_STATUS;
-         }
       }
       monitor.done();
 
