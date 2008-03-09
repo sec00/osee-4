@@ -48,6 +48,7 @@ import org.eclipse.osee.framework.skynet.core.transaction.TransactionIdManager;
 import org.eclipse.osee.framework.skynet.core.user.UserEnum;
 import org.eclipse.osee.framework.skynet.core.util.Requirements;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
+import org.eclipse.osee.framework.ui.skynet.TagBranchesJob;
 import org.eclipse.osee.framework.ui.skynet.Import.ArtifactExtractor;
 import org.eclipse.osee.framework.ui.skynet.Import.ArtifactImportJob;
 import org.eclipse.osee.framework.ui.skynet.Import.IArtifactImportResolver;
@@ -125,12 +126,24 @@ public class PopulateDemoActions extends XNavigateItemAction {
             // Create actions against non-requirement AIs and Teams
             createNonReqChangeDemoActions();
 
+            // Tag all artifacts and all branches
+            tagAllArtifacts();
+
             OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Populate Complete", false);
 
          } catch (Exception ex) {
             OSEELog.logException(OseeAtsConfigDemoPlugin.class, ex, false);
          }
       }
+   }
+
+   public void tagAllArtifacts() throws Exception {
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Tagging Branches", false);
+      Job job = new TagBranchesJob(BranchPersistenceManager.getInstance().getBranches());
+      job.setUser(false);
+      job.setPriority(Job.LONG);
+      job.schedule();
+      job.join();
    }
 
    public class CreateTraceabilityTx extends AbstractSkynetTxTemplate {
@@ -173,7 +186,7 @@ public class PopulateDemoActions extends XNavigateItemAction {
                art.relate(RelationSide.ALLOCATION__COMPONENT, component, true);
 
             // Relate Software Artifacts to Test 
-            System.err.println("Add trace to test artifacts (once talk to Ryan)");
+            System.err.println("Add trace to test artifacts");
 
          } catch (Exception ex) {
             OSEELog.logException(OseeAtsConfigDemoPlugin.class, ex, false);
