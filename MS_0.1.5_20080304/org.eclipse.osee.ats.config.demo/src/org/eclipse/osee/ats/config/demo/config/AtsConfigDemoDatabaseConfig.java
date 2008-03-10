@@ -108,25 +108,13 @@ public class AtsConfigDemoDatabaseConfig extends DbInitializationTask {
             ArtifactPersistenceManager.getInstance().getDefaultHierarchyRootArtifact(programBranch, true);
       programRoot.addChild(sawProduct);
 
-      descriptor = configurationManager.getArtifactSubtypeDescriptor("Folder");
-      systemReq = descriptor.makeNewArtifact(programBranch);
-      systemReq.setDescriptiveName("System Requirements");
-      programRoot.addChild(systemReq);
-
-      descriptor = configurationManager.getArtifactSubtypeDescriptor("Folder");
-      Artifact subsystem = descriptor.makeNewArtifact(programBranch);
-      subsystem.setDescriptiveName("Subsystem Requirements");
-      programRoot.addChild(subsystem);
-
-      descriptor = configurationManager.getArtifactSubtypeDescriptor("Folder");
-      Artifact software = descriptor.makeNewArtifact(programBranch);
-      software.setDescriptiveName("Software Requirements");
-      programRoot.addChild(software);
-
-      descriptor = configurationManager.getArtifactSubtypeDescriptor("Folder");
-      Artifact hardware = descriptor.makeNewArtifact(programBranch);
-      hardware.setDescriptiveName("Hardware Requirements");
-      programRoot.addChild(hardware);
+      for (String name : new String[] {"System Requirements", "Subsystem Requirements", "Software Requirements",
+            "Hardware Requirements", "Verification Tests", "Validation Tests", "Integration Tests"}) {
+         descriptor = configurationManager.getArtifactSubtypeDescriptor("Folder");
+         systemReq = descriptor.makeNewArtifact(programBranch);
+         systemReq.setDescriptiveName(name);
+         programRoot.addChild(systemReq);
+      }
 
       programRoot.persist(true);
 
