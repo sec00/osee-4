@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Display;
  */
 public class SkynetAuthentication implements PersistenceManager {
    private static final Logger logger = ConfigUtil.getConfigFactory().getLogger(SkynetAuthentication.class);
-
+   private static final boolean createLoginUserIfNecessary = false;
    private OseeAuthentication oseeAuthentication;
    private ArtifactPersistenceManager artifactManager;
    private BranchPersistenceManager branchManager;
@@ -144,10 +144,14 @@ public class SkynetAuthentication implements PersistenceManager {
                         try {
                            currentUser = getUserByIdWithError(userId);
                         } catch (IllegalArgumentException ex1) {
-                           currentUser =
-                                 createUser(oseeAuthentication.getCredentials().getField(UserCredentialEnum.Name),
-                                       "spawnedBySkynet", userId, true);
-                           persistUser(currentUser); // this is done outside of the crateUser call to avoid recursion
+                           if (createLoginUserIfNecessary) {
+                              currentUser =
+                                    createUser(oseeAuthentication.getCredentials().getField(UserCredentialEnum.Name),
+                                          "spawnedBySkynet", userId, true);
+                              persistUser(currentUser); // this is done outside of the crateUser call to avoid recursion
+                           } else {
+                              currentUser = getUser(UserEnum.Guest);
+                           }
                         }
                      }
                   }
