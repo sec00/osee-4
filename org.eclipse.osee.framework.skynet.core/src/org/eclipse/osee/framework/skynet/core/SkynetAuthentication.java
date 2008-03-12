@@ -34,6 +34,7 @@ import org.eclipse.osee.framework.ui.plugin.event.AuthenticationEvent;
 import org.eclipse.osee.framework.ui.plugin.security.AuthenticationDialog;
 import org.eclipse.osee.framework.ui.plugin.security.OseeAuthentication;
 import org.eclipse.osee.framework.ui.plugin.security.UserCredentials.UserCredentialEnum;
+import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -150,6 +151,8 @@ public class SkynetAuthentication implements PersistenceManager {
                                           "spawnedBySkynet", userId, true);
                               persistUser(currentUser); // this is done outside of the crateUser call to avoid recursion
                            } else {
+                              AWorkbench.popup("Logged in as Guest",
+                                    "If you do not expect to be logged in as Guest, please report this immediately.");
                               currentUser = getUser(UserEnum.Guest);
                            }
                         }
