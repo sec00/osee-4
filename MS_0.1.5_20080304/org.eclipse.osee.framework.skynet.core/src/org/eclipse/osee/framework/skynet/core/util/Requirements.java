@@ -17,6 +17,8 @@ public class Requirements {
    public static String SYSTEM_REQUREMENT = "System Requirement";
    public static String SUBSYSTEM_REQUIREMENT = "Subsystem Requirement";
    public static String COMPONENT = "Component";
+   public static String TEST_SCRIPT = "Test Script";
+   public static String TEST_PROCEDURE = "Test Procedure";
 
    public static List<String> Software_RequirementTypes =
          Arrays.asList(new String[] {SOFTWARE_REQUIREMENT, INDIRECT_SOFTWARE_REQUIREMENT});

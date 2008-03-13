@@ -189,8 +189,65 @@ public class PopulateDemoActions extends XNavigateItemAction {
             for (Artifact art : softArts)
                art.relate(RelationSide.ALLOCATION__COMPONENT, component, true);
 
-            // Relate Software Artifacts to Test 
-            System.err.println("Add trace to test artifacts");
+            // Create Test Script Artifacts
+            Set<Artifact> verificationTests = new HashSet<Artifact>();
+            Artifact verificationHeader =
+                  (new ArtifactTypeNameSearch("Folder", "Verification Tests",
+                        BranchPersistenceManager.getInstance().getDefaultBranch())).getSingletonArtifact(Artifact.class);
+            if (verificationHeader == null) throw new IllegalStateException("Could not find Verification Tests header");
+            for (String str : new String[] {"A", "B", "C"}) {
+               Artifact newArt =
+                     ConfigurationPersistenceManager.getInstance().getArtifactSubtypeDescriptor(
+                           Requirements.TEST_SCRIPT).makeNewArtifact(verificationHeader.getBranch());
+               newArt.setDescriptiveName("Verification Test " + str);
+               verificationTests.add(newArt);
+               newArt.persist(true);
+            }
+            Artifact verificationTestsArray[] = verificationTests.toArray(new Artifact[verificationTests.size()]);
+
+            // Create Validation Test Procedure Artifacts
+            Set<Artifact> validationTests = new HashSet<Artifact>();
+            Artifact validationHeader =
+                  (new ArtifactTypeNameSearch("Folder", "Validation Tests",
+                        BranchPersistenceManager.getInstance().getDefaultBranch())).getSingletonArtifact(Artifact.class);
+            if (validationHeader == null) throw new IllegalStateException("Could not find Validation Tests header");
+            for (String str : new String[] {"1", "2", "3"}) {
+               Artifact newArt =
+                     ConfigurationPersistenceManager.getInstance().getArtifactSubtypeDescriptor(
+                           Requirements.TEST_PROCEDURE).makeNewArtifact(validationHeader.getBranch());
+               newArt.setDescriptiveName("Validation Test " + str);
+               validationTests.add(newArt);
+               newArt.persist(true);
+            }
+            Artifact validationTestsArray[] = validationTests.toArray(new Artifact[validationTests.size()]);
+
+            // Create Integration Test Procedure Artifacts
+            Set<Artifact> integrationTests = new HashSet<Artifact>();
+            Artifact integrationHeader =
+                  (new ArtifactTypeNameSearch("Folder", "Integration Tests",
+                        BranchPersistenceManager.getInstance().getDefaultBranch())).getSingletonArtifact(Artifact.class);
+            if (integrationHeader == null) throw new IllegalStateException("Could not find integration Tests header");
+            for (String str : new String[] {"X", "Y", "Z"}) {
+               Artifact newArt =
+                     ConfigurationPersistenceManager.getInstance().getArtifactSubtypeDescriptor(
+                           Requirements.TEST_PROCEDURE).makeNewArtifact(integrationHeader.getBranch());
+               newArt.setDescriptiveName("integration Test " + str);
+               integrationTests.add(newArt);
+               newArt.persist(true);
+            }
+            Artifact integrationTestsArray[] = integrationTests.toArray(new Artifact[integrationTests.size()]);
+
+            // Relate Software Artifacts to Tests
+            Artifact softReqsArray[] = softArts.toArray(new Artifact[softArts.size()]);
+            softReqsArray[0].relate(RelationSide.Validation__Validator, verificationTestsArray[0], true);
+            softReqsArray[0].relate(RelationSide.Validation__Validator, verificationTestsArray[1], true);
+            softReqsArray[1].relate(RelationSide.Validation__Validator, verificationTestsArray[0], true);
+            softReqsArray[1].relate(RelationSide.Validation__Validator, validationTestsArray[1], true);
+            softReqsArray[2].relate(RelationSide.Validation__Validator, validationTestsArray[0], true);
+            softReqsArray[2].relate(RelationSide.Validation__Validator, integrationTestsArray[1], true);
+            softReqsArray[3].relate(RelationSide.Validation__Validator, integrationTestsArray[0], true);
+            softReqsArray[4].relate(RelationSide.Validation__Validator, integrationTestsArray[2], true);
+            softReqsArray[5].relate(RelationSide.Validation__Validator, validationTestsArray[2], true);
 
          } catch (Exception ex) {
             OSEELog.logException(OseeAtsConfigDemoPlugin.class, ex, false);
