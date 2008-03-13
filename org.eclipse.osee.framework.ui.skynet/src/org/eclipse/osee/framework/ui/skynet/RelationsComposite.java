@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -380,15 +381,19 @@ public class RelationsComposite extends Composite implements IEventReceiver {
       Menu newMenu = new Menu(parentMenu.getShell(), SWT.DROP_DOWN);
       boolean isRelatable = false;
 
-      for (IRelationLinkDescriptor relationDescriptor : RelationPersistenceManager.getInstance().getIRelationLinkDescriptors(
-            artifact.getDescriptor(), artifact.getBranch())) {
-         MenuItem mItem = new MenuItem(newMenu, SWT.PUSH);
-         mItem.setData(relationDescriptor);
-         mItem.setText(relationDescriptor.getName());
-         mItem.addListener(SWT.Selection, new CreateNewRelationSelectedListener(parentMenu.getShell()));
+      try {
+		for (IRelationLinkDescriptor relationDescriptor : RelationPersistenceManager.getInstance().getIRelationLinkDescriptors(
+		        artifact.getDescriptor(), artifact.getBranch())) {
+		     MenuItem mItem = new MenuItem(newMenu, SWT.PUSH);
+		     mItem.setData(relationDescriptor);
+		     mItem.setText(relationDescriptor.getName());
+		     mItem.addListener(SWT.Selection, new CreateNewRelationSelectedListener(parentMenu.getShell()));
 
-         isRelatable = true;
-      }
+		     isRelatable = true;
+		  }
+	} catch (SQLException ex) {
+		OSEELog.logException(SkynetGuiPlugin.class, ex, true);
+	}
 
       if (isRelatable) {
          newMenuItem.setText("&New Relation");
