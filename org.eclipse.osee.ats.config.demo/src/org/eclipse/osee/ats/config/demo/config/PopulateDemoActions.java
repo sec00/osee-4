@@ -93,11 +93,15 @@ public class PopulateDemoActions extends XNavigateItemAction {
                         !SkynetDbInit.isDbInit());
             importTx.execute();
 
+            sleep(10000);
+
             // Create traceability between System, Subsystem and Software requirements
             CreateTraceabilityTx traceTx =
                   new CreateTraceabilityTx(BranchPersistenceManager.getInstance().getAtsBranch(),
                         !SkynetDbInit.isDbInit());
             traceTx.execute();
+
+            sleep(10000);
 
             // Create SAW_Bld_2 Child Main Working Branch off SAW_Bld_1
             CreateMainWorkingBranchTx saw2BranchTx =
@@ -391,11 +395,16 @@ public class PopulateDemoActions extends XNavigateItemAction {
    }
 
    private Set<Artifact> getArtTypeRequirements(String artifactType, String artifactNameStr) {
-      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Getting \"" + artifactNameStr + "\" requirement(s).", false);
+      OSEELog.logInfo(
+            OseeAtsConfigDemoPlugin.class,
+            "Getting \"" + artifactNameStr + "\" requirement(s) from Branch " + BranchPersistenceManager.getInstance().getDefaultBranch().getBranchName(),
+            false);
       ArtifactTypeNameSearch srch =
             new ArtifactTypeNameSearch(artifactType, artifactNameStr,
                   BranchPersistenceManager.getInstance().getDefaultBranch(), SearchOperator.LIKE);
-      return srch.getArtifacts(Artifact.class);
+      Set<Artifact> arts = srch.getArtifacts(Artifact.class);
+      OSEELog.logInfo(OseeAtsConfigDemoPlugin.class, "Found " + arts.size() + " Artifacts", false);
+      return arts;
    }
 
    private static String INTERFACE_INITIALIZATION = "Interface Initialization";
