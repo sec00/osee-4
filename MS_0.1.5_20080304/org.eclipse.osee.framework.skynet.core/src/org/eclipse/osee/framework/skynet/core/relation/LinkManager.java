@@ -305,7 +305,8 @@ public class LinkManager {
       else if (artifact == link.getArtifactB())
          return link.getArtifactA();
       else
-         throw new IllegalArgumentException("The link does not pertain to this link manager");
+         throw new IllegalArgumentException(
+               "The link " + link.getPersistenceMemo() + " does not pertain to this link manager for artifact " + artifact.getGuid() + ". Artifact a: " + (link.getArtifactA() == null ? null : link.getArtifactA().getGuid()) + " Artifact b: " + (link.getArtifactB() == null ? null : link.getArtifactB().getGuid()));
    }
 
    public boolean hasArtifacts(IRelationEnumeration side) {
