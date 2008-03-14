@@ -87,13 +87,16 @@ public class PopulateDemoActions extends XNavigateItemAction {
       if (SkynetDbInit.isDbInit() || (!SkynetDbInit.isDbInit() && MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(), getName(), getName()))) {
          try {
+
+            setDefaultBranch(BranchPersistenceManager.getInstance().getKeyedBranch(SawBuilds.SAW_Bld_1.name()));
+
             // Import all requirements on SAW_Bld_1 Branch
             ImportRequirementsTx importTx =
                   new ImportRequirementsTx(BranchPersistenceManager.getInstance().getAtsBranch(),
                         !SkynetDbInit.isDbInit());
             importTx.execute();
 
-            sleep(10000);
+            sleep(5000);
 
             // Create traceability between System, Subsystem and Software requirements
             CreateTraceabilityTx traceTx =
@@ -101,7 +104,7 @@ public class PopulateDemoActions extends XNavigateItemAction {
                         !SkynetDbInit.isDbInit());
             traceTx.execute();
 
-            sleep(10000);
+            sleep(5000);
 
             // Create SAW_Bld_2 Child Main Working Branch off SAW_Bld_1
             CreateMainWorkingBranchTx saw2BranchTx =
@@ -201,6 +204,7 @@ public class PopulateDemoActions extends XNavigateItemAction {
                            Requirements.TEST_SCRIPT).makeNewArtifact(verificationHeader.getBranch());
                newArt.setDescriptiveName("Verification Test " + str);
                verificationTests.add(newArt);
+               verificationHeader.relate(RelationSide.DEFAULT_HIERARCHICAL__CHILD, newArt, true);
                newArt.persist(true);
             }
             Artifact verificationTestsArray[] = verificationTests.toArray(new Artifact[verificationTests.size()]);
@@ -217,6 +221,7 @@ public class PopulateDemoActions extends XNavigateItemAction {
                            Requirements.TEST_PROCEDURE).makeNewArtifact(validationHeader.getBranch());
                newArt.setDescriptiveName("Validation Test " + str);
                validationTests.add(newArt);
+               validationHeader.relate(RelationSide.DEFAULT_HIERARCHICAL__CHILD, newArt, true);
                newArt.persist(true);
             }
             Artifact validationTestsArray[] = validationTests.toArray(new Artifact[validationTests.size()]);
@@ -233,6 +238,7 @@ public class PopulateDemoActions extends XNavigateItemAction {
                            Requirements.TEST_PROCEDURE).makeNewArtifact(integrationHeader.getBranch());
                newArt.setDescriptiveName("integration Test " + str);
                integrationTests.add(newArt);
+               integrationHeader.relate(RelationSide.DEFAULT_HIERARCHICAL__CHILD, newArt, true);
                newArt.persist(true);
             }
             Artifact integrationTestsArray[] = integrationTests.toArray(new Artifact[integrationTests.size()]);
