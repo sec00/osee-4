@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -161,15 +162,15 @@ public class WordTemplateProcessor {
    private InputStream applyTemplate(BlamVariableMap variableMap, String template, IFolder folder, String nextParagraphNumber, String outlineType) throws Exception {
       CharBackedInputStream charBak = new CharBackedInputStream();
       WordMLProducer wordMl = new WordMLProducer(charBak);
+      
+      template = handleSettingParagraphNumbers(variableMap, template, outlineType, nextParagraphNumber, wordMl);
+      template = WordUtil.stripSpellCheck(template);
+      
       Matcher matcher = headElementsPattern.matcher(template);
       int lastEndIndex = 0;
-
-      handleSettingParagraphNumbers(variableMap, template, outlineType, nextParagraphNumber, wordMl);
-
       while (matcher.find()) {
          // Write the part of the template between the elements
          wordMl.addWordMl(template.substring(lastEndIndex, matcher.start()));
-
          lastEndIndex = matcher.end();
          String elementType = matcher.group(3);
          String elementValue = matcher.group(4);
@@ -202,7 +203,8 @@ public class WordTemplateProcessor {
       outlineNumber = peekAtFirstArtifactToGetParagraphNumber(template, null, variableMap);
       //modifications to the template must be done before the matcher
       template = wordMl.setHeadingNumbers(outlineNumber, template);
-
+      template = WordUtil.stripSpellCheck(template);
+      
       Matcher matcher = headElementsPattern.matcher(template);
 
       while (matcher.find()) {
@@ -240,7 +242,7 @@ public class WordTemplateProcessor {
       if (nextParagraphNumber != null && !appendixOutlineType) {
          wordMl.setNextParagraphNumberTo(nextParagraphNumber);
       }
-      return nextParagraphNumber;
+      return template;
    }
 
    @SuppressWarnings("unchecked")
@@ -421,7 +423,7 @@ public class WordTemplateProcessor {
 
             if (doSubDocuments) {
                newVariableMap.setValue("Branch", variableMap.getBranch("Branch"));
-               String subDocFileName = subdocumentName + ".xml";
+               String subDocFileName = subdocumentName + ".xml"; 
                producer.process(newVariableMap);
                AIFile.writeToFile(folder.getFile(subDocFileName), applyTemplate(newVariableMap, slaveTemplate, folder,
                      nextParagraphNumber, outlineType));
@@ -485,7 +487,6 @@ public class WordTemplateProcessor {
 
          if (paragraphNumber != null && saveParagraphNumOnArtifact) {
             artifact.setSoleAttributeValue("Imported Paragraph Number", paragraphNumber.toString());
-
             try {
                artifact.persistAttributes();
             } catch (SQLException ex) {
@@ -565,14 +566,14 @@ public class WordTemplateProcessor {
             if (attributeElement.label.length() > 0) {
                wordMl.addParagraph(attributeElement.label);
             }
-
+            String wordContent = WordUtil.stripSpellCheck(attribute.getStringData());
             if (true) {
                DynamicAttributeDescriptor attributeDescriptor = attribute.getManager().getDescriptor();
                writeXMLMetaDataWrapper(wordMl, elementNameFor(attributeDescriptor.getName()),
                      "ns0:guid=\"" + artifact.getGuid() + "\"",
-                     "ns0:attrId=\"" + attributeDescriptor.getAttrTypeId() + "\"", attribute.getStringData());
+                     "ns0:attrId=\"" + attributeDescriptor.getAttrTypeId() + "\"", wordContent);
             } else {
-               wordMl.addWordMl(attribute.getStringData());
+               wordMl.addWordMl(wordContent);
             }
             wordMl.resetListValue();
          } else {
