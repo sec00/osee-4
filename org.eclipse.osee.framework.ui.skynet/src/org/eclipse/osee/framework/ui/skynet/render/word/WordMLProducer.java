@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.osee.framework.jdk.core.util.xml.Xml;
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.attribute.Attribute;
@@ -69,10 +72,11 @@ public class WordMLProducer {
          flattenedLevelCount++;
          endOutlineSubSection(true);
          logger.log(Level.WARNING, "Outline level flattened, outline can only go 9 levels deep");
-         //         startParagraph();
-         //         addTextInsideParagraph("OUTLINE LEVEL FLATTENED: " + headingText, RGB_RED);
-         //         endParagraph();
-
+         if(false){
+        	 startParagraph();
+             addTextInsideParagraph("OUTLINE LEVEL FLATTENED: " + headingText, RGB_RED);
+             endParagraph();
+         }
          return startOutlineSubSection(font, headingText, outlineType);
       }
    };
@@ -99,10 +103,9 @@ public class WordMLProducer {
       String[] numbers = outLineNumber.split("\\.");
 
       for (String number : numbers) {
-         template =
-               template.replaceAll("<w:start w:val=\"1\"/><w:pStyle w:val=\"Heading" + index + "\"/>",
-                     "<w:start w:val=\"" + number + "\"/><w:pStyle w:val=\"Heading" + index + "\"/>");
-
+    	 Matcher matcher = Pattern.compile(String.format("<w:start w:val=\"(\\d*?)\"/><w:pStyle w:val=\"Heading%d\"/>", index)).matcher("");
+    	 matcher.reset(template);
+    	 template = matcher.replaceAll(String.format("<w:start w:val=\"%s\"/><w:pStyle w:val=\"Heading%d\"/>", number, index));
          index++;
       }
       return template;
