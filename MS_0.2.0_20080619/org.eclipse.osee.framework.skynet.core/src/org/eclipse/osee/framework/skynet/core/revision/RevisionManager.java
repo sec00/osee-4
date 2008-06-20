@@ -536,8 +536,8 @@ public class RevisionManager implements IEventReceiver {
       Map<Integer, Change> mightNeedWasValue = new HashMap<Integer, Change>();
       ConnectionHandlerStatement connectionHandlerStatement = null;
       boolean hasBranch = sourceBranch != null;
-      TransactionId sourceHeadTransactionId;
-      TransactionId sourceEndTransactionId;
+      TransactionId fromTransactionId;
+      TransactionId toTransactionId;
 
       try {
          //Changes per a branch
@@ -549,18 +549,16 @@ public class RevisionManager implements IEventReceiver {
             Pair<TransactionId, TransactionId> branchStartEndTransaction =
                   TransactionIdManager.getInstance().getStartEndPoint(sourceBranch);
 
-            sourceHeadTransactionId = branchStartEndTransaction.getKey();
-            sourceEndTransactionId = branchStartEndTransaction.getValue();
+            fromTransactionId = branchStartEndTransaction.getKey();
+            toTransactionId = branchStartEndTransaction.getValue();
          }//Changes per transaction number
          else {
             connectionHandlerStatement =
                   ConnectionHandler.runPreparedQuery(TRANSACTION_ATTRIBUTE_CHANGES, SQL3DataType.INTEGER,
                         transactionNumber);
 
-            sourceHeadTransactionId =
-                  TransactionIdManager.getInstance().getPossiblyEditableTransactionId(transactionNumber);
-            sourceEndTransactionId =
-                  TransactionIdManager.getInstance().getPossiblyEditableTransactionId(transactionNumber);
+            toTransactionId = TransactionIdManager.getInstance().getPossiblyEditableTransactionId(transactionNumber);
+            fromTransactionId = TransactionIdManager.getInstance().getPriorTransaction(toTransactionId);
          }
          ResultSet resultSet = connectionHandlerStatement.getRset();
          AttributeChanged attributeChanged;
@@ -575,9 +573,9 @@ public class RevisionManager implements IEventReceiver {
             String isValue = resultSet.getString(6);
 
             attributeChanged =
-                  new AttributeChanged(sourceBranch, artTypeId, sourceGamma, artId, sourceEndTransactionId,
-                        sourceHeadTransactionId, hasBranch ? ModificationType.NEW : ModificationType.getMod(modType),
-                        ChangeType.OUTGOING, isValue, "", attrId, attrTypeId);
+                  new AttributeChanged(sourceBranch, artTypeId, sourceGamma, artId, toTransactionId, fromTransactionId,
+                        hasBranch ? ModificationType.NEW : ModificationType.getMod(modType), ChangeType.OUTGOING,
+                        isValue, "", attrId, attrTypeId);
 
             changes.add(attributeChanged);
             mightNeedWasValue.put(attrId, attributeChanged);
