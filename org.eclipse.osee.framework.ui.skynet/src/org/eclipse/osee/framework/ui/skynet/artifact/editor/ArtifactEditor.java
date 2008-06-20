@@ -520,7 +520,7 @@ public class ArtifactEditor extends MultiPageEditorPart implements IDirtiableEdi
          ArtifactEvent artifactEvent = (ArtifactEvent) event;
          Artifact eventArtifact = artifactEvent.getArtifact();
 
-         if (eventArtifact.equals(artifact)) {
+         if (eventArtifact != null && eventArtifact.equals(artifact)) {
             if (event instanceof ArtifactModifiedEvent) {
                ModType modType = ((ArtifactModifiedEvent) event).getType();
 
