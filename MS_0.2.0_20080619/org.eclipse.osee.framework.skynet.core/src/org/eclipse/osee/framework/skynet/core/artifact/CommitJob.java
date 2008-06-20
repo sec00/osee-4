@@ -14,6 +14,7 @@ package org.eclipse.osee.framework.skynet.core.artifact;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -85,7 +86,7 @@ class CommitJob extends Job {
       super("Committing Branch: " + fromBranch.getBranchName());
       conflictManager = new ConflictManager(toBranch, fromBranch);
 
-      if (conflictManager.remainingConflictsExist()) {
+      if (!forceCommit && conflictManager.remainingConflictsExist()) {
          throw new ConflictDetectionException(
                "Trying to commit " + fromBranch.getBranchName() + " into " + toBranch.getBranchName() + " when " + conflictManager.getRemainingConflicts().size() + " conflicts still exist");
       }
