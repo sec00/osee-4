@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.osee.ats.feature"
+      label="ATS (Incubation)"
+      version="0.1.0.qualifier"
+      provider-name="Eclipse.org"
+      plugin="org.eclipse.osee.framework.ui.product">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update url="http://lba-cte.msc.az.boeing.com:31110/osee/lba_updatesite/"/>
+   </url>
+
+   <plugin
+         id="org.eclipse.osee.ats"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.osee.ats.feature.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
