@@ -93,12 +93,11 @@ public class UpdateArtifactJob extends UpdateJob {
 		FileInputStream myFileInputStream = new FileInputStream(workingFile);
 
 		String guid = WordUtil.getGUIDFromFileInputStream(myFileInputStream);
-		// TODO Patch Fix -- need better way to determine whether its a whole or non-whole word doc
-		try {
+		if (guid == null) {
+			processNonWholeDocumentUpdates(branch);
+		} else {
 			Artifact myArtifact = ArtifactQuery.getArtifactFromId(guid, branch);
 			updateWholeDocumentArtifact(myArtifact);
-		} catch (Exception ex) {
-			processNonWholeDocumentUpdates(branch);
 		}
 	}
 
@@ -208,7 +207,7 @@ public class UpdateArtifactJob extends UpdateJob {
 									WordAttribute.OLE_DATA_NAME, "");
 						} else if (oleDataElement != null && singleArtifact) {
 							artifact
-									.setSoleAttributeValue(
+									.setSoleAttributeFromStream(
 											WordAttribute.OLE_DATA_NAME,
 											new ByteArrayInputStream(
 													WordRenderer
