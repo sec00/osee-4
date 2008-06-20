@@ -231,10 +231,9 @@ public class WordUtil {
 
    public final static String removeGUIDFromTemplate(String template) {
       String newTemplate = "";
-      System.out.println(template);
 
       String[] splitsBeforeAndAfter =
-            template.split("xmlns:ns0=\"http:/" + Artifact.BEFORE_GUID_STRING + "|" + Artifact.AFTER_GUID_STRING + "\"");
+            template.split(Artifact.BEFORE_GUID_STRING + "|" + Artifact.AFTER_GUID_STRING + "\"");
 
       if (splitsBeforeAndAfter.length == 3) {
          newTemplate = splitsBeforeAndAfter[0] + " " + splitsBeforeAndAfter[2];
