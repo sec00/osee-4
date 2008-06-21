@@ -16,12 +16,14 @@ import static org.eclipse.osee.framework.skynet.core.change.ChangeType.OUTGOING;
 import static org.eclipse.osee.framework.skynet.core.change.ModificationType.CHANGE;
 import static org.eclipse.osee.framework.skynet.core.change.ModificationType.DELETED;
 import static org.eclipse.osee.framework.skynet.core.change.ModificationType.NEW;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.sql.SQLException;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.osee.framework.skynet.core.SkynetActivator;
@@ -143,6 +145,14 @@ public class ArtifactType implements Serializable, Comparable<ArtifactType> {
     */
    public String getName() {
       return name;
+   }
+   
+   /**
+    * determines if this artifact type is equal to or a subclass of the artifact type referenced by artifactTypeName
+    * @return
+    */
+   public boolean isTypeCompatible(String artifactTypeName) {
+       return name.equals(artifactTypeName);
    }
 
    /**
