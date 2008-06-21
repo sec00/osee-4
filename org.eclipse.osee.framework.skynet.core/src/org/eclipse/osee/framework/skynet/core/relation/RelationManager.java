@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+
 import org.eclipse.osee.framework.db.connection.ConnectionHandler;
 import org.eclipse.osee.framework.db.connection.info.SQL3DataType;
 import org.eclipse.osee.framework.jdk.core.type.CompositeKeyHashMap;
@@ -552,8 +553,12 @@ public class RelationManager {
          List<RelationLink> selectedRelations = relationsByType.get(sourceArtifact, relation.getRelationType());
          if (selectedRelations.remove(relation)) {
             int targetIndex = selectedRelations.indexOf(targetRelation);
-            int index = insertAfterTarget ? targetIndex + 1 : targetIndex;
-            selectedRelations.add(index, relation);
+            if(targetIndex == -1){
+	            selectedRelations.add(relation);
+            } else {
+            	int index = insertAfterTarget ? targetIndex + 1 : targetIndex;
+	            selectedRelations.add(index, relation);
+            }
             int lastArtId = LINKED_LIST_KEY;
             for (RelationLink link : selectedRelations) {
                if (!link.isDeleted() && link.getSide(sourceArtifact) == side.oppositeSide()) {
