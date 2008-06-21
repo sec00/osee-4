@@ -586,12 +586,6 @@
 	<extension id="UpdateFromParentBranch" name="Update From Parent Branch" point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
 		<Operation className="org.eclipse.osee.framework.ui.skynet.blam.operation.UpdateFromParentBranch"/>
 	</extension>
-	      <extension
-            id="DeleteErroneousTagsFromWorkingBranches"
-            name="Delete Erroneous Tags From Working Branches"
-            point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
-         <Operation className="org.eclipse.osee.framework.ui.skynet.blam.operation.DeleteErroneousTagsFromWorkingBranches"/>
-      </extension>
        <extension
              id="CopyTransactionDataToBaseline"
              name="Copy Transaction Data To Baseline"
