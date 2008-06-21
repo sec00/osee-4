@@ -118,6 +118,7 @@ public class ViewWordChangeReportHandler extends AbstractHandler {
          return false;
       }
 
+      artifactChangeMap.clear();
       List<Artifact> artifacts = new LinkedList<Artifact>();
       boolean isEnabled = false;
 
