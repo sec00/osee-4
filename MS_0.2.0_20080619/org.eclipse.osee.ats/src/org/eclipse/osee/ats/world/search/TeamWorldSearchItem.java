@@ -174,7 +174,7 @@ public class TeamWorldSearchItem extends WorldSearchItem {
       if (result == 0) {
          showFinished = diag.isShowFinished();
          showAction = diag.isShowAction();
-         recurseChildren = diag.isRecurseChildren();
+         selectedRecurseChildren = diag.isRecurseChildren();
          if (selectedTeamDefs == null)
             selectedTeamDefs = new HashSet<TeamDefinitionArtifact>();
          else
