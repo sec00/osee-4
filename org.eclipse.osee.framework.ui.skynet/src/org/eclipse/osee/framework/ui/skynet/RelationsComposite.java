@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -530,22 +531,23 @@ public class RelationsComposite extends Composite implements IEventReceiver {
     * @param selection
     */
    private void performDeleteRelation(IStructuredSelection selection) {
-      Object object = selection.getFirstElement();
-
-      if (object instanceof RelationLink) {
-         ((RelationLink) object).delete();
-      } else if (object instanceof RelationType) {
-         RelationType relationType = (RelationType) object;
-         RelationManager.deleteRelations(artifact, relationType, null);
-      } else if (object instanceof RelationTypeSide) {
-         RelationTypeSide group = (RelationTypeSide) object;
-         try {
-            RelationManager.deleteRelations(artifact, group.getRelationType(), group.getSide());
-         } catch (SQLException ex) {
-            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
-         }
+      Object[] objects = selection.toArray();
+      for(Object object:objects){
+	      if (object instanceof RelationLink) {
+	         ((RelationLink) object).delete();
+	      } else if (object instanceof RelationType) {
+	         RelationType relationType = (RelationType) object;
+	         RelationManager.deleteRelations(artifact, relationType, null);
+	      } else if (object instanceof RelationTypeSide) {
+	         RelationTypeSide group = (RelationTypeSide) object;
+	         try {
+	            RelationManager.deleteRelations(artifact, group.getRelationType(), group.getSide());
+	         } catch (SQLException ex) {
+	            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
+	         }
+	      }
       }
-
+      
       refresh();
    }
 
@@ -581,7 +583,9 @@ public class RelationsComposite extends Composite implements IEventReceiver {
    }
 
    public void onEvent(org.eclipse.osee.framework.ui.plugin.event.Event event) {
-      if (treeViewer != null && treeViewer.getInput() instanceof Artifact) refresh();
+      if (treeViewer != null && treeViewer.getInput() instanceof Artifact){
+    	  refresh();
+      }
    }
 
    public boolean runOnEventInDisplayThread() {
