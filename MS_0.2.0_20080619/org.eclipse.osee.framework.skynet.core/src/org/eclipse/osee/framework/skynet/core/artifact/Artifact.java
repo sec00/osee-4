@@ -12,7 +12,6 @@ package org.eclipse.osee.framework.skynet.core.artifact;
 
 import static org.eclipse.osee.framework.skynet.core.artifact.ArtifactLoad.FULL;
 import static org.eclipse.osee.framework.skynet.core.relation.CoreRelationEnumeration.DEFAULT_HIERARCHICAL__CHILD;
-
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.sql.SQLException;
@@ -20,13 +19,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
-
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -380,7 +377,7 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
     * creates a new child using descriptor, relates it to its parent, and persists the child
     * 
     * @param artifactType
-    * @param name TODO
+    * @param name
     * @throws SQLException
     * @throws OseeCoreException
     */
@@ -454,7 +451,7 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
    }
 
    /**
-    * The use of this method is discouraged since it directly returns Attributres.
+    * The use of this method is discouraged since it directly returns Attributes.
     * 
     * @param <T>
     * @param attributeTypeName
@@ -463,11 +460,17 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
     */
    public <T> List<Attribute<T>> getAttributes(String attributeTypeName) throws SQLException {
       ensureAttributesLoaded();
+      List<Attribute<?>> notDeltedAttributes = new ArrayList<Attribute<?>>();
       Collection<Attribute<?>> selectedAttributes = attributes.getValues(attributeTypeName);
       if (selectedAttributes == null) {
          return java.util.Collections.emptyList();
       }
-      return Collections.castAll(selectedAttributes);
+      for (Attribute<?> attribute : selectedAttributes) {
+         if (!attribute.isDeleted()) {
+            notDeltedAttributes.add(attribute);
+         }
+      }
+      return Collections.castAll(notDeltedAttributes);
    }
 
    /**
@@ -534,8 +537,8 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
 
    private <T> Attribute<T> getSoleAttribute(String attributeTypeName) throws SQLException, MultipleAttributesExist {
       ensureAttributesLoaded();
-      Collection<Attribute<?>> soleAttributes = attributes.getValues(attributeTypeName);
-      if (soleAttributes == null) {
+      List<Attribute<T>> soleAttributes = getAttributes(attributeTypeName);
+      if (soleAttributes.size() == 0) {
          return null;
       } else if (soleAttributes.size() > 1) {
          throw new MultipleAttributesExist(String.format(
@@ -569,8 +572,8 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
     */
    public <T> T getSoleAttributeValue(String attributeTypeName) throws AttributeDoesNotExist, MultipleAttributesExist, SQLException {
       ensureAttributesLoaded();
-      Collection<Attribute<?>> soleAttributes = attributes.getValues(attributeTypeName);
-      if (soleAttributes == null) {
+      List<Attribute<T>> soleAttributes = getAttributes(attributeTypeName);
+      if (soleAttributes.size() == 0) {
          throw new AttributeDoesNotExist(
                "Attribute \"" + attributeTypeName + "\" does not exist for artifact " + getHumanReadableId());
       } else if (soleAttributes.size() > 1) {
@@ -710,8 +713,7 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
     * 
     * @param attributeTypeName
     * @param dataStrs
-    * @throws OseeCoreException TODO
-    * @throws SQLException TODO
+    * @throws OseeCoreException
     * @throws SQLException
     */
    public void setAttributeValues(String attributeTypeName, Collection<String> dataStrs) throws OseeCoreException, SQLException {
@@ -735,7 +737,7 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
       if (dataStrs.size() == maxOccur && !storedNames.equals(dataStrs)) {
          String[] dataStrsArr = dataStrs.toArray(new String[dataStrs.size()]);
          int x = 0;
-         for (Attribute<?> attribute : attributes.getValues(attributeTypeName)) {
+         for (Attribute<?> attribute : getAttributes(attributeTypeName)) {
             if (attribute instanceof CharacterBackedAttribute) {
                ((CharacterBackedAttribute<?>) attribute).setFromString(dataStrsArr[x++]);
             }
@@ -753,7 +755,7 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
       // Remove items that aren't selected anymore
       for (String stored : storedNames) {
          if (!dataStrs.contains(stored)) {
-            for (Attribute<?> attribute : attributes.getValues(attributeTypeName)) {
+            for (Attribute<?> attribute : getAttributes(attributeTypeName)) {
                if (attribute.toString().equals(stored)) {
                   attribute.delete();
                }
@@ -787,12 +789,8 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
       ensureAttributesLoaded();
 
       List<String> items = new ArrayList<String>();
-      Collection<Attribute<?>> selectedAttributes = attributes.getValues(attributeTypeName);
-
-      if (selectedAttributes != null) {
-         for (Attribute<?> attribute : selectedAttributes) {
-            items.add(attribute.toString());
-         }
+      for (Attribute<?> attribute : getAttributes(attributeTypeName)) {
+         items.add(attribute.toString());
       }
       return items;
    }
@@ -830,10 +828,10 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
     * 
     * @throws SQLException
     */
-   public void setNotDirty() {
+   public void setNotDirty() throws SQLException {
       dirty = false;
 
-      for (Attribute<?> attribute : attributes.getValues()) {
+      for (Attribute<?> attribute : getAttributes()) {
          attribute.setNotDirty();
       }
    }
@@ -863,7 +861,7 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
    }
 
    private boolean anAttributeIsDirty() throws SQLException {
-      for (Attribute<?> attribute : attributes.getValues()) {
+      for (Attribute<?> attribute : getAttributes()) {
          if (attribute.isDirty()) {
             return true;
          }
@@ -911,26 +909,12 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
       };
       try {
          artifactPersistTx.execute();
-         clearDeletedAttributes();
       } catch (Exception ex) {
          throw new SQLException(ex);
       }
    }
 
-   /**
- * 
- */
-private void clearDeletedAttributes() {
-	Iterator<Attribute<?>> it = attributes.getValues().iterator();
-	while(it.hasNext()){
-		Attribute<?> attr = it.next();
-		if(attr.isDeleted()){
-			it.remove();
-		}
-	}
-}
-
-public void persistRelations() throws SQLException {
+   public void persistRelations() throws SQLException {
       RelationManager.persistRelationsFor(this, null);
    }
 
@@ -1256,7 +1240,7 @@ public void persistRelations() throws SQLException {
       try {
          if (isDirty()) {
 
-            for (Attribute<?> attribute : attributes.getValues()) {
+            for (Attribute<?> attribute : getAttributes()) {
                if (attribute.isDirty()) {
                   return new Result(true, "===> Dirty Attribute - " + attribute.getAttributeType().getName() + "\n");
                }
@@ -1384,7 +1368,7 @@ public void persistRelations() throws SQLException {
    public Collection<SkynetAttributeChange> getDirtySkynetAttributeChanges() throws Exception {
       List<SkynetAttributeChange> dirtyAttributes = new LinkedList<SkynetAttributeChange>();
 
-      for (Attribute<?> attribute : attributes.getValues()) {
+      for (Attribute<?> attribute : getAttributes()) {
          if (attribute.isDirty()) {
             dirtyAttributes.add(new SkynetAttributeChange(attribute.getAttributeType().getName(),
                   attribute.getAttributeDataProvider().getData(), attribute.getAttrId(), attribute.getGammaId()));
@@ -1547,12 +1531,7 @@ public void persistRelations() throws SQLException {
 
    public int getAttributeCount(String attributeTypeName) throws SQLException {
       ensureAttributesLoaded();
-
-      Collection<Attribute<?>> tempAttributes = attributes.getValues(attributeTypeName);
-      if (tempAttributes == null) {
-         return 0;
-      }
-      return tempAttributes.size();
+      return getAttributes(attributeTypeName).size();
    }
 
    void setArtId(int artifactId) {

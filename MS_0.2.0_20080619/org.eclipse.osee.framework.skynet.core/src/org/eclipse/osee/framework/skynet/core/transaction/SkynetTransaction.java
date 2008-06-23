@@ -220,7 +220,7 @@ public class SkynetTransaction {
       return insertTransactionDataItems;
    }
 
-   private void setArtifactsNotDirty() {
+   private void setArtifactsNotDirty() throws SQLException {
       for (ITransactionData transactionData : transactionItems.keySet()) {
          if (transactionData instanceof ArtifactTransactionData) {
             Artifact artifact = ((ArtifactTransactionData) transactionData).getArtifact();
