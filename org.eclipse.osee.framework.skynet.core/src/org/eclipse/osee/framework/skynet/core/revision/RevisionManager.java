@@ -444,20 +444,34 @@ public class RevisionManager implements IEventReceiver {
     * @param sourceBranch
     * @param changes
     * @throws SQLException
+    * @throws TransactionDoesNotExist
+    * @throws BranchDoesNotExist
     */
-   private void loadNewOrDeletedArtifactChanges(Branch sourceBranch, int transactionNumber, Set<Integer> artIds, ArrayList<Change> changes) throws SQLException {
+   private void loadNewOrDeletedArtifactChanges(Branch sourceBranch, int transactionNumber, Set<Integer> artIds, ArrayList<Change> changes) throws SQLException, BranchDoesNotExist, TransactionDoesNotExist {
       ConnectionHandlerStatement connectionHandlerStatement = null;
       Map<Integer, ArtifactChanged> artifactChanges = new HashMap<Integer, ArtifactChanged>();
+      boolean hasBranch = sourceBranch != null;
+      TransactionId fromTransactionId;
+      TransactionId toTransactionId;
 
       try {
          //Changes per a branch
-         if (sourceBranch != null) {
+         if (hasBranch) {
+            Pair<TransactionId, TransactionId> branchStartEndTransaction =
+                  TransactionIdManager.getInstance().getStartEndPoint(sourceBranch);
+
+            fromTransactionId = branchStartEndTransaction.getKey();
+            toTransactionId = branchStartEndTransaction.getValue();
+
             connectionHandlerStatement =
                   ConnectionHandler.runPreparedQuery(BRANCH_ARTIFACT_CHANGES, SQL3DataType.INTEGER,
                         sourceBranch.getBranchId());
          }
          //Changes per a transaction
          else {
+            toTransactionId = TransactionIdManager.getInstance().getPossiblyEditableTransactionId(transactionNumber);
+            fromTransactionId = TransactionIdManager.getInstance().getPriorTransaction(toTransactionId);
+
             connectionHandlerStatement =
                   ConnectionHandler.runPreparedQuery(TRANSACTION_ARTIFACT_CHANGES, SQL3DataType.INTEGER,
                         transactionNumber);
@@ -468,7 +482,8 @@ public class RevisionManager implements IEventReceiver {
             int artId = resultSet.getInt("art_id");
             ArtifactChanged artifactChanged =
                   new ArtifactChanged(sourceBranch, resultSet.getInt("art_type_id"), resultSet.getInt("gamma_id"),
-                        artId, null, null, ModificationType.getMod(resultSet.getInt("mod_type")), ChangeType.OUTGOING);
+                        artId, toTransactionId, fromTransactionId,
+                        ModificationType.getMod(resultSet.getInt("mod_type")), ChangeType.OUTGOING);
 
             //We do not want to display artifacts that were new and then deleted
             //The only was this could happen is if the artifact was in here twice

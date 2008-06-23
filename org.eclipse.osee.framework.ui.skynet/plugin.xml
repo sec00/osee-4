@@ -787,6 +787,13 @@
              name="org.eclipse.ui.edit.ChangeView.copy.seperator"
              visible="true">
        </separator>
+       <command
+             commandId="org.eclipse.osee.framework.ui.skynet.changeReportView.revertArtifact.command">
+       </command>
+       <separator
+             name="org.eclipse.ui.edit.ChangeView.revert.seperator"
+             visible="true">
+       </separator>
     </menuContribution>
  </extension>
  <extension
