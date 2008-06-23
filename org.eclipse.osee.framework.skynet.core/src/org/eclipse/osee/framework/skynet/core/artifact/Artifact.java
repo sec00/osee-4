@@ -12,6 +12,7 @@ package org.eclipse.osee.framework.skynet.core.artifact;
 
 import static org.eclipse.osee.framework.skynet.core.artifact.ArtifactLoad.FULL;
 import static org.eclipse.osee.framework.skynet.core.relation.CoreRelationEnumeration.DEFAULT_HIERARCHICAL__CHILD;
+
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.sql.SQLException;
@@ -19,11 +20,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -908,12 +911,26 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
       };
       try {
          artifactPersistTx.execute();
+         clearDeletedAttributes();
       } catch (Exception ex) {
          throw new SQLException(ex);
       }
    }
 
-   public void persistRelations() throws SQLException {
+   /**
+ * 
+ */
+private void clearDeletedAttributes() {
+	Iterator<Attribute<?>> it = attributes.getValues().iterator();
+	while(it.hasNext()){
+		Attribute<?> attr = it.next();
+		if(attr.isDeleted()){
+			it.remove();
+		}
+	}
+}
+
+public void persistRelations() throws SQLException {
       RelationManager.persistRelationsFor(this, null);
    }
 
