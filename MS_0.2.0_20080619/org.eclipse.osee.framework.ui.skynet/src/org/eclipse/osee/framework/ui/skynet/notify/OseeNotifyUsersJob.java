@@ -26,6 +26,7 @@ import org.eclipse.osee.framework.jdk.core.util.AHTML;
 import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
 import org.eclipse.osee.framework.skynet.core.User;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
+import org.eclipse.osee.framework.skynet.core.user.UserEnum;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.util.AEmail;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
@@ -83,10 +84,17 @@ public class OseeNotifyUsersJob extends Job {
    }
 
    private void notifyUser(User user, List<OseeNotificationEvent> notificationEvents, XResultData resultData) throws MessagingException, OseeCoreException, SQLException {
+      if (user == SkynetAuthentication.getUser(UserEnum.NoOne) || user == SkynetAuthentication.getUser(UserEnum.UnAssigned) || user == SkynetAuthentication.getUser(UserEnum.Guest)) {
+         // do nothing
+         return;
+      }
       String html = notificationEventsToHtml(notificationEvents);
       if (testing) {
          resultData.log("To: " + user.getName() + " at " + user.getEmail());
          resultData.addRaw(html + AHTML.newline(2));
+      } else if (user.getEmail() == null || user.getEmail().equals("")) {
+         // do nothing
+         return;
       } else {
          AEmail emailMessage =
                new AEmail(null, SkynetAuthentication.getUser().getEmail(), SkynetAuthentication.getUser().getEmail(),
@@ -96,5 +104,4 @@ public class OseeNotifyUsersJob extends Job {
          emailMessage.send();
       }
    }
-
 }
