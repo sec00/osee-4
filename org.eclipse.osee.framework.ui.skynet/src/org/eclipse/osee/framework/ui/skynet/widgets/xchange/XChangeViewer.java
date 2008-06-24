@@ -38,6 +38,8 @@ import org.eclipse.osee.framework.ui.plugin.util.Displays;
 import org.eclipse.osee.framework.ui.plugin.util.Jobs;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
+import org.eclipse.osee.framework.ui.skynet.ats.IActionable;
+import org.eclipse.osee.framework.ui.skynet.ats.OseeAts;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.util.SkynetDragAndDrop;
 import org.eclipse.osee.framework.ui.skynet.widgets.XWidget;
@@ -59,7 +61,7 @@ import org.eclipse.swt.widgets.Tree;
 /**
  * @author Donald G. Dunne
  */
-public class XChangeViewer extends XWidget implements IEventReceiver {
+public class XChangeViewer extends XWidget implements IEventReceiver, IActionable {
 
    private ChangeXViewer xChangeViewer;
    public final static String normalColor = "#EEEEEE";
@@ -163,6 +165,8 @@ public class XChangeViewer extends XWidget implements IEventReceiver {
          }
       });
 
+      OseeAts.addButtonToEditorToolBar(this, SkynetGuiPlugin.getInstance(), toolBar, ChangeView.VIEW_ID,
+            "Change Report");
    }
 
    public void loadTable() {
@@ -347,5 +351,16 @@ public class XChangeViewer extends XWidget implements IEventReceiver {
          }
          return artifacts.toArray(new Artifact[artifacts.size()]);
       }
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.skynet.ats.IActionable#getActionDescription()
+    */
+   @Override
+   public String getActionDescription() {
+      StringBuffer sb = new StringBuffer();
+      if (branch != null) sb.append("\nBranch: " + branch);
+      sb.append("\nTransaction Id: " + transactionNumber);
+      return sb.toString();
    }
 }

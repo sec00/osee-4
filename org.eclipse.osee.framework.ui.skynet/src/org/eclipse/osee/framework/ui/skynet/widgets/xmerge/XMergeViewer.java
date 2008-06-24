@@ -42,6 +42,7 @@ import org.eclipse.osee.framework.ui.plugin.util.Jobs;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.artifact.editor.ArtifactEditor;
+import org.eclipse.osee.framework.ui.skynet.ats.IActionable;
 import org.eclipse.osee.framework.ui.skynet.ats.OseeAts;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.XWidget;
@@ -64,7 +65,7 @@ import org.eclipse.swt.widgets.Tree;
  * @author Donald G. Dunne
  * @author Theron Virgin
  */
-public class XMergeViewer extends XWidget implements IEventReceiver {
+public class XMergeViewer extends XWidget implements IEventReceiver, IActionable {
 
    private MergeXViewer xCommitViewer;
    private IDirtiableEditor editor;
@@ -139,6 +140,9 @@ public class XMergeViewer extends XWidget implements IEventReceiver {
    }
 
    private ToolItem openAssociatedArtifactItem;
+   private Branch sourceBranch;
+   private Branch destBranch;
+   private TransactionId tranId;
 
    private void refreshAssociatedArtifactItem(Branch sourceBranch) {
       try {
@@ -246,6 +250,8 @@ public class XMergeViewer extends XWidget implements IEventReceiver {
             xCommitViewer.getCustomize().handleTableCustomization();
          }
       });
+
+      OseeAts.addButtonToEditorToolBar(this, SkynetGuiPlugin.getInstance(), toolBar, MergeView.VIEW_ID, "Merge Manager");
    }
 
    public void refreshTable() {
@@ -394,6 +400,9 @@ public class XMergeViewer extends XWidget implements IEventReceiver {
     * @see org.eclipse.osee.framework.ui.skynet.widgets.IDamWidget#setArtifact(org.eclipse.osee.framework.skynet.core.artifact.Artifact, java.lang.String)
     */
    public void setInputData(final Branch sourceBranch, final Branch destBranch, final TransactionId tranId, final MergeView mergeView) throws IllegalStateException, SQLException {
+      this.sourceBranch = sourceBranch;
+      this.destBranch = destBranch;
+      this.tranId = tranId;
       extraInfoLabel.setText(LOADING);
       Job job = new Job("") {
          @Override
@@ -449,5 +458,17 @@ public class XMergeViewer extends XWidget implements IEventReceiver {
 
       }
 
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.framework.ui.skynet.ats.IActionable#getActionDescription()
+    */
+   @Override
+   public String getActionDescription() {
+      StringBuffer sb = new StringBuffer();
+      if (sourceBranch != null) sb.append("\nSource Branch: " + sourceBranch);
+      if (destBranch != null) sb.append("\nDestination Branch: " + destBranch);
+      if (tranId != null) sb.append("\nTransactionId: " + tranId);
+      return sb.toString();
    }
 }
