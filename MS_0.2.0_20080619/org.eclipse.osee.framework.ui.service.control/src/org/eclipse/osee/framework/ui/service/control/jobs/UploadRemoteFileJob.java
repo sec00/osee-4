@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Map;
+
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -34,6 +35,7 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.osgi.framework.Bundle;
+
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpException;
 
@@ -172,7 +174,7 @@ public class UploadRemoteFileJob extends Job {
       }
       try {
          url = FileLocator.toFileURL(url);
-         File file = new File(url.getFile());
+         File file = new File(url.toURI());
          return file;
       } catch (Throwable e) {
          throw new IOException("Invalid URL format for the URL " + url.toString(), e);
