@@ -75,10 +75,6 @@ public class RevertArtifactHandler extends AbstractHandler {
                monitor.setTaskName(artifactChange.getArtifact().getDescriptiveName());
                ArtifactPersistenceManager.getInstance().revertArtifact(artifactChange.getArtifact());
                monitor.worked(1);
-
-               if (monitor.isCanceled()) {
-                  return Status.CANCEL_STATUS;
-               }
             }
             toReturn = Status.OK_STATUS;
          } catch (Exception ex) {

@@ -13,8 +13,8 @@ package org.eclipse.osee.framework.skynet.core.change;
 
 import java.sql.SQLException;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.artifact.ArtifactCache;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
-import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 import org.eclipse.osee.framework.skynet.core.exception.ArtifactDoesNotExist;
 import org.eclipse.osee.framework.skynet.core.exception.MultipleArtifactsExist;
 import org.eclipse.osee.framework.skynet.core.relation.RelationType;
@@ -91,7 +91,7 @@ public class RelationChanged extends Change {
     */
    public Artifact getBArtifact() throws ArtifactDoesNotExist, SQLException {
       if (bArtifact == null) {
-         bArtifact = ArtifactQuery.getArtifactFromId(bArtId, getBranch());
+         bArtifact = ArtifactCache.getActive(bArtId, getBranch());
       }
       return bArtifact;
    }
@@ -166,7 +166,7 @@ public class RelationChanged extends Change {
     */
    @Override
    public String getIsValue() {
-      return getRationale();
+      return getModificationType() == ModificationType.DELETED ? "" : getRationale();
    }
 
    /* (non-Javadoc)
