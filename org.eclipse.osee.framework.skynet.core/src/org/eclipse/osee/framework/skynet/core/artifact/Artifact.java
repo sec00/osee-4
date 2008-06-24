@@ -12,6 +12,7 @@ package org.eclipse.osee.framework.skynet.core.artifact;
 
 import static org.eclipse.osee.framework.skynet.core.artifact.ArtifactLoad.FULL;
 import static org.eclipse.osee.framework.skynet.core.relation.CoreRelationEnumeration.DEFAULT_HIERARCHICAL__CHILD;
+
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.sql.SQLException;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -1330,6 +1332,8 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
     */
    public Artifact duplicate(Branch branch) throws SQLException, OseeCoreException {
       Artifact newArtifact = artifactType.makeNewArtifact(branch);
+      //we do this because attributes were added on creation to meet the minimium attribute requirements      
+      newArtifact.attributes.clear();
       copyAttributes(newArtifact);
       return newArtifact;
    }
