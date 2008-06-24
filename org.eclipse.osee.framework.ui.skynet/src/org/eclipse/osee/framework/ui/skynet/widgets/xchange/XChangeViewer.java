@@ -28,8 +28,10 @@ import org.eclipse.osee.framework.skynet.core.event.LocalTransactionEvent;
 import org.eclipse.osee.framework.skynet.core.event.RemoteTransactionEvent;
 import org.eclipse.osee.framework.skynet.core.event.SkynetEventManager;
 import org.eclipse.osee.framework.skynet.core.event.TransactionEvent;
+import org.eclipse.osee.framework.skynet.core.exception.BranchDoesNotExist;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.revision.RevisionManager;
+import org.eclipse.osee.framework.skynet.core.transaction.TransactionIdManager;
 import org.eclipse.osee.framework.ui.plugin.event.Event;
 import org.eclipse.osee.framework.ui.plugin.event.IEventReceiver;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
@@ -270,11 +272,14 @@ public class XChangeViewer extends XWidget implements IEventReceiver {
                         if (changes.length == 0) {
                            extraInfoLabel.setText(NOT_CHANGES);
                         } else {
-                           extraInfoLabel.setText(hasBranch ? "Changes made to branch " + branch.getBranchName() : "Changes made on transaction " + transactionNumber);
+                           extraInfoLabel.setText(hasBranch ? "Changes made to branch: " + branch.getBranchName() : "Changes made on transaction: " + transactionNumber + ", " + TransactionIdManager.getInstance().getPossiblyEditableTransactionId(
+                                 transactionNumber).getComment());
                            xChangeViewer.setChanges(changes);
                            loadTable();
                         }
                      } catch (SQLException ex) {
+                        OSEELog.logException(SkynetGuiPlugin.class, ex.getLocalizedMessage(), ex, false);
+                     } catch (BranchDoesNotExist ex) {
                         OSEELog.logException(SkynetGuiPlugin.class, ex.getLocalizedMessage(), ex, false);
                      }
                   }
