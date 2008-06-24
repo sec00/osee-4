@@ -166,7 +166,7 @@ public class RelationChanged extends Change {
     */
    @Override
    public String getIsValue() {
-      return getModificationType() == ModificationType.DELETED ? "" : getRationale();
+      return getRationale();
    }
 
    /* (non-Javadoc)
