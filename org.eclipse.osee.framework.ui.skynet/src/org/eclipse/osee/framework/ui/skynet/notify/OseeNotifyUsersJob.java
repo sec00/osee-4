@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osee.framework.jdk.core.util.AHTML;
+import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
 import org.eclipse.osee.framework.skynet.core.User;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
@@ -98,10 +99,18 @@ public class OseeNotifyUsersJob extends Job {
       } else {
          AEmail emailMessage =
                new AEmail(null, SkynetAuthentication.getUser().getEmail(), SkynetAuthentication.getUser().getEmail(),
-                     "OSEE Notification");
+                     getNotificationEmailSubject(notificationEvents));
          emailMessage.setRecipients(Message.RecipientType.TO, new String[] {user.getEmail()});
          emailMessage.addHTMLBody(html);
          emailMessage.send();
       }
+   }
+
+   private String getNotificationEmailSubject(List<OseeNotificationEvent> notificationEvents) {
+      if (notificationEvents.size() == 1) {
+         OseeNotificationEvent event = notificationEvents.iterator().next();
+         return Strings.truncate("OSEE Notification" + " - " + event.getType() + " - " + event.getDescription(), 128);
+      }
+      return "OSEE Notification";
    }
 }
