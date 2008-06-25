@@ -14,9 +14,6 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osee.ats.AtsPlugin;
-import org.eclipse.osee.ats.artifact.DecisionReviewArtifact;
-import org.eclipse.osee.ats.artifact.PeerToPeerReviewArtifact;
-import org.eclipse.osee.ats.artifact.TaskArtifact;
 import org.eclipse.osee.ats.artifact.TeamWorkFlowArtifact;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
@@ -105,13 +102,7 @@ public class DoesNotWorkItem extends XNavigateItemAction {
          @Override
          protected void handleTxWork() throws OseeCoreException, SQLException {
             int x = 0;
-            for (String artTypeName : Arrays.asList(TeamWorkFlowArtifact.ARTIFACT_NAME, TaskArtifact.ARTIFACT_NAME,
-                  DecisionReviewArtifact.ARTIFACT_NAME, PeerToPeerReviewArtifact.ARTIFACT_NAME,
-                  "Lba V13 Code Team Workflow", "Lba V13 Test Team Workflow", "Lba V13 Req Team Workflow",
-                  "Lba V13 SW Design Team Workflow", "Lba V13 Tech Approach Team Workflow",
-                  "Lba V11 REU Code Team Workflow", "Lba V11 REU Test Team Workflow", "Lba V11 REU Req Team Workflow",
-                  "Lba B3 Code Team Workflow", "Lba B3 Test Team Workflow", "Lba B3 Req Team Workflow",
-                  "Lba B3 SW Design Team Workflow", "Lba B3 Tech Approach Team Workflow")) {
+            for (String artTypeName : Arrays.asList(TeamWorkFlowArtifact.ARTIFACT_NAME)) {
                for (Artifact team : ArtifactQuery.getArtifactsFromType(artTypeName, AtsPlugin.getAtsBranch())) {
                   for (Attribute<?> attr : team.getAttributes()) {
                      if (attr.getValue() == null) {
@@ -129,5 +120,13 @@ public class DoesNotWorkItem extends XNavigateItemAction {
       newActionTx.execute();
 
    }
+
+   //   for (String artTypeName : Arrays.asList(TeamWorkFlowArtifact.ARTIFACT_NAME, TaskArtifact.ARTIFACT_NAME,
+   //         DecisionReviewArtifact.ARTIFACT_NAME, PeerToPeerReviewArtifact.ARTIFACT_NAME,
+   //         "Lba V13 Code Team Workflow", "Lba V13 Test Team Workflow", "Lba V13 Req Team Workflow",
+   //         "Lba V13 SW Design Team Workflow", "Lba V13 Tech Approach Team Workflow",
+   //         "Lba V11 REU Code Team Workflow", "Lba V11 REU Test Team Workflow", "Lba V11 REU Req Team Workflow",
+   //         "Lba B3 Code Team Workflow", "Lba B3 Test Team Workflow", "Lba B3 Req Team Workflow",
+   //         "Lba B3 SW Design Team Workflow", "Lba B3 Tech Approach Team Workflow")) {
 
 }
