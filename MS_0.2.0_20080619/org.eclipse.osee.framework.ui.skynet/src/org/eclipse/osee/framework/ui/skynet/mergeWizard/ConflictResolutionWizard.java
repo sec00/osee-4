@@ -12,6 +12,7 @@ package org.eclipse.osee.framework.ui.skynet.mergeWizard;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osee.framework.skynet.core.conflict.AttributeConflict;
 import org.eclipse.osee.framework.skynet.core.conflict.Conflict;
 
@@ -19,94 +20,81 @@ import org.eclipse.osee.framework.skynet.core.conflict.Conflict;
  * @author Theron Virgin
  */
 public class ConflictResolutionWizard extends Wizard {
+	public static final String TITLE = "How would you like to resolve this conflict?";
+	public static final String INDENT = "     ";
+	public static final String SOURCE_TITLE = "Source Value:";
+	public static final String DEST_TITLE = "Destination value:";
+	public static final String ART_TEXT = "Artifact: ";
+	public static final String TYPE_TEXT = "Attribute type: ";
 
-   /* (non-Javadoc)
-    * @see org.eclipse.jface.wizard.Wizard#getPreviousPage(org.eclipse.jface.wizard.IWizardPage)
-    */
+	private WizardPage editWizardPage;
+	private final AttributeConflict conflict;
 
-   private ConflictResolutionWizardPage conflictWizardPage;
-   private EditAttributeWizardPage editWizardPage;
-   private EditWFCAttributeWizardPage editWFCWizardPage;
-   private final AttributeConflict conflict;
+	public ConflictResolutionWizard(Conflict conflict) {
+		if (conflict instanceof AttributeConflict)
+			this.conflict = (AttributeConflict) conflict;
+		else
+			this.conflict = null;
 
-   public ConflictResolutionWizard(Conflict conflict) {
-      if (conflict instanceof AttributeConflict)
-         this.conflict = (AttributeConflict) conflict;
-      else
-         this.conflict = null;
+	}
 
-   }
+	@Override
+	public void addPages() {
+		if (conflict.isWordAttribute()) {
+			editWizardPage = new EditWFCAttributeWizardPage(conflict);
+		} else {
+			editWizardPage = new EditAttributeWizardPage(conflict);
+		}
+		addPage(editWizardPage);
+	}
 
-   @Override
-   public void addPages() {
-      conflictWizardPage = new ConflictResolutionWizardPage(conflict);
-      addPage(conflictWizardPage);
-      editWizardPage = new EditAttributeWizardPage(conflict);
-      addPage(editWizardPage);
-      editWFCWizardPage = new EditWFCAttributeWizardPage(conflict);
-      addPage(editWFCWizardPage);
-   }
+	@Override
+	public boolean performFinish() {
+		IWizardPage page = getContainer().getCurrentPage();
+		if (page instanceof EditAttributeWizardPage) {
+			return ((EditAttributeWizardPage) page).closingPage();
+		} else if (page instanceof EditWFCAttributeWizardPage) {
+			return ((EditWFCAttributeWizardPage) page).closingPage();
+		}
+		return true;
+	}
 
-   @Override
-   public boolean performFinish() {
-      IWizardPage page = getContainer().getCurrentPage();
-      if (page.equals(conflictWizardPage)) {
-         return conflictWizardPage.closingPage();
-      }
-      if (page.equals(editWizardPage)) {
-         return editWizardPage.closingPage();
-      }
-      if (page.equals(editWFCWizardPage)) {
-         return editWFCWizardPage.closingPage();
-      }
-      return true;
-   }
+	@Override
+	public boolean canFinish() {
+		return true;
+	}
 
-   @Override
-   public boolean canFinish() {
-      IWizardPage page = getContainer().getCurrentPage();
-      if (page.equals(conflictWizardPage)) {
-         return conflictWizardPage.canFinish();
-      }
-      return true;
-   }
+	public boolean getResolved() {
+		return true;
+	}
 
-   public boolean getResolved() {
-      return true;
-   }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.wizard.Wizard#getStartingPage()
+	 */
+	@Override
+	public IWizardPage getStartingPage() {
+		if (conflict.isWordAttribute())
+			return getPage(EditWFCAttributeWizardPage.TITLE);
+		else
+			return getPage(EditAttributeWizardPage.TITLE);
 
-   /* (non-Javadoc)
-    * @see org.eclipse.jface.wizard.Wizard#getStartingPage()
-    */
-   @Override
-   public IWizardPage getStartingPage() {
-      if (conflict.statusUntouched()) {
-         return conflictWizardPage;
-      } else {
-         return conflictWizardPage.getNextPage();
-      }
-   }
+	}
 
-   @Override
-   public IWizardPage getPreviousPage(IWizardPage page) {
-      if (page.equals(conflictWizardPage)) {
-         return null;
-      }
-      if (page.equals(editWizardPage)) {
-         return conflictWizardPage;
-      }
-      if (page.equals(editWFCWizardPage)) {
-         return conflictWizardPage;
-      }
-      return null;
-   }
+	@Override
+	public IWizardPage getPreviousPage(IWizardPage page) {
+		return null;
+	}
 
-   /* (non-Javadoc)
-    * @see org.eclipse.jface.wizard.Wizard#performCancel()
-    */
-   @Override
-   public boolean performCancel() {
-      return super.performCancel();
-   }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.wizard.Wizard#performCancel()
+	 */
+	@Override
+	public boolean performCancel() {
+		return super.performCancel();
+	}
 
 }
