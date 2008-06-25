@@ -120,7 +120,7 @@ public class DoesNotWorkItem extends XNavigateItemAction {
                         x++;
                      }
                   }
-                  team.persistAttributes();
+                  if (team.isDirty()) team.persistAttributes();
                }
             }
             System.out.println("Deleted " + x);
