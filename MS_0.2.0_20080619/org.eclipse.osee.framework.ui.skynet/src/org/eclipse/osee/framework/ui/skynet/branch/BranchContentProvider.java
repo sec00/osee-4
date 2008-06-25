@@ -125,17 +125,12 @@ public class BranchContentProvider implements ITreeContentProvider, ArtifactChan
             try {
                Collection<Branch> branches = BranchPersistenceManager.getBranches();
                Iterator<Branch> iter = branches.iterator();
+
                while (iter.hasNext()) {
-                  if (!OseeProperties.isDeveloper() && iter.next().isMergeBranch()) {
+                  Branch branch = iter.next();
+
+                  if ((showChildBranchesAtMainLevel && branch.getParentBranch() != null) || (!OseeProperties.isDeveloper() && branch.isMergeBranch())) {
                      iter.remove();
-                  }
-               }
-               if (!showChildBranchesAtMainLevel) {
-                  iter = branches.iterator();
-                  while (iter.hasNext()) {
-                     if (iter.next().getParentBranch() != null) {
-                        iter.remove();
-                     }
                   }
                }
                return branches.toArray();
