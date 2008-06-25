@@ -31,6 +31,7 @@ import org.eclipse.osee.framework.skynet.core.event.TransactionEvent;
 import org.eclipse.osee.framework.skynet.core.exception.BranchDoesNotExist;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.revision.RevisionManager;
+import org.eclipse.osee.framework.skynet.core.transaction.TransactionId;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionIdManager;
 import org.eclipse.osee.framework.ui.plugin.event.Event;
 import org.eclipse.osee.framework.ui.plugin.event.IEventReceiver;
@@ -276,8 +277,16 @@ public class XChangeViewer extends XWidget implements IEventReceiver, IActionabl
                         if (changes.length == 0) {
                            extraInfoLabel.setText(NOT_CHANGES);
                         } else {
-                           extraInfoLabel.setText(hasBranch ? "Changes made to branch: " + branch.getBranchName() : "Changes made on transaction: " + transactionNumber + ", " + TransactionIdManager.getInstance().getPossiblyEditableTransactionId(
-                                 transactionNumber).getComment());
+                           TransactionId transId =
+                                 hasBranch ? null : TransactionIdManager.getInstance().getPossiblyEditableTransactionId(
+                                       transactionNumber);
+                           String infoLabel =
+                                 String.format(
+                                       "Changes %s to branch: %s\n%s",
+                                       hasBranch ? "made" : "committed",
+                                       hasBranch ? branch : "(" + transId.getTransactionNumber() + ") " + transId.getBranch(),
+                                       hasBranch ? "" : "Comment: " + transId.getComment());
+                           extraInfoLabel.setText(infoLabel);
                            xChangeViewer.setChanges(changes);
                            loadTable();
                         }
