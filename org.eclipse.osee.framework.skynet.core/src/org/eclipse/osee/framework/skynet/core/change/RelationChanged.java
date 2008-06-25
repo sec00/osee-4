@@ -89,10 +89,16 @@ public class RelationChanged extends Change {
     * @throws SQLException
     * @throws ArtifactDoesNotExist
     */
-   public Artifact getBArtifact() throws ArtifactDoesNotExist, SQLException {
+   public Artifact getBArtifact() throws ArtifactDoesNotExist {
       if (bArtifact == null) {
          bArtifact = ArtifactCache.getActive(bArtId, getBranch());
       }
+
+      if (bArtifact == null) {
+         throw new ArtifactDoesNotExist(
+               "Artifact: " + bArtId + " Does not exist on branch: " + getBranch().getBranchName() + " branch id: " + getBranch().getBranchId());
+      }
+
       return bArtifact;
    }
 
