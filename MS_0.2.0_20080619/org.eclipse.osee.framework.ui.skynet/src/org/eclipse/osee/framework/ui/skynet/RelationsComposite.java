@@ -570,7 +570,6 @@ public class RelationsComposite extends Composite implements IEventReceiver {
 	         }
 	      }
       }
-      
    }
 
    public void refresh() {
