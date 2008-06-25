@@ -34,13 +34,16 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactData;
+import org.eclipse.osee.framework.skynet.core.artifact.CacheArtifactModifiedEvent;
 import org.eclipse.osee.framework.skynet.core.event.SkynetEventManager;
 import org.eclipse.osee.framework.skynet.core.exception.ArtifactDoesNotExist;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.relation.RelationLink;
 import org.eclipse.osee.framework.skynet.core.relation.RelationManager;
 import org.eclipse.osee.framework.skynet.core.relation.RelationModifiedEvent;
+import org.eclipse.osee.framework.skynet.core.relation.RelationSide;
 import org.eclipse.osee.framework.skynet.core.relation.RelationType;
+import org.eclipse.osee.framework.skynet.core.relation.RelationTypeManager;
 import org.eclipse.osee.framework.skynet.core.relation.RelationTypeSide;
 import org.eclipse.osee.framework.ui.plugin.event.IEventReceiver;
 import org.eclipse.osee.framework.ui.skynet.artifact.editor.ArtifactEditor;
@@ -535,20 +538,39 @@ public class RelationsComposite extends Composite implements IEventReceiver {
       for(Object object:objects){
 	      if (object instanceof RelationLink) {
 	         ((RelationLink) object).delete();
+	         
+	         RelationType relationType = (RelationType) ((RelationLink) object).getRelationType();
+	            int sideAMax =
+	                  RelationTypeManager.getRelationSideMax(relationType, artifact.getArtifactType(), RelationSide.SIDE_A);
+	            int sideBMax =
+	                  RelationTypeManager.getRelationSideMax(relationType, artifact.getArtifactType(), RelationSide.SIDE_B);
+	            RelationTypeSide sideA = new RelationTypeSide(relationType, RelationSide.SIDE_A, artifact);
+	            RelationTypeSide sideB = new RelationTypeSide(relationType, RelationSide.SIDE_B, artifact);
+	            boolean onSideA = sideBMax > 0;
+	            boolean onSideB = sideAMax > 0;
+	            if (onSideA && onSideB) {
+	               treeViewer.refresh(sideA);
+	            } else if (onSideA) {
+	            	treeViewer.refresh(sideA);
+	            	treeViewer.refresh(sideB);
+	            } else if (onSideB) {
+	            	treeViewer.refresh(sideB);
+	            }
 	      } else if (object instanceof RelationType) {
 	         RelationType relationType = (RelationType) object;
 	         RelationManager.deleteRelations(artifact, relationType, null);
+	         treeViewer.refresh(relationType);
 	      } else if (object instanceof RelationTypeSide) {
 	         RelationTypeSide group = (RelationTypeSide) object;
 	         try {
 	            RelationManager.deleteRelations(artifact, group.getRelationType(), group.getSide());
+	            treeViewer.refresh(group);
 	         } catch (SQLException ex) {
 	            OSEELog.logException(SkynetGuiPlugin.class, ex, true);
 	         }
 	      }
       }
       
-      refresh();
    }
 
    public void refresh() {
@@ -584,7 +606,25 @@ public class RelationsComposite extends Composite implements IEventReceiver {
 
    public void onEvent(org.eclipse.osee.framework.ui.plugin.event.Event event) {
       if (treeViewer != null && treeViewer.getInput() instanceof Artifact){
-    	  refresh();
+    	  if(event instanceof CacheArtifactModifiedEvent){
+    		  CacheArtifactModifiedEvent ev = (CacheArtifactModifiedEvent)event;
+    		  Artifact modifiedArtifact = ev.getArtifact();
+    		  if (artifact == modifiedArtifact){
+    			  treeViewer.refresh(modifiedArtifact);
+    		  } else {
+    			  for(RelationLink rel : modifiedArtifact.getRelationsAll()){
+    				  try {
+						if(rel.getArtifactOnOtherSide(modifiedArtifact) == artifact){
+							  treeViewer.update(rel, null);
+						  }
+					} catch (ArtifactDoesNotExist ex) {
+					} catch (SQLException ex) {
+					}
+    			  }
+    		  }
+    	  } else if(event instanceof RelationModifiedEvent){
+    		  treeViewer.refresh(getArtifact());
+    	  }
       }
    }
 
