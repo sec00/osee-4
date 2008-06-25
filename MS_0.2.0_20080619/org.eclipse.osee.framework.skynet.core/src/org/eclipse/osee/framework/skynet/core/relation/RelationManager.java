@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 import org.eclipse.osee.framework.db.connection.ConnectionHandler;
@@ -113,7 +114,7 @@ public class RelationManager {
 
          List<RelationLink> selectedRelations = relationsByType.get(artifact, relation.getRelationType());
          if (selectedRelations == null) {
-            selectedRelations = Collections.synchronizedList(new ArrayList<RelationLink>(4));
+            selectedRelations = new CopyOnWriteArrayList<RelationLink>();
             relationsByType.put(artifact, relation.getRelationType(), selectedRelations);
          }
          selectedRelations.add(relation);
