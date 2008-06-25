@@ -152,15 +152,25 @@ public class RelationManager {
       relatedArtifacts.clear();
       for (RelationLink relation : selectedRelations) {
          if (!relation.isDeleted()) {
-            if (relationSide == null) {
-               relatedArtifacts.add(relation.getArtifactOnOtherSide(artifact));
-            } else {
-               // only select relations where the related artifact is on relationSide
-               // (and thus on the side opposite of "artifact")
-               if (relation.getSide(artifact) != relationSide) {
-                  relatedArtifacts.add(relation.getArtifact(relationSide));
-               }
-            }
+        	try{
+	            if (relationSide == null) {
+	               Artifact art = relation.getArtifactOnOtherSide(artifact);
+//	               if(!art.isDeleted()){
+	            	   relatedArtifacts.add(art);
+//	               }
+	            } else {
+	               // only select relations where the related artifact is on relationSide
+	               // (and thus on the side opposite of "artifact")
+	               if (relation.getSide(artifact) != relationSide) {
+	            	  Artifact art = relation.getArtifact(relationSide);
+//	            	  if(!art.isDeleted()){
+		                 relatedArtifacts.add(art);
+//		              }	                  
+	               }
+	            }
+        	} catch (ArtifactDoesNotExist ex){
+        		OseeLog.log(SkynetActivator.class, Level.WARNING, ex.getMessage(), ex);
+        	}
          }
       }
       return relatedArtifacts;
