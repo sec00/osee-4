@@ -12,6 +12,7 @@ package org.eclipse.osee.framework.skynet.core.artifact;
 
 import static org.eclipse.osee.framework.skynet.core.artifact.ArtifactLoad.FULL;
 import static org.eclipse.osee.framework.skynet.core.relation.CoreRelationEnumeration.DEFAULT_HIERARCHICAL__CHILD;
+
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.sql.SQLException;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -840,7 +842,7 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
    public void setNotDirty() throws SQLException {
       dirty = false;
 
-      for (Attribute<?> attribute : getAttributes()) {
+      for (Attribute<?> attribute : internalGetAttributes()) {
          attribute.setNotDirty();
       }
    }
@@ -870,7 +872,7 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
    }
 
    private boolean anAttributeIsDirty() throws SQLException {
-      for (Attribute<?> attribute : getAttributes()) {
+      for (Attribute<?> attribute : internalGetAttributes()) {
          if (attribute.isDirty()) {
             return true;
          }
@@ -1249,7 +1251,7 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
       try {
          if (isDirty()) {
 
-            for (Attribute<?> attribute : getAttributes()) {
+            for (Attribute<?> attribute : internalGetAttributes()) {
                if (attribute.isDirty()) {
                   return new Result(true, "===> Dirty Attribute - " + attribute.getAttributeType().getName() + "\n");
                }
@@ -1379,7 +1381,7 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
    public Collection<SkynetAttributeChange> getDirtySkynetAttributeChanges() throws Exception {
       List<SkynetAttributeChange> dirtyAttributes = new LinkedList<SkynetAttributeChange>();
 
-      for (Attribute<?> attribute : getAttributes()) {
+      for (Attribute<?> attribute : internalGetAttributes()) {
          if (attribute.isDirty()) {
             dirtyAttributes.add(new SkynetAttributeChange(attribute.getAttributeType().getName(),
                   attribute.getAttributeDataProvider().getData(), attribute.getAttrId(), attribute.getGammaId()));
