@@ -174,7 +174,7 @@ public class UploadRemoteFileJob extends Job {
       }
       try {
          url = FileLocator.toFileURL(url);
-         File file = new File(url.toURI());
+         File file = new File(url.getFile());
          return file;
       } catch (Throwable e) {
          throw new IOException("Invalid URL format for the URL " + url.toString(), e);
