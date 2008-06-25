@@ -890,4 +890,12 @@
           className="org.eclipse.osee.framework.ui.skynet.blam.operation.UpdateCurrentColumn">
     </Operation>
  </extension>
+ <extension
+       id="Find Relations With Deleted Artifacts"
+       name="Find Relations With Deleted Artifacts"
+       point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
+    <Operation
+          className="org.eclipse.osee.framework.ui.skynet.blam.operation.FindRelationsWithDeletedArtifacts">
+    </Operation>
+ </extension>
 </plugin>
