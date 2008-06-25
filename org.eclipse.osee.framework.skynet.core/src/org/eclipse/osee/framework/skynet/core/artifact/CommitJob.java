@@ -14,7 +14,6 @@ package org.eclipse.osee.framework.skynet.core.artifact;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -183,6 +182,7 @@ class CommitJob extends Job {
                ConnectionHandler.runPreparedUpdateReturnCount(UPDATE_MERGE_TRANSACTIONS, SQL3DataType.INTEGER,
                      conflict.getMergeGammaId(), SQL3DataType.INTEGER, newTransactionNumber, SQL3DataType.INTEGER,
                      conflict.getSourceGamma());
+               conflict.setStatus(Conflict.Status.COMMITED);
             }
 
          }

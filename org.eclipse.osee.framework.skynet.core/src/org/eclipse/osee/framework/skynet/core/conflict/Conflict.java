@@ -31,7 +31,7 @@ import org.eclipse.swt.graphics.Image;
  */
 public abstract class Conflict implements IAdaptable {
    public static enum Status {
-      UNTOUCHED(1), EDITED(2), RESOLVED(3), OUT_OF_DATE(4), NOT_RESOLVABLE(5);
+      UNTOUCHED(1), EDITED(2), RESOLVED(3), OUT_OF_DATE(4), NOT_RESOLVABLE(5), COMMITED(6);
       private final int value;
 
       Status(int value) {
@@ -247,7 +247,7 @@ public abstract class Conflict implements IAdaptable {
    }
 
    public boolean okToOverwriteMerge() throws OseeCoreException {
-      if (status.equals(Status.RESOLVED)) {
+      if (status.equals(Status.RESOLVED) || status.equals(Status.COMMITED)) {
          return false;
       }
       return true;
