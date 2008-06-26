@@ -48,6 +48,7 @@ import org.eclipse.osee.framework.skynet.core.access.AccessControlManager;
 import org.eclipse.osee.framework.skynet.core.access.PermissionEnum;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
+import org.eclipse.osee.framework.skynet.core.exception.ArtifactDoesNotExist;
 import org.eclipse.osee.framework.skynet.core.exception.MultipleAttributesExist;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.transaction.AbstractSkynetTxTemplate;
@@ -321,7 +322,7 @@ public class SMAManager {
       return true;
    }
 
-   private static void promptChangeVersionHelper(Collection<? extends TeamWorkFlowArtifact> smas, VersionListDialog vld, boolean persist) throws SQLException {
+   private static void promptChangeVersionHelper(Collection<? extends TeamWorkFlowArtifact> smas, VersionListDialog vld, boolean persist) throws SQLException, ArtifactDoesNotExist {
       Object obj = vld.getResult()[0];
       VersionArtifact newVersion = (VersionArtifact) obj;
 
