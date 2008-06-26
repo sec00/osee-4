@@ -12,6 +12,7 @@ package org.eclipse.osee.framework.ui.skynet.widgets.dialog;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -27,8 +28,11 @@ import org.eclipse.ui.dialogs.CheckedTreeSelectionDialog;
 public class ArtifactCheckTreeDialog extends CheckedTreeSelectionDialog {
 
    public ArtifactCheckTreeDialog(Collection<? extends Artifact> artifacts) {
-      super(Display.getCurrent().getActiveShell(), new ArtifactDescriptiveLabelProvider(),
-            new ArtifactTreeContentProvider());
+      this(artifacts, new ArtifactDescriptiveLabelProvider());
+   }
+
+   public ArtifactCheckTreeDialog(Collection<? extends Artifact> artifacts, ILabelProvider iLabelProvider) {
+      super(Display.getCurrent().getActiveShell(), iLabelProvider, new ArtifactTreeContentProvider());
       if (artifacts != null) setInput(artifacts);
    }
 
