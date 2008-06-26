@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
-
 import org.eclipse.osee.framework.db.connection.ConnectionHandler;
 import org.eclipse.osee.framework.db.connection.info.SQL3DataType;
 import org.eclipse.osee.framework.jdk.core.type.CompositeKeyHashMap;
@@ -153,25 +152,25 @@ public class RelationManager {
       relatedArtifacts.clear();
       for (RelationLink relation : selectedRelations) {
          if (!relation.isDeleted()) {
-        	try{
-	            if (relationSide == null) {
-	               Artifact art = relation.getArtifactOnOtherSide(artifact);
-//	               if(!art.isDeleted()){
-	            	   relatedArtifacts.add(art);
-//	               }
-	            } else {
-	               // only select relations where the related artifact is on relationSide
-	               // (and thus on the side opposite of "artifact")
-	               if (relation.getSide(artifact) != relationSide) {
-	            	  Artifact art = relation.getArtifact(relationSide);
-//	            	  if(!art.isDeleted()){
-		                 relatedArtifacts.add(art);
-//		              }	                  
-	               }
-	            }
-        	} catch (ArtifactDoesNotExist ex){
-        		OseeLog.log(SkynetActivator.class, Level.WARNING, ex.getMessage(), ex);
-        	}
+            try {
+               if (relationSide == null) {
+                  Artifact art = relation.getArtifactOnOtherSide(artifact);
+                  //	               if(!art.isDeleted()){
+                  relatedArtifacts.add(art);
+                  //	               }
+               } else {
+                  // only select relations where the related artifact is on relationSide
+                  // (and thus on the side opposite of "artifact")
+                  if (relation.getSide(artifact) != relationSide) {
+                     Artifact art = relation.getArtifact(relationSide);
+                     //	            	  if(!art.isDeleted()){
+                     relatedArtifacts.add(art);
+                     //		              }	                  
+                  }
+               }
+            } catch (ArtifactDoesNotExist ex) {
+               OseeLog.log(SkynetActivator.class, Level.WARNING, ex.getMessage(), ex);
+            }
          }
       }
       return relatedArtifacts;
@@ -451,11 +450,12 @@ public class RelationManager {
       }
    }
 
-   public static void deleteRelation(RelationType relationType, Artifact artifactA, Artifact artifactB) {
-      getLoadedRelation(artifactA, artifactA.getArtId(), artifactB.getArtId(), relationType).delete();
+   public static void deleteRelation(RelationType relationType, Artifact artifactA, Artifact artifactB) throws ArtifactDoesNotExist, SQLException {
+      RelationLink relation = getLoadedRelation(artifactA, artifactA.getArtId(), artifactB.getArtId(), relationType);
+      relation.delete();
    }
 
-   public static void deleteRelationsAll(Artifact artifact) {
+   public static void deleteRelationsAll(Artifact artifact) throws ArtifactDoesNotExist, SQLException {
       List<RelationLink> selectedRelations = artifactToRelations.get(artifact);
       if (selectedRelations != null) {
          for (RelationLink relation : selectedRelations) {
@@ -464,7 +464,7 @@ public class RelationManager {
       }
    }
 
-   public static void deleteRelations(Artifact artifact, RelationType relationType, RelationSide relationSide) {
+   public static void deleteRelations(Artifact artifact, RelationType relationType, RelationSide relationSide) throws ArtifactDoesNotExist, SQLException {
       List<RelationLink> selectedRelations = relationsByType.get(artifact, relationType);
       if (selectedRelations != null) {
          for (RelationLink relation : selectedRelations) {
@@ -564,11 +564,11 @@ public class RelationManager {
          List<RelationLink> selectedRelations = relationsByType.get(sourceArtifact, relation.getRelationType());
          if (selectedRelations.remove(relation)) {
             int targetIndex = selectedRelations.indexOf(targetRelation);
-            if(targetIndex == -1){
-	            selectedRelations.add(relation);
+            if (targetIndex == -1) {
+               selectedRelations.add(relation);
             } else {
-            	int index = insertAfterTarget ? targetIndex + 1 : targetIndex;
-	            selectedRelations.add(index, relation);
+               int index = insertAfterTarget ? targetIndex + 1 : targetIndex;
+               selectedRelations.add(index, relation);
             }
             int lastArtId = LINKED_LIST_KEY;
             for (RelationLink link : selectedRelations) {
@@ -666,4 +666,28 @@ public class RelationManager {
          }
       }
    }
+
+   /**
+    * @param relationLink
+    * @throws SQLException
+    * @throws ArtifactDoesNotExist
+    */
+   static void setOrderValuesBasedOnCurrentMemoryOrder(RelationLink relationLink) throws ArtifactDoesNotExist, SQLException {
+      sort(relationLink.getArtifact(RelationSide.SIDE_A), relationLink.getRelationType(), RelationSide.SIDE_B);
+      sort(relationLink.getArtifact(RelationSide.SIDE_B), relationLink.getRelationType(), RelationSide.SIDE_A);
+   }
+
+   private static void sort(Artifact sourceArtifact, RelationType type, RelationSide side) {
+      List<RelationLink> selectedRelations = relationsByType.get(sourceArtifact, type);
+      int lastArtId = LINKED_LIST_KEY;
+      for (RelationLink link : selectedRelations) {
+         if (!link.isDeleted() && link.getSide(sourceArtifact) == side.oppositeSide()) {
+            if (link.getOrder(side) != lastArtId) {
+               link.setOrder(side, lastArtId);
+            }
+            lastArtId = link.getArtifactId(side);
+         }
+      }
+   }
+
 }
