@@ -125,7 +125,7 @@ public class ReAssignATSObjectsToUser extends AbstractBlam {
     */
    @Override
    public String getDescriptionUsage() {
-      return "Re-Assign ATS Workflows, Tasks and Reviews to another user.";
+      return "Re-Assign ATS Workflows, Tasks and Reviews to another user.  Enter to and from User and select play.  You will be promted to select the ATS Objects to reassign.";
    }
 
 }
