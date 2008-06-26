@@ -28,6 +28,8 @@ import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
 import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
 import org.eclipse.osee.framework.ui.skynet.blam.operation.AbstractBlam;
+import org.eclipse.osee.framework.ui.skynet.notify.OseeNotificationManager;
+import org.eclipse.osee.framework.ui.skynet.util.ArtifactTypeAndDescriptiveLabelProvider;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.dialog.ArtifactCheckTreeDialog;
 
@@ -76,7 +78,8 @@ public class ReAssignATSObjectsToUser extends AbstractBlam {
                }
 
                // Show in list dialog and allow select for ones to change
-               ArtifactCheckTreeDialog dialog = new ArtifactCheckTreeDialog(atsArts);
+               ArtifactCheckTreeDialog dialog =
+                     new ArtifactCheckTreeDialog(atsArts, new ArtifactTypeAndDescriptiveLabelProvider());
                dialog.setTitle("ReAssign ATS Object to User");
                dialog.setMessage("Select to re-assign to user \"" + toUser);
                if (dialog.open() != 0) return;
@@ -97,6 +100,7 @@ public class ReAssignATSObjectsToUser extends AbstractBlam {
                         }
                      };
                txWrapper.execute();
+               OseeNotificationManager.sendNotifications();
             } catch (Exception ex) {
                OSEELog.logException(AtsPlugin.class, ex, true);
             }
