@@ -816,7 +816,7 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
          for (Attribute<?> attribute : internalGetAttributes()) {
             if (attribute.getAttributeType().getName().equals("Name")) {
                name = (String) attribute.getValue();
-            }
+   }
          }
       } catch (Exception ex) {
          SkynetActivator.getLogger().log(Level.SEVERE, ex.getLocalizedMessage(), ex);
@@ -1159,7 +1159,11 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
       boolean sideA = relationSide.isSideA();
       Artifact artifactA = sideA ? artifact : this;
       Artifact artifactB = sideA ? this : artifact;
-      RelationManager.deleteRelation(relationSide.getRelationType(), artifactA, artifactB);
+      try {
+         RelationManager.deleteRelation(relationSide.getRelationType(), artifactA, artifactB);
+      } catch (ArtifactDoesNotExist ex) {
+         throw new SQLException(ex);
+      }
    }
 
    /**
@@ -1168,8 +1172,10 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
     * @param relationSide
     * @param artifact
     * @throws SQLException
+    * @throws ArtifactDoesNotExist
+    * @throws ArtifactDoesNotExist
     */
-   public void setSoleRelation(IRelationEnumeration relationSide, Artifact artifact) throws SQLException {
+   public void setSoleRelation(IRelationEnumeration relationSide, Artifact artifact) throws SQLException, ArtifactDoesNotExist {
       // Delete all existing relations
       for (RelationLink relationLink : getRelations(relationSide)) {
          relationLink.delete();
@@ -1183,8 +1189,9 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
     * @param relationSide
     * @param artifacts
     * @throws SQLException
+    * @throws ArtifactDoesNotExist
     */
-   public void setRelations(IRelationEnumeration relationSide, Collection<? extends Artifact> artifacts) throws SQLException {
+   public void setRelations(IRelationEnumeration relationSide, Collection<? extends Artifact> artifacts) throws SQLException, ArtifactDoesNotExist {
       Collection<Artifact> currentlyRelated = getArtifacts(relationSide, Artifact.class);
       // Add new relations if don't exist
       for (Artifact artifact : artifacts) {
@@ -1296,22 +1303,30 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
 
    /**
     * Save artifact, any of it's links specified, and any of the artifacts on the other side of the links that are dirty
+    * 
+    * @throws ArtifactDoesNotExist
     */
-   public void saveArtifactsFromRelations(Set<IRelationEnumeration> links) throws SQLException {
+   public void saveArtifactsFromRelations(Set<IRelationEnumeration> links) throws SQLException, ArtifactDoesNotExist {
       saveRevertArtifactsFromRelations(links, false);
    }
 
    /**
     * Revert artifact, any of it's links specified, and any of the artifacts on the other side of the links that are
     * dirty
+    * 
+    * @throws ArtifactDoesNotExist
     */
    public void revertArtifactsFromRelations(Set<IRelationEnumeration> links) throws SQLException {
-      saveRevertArtifactsFromRelations(links, true);
+      try {
+         saveRevertArtifactsFromRelations(links, true);
+      } catch (ArtifactDoesNotExist ex) {
+         throw new SQLException(ex);
+      }
    }
 
    @Deprecated
    //  use persistAttributesAndLinks() instead
-   private void saveRevertArtifactsFromRelations(Set<IRelationEnumeration> links, boolean revert) throws SQLException {
+   private void saveRevertArtifactsFromRelations(Set<IRelationEnumeration> links, boolean revert) throws SQLException, ArtifactDoesNotExist {
       Set<Artifact> artifactToManipulate = new HashSet<Artifact>();
       artifactToManipulate.add(this);
       Set<RelationLink> linksToManipulate = new HashSet<RelationLink>();
