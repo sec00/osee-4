@@ -48,25 +48,23 @@ import org.eclipse.osee.framework.ui.skynet.widgets.xnavigate.XNavigateComposite
  */
 public class AtsNavigateItemsToWorldViewTest extends TestCase {
 
+   private User kayJones;
+
    /* (non-Javadoc)
     * @see junit.framework.TestCase#setUp()
     */
    protected void setUp() throws Exception {
       super.setUp();
       DemoTestUtil.setUpTest();
+      kayJones = DemoUsers.getDemoUser(DemoUsers.Kay_Jones);
+      assertTrue(kayJones != null);
    }
 
-   public void testMySearches() throws Exception {
-      runGeneralLoadingTest("My World", ActionArtifact.class, 9, null);
-      runGeneralLoadingTest("My Reviews", PeerToPeerReviewArtifact.class, 2, null);
-      // TODO Transition Review to Completed and another to Cancelled and test My Reviews - All returns them
-      runGeneralLoadingTest("My Reviews - All", PeerToPeerReviewArtifact.class, 3, null);
-      runGeneralLoadingTest("My Subscribed", TeamWorkFlowArtifact.class, 1, null);
-      runGeneralLoadingTest("My Team Workflows", TeamWorkFlowArtifact.class, 11, null);
-      runGeneralLoadingTest("My Tasks (WorldView)", TaskArtifact.class, DemoDbTasks.getNumTasks(), null);
-      runGeneralLoadingTest("My Originator - InWork", ActionArtifact.class, 9, null);
-      runGeneralLoadingTest("My Originator - All", ActionArtifact.class, 16, null);
-      runGeneralLoadingTest("My Completed", TeamWorkFlowArtifact.class, 23, null);
+   public void testMyWorld() throws Exception {
+      runGeneralLoadingTest("My World", ActionArtifact.class, 5, null);
+   }
+
+   public void testMyFavorites() throws Exception {
       // Load My Favorites (test My Favorites and use results to test My Recently Visited
       Collection<Artifact> arts = runGeneralLoadingTest("My Favorites", TeamWorkFlowArtifact.class, 3, null);
       assertTrue(arts.size() == 3);
@@ -75,23 +73,72 @@ public class AtsNavigateItemsToWorldViewTest extends TestCase {
       // Clear WorldView
       WorldView.loadIt("", new ArrayList<Artifact>(), TableLoadOption.ForcePend);
       assertTrue(WorldView.getLoadedArtifacts().size() == 0);
+   }
+
+   public void testMyReviews() throws Exception {
+      runGeneralLoadingTest("My Reviews", PeerToPeerReviewArtifact.class, 2, null);
+      // TODO Transition Review to Completed and another to Cancelled and test My Reviews - All returns them
+      runGeneralLoadingTest("My Reviews - All", PeerToPeerReviewArtifact.class, 3, null);
+   }
+
+   public void testMySubscribed() throws Exception {
+      runGeneralLoadingTest("My Subscribed", TeamWorkFlowArtifact.class, 1, null);
+   }
+
+   public void testMyWorkflows() throws Exception {
+      runGeneralLoadingTest("My Team Workflows", TeamWorkFlowArtifact.class, 8, null);
+   }
+
+   public void testMyTasks() throws Exception {
+      runGeneralLoadingTest("My Tasks (WorldView)", TaskArtifact.class, DemoDbTasks.getNumTasks(), null);
+   }
+
+   public void testMyOriginator() throws Exception {
+      runGeneralLoadingTest("My Originator - InWork", ActionArtifact.class, 10, null);
+      runGeneralLoadingTest("My Originator - All", ActionArtifact.class, 16, null);
+   }
+
+   public void testMyCompleted() throws Exception {
+      runGeneralLoadingTest("My Completed", TeamWorkFlowArtifact.class, 23, null);
+   }
+
+   public void testMyRecentlyVisited() throws Exception {
       // Load Recently Visited
       runGeneralLoadingTest("My Recently Visited", TeamWorkFlowArtifact.class, 3, null);
    }
 
-   public void testOtherUsersSearches() throws Exception {
-      User kayJones = DemoUsers.getDemoUser(DemoUsers.Kay_Jones);
-      assertTrue(kayJones != null);
-      runGeneralLoadingTest("User's World", ActionArtifact.class, 5, kayJones);
+   public void testOtherUsersWorld() throws Exception {
+      runGeneralLoadingTest("User's World", ActionArtifact.class, 4, kayJones);
+   }
+
+   public void testOtherUsersReviews() throws Exception {
       runGeneralLoadingTest("User's Reviews - InWork", PeerToPeerReviewArtifact.class, 1, kayJones);
       runGeneralLoadingTest("User's Reviews - All", PeerToPeerReviewArtifact.class, 2, kayJones);
+   }
+
+   public void testOtherUsersSubscribed() throws Exception {
       runGeneralLoadingTest("User's Subscribed", TeamWorkFlowArtifact.class, 0, kayJones);
+   }
+
+   public void testOtherUsersTasks() throws Exception {
       runGeneralLoadingTest("User's Tasks (WorldView)", TaskArtifact.class, DemoDbTasks.getTaskTitles(true).size(),
             kayJones);
+   }
+
+   public void testOtherUsersFavorites() throws Exception {
       runGeneralLoadingTest("User's Favorites", TeamWorkFlowArtifact.class, 0, kayJones);
+   }
+
+   public void testOtherUsersWorkflows() throws Exception {
       runGeneralLoadingTest("User's Team Workflows", TeamWorkFlowArtifact.class, 8, kayJones);
+   }
+
+   public void testOtherUsersOriginator() throws Exception {
       runGeneralLoadingTest("User's Originator - InWork", ActionArtifact.class, 0, kayJones);
       runGeneralLoadingTest("User's Originator - All", ActionArtifact.class, 0, kayJones);
+   }
+
+   public void testOtherUsersCompleted() throws Exception {
       runGeneralLoadingTest("User's Completed", ActionArtifact.class, 0, kayJones);
    }
 
