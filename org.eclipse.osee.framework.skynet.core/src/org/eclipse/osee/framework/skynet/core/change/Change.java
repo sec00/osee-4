@@ -99,7 +99,7 @@ public abstract class Change implements IAdaptable {
    }
 
    public String getArtifactName() throws IllegalArgumentException, ArtifactDoesNotExist, MultipleArtifactsExist, SQLException {
-      return getArtifact().getDescriptiveName();
+      return getArtifact().getInternalDescriptiveName();
    }
 
    /**
