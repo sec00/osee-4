@@ -129,7 +129,7 @@ public class BranchContentProvider implements ITreeContentProvider, ArtifactChan
                while (iter.hasNext()) {
                   Branch branch = iter.next();
 
-                  if ((showChildBranchesAtMainLevel && branch.getParentBranch() != null) || (!OseeProperties.isDeveloper() && branch.isMergeBranch())) {
+                  if ((!showChildBranchesAtMainLevel && branch.getParentBranch() != null) || (!OseeProperties.isDeveloper() && branch.isMergeBranch())) {
                      iter.remove();
                   }
                }
