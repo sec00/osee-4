@@ -695,7 +695,7 @@ public class ArtifactPersistenceManager {
          return root;
       } catch (ArtifactDoesNotExist ex) {
          if (createIfNecessary) {
-            logger.log(Level.INFO, "Created " + DEFAULT_HIERARCHY_ROOT_NAME + " becuase no root was found.");
+            logger.log(Level.INFO, "Created " + DEFAULT_HIERARCHY_ROOT_NAME + " because no root was found.");
             Artifact root =
                   ArtifactTypeManager.addArtifact(ROOT_ARTIFACT_TYPE_NAME, branch, DEFAULT_HIERARCHY_ROOT_NAME);
             root.persistAttributes();
