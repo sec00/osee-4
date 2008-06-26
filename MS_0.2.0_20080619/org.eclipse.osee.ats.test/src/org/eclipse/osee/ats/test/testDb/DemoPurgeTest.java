@@ -28,6 +28,10 @@ import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 import org.eclipse.osee.framework.ui.skynet.util.ChangeType;
 
 /**
+ * This test is intended to be run against a demo database. It tests the purge logic by counting the rows of the version
+ * and txs tables, then adds an Action, Workflow and 30 Tasks, deletes these objects and compares the row count. If
+ * purge works properly, all rows should be equal.
+ * 
  * @author Donald G. Dunne
  */
 public class DemoPurgeTest extends TestCase {
