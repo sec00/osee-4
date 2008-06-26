@@ -317,4 +317,12 @@
             classname="org.eclipse.osee.ats.workflow.item.AtsWorkDefinitions">
       </WorkDefinitionProvider>
    </extension>
+   <extension
+         id="ReAssignATSObjectsToUser"
+         name="ReAssignATSObjectsToUser"
+         point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
+      <Operation
+            className="org.eclipse.osee.ats.operation.ReAssignATSObjectsToUser">
+      </Operation>
+   </extension>
 </plugin>

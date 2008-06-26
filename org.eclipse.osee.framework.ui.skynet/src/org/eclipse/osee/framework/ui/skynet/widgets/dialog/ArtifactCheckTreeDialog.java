@@ -18,7 +18,7 @@ import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.ui.skynet.util.ArtifactDescriptiveLabelProvider;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.dialogs.CheckedTreeSelectionDialog;
 
 /**
@@ -26,13 +26,14 @@ import org.eclipse.ui.dialogs.CheckedTreeSelectionDialog;
  */
 public class ArtifactCheckTreeDialog extends CheckedTreeSelectionDialog {
 
-   public ArtifactCheckTreeDialog(Shell parent, Collection<Artifact> artifacts) {
-      super(parent, new ArtifactDescriptiveLabelProvider(), new ArtifactTreeContentProvider());
-      setInput(artifacts);
+   public ArtifactCheckTreeDialog(Collection<? extends Artifact> artifacts) {
+      super(Display.getCurrent().getActiveShell(), new ArtifactDescriptiveLabelProvider(),
+            new ArtifactTreeContentProvider());
+      if (artifacts != null) setInput(artifacts);
    }
 
-   public ArtifactCheckTreeDialog(Shell parent) {
-      super(parent, new ArtifactDescriptiveLabelProvider(), new ArtifactTreeContentProvider());
+   public ArtifactCheckTreeDialog() {
+      this(null);
    }
 
    public Collection<Artifact> getSelection() {
