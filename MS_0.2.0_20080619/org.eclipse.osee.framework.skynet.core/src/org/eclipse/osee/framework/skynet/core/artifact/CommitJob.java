@@ -138,6 +138,8 @@ class CommitJob extends Job {
          monitor.beginTask("Acquire from branch transactions", 100);
 
          User userToBlame = SkynetAuthentication.getUser();
+         //Load new and deleted artifact so they can be compressed out of the commit transaction
+         //select av1.art_id from osee_define_txs tx1, osee_define_txs tx2, osee_Define_tx_details td1, osee_Define_tx_details td2, osee_Define_artifact_version av1, osee_Define_artifact_version av2 where td1.branch_id = 874 AND td1.tx_type = 0 AND td1.transaction_id = tx1.transaction_id AND tx1.mod_type = 1 AND tx1.gamma_id = av1.gamma_id AND td2.branch_id = 874 AND td2.tx_type = 0 AND td2.transaction_id = tx2.transaction_id AND tx2.mod_type = 3 AND tx2.tx_current = 2 AND tx2.gamma_id = av2.gamma_id AND av1.art_id = av2.art_id;
 
          if (fromBranch != null) {
             newTransactionNumber =
