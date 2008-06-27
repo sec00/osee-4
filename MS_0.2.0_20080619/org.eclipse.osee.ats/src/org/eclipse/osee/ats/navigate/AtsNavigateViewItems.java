@@ -111,8 +111,8 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
       items.add(new SearchNavigateItem(null, new MyWorldSearchItem("My World", user)));
       items.add(new SearchNavigateItem(null, new MyFavoritesSearchItem("My Favorites", user)));
       items.add(new SearchNavigateItem(null, new MyReviewWorkflowItem("My Reviews", user, ReviewState.InWork)));
-
       items.add(new VisitedItems(null));
+      items.add(new SearchNavigateItem(null, new MyWorldSearchItem("User's World")));
 
       XNavigateItem otherItems = new XNavigateItem(null, "Other My Searches");
       new SearchNavigateItem(otherItems, new MyTeamWFSearchItem("My Team Workflows", user));
