@@ -135,10 +135,17 @@ public class RelationLink {
       if (!deleted) {
          markAsDeleted();
          dirty = true;
-         RelationManager.setOrderValuesBasedOnCurrentMemoryOrder(this);
+         RelationManager.setOrderValuesBasedOnCurrentMemoryOrder(this, false);
          SkynetEventManager.getInstance().kick(
                new CacheRelationModifiedEvent(this, getRelationType().getTypeName(), getASideName(),
                      ModType.Deleted.name(), this, getBranch()));
+      }
+   }
+
+   public void deleteWithoutDirtyAndEvent() throws ArtifactDoesNotExist, SQLException {
+      if (!deleted) {
+         markAsDeleted();
+         RelationManager.setOrderValuesBasedOnCurrentMemoryOrder(this, true);
       }
    }
 
