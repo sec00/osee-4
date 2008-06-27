@@ -50,7 +50,6 @@ public class ArtifactChange extends RevisionChange {
 
    transient private Artifact conflictingModArtifact;
    private int conflictingArtId;
-   private TransactionId conflictingArtTransactionId;
    private TransactionId deletedTransactionId;
 
    @Override
@@ -212,11 +211,6 @@ public class ArtifactChange extends RevisionChange {
       if (conflictingModArtifact != null) {
          return conflictingModArtifact;
       }
-
-      if (conflictingArtTransactionId == null) return null;
-      if (conflictingModArtifact == null && conflictingArtTransactionId.getTransactionNumber() != 0) {
-         conflictingModArtifact = loadArtifact(conflictingArtTransactionId, conflictingModArtifact, conflictingArtId);
-      }
       return conflictingModArtifact;
    }
 
@@ -228,9 +222,6 @@ public class ArtifactChange extends RevisionChange {
    public void setConflictingModArtifact(Artifact conflictingModArtifact) throws SQLException, BranchDoesNotExist {
       this.conflictingModArtifact = conflictingModArtifact;
       this.conflictingArtId = conflictingModArtifact.getArtId();
-      //      this.conflictingArtTransactionId =
-      //            TransactionIdManager.getInstance().getPossiblyEditableTransactionId(
-      //                  conflictingModArtifact.getTransactionNumber());
    }
 
    /*
