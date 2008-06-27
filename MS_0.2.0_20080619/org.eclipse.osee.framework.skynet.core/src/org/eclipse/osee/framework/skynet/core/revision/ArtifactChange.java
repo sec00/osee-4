@@ -23,7 +23,6 @@ import org.eclipse.osee.framework.skynet.core.change.ModificationType;
 import org.eclipse.osee.framework.skynet.core.exception.BranchDoesNotExist;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionId;
-import org.eclipse.osee.framework.skynet.core.transaction.TransactionIdManager;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -210,6 +209,10 @@ public class ArtifactChange extends RevisionChange {
     * @return Returns the conflictingModArtifact.
     */
    public Artifact getConflictingModArtifact() throws OseeCoreException, SQLException {
+      if (conflictingModArtifact != null) {
+         return conflictingModArtifact;
+      }
+
       if (conflictingArtTransactionId == null) return null;
       if (conflictingModArtifact == null && conflictingArtTransactionId.getTransactionNumber() != 0) {
          conflictingModArtifact = loadArtifact(conflictingArtTransactionId, conflictingModArtifact, conflictingArtId);
@@ -225,9 +228,9 @@ public class ArtifactChange extends RevisionChange {
    public void setConflictingModArtifact(Artifact conflictingModArtifact) throws SQLException, BranchDoesNotExist {
       this.conflictingModArtifact = conflictingModArtifact;
       this.conflictingArtId = conflictingModArtifact.getArtId();
-      this.conflictingArtTransactionId =
-            TransactionIdManager.getInstance().getPossiblyEditableTransactionId(
-                  conflictingModArtifact.getTransactionNumber());
+      //      this.conflictingArtTransactionId =
+      //            TransactionIdManager.getInstance().getPossiblyEditableTransactionId(
+      //                  conflictingModArtifact.getTransactionNumber());
    }
 
    /*
