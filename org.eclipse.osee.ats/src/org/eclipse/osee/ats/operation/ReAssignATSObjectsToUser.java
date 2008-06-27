@@ -95,7 +95,7 @@ public class ReAssignATSObjectsToUser extends AbstractBlam {
                                  ((StateMachineArtifact) artifact).getSmaMgr().getStateMgr().removeAssignee(fromUser);
                                  ((StateMachineArtifact) artifact).getSmaMgr().getStateMgr().addAssignee(toUser);
                               }
-                              artifact.persistAttributes();
+                              artifact.persistAttributesAndRelations();
                            }
                         }
                      };
