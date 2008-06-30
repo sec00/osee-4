@@ -651,9 +651,9 @@ public class RelationManager {
                      "Artifact [%d][%s] is unsorted for relations type [%d][%s]. (missing a relation)",
                      artifact.getArtId(), artifact.toString(), type.getRelationTypeId(), type.toString()));
             } else {
-               OseeLog.log(SkynetActivator.class, Level.FINE, String.format(
-                     "Artifact [%d][%s] is sorted!!! relations type [%d][%s].", artifact.getArtId(),
-                     artifact.toString(), type.getRelationTypeId(), type.toString()));
+               //               OseeLog.log(SkynetActivator.class, Level.FINE, String.format(
+               //                     "Artifact [%d][%s] is sorted!!! relations type [%d][%s].", artifact.getArtId(),
+               //                     artifact.toString(), type.getRelationTypeId(), type.toString()));
             }
             relations.addAll(sideB.values());
             //now side a
@@ -667,9 +667,9 @@ public class RelationManager {
                      "Artifact [%d][%s] is unsorted for relations type [%d][%s]. (missing a relation)",
                      artifact.getArtId(), artifact.toString(), type.getRelationTypeId(), type.toString()));
             } else {
-               OseeLog.log(SkynetActivator.class, Level.FINE, String.format(
-                     "Artifact [%d][%s] is sorted!! for relations type [%d][%s].", artifact.getArtId(),
-                     artifact.toString(), type.getRelationTypeId(), type.toString()));
+               //               OseeLog.log(SkynetActivator.class, Level.FINE, String.format(
+               //                     "Artifact [%d][%s] is sorted!! for relations type [%d][%s].", artifact.getArtId(),
+               //                     artifact.toString(), type.getRelationTypeId(), type.toString()));
             }
             relations.addAll(sideA.values());
          } else {
