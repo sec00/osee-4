@@ -249,14 +249,14 @@
          id="ActionsHaveOneTeam"
          point="org.eclipse.osee.framework.skynet.core.AutoRunTask">
       <AutoRunTask
-            classname="org.eclipse.osee.ats.health.ActionsHaveOneTeam">
+            classname="org.eclipse.osee.ats.health.ValidateActions">
       </AutoRunTask>
    </extension>
    <extension
          id="AssignedActiveActions"
          point="org.eclipse.osee.framework.skynet.core.AutoRunTask">
       <AutoRunTask
-            classname="org.eclipse.osee.ats.health.AssignedActiveActions">
+            classname="org.eclipse.osee.ats.health.ValidateAssignees">
       </AutoRunTask>
    </extension>
    <extension
@@ -270,14 +270,14 @@
          id="OrphanedTasks"
          point="org.eclipse.osee.framework.skynet.core.AutoRunTask">
       <AutoRunTask
-            classname="org.eclipse.osee.ats.health.OrphanedTasks">
+            classname="org.eclipse.osee.ats.health.ValidateTasks">
       </AutoRunTask>
    </extension>
    <extension
          id="TeamWorkflowsHaveZeroOrOneVersion"
          point="org.eclipse.osee.framework.skynet.core.AutoRunTask">
       <AutoRunTask
-            classname="org.eclipse.osee.ats.health.TeamWorkflowsHaveZeroOrOneVersion">
+            classname="org.eclipse.osee.ats.health.ValidateTargetedForWorkflows">
       </AutoRunTask>
    </extension>
    <extension
@@ -324,5 +324,11 @@
       <Operation
             className="org.eclipse.osee.ats.operation.ReAssignATSObjectsToUser">
       </Operation>
+   </extension>
+   <extension
+         point="org.eclipse.osee.framework.skynet.core.AutoRunTask">
+      <AutoRunTask
+            classname="org.eclipse.osee.ats.health.ValidateAttributeValues">
+      </AutoRunTask>
    </extension>
 </plugin>

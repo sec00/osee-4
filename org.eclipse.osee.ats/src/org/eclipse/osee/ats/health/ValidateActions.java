@@ -11,13 +11,19 @@
 package org.eclipse.osee.ats.health;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osee.ats.AtsPlugin;
-import org.eclipse.osee.ats.artifact.StateMachineArtifact;
+import org.eclipse.osee.ats.artifact.ActionArtifact;
+import org.eclipse.osee.ats.artifact.TeamWorkFlowArtifact;
+import org.eclipse.osee.ats.artifact.TeamWorkflowExtensions;
+import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
@@ -33,16 +39,16 @@ import org.eclipse.swt.widgets.Display;
 /**
  * @author Donald G. Dunne
  */
-public class AttributeDuplication extends XNavigateItemAutoRunAction implements IAutoRunTask {
+public class ValidateActions extends XNavigateItemAutoRunAction implements IAutoRunTask {
 
    /**
     * @param parent
     */
-   public AttributeDuplication(XNavigateItem parent) {
-      super(parent, "Report Duplication Attribute");
+   public ValidateActions(XNavigateItem parent) {
+      super(parent, "Validate Actions");
    }
 
-   public AttributeDuplication() {
+   public ValidateActions() {
       this(null);
    }
 
@@ -54,12 +60,12 @@ public class AttributeDuplication extends XNavigateItemAutoRunAction implements 
    @Override
    public void run(TableLoadOption... tableLoadOptions) throws SQLException {
       if (!MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), getName(), getName())) return;
-      Jobs.startJob(new LoadArtifactsJob(getName()), true);
+      Jobs.startJob(new Report(getName()), true);
    }
 
-   public class LoadArtifactsJob extends Job {
+   public class Report extends Job {
 
-      public LoadArtifactsJob(String name) {
+      public Report(String name) {
          super(name);
       }
 
@@ -83,24 +89,40 @@ public class AttributeDuplication extends XNavigateItemAutoRunAction implements 
       }
    }
 
-   private void runIt(IProgressMonitor monitor, XResultData rd)throws OseeCoreException, SQLException{
-      for (String type : StateMachineArtifact.getAllSMATypeNames()) {
-         if (monitor != null) monitor.subTask("Loading " + type + "...");
+   private void runIt(IProgressMonitor monitor, XResultData rd) throws OseeCoreException, SQLException {
+      // Get Team and Action artifacts
+      Set<String> artTypeNames = TeamWorkflowExtensions.getInstance().getAllTeamWorkflowArtifactNames();
+      artTypeNames.add(ActionArtifact.ARTIFACT_NAME);
+      List<Artifact> artifacts = new ArrayList<Artifact>();
+      for (String artType : artTypeNames) {
+         artifacts.addAll(ArtifactQuery.getArtifactsFromType(artType, BranchPersistenceManager.getAtsBranch()));
+      }
+      int x = 0;
+      for (Artifact art : artifacts) {
+         if (monitor != null) monitor.subTask(String.format("Processing %d/%d...", x++, artifacts.size()));
          try {
-            // just need to load the artifacts for them to exception out
-            ArtifactQuery.getArtifactsFromType(type, BranchPersistenceManager.getAtsBranch());
-         } catch (Exception ex) {
-            OSEELog.logException(AtsPlugin.class, ex, false);
-            rd.logError(ex.getLocalizedMessage());
+            if (art instanceof ActionArtifact) {
+               if (((ActionArtifact) art).getTeamWorkFlowArtifacts().size() == 0) {
+                  rd.logError("Action " + art.getHumanReadableId() + " has no Team Workflows\n");
+               }
+            }
+            if (art instanceof TeamWorkFlowArtifact) {
+               if (((TeamWorkFlowArtifact) art).getParentActionArtifact() == null) {
+                  rd.logError("Team " + art.getHumanReadableId() + " has no parent Action\n");
+               }
+            }
+         } catch (IllegalStateException ex) {
+            rd.logError("Team " + art.getHumanReadableId() + " has no parent Action\n" + ex.getLocalizedMessage() + "\n");
          }
       }
+      rd.log("Completed processing " + artifacts.size() + " artifacts.");
    }
 
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask#get24HourStartTime()
     */
    public String get24HourStartTime() {
-      return "23:10";
+      return "23:00";
    }
 
    /* (non-Javadoc)
@@ -114,7 +136,7 @@ public class AttributeDuplication extends XNavigateItemAutoRunAction implements 
     * @see org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask#getDescription()
     */
    public String getDescription() {
-      return "Load all Action artifacts to ensure no invalid duplicate attributes.";
+      return "Ensure Actions have at least one Team Workflow and Workflows are related to one Action";
    }
 
    /* (non-Javadoc)
@@ -134,8 +156,7 @@ public class AttributeDuplication extends XNavigateItemAutoRunAction implements 
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask#startTasks(org.eclipse.osee.framework.ui.skynet.widgets.xresults.XResultData)
     */
-   public void startTasks(XResultData resultData)throws OseeCoreException, SQLException{
+   public void startTasks(XResultData resultData) throws OseeCoreException, SQLException {
       runIt(null, resultData);
    }
-
 }

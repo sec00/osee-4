@@ -29,12 +29,11 @@ import org.eclipse.osee.ats.artifact.PeerToPeerReviewArtifact;
 import org.eclipse.osee.ats.artifact.TaskArtifact;
 import org.eclipse.osee.ats.artifact.TeamDefinitionArtifact;
 import org.eclipse.osee.ats.artifact.TeamWorkflowExtensions;
-import org.eclipse.osee.ats.health.ActionsHaveOneTeam;
-import org.eclipse.osee.ats.health.AssignedActiveActions;
-import org.eclipse.osee.ats.health.AttributeDuplication;
-import org.eclipse.osee.ats.health.OrphanedTasks;
-import org.eclipse.osee.ats.health.TeamWorkflowsHaveZeroOrOneVersion;
-import org.eclipse.osee.ats.health.UnAssignedAssignedAtsObjects;
+import org.eclipse.osee.ats.health.ValidateActions;
+import org.eclipse.osee.ats.health.ValidateAssignees;
+import org.eclipse.osee.ats.health.ValidateAttributeValues;
+import org.eclipse.osee.ats.health.ValidateTargetedForWorkflows;
+import org.eclipse.osee.ats.health.ValidateTasks;
 import org.eclipse.osee.ats.navigate.EmailTeamsItem.MemberType;
 import org.eclipse.osee.ats.report.ExtendedStatusReportItem;
 import org.eclipse.osee.ats.util.DoesNotWorkItem;
@@ -265,12 +264,11 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
          new DoesNotWorkItem(adminItems);
 
          XNavigateItem healthItems = new XNavigateItem(adminItems, "Health");
-         new AttributeDuplication(healthItems);
-         new OrphanedTasks(healthItems);
-         new ActionsHaveOneTeam(healthItems);
-         new AssignedActiveActions(healthItems);
-         new TeamWorkflowsHaveZeroOrOneVersion(healthItems);
-         new UnAssignedAssignedAtsObjects(healthItems);
+         new ValidateTasks(healthItems);
+         new ValidateActions(healthItems);
+         new ValidateAssignees(healthItems);
+         new ValidateTargetedForWorkflows(healthItems);
+         new ValidateAttributeValues(healthItems);
 
          // new ActionNavigateItem(adminItems, new XViewerViewAction());
          // new ActionNavigateItem(adminItems, new OpenEditorAction());
