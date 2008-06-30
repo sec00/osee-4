@@ -112,14 +112,12 @@ public class SMAManager {
 
    public String getEditorHeaderString() {
       if (sma instanceof TeamWorkFlowArtifact)
-         return String.format("Current State: %s        Team: %s       Assignee(s): %s        Created: %s",
-               stateMgr.getCurrentStateName(), ((TeamWorkFlowArtifact) sma).getTeamName(),
-               Artifacts.commaArts(stateMgr.getAssignees()), XDate.getDateStr(getSma().getLog().getCreationDate(),
+         return String.format("Current State: %s        Team: %s        Created: %s", stateMgr.getCurrentStateName(),
+               ((TeamWorkFlowArtifact) sma).getTeamName(), XDate.getDateStr(getSma().getLog().getCreationDate(),
                      XDate.MMDDYYHHMM));
       else
-         return String.format("Current State: %s        Assignee(s): %s        Created: %s",
-               stateMgr.getCurrentStateName(), Artifacts.commaArts(stateMgr.getAssignees()), XDate.getDateStr(
-                     getSma().getLog().getCreationDate(), XDate.MMDDYYHHMM));
+         return String.format("Current State: %s        Created: %s", stateMgr.getCurrentStateName(), XDate.getDateStr(
+               getSma().getLog().getCreationDate(), XDate.MMDDYYHHMM));
    }
 
    public Result getUserInputNeeded() {
