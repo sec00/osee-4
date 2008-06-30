@@ -205,8 +205,6 @@ public class DeleteTransactionJob extends Job {
          TransactionJoinQuery joinQuery = null;
          try {
             joinQuery = findAllGammasForTransaction(connection, queryId);
-            joinQuery.store(connection);
-
             ConnectionHandler.runPreparedUpdate(connection, UPDATE_TX_CURRENT, SQL3DataType.INTEGER,
                   joinQuery.getQueryId());
             ConnectionHandler.runPreparedUpdate(connection, UPDATE_TX_CURRENT_DELETED_ITEMS, SQL3DataType.INTEGER,
