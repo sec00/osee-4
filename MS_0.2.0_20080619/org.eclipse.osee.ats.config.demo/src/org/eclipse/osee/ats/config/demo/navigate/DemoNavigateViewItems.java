@@ -23,12 +23,11 @@ import org.eclipse.osee.ats.config.demo.OseeAtsConfigDemoPlugin;
 import org.eclipse.osee.ats.config.demo.config.PopulateDemoActions;
 import org.eclipse.osee.ats.config.demo.util.DemoTeams;
 import org.eclipse.osee.ats.config.demo.util.DemoTeams.Team;
-import org.eclipse.osee.ats.health.ActionsHaveOneTeam;
-import org.eclipse.osee.ats.health.AssignedActiveActions;
-import org.eclipse.osee.ats.health.AttributeDuplication;
-import org.eclipse.osee.ats.health.OrphanedTasks;
-import org.eclipse.osee.ats.health.TeamWorkflowsHaveZeroOrOneVersion;
-import org.eclipse.osee.ats.health.UnAssignedAssignedAtsObjects;
+import org.eclipse.osee.ats.health.ValidateActions;
+import org.eclipse.osee.ats.health.ValidateAssignees;
+import org.eclipse.osee.ats.health.ValidateAttributeValues;
+import org.eclipse.osee.ats.health.ValidateTargetedForWorkflows;
+import org.eclipse.osee.ats.health.ValidateTasks;
 import org.eclipse.osee.ats.navigate.CreateNewVersionItem;
 import org.eclipse.osee.ats.navigate.IAtsNavigateItem;
 import org.eclipse.osee.ats.navigate.ReleaseVersionItem;
@@ -140,12 +139,11 @@ public class DemoNavigateViewItems implements IAtsNavigateItem {
       new SearchNavigateItem(adminItems, new CriteriaSearchItem("Show All Tasks", criteria, true));
 
       XNavigateItem healthItems = new XNavigateItem(adminItems, "Health");
-      new AttributeDuplication(healthItems);
-      new OrphanedTasks(healthItems);
-      new ActionsHaveOneTeam(healthItems);
-      new AssignedActiveActions(healthItems);
-      new TeamWorkflowsHaveZeroOrOneVersion(healthItems);
-      new UnAssignedAssignedAtsObjects(healthItems);
+      new ValidateTasks(healthItems);
+      new ValidateActions(healthItems);
+      new ValidateAssignees(healthItems);
+      new ValidateTargetedForWorkflows(healthItems);
+      new ValidateAttributeValues(healthItems);
 
       XNavigateItem demoItems = new XNavigateItem(adminItems, "Demo Data");
       new PopulateDemoActions(demoItems);

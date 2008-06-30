@@ -14,6 +14,7 @@ package org.eclipse.osee.ats.health;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -25,11 +26,16 @@ import org.eclipse.osee.ats.artifact.StateMachineArtifact;
 import org.eclipse.osee.ats.artifact.TaskArtifact;
 import org.eclipse.osee.ats.artifact.TeamWorkflowExtensions;
 import org.eclipse.osee.ats.editor.SMAManager;
+import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
+import org.eclipse.osee.framework.skynet.core.User;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
+import org.eclipse.osee.framework.skynet.core.relation.CoreRelationEnumeration;
 import org.eclipse.osee.framework.skynet.core.transaction.AbstractSkynetTxTemplate;
+import org.eclipse.osee.framework.skynet.core.user.UserEnum;
+import org.eclipse.osee.framework.skynet.core.utility.Artifacts;
 import org.eclipse.osee.framework.ui.plugin.util.Jobs;
 import org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
@@ -42,18 +48,18 @@ import org.eclipse.swt.widgets.Display;
 /**
  * @author Donald G. Dunne
  */
-public class AssignedActiveActions extends XNavigateItemAutoRunAction implements IAutoRunTask {
+public class ValidateAssignees extends XNavigateItemAutoRunAction implements IAutoRunTask {
 
    boolean fixIt = true;
 
    /**
     * @param parent
     */
-   public AssignedActiveActions(XNavigateItem parent) {
-      super(parent, "Report Assigned Active Actions (fix available)");
+   public ValidateAssignees(XNavigateItem parent) {
+      super(parent, "Validate Assignees (fix available)");
    }
 
-   public AssignedActiveActions() {
+   public ValidateAssignees() {
       this(null);
    }
 
@@ -97,11 +103,11 @@ public class AssignedActiveActions extends XNavigateItemAutoRunAction implements
       }
    }
 
-   private void runIt(IProgressMonitor monitor, final XResultData rd)throws OseeCoreException, SQLException{
+   private void runIt(IProgressMonitor monitor, final XResultData rd) throws OseeCoreException, SQLException {
       if (fixIt) {
          AbstractSkynetTxTemplate txWrapper = new AbstractSkynetTxTemplate(BranchPersistenceManager.getAtsBranch()) {
             @Override
-            protected void handleTxWork()throws OseeCoreException, SQLException{
+            protected void handleTxWork() throws OseeCoreException, SQLException {
                assignedActiveActionsHelper(rd);
             }
          };
@@ -111,7 +117,10 @@ public class AssignedActiveActions extends XNavigateItemAutoRunAction implements
       }
    }
 
-   private void assignedActiveActionsHelper(XResultData rd)throws OseeCoreException, SQLException{
+   private void assignedActiveActionsHelper(XResultData rd) throws OseeCoreException, SQLException {
+      User unAssignedUser = SkynetAuthentication.getUser(UserEnum.UnAssigned);
+      User noOneUser = SkynetAuthentication.getUser(UserEnum.NoOne);
+
       Set<String> artTypeNames = TeamWorkflowExtensions.getInstance().getAllTeamWorkflowArtifactNames();
       artTypeNames.add(TaskArtifact.ARTIFACT_NAME);
       Collection<Artifact> artifacts = new ArrayList<Artifact>();
@@ -122,15 +131,34 @@ public class AssignedActiveActions extends XNavigateItemAutoRunAction implements
          StateMachineArtifact sma = (StateMachineArtifact) art;
          SMAManager smaMgr = new SMAManager(sma);
          if ((smaMgr.isCompleted() || smaMgr.isCancelled()) && smaMgr.getStateMgr().getAssignees().size() > 0) {
-            rd.logError(sma.getArtifactTypeName() + " " + sma.getHumanReadableId() + " cancel/complete with assignees");
+            rd.logError(sma.getArtifactTypeName() + " " + sma.getHumanReadableId() + " cancel/complete with attribute assignees");
             if (fixIt) {
                smaMgr.getStateMgr().clearAssignees();
                smaMgr.getSma().persistAttributes();
                rd.log("Fixed");
             }
-         } else if ((!smaMgr.isCompleted() && !smaMgr.isCancelled()) && smaMgr.getStateMgr().getAssignees().size() == 0) {
+         }
+         if (smaMgr.getStateMgr().getAssignees().contains(unAssignedUser)) {
+            rd.logError(sma.getArtifactTypeName() + " " + sma.getHumanReadableId() + " is unassigned and assigned => " + Artifacts.commaArts(smaMgr.getStateMgr().getAssignees()));
+            if (fixIt) {
+               smaMgr.getStateMgr().removeAssignee(unAssignedUser);
+            }
+         }
+         if (smaMgr.getStateMgr().getAssignees().contains(noOneUser)) {
+            rd.logError(art.getHumanReadableId() + " is assigned to NoOne; invalid assignment - MANUAL FIX REQUIRED");
+         }
+         if ((!smaMgr.isCompleted() && !smaMgr.isCancelled()) && smaMgr.getStateMgr().getAssignees().size() == 0) {
             rd.logError(sma.getArtifactTypeName() + " " + sma.getHumanReadableId() + " In Work without assignees");
          }
+         if (art instanceof StateMachineArtifact) {
+            List<Artifact> assigned = art.getArtifacts(CoreRelationEnumeration.Users_Artifact, Artifact.class);
+            if ((smaMgr.isCompleted() || smaMgr.isCancelled()) && assigned.size() > 0) {
+               rd.logError(sma.getArtifactTypeName() + " " + sma.getHumanReadableId() + " cancel/complete with related assignees");
+            } else if (smaMgr.getStateMgr().getAssignees().size() != assigned.size()) {
+               rd.logError(sma.getArtifactTypeName() + " " + sma.getHumanReadableId() + " attribute assignees doesn't match related assignees");
+            }
+         }
+
       }
       rd.log("Completed processing " + artifacts.size() + " artifacts.");
    }
@@ -153,7 +181,7 @@ public class AssignedActiveActions extends XNavigateItemAutoRunAction implements
     * @see org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask#getDescription()
     */
    public String getDescription() {
-      return "Ensure active Actions have at least one assignee";
+      return "Ensure active Actions have at least one assignee; no completed/cancelled assignments and matched attribute/relation assignments";
    }
 
    /* (non-Javadoc)
@@ -173,7 +201,7 @@ public class AssignedActiveActions extends XNavigateItemAutoRunAction implements
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask#startTasks(org.eclipse.osee.framework.ui.skynet.widgets.xresults.XResultData)
     */
-   public void startTasks(XResultData resultData)throws OseeCoreException, SQLException{
+   public void startTasks(XResultData resultData) throws OseeCoreException, SQLException {
       runIt(null, resultData);
    }
 

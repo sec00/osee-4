@@ -8,27 +8,25 @@
  * Contributors:
  *     Boeing - initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.osee.ats.health;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osee.ats.AtsPlugin;
-import org.eclipse.osee.ats.artifact.TeamWorkFlowArtifact;
-import org.eclipse.osee.ats.artifact.TeamWorkflowExtensions;
-import org.eclipse.osee.ats.util.AtsRelation;
+import org.eclipse.osee.ats.artifact.TaskArtifact;
+import org.eclipse.osee.ats.world.WorldView;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
-import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
-import org.eclipse.osee.framework.skynet.core.transaction.AbstractSkynetTxTemplate;
+import org.eclipse.osee.framework.ui.plugin.util.Displays;
 import org.eclipse.osee.framework.ui.plugin.util.Jobs;
 import org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
@@ -41,18 +39,16 @@ import org.eclipse.swt.widgets.Display;
 /**
  * @author Donald G. Dunne
  */
-public class TeamWorkflowsHaveZeroOrOneVersion extends XNavigateItemAutoRunAction implements IAutoRunTask {
-
-   boolean fixIt = false;
+public class ValidateTasks extends XNavigateItemAutoRunAction implements IAutoRunTask {
 
    /**
     * @param parent
     */
-   public TeamWorkflowsHaveZeroOrOneVersion(XNavigateItem parent) {
-      super(parent, "Report Team Workflows have > 1 version.");
+   public ValidateTasks(XNavigateItem parent) {
+      super(parent, "Validate Tasks");
    }
 
-   public TeamWorkflowsHaveZeroOrOneVersion() {
+   public ValidateTasks() {
       this(null);
    }
 
@@ -64,80 +60,65 @@ public class TeamWorkflowsHaveZeroOrOneVersion extends XNavigateItemAutoRunActio
    @Override
    public void run(TableLoadOption... tableLoadOptions) throws SQLException {
       if (!MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), getName(), getName())) return;
-      Jobs.startJob(new ReportCompletedWorkflowsJob(getName()), true);
+      Jobs.startJob(new LoadArtifactsJob(getName()), true);
    }
 
-   private final class ReportCompletedWorkflowsJob extends Job {
+   public class LoadArtifactsJob extends Job {
 
-      public ReportCompletedWorkflowsJob(String jobName) {
-         super(jobName);
-      }
+      private final String name;
 
-      public IStatus run(IProgressMonitor monitor) {
-         XResultData rd = new XResultData(AtsPlugin.getLogger());
-         try {
-            runIt(monitor, rd);
-
-         } catch (Exception ex) {
-            OSEELog.logException(AtsPlugin.class, ex, false);
-            return new Status(Status.ERROR, AtsPlugin.PLUGIN_ID, -1, ex.getLocalizedMessage(), ex);
-         } finally {
-            monitor.done();
-         }
-         return Status.OK_STATUS;
-      }
-   }
-
-   private void runIt(IProgressMonitor monitor, XResultData rd)throws OseeCoreException, SQLException{
-      SearchWorkFlowsTx searchWorkFlowsTx =
-            new SearchWorkFlowsTx(BranchPersistenceManager.getAtsBranch(), getName(), monitor, rd);
-      searchWorkFlowsTx.execute();
-   }
-
-   private final class SearchWorkFlowsTx extends AbstractSkynetTxTemplate {
-      private XResultData rd;
-      private String jobName;
-      private IProgressMonitor monitor;
-
-      public SearchWorkFlowsTx(Branch branch, String jobName, IProgressMonitor monitor, XResultData resultData) {
-         super(branch);
-         this.rd = resultData;
-         this.jobName = jobName;
-         this.monitor = monitor;
+      public LoadArtifactsJob(String name) {
+         super(name);
+         this.name = name;
       }
 
       /*
        * (non-Javadoc)
        * 
-       * @see org.eclipse.osee.framework.skynet.core.transaction.AbstractTxTemplate#handleTxWork()
+       * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
        */
       @Override
-      protected void handleTxWork()throws OseeCoreException, SQLException{
-         if (monitor != null) monitor.subTask("Searching Team Workflows...");
-         Collection<Artifact> arts = new ArrayList<Artifact>();
-         for (String artifactTypeName : TeamWorkflowExtensions.getInstance().getAllTeamWorkflowArtifactNames()) {
-            arts.addAll(ArtifactQuery.getArtifactsFromType(artifactTypeName, getTxBranch()));
+      protected IStatus run(IProgressMonitor monitor) {
+         final XResultData rd = new XResultData(AtsPlugin.getLogger());
+         try {
+            final List<TaskArtifact> orphanedTasks = runIt(monitor, rd);
+            Displays.ensureInDisplayThread(new Runnable() {
+               public void run() {
+                  rd.report(name);
+                  WorldView.loadIt("Orphaned Tasks", orphanedTasks);
+               }
+            });
+         } catch (Exception ex) {
+            OSEELog.logException(AtsPlugin.class, ex, false);
+            rd.logError(ex.getLocalizedMessage());
          }
-         int x = 0;
-
-         for (Artifact art : arts) {
-            if (monitor != null) monitor.subTask(String.format("Processing %d/%d...", x++, arts.size()));
-            TeamWorkFlowArtifact teamArt = (TeamWorkFlowArtifact) art;
-            if (teamArt.getRelatedArtifacts(AtsRelation.TeamWorkflowTargetedForVersion_Version).size() > 1) {
-               rd.logError("Team workflow " + teamArt.getHumanReadableId() + " has " + teamArt.getRelatedArtifacts(
-                     AtsRelation.TeamWorkflowTargetedForVersion_Version).size() + " versions");
-            }
-         }
-         rd.log("Completed processing " + arts.size() + " artifacts.");
-         rd.report(jobName);
+         monitor.done();
+         return Status.OK_STATUS;
       }
+   }
+
+   private List<TaskArtifact> runIt(IProgressMonitor monitor, XResultData rd) throws OseeCoreException, SQLException {
+      final List<TaskArtifact> orphanedTasks = new ArrayList<TaskArtifact>();
+      Collection<Artifact> arts =
+            ArtifactQuery.getArtifactsFromType(TaskArtifact.ARTIFACT_NAME, BranchPersistenceManager.getAtsBranch());
+      int x = 0;
+      for (Artifact art : arts) {
+         TaskArtifact taskArt = (TaskArtifact) art;
+         if (monitor != null) monitor.subTask("Checking task " + x++ + "/" + arts.size() + " - " + art.getHumanReadableId());
+         if (taskArt.getParentSMA() == null) {
+            orphanedTasks.add(taskArt);
+            rd.logError("Orphaned => " + taskArt.getHumanReadableId());
+         }
+      }
+      rd.log("Completed processing " + arts.size() + " artifacts.");
+      return orphanedTasks;
    }
 
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask#get24HourStartTime()
     */
    public String get24HourStartTime() {
-      return "23:30";
+      return "23:25";
    }
 
    /* (non-Javadoc)
@@ -151,7 +132,7 @@ public class TeamWorkflowsHaveZeroOrOneVersion extends XNavigateItemAutoRunActio
     * @see org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask#getDescription()
     */
    public String getDescription() {
-      return "Ensure all Team workflows have either 0 or No targeted version.";
+      return "Ensure all Task artifacts have parents.";
    }
 
    /* (non-Javadoc)
@@ -171,8 +152,7 @@ public class TeamWorkflowsHaveZeroOrOneVersion extends XNavigateItemAutoRunActio
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask#startTasks(org.eclipse.osee.framework.ui.skynet.widgets.xresults.XResultData)
     */
-   public void startTasks(XResultData resultData)throws OseeCoreException, SQLException{
+   public void startTasks(XResultData resultData) throws OseeCoreException, SQLException {
       runIt(null, resultData);
    }
-
 }

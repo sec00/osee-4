@@ -11,20 +11,15 @@
 package org.eclipse.osee.ats.health;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osee.ats.AtsPlugin;
-import org.eclipse.osee.ats.artifact.TaskArtifact;
-import org.eclipse.osee.ats.world.WorldView;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
-import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
+import org.eclipse.osee.framework.skynet.core.attribute.Attribute;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
 import org.eclipse.osee.framework.ui.plugin.util.Jobs;
@@ -39,16 +34,16 @@ import org.eclipse.swt.widgets.Display;
 /**
  * @author Donald G. Dunne
  */
-public class OrphanedTasks extends XNavigateItemAutoRunAction implements IAutoRunTask {
+public class ValidateAttributeValues extends XNavigateItemAutoRunAction implements IAutoRunTask {
 
    /**
     * @param parent
     */
-   public OrphanedTasks(XNavigateItem parent) {
-      super(parent, "Report Orphaned Tasks");
+   public ValidateAttributeValues(XNavigateItem parent) {
+      super(parent, "Validate ATS Branch Attribute Values");
    }
 
-   public OrphanedTasks() {
+   public ValidateAttributeValues() {
       this(null);
    }
 
@@ -81,11 +76,9 @@ public class OrphanedTasks extends XNavigateItemAutoRunAction implements IAutoRu
       protected IStatus run(IProgressMonitor monitor) {
          final XResultData rd = new XResultData(AtsPlugin.getLogger());
          try {
-            final List<TaskArtifact> orphanedTasks = runIt(monitor, rd);
             Displays.ensureInDisplayThread(new Runnable() {
                public void run() {
                   rd.report(name);
-                  WorldView.loadIt("Orphaned Tasks", orphanedTasks);
                }
             });
          } catch (Exception ex) {
@@ -97,21 +90,16 @@ public class OrphanedTasks extends XNavigateItemAutoRunAction implements IAutoRu
       }
    }
 
-   private List<TaskArtifact> runIt(IProgressMonitor monitor, XResultData rd)throws OseeCoreException, SQLException{
-      final List<TaskArtifact> orphanedTasks = new ArrayList<TaskArtifact>();
-      Collection<Artifact> arts =
-            ArtifactQuery.getArtifactsFromType(TaskArtifact.ARTIFACT_NAME, BranchPersistenceManager.getAtsBranch());
-      int x = 0;
-      for (Artifact art : arts) {
-         TaskArtifact taskArt = (TaskArtifact) art;
-         if (monitor != null) monitor.subTask("Checking task " + x++ + "/" + arts.size() + " - " + art.getHumanReadableId());
-         if (taskArt.getParentSMA() == null) {
-            orphanedTasks.add(taskArt);
-            rd.logError("Orphaned => " + taskArt.getHumanReadableId());
+   private void runIt(IProgressMonitor monitor, XResultData rd) throws OseeCoreException, SQLException {
+      for (Artifact artifact : ArtifactQuery.getArtifactsFromBranch(AtsPlugin.getAtsBranch(), false)) {
+         for (Attribute<?> attr : artifact.getAttributes()) {
+            if (attr.getValue() == null) {
+               rd.logError("Artifact: " + artifact.getHumanReadableId() + " - Null Attribute: " + attr.getNameValueDescription());
+               // attr.delete();
+            }
          }
+         if (artifact.isDirty()) artifact.persistAttributes();
       }
-      rd.log("Completed processing " + arts.size() + " artifacts.");
-      return orphanedTasks;
    }
 
    /* (non-Javadoc)
@@ -132,7 +120,7 @@ public class OrphanedTasks extends XNavigateItemAutoRunAction implements IAutoRu
     * @see org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask#getDescription()
     */
    public String getDescription() {
-      return "Ensure all Task artifacts have parents.";
+      return "Ensure no artifacts on ATS branch have null attributes.";
    }
 
    /* (non-Javadoc)
@@ -152,7 +140,7 @@ public class OrphanedTasks extends XNavigateItemAutoRunAction implements IAutoRu
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask#startTasks(org.eclipse.osee.framework.ui.skynet.widgets.xresults.XResultData)
     */
-   public void startTasks(XResultData resultData)throws OseeCoreException, SQLException{
+   public void startTasks(XResultData resultData) throws OseeCoreException, SQLException {
       runIt(null, resultData);
    }
 }
