@@ -18,6 +18,7 @@ import org.eclipse.osee.ats.artifact.DecisionReviewArtifact;
 import org.eclipse.osee.ats.artifact.PeerToPeerReviewArtifact;
 import org.eclipse.osee.ats.artifact.TaskArtifact;
 import org.eclipse.osee.ats.artifact.TeamWorkFlowArtifact;
+import org.eclipse.osee.framework.skynet.core.User;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
@@ -54,7 +55,7 @@ public class DoesNotWorkItem extends XNavigateItemAction {
       //      relateDonDunne();
 
       //      testDeleteAttribute();
-      deleteNullAttributes();
+      deleteNullUserAttributes();
       //      XNavigateItem item = AtsNavigateViewItems.getInstance().getSearchNavigateItems().get(1);
       //      System.out.println("Item " + item.getName());
       //      NavigateView.getNavigateView().handleDoubleClick(item);
@@ -112,6 +113,32 @@ public class DoesNotWorkItem extends XNavigateItemAction {
                   "Lba V11 REU Code Team Workflow", "Lba V11 REU Test Team Workflow", "Lba V11 REU Req Team Workflow",
                   "Lba B3 Code Team Workflow", "Lba B3 Test Team Workflow", "Lba B3 Req Team Workflow",
                   "Lba B3 SW Design Team Workflow", "Lba B3 Tech Approach Team Workflow")) {
+               for (Artifact team : ArtifactQuery.getArtifactsFromType(artTypeName, AtsPlugin.getAtsBranch())) {
+                  for (Attribute<?> attr : team.getAttributes()) {
+                     if (attr.getValue() == null) {
+                        System.out.println(team.getHumanReadableId() + " - " + attr.getNameValueDescription());
+                        attr.delete();
+                        x++;
+                     }
+                  }
+                  if (team.isDirty()) team.persistAttributes();
+               }
+            }
+            System.out.println("Deleted " + x);
+         }
+      };
+      newActionTx.execute();
+
+   }
+
+   private void deleteNullUserAttributes() throws OseeCoreException, SQLException {
+
+      AbstractSkynetTxTemplate newActionTx = new AbstractSkynetTxTemplate(BranchPersistenceManager.getAtsBranch()) {
+
+         @Override
+         protected void handleTxWork() throws OseeCoreException, SQLException {
+            int x = 0;
+            for (String artTypeName : Arrays.asList(User.ARTIFACT_NAME)) {
                for (Artifact team : ArtifactQuery.getArtifactsFromType(artTypeName, AtsPlugin.getAtsBranch())) {
                   for (Attribute<?> attr : team.getAttributes()) {
                      if (attr.getValue() == null) {
