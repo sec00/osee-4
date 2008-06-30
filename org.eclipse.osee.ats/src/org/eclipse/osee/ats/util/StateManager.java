@@ -259,9 +259,7 @@ public class StateManager {
       // Set XCurrentState info to XState
       stateDam.setState(currentStateDam.getState());
 
-      // Set XCurrentState; If been to this state, copy state info from
-      // prev state; else create
-      // new
+      // Set XCurrentState; If been to this state, copy state info from prev state; else create new
       SMAState previousState = stateDam.getState(toStateName, false);
       if (previousState != null) {
          if (toAssignees.size() > 0) previousState.setAssignees(toAssignees);
