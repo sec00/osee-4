@@ -36,6 +36,7 @@ import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.IATSStateMachineArtifact;
 import org.eclipse.osee.framework.skynet.core.artifact.search.Active;
 import org.eclipse.osee.framework.skynet.core.exception.ArtifactDoesNotExist;
+import org.eclipse.osee.framework.skynet.core.exception.MultipleBranchesExist;
 import org.eclipse.osee.framework.skynet.core.exception.MultipleAttributesExist;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.transaction.AbstractSkynetTxTemplate;
@@ -572,7 +573,7 @@ public class TeamWorkFlowArtifact extends TaskableStateMachineArtifact implement
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.widgets.IBranchArtifact#getCommitManagerBranch()
     */
-   public Branch getWorkingBranch() throws SQLException {
+   public Branch getWorkingBranch() throws SQLException, MultipleBranchesExist {
       if (getSmaMgr().getBranchMgr().getWorkingBranch() != null) {
          return getSmaMgr().getBranchMgr().getWorkingBranch();
       }
