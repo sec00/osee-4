@@ -318,7 +318,7 @@ public class SMAWorkFlowSection extends SectionPart {
       comp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
       if (isEditable && !smaMgr.isCancelled() && !smaMgr.isCompleted()) {
-         toolkit.createLabel(comp, "\"" + page.getName() + "\" state assigned to ");
+         toolkit.createLabel(comp, "\"" + page.getName() + "\" State  ");
          Hyperlink link = toolkit.createHyperlink(comp, ASSIGNEES, SWT.NONE);
          link.addHyperlinkListener(new IHyperlinkListener() {
 
