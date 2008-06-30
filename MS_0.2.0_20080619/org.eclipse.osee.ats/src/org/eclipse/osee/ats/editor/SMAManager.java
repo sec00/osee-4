@@ -725,13 +725,6 @@ public class SMAManager {
    public Result transitionToCancelled(String reason, boolean persist) throws SQLException {
       Result result =
             transition(DefaultTeamState.Cancelled.name(), Arrays.asList(new User[] {}), persist, reason, false);
-      if (result.isTrue()) {
-         for (VersionArtifact verArt : sma.getArtifacts(AtsRelation.TeamWorkflowTargetedForVersion_Version,
-               VersionArtifact.class)) {
-            sma.deleteRelation(AtsRelation.TeamWorkflowTargetedForVersion_Version, verArt);
-         }
-         sma.persistRelations();
-      }
       return result;
    }
 
