@@ -805,24 +805,34 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
    }
 
    public String getInternalDescriptiveName() {
-      String name = UNNAMED;
+      String name = getInternalAttributeValue("Name");
+      if (name.equals("")) return UNNAMED;
+      return name;
+   }
 
+   /**
+    * Return the String value of the first found attributeTypeName attribute whether deleted or not.
+    * 
+    * @param attributeTypeName
+    * @return
+    */
+   public String getInternalAttributeValue(String attributeTypeName) {
       try {
-         if (!isAttributeTypeValid("Name")) {
+         if (!isAttributeTypeValid(attributeTypeName)) {
             throw new IllegalStateException(String.format(
                   "Artifact Type [%s] guid [%s] does not have the attribute type 'Name' which is required.",
                   getArtifactTypeName(), getGuid()));
          }
          for (Attribute<?> attribute : internalGetAttributes()) {
-            if (attribute.getAttributeType().getName().equals("Name")) {
-               name = (String) attribute.getValue();
-   }
+            if (attribute.getAttributeType().getName().equals(attributeTypeName)) {
+               return (String) attribute.getValue();
+            }
          }
       } catch (Exception ex) {
          SkynetActivator.getLogger().log(Level.SEVERE, ex.getLocalizedMessage(), ex);
          return ex.getLocalizedMessage();
       }
-      return name;
+      return "";
    }
 
    public String getDescriptiveName() {
