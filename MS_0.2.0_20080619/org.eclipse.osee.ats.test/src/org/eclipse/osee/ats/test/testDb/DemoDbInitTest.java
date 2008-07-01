@@ -8,10 +8,7 @@ package org.eclipse.osee.ats.test.testDb;
 import junit.framework.TestCase;
 import org.eclipse.osee.ats.AtsPlugin;
 import org.eclipse.osee.framework.database.initialize.LaunchOseeDbConfigClient;
-import org.eclipse.osee.framework.database.utility.GroupSelection;
-import org.eclipse.osee.framework.db.connection.OseeDb;
-import org.eclipse.osee.framework.db.connection.OseeDbConnection;
-import org.eclipse.osee.framework.db.connection.core.OseeApplicationServer;
+import org.eclipse.osee.framework.jdk.core.util.OseeProperties;
 
 /**
  * @author Donald G. Dunne
@@ -27,15 +24,10 @@ public class DemoDbInitTest extends TestCase {
    }
 
    public void testDemoDbInit() throws Exception {
-      System.out.println("Validating OSEE Application Server...");
-      if (!OseeApplicationServer.isApplicationServerAlive()) {
-         System.err.println("No OSEE Application Server running.\nExiting.");
-         return;
-      }
       System.out.println("Begin Database Initialization...");
-      LaunchOseeDbConfigClient configClient = new LaunchOseeDbConfigClient(OseeDb.getDefaultDatabaseService());
-      configClient.run(OseeDbConnection.getConnection(), GroupSelection.getInstance().getDbInitTasks(
-            "OSEE Demo Database"));
+      OseeProperties.getInstance().setDBConfigInitChoice("OSEE Demo Database");
+      System.setProperty(OseeProperties.OSEE_NO_PROMPT, "true");
+      LaunchOseeDbConfigClient.main(null);
       System.out.println("Database Initialization Complete.");
    }
 
