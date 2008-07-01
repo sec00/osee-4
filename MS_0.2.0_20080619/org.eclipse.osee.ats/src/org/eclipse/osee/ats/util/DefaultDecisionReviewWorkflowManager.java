@@ -36,22 +36,29 @@ public class DefaultDecisionReviewWorkflowManager {
     * @return
     * @throws Exception
     */
-   public static Result transitionTo(DecisionReviewArtifact reviewArt, DecisionReviewArtifact.StateNames toState, User user, boolean popup)throws OseeCoreException, SQLException{
-      Result result = setPrepareStateData(reviewArt, 100, .2);
-      if (result.isFalse()) {
-         if (popup) result.popup();
-         return result;
+   public static Result transitionTo(DecisionReviewArtifact reviewArt, DecisionReviewArtifact.StateNames toState, User user, boolean popup) throws OseeCoreException, SQLException {
+      Result result = Result.TrueResult;
+      // If in Prepare state, set data and transition to Decision
+      if (reviewArt.getSmaMgr().getStateMgr().getCurrentStateName().equals(
+            DecisionReviewArtifact.StateNames.Prepare.name())) {
+         result = setPrepareStateData(reviewArt, 100, 3, .2);
+
+         if (result.isFalse()) {
+            if (popup) result.popup();
+            return result;
+         }
+         result =
+               reviewArt.getSmaMgr().transition(DecisionReviewArtifact.StateNames.Decision.name(),
+                     (user != null ? user : reviewArt.getSmaMgr().getStateMgr().getAssignees().iterator().next()),
+                     false);
       }
-      result =
-            reviewArt.getSmaMgr().transition(DecisionReviewArtifact.StateNames.Decision.name(),
-                  (user != null ? user : reviewArt.getSmaMgr().getStateMgr().getAssignees().iterator().next()), false);
       if (result.isFalse()) {
          if (popup) result.popup();
          return result;
       }
       if (toState == DecisionReviewArtifact.StateNames.Decision) return Result.TrueResult;
 
-      // If desired to transition to followup, then decision is false
+      // If desired to transition to follow-up, then decision is false
       boolean decision = (toState != DecisionReviewArtifact.StateNames.Followup);
 
       result = setDecisionStateData(reviewArt, decision, 100, .2);
@@ -70,16 +77,19 @@ public class DefaultDecisionReviewWorkflowManager {
       return Result.TrueResult;
    }
 
-   public static Result setPrepareStateData(DecisionReviewArtifact reviewArt, int statePercentComplete, double stateHoursSpent)throws OseeCoreException, SQLException{
-      if (!reviewArt.getSmaMgr().getStateMgr().getCurrentStateName().equals("Prepare")) return new Result(
-            "Action not in Prepare state");
+   public static Result setPrepareStateData(DecisionReviewArtifact reviewArt, int statePercentComplete, double estimateHours, double stateHoursSpent) throws OseeCoreException, SQLException {
+      if (!reviewArt.getSmaMgr().getStateMgr().getCurrentStateName().equals(
+            DecisionReviewArtifact.StateNames.Prepare.name())) return new Result("Action not in Prepare state");
+      reviewArt.setSoleAttributeValue(ATSAttributes.ESTIMATED_HOURS_ATTRIBUTE.getStoreName(), estimateHours);
       reviewArt.getSmaMgr().getStateMgr().setHoursSpent(stateHoursSpent);
       reviewArt.getSmaMgr().getStateMgr().setPercentComplete(statePercentComplete);
       return Result.TrueResult;
    }
 
-   public static Result setDecisionStateData(DecisionReviewArtifact reviewArt, boolean decision, int statePercentComplete, double stateHoursSpent)throws OseeCoreException, SQLException{
-      reviewArt.setSoleAttributeValue(ATSAttributes.DECISION_ATTRIBUTE.getStoreName(), decision);
+   public static Result setDecisionStateData(DecisionReviewArtifact reviewArt, boolean decision, int statePercentComplete, double stateHoursSpent) throws OseeCoreException, SQLException {
+      if (!reviewArt.getSmaMgr().getStateMgr().getCurrentStateName().equals(
+            DecisionReviewArtifact.StateNames.Decision.name())) return new Result("Action not in Decision state");
+      reviewArt.setSoleAttributeValue(ATSAttributes.DECISION_ATTRIBUTE.getStoreName(), decision ? "Yes" : "No");
       reviewArt.getSmaMgr().getStateMgr().setHoursSpent(stateHoursSpent);
       reviewArt.getSmaMgr().getStateMgr().setPercentComplete(statePercentComplete);
       return Result.TrueResult;

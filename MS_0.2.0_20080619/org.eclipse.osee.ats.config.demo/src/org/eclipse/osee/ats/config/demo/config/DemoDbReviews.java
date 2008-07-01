@@ -40,9 +40,9 @@ public class DemoDbReviews {
    }
 
    /**
-    * Create<br>
-    * 0) NOTE: One decision review was already created through the validation flag being set on a workflow<br>
-    * 1) Decision in ReWork state w Joe Smith assignee and 2 reviewers<br>
+    * Create Decision Reviews<br>
+    * 1) ALREADY CREATED: Decision review created through the validation flag being set on a workflow<br>
+    * 2) Decision in ReWork state w Joe Smith assignee and 2 reviewers<br>
     * 3) Decision in Complete state w Joe Smith assignee and completed<br>
     * <br>
     * 
@@ -57,13 +57,22 @@ public class DemoDbReviews {
 
       // Create a Decision review and transition to ReWork
       DecisionReviewArtifact reviewArt = firstTestArt.getSmaMgr().getReviewManager().createValidateReview(true);
-      DefaultDecisionReviewWorkflowManager.transitionTo(reviewArt, DecisionReviewArtifact.StateNames.Followup,
-            SkynetAuthentication.getUser(), false);
+      Result result =
+            DefaultDecisionReviewWorkflowManager.transitionTo(reviewArt, DecisionReviewArtifact.StateNames.Followup,
+                  SkynetAuthentication.getUser(), false);
+      if (result.isFalse()) {
+         throw new IllegalStateException("Failed transitioning review to Followup: " + result.getText());
+      }
+      reviewArt.persistAttributesAndRelations();
 
       // Create a Decision review and transition to Completed
       reviewArt = secondTestArt.getSmaMgr().getReviewManager().createValidateReview(true);
       DefaultDecisionReviewWorkflowManager.transitionTo(reviewArt, DecisionReviewArtifact.StateNames.Completed,
             SkynetAuthentication.getUser(), false);
+      if (result.isFalse()) {
+         throw new IllegalStateException("Failed transitioning review to Completed: " + result.getText());
+      }
+      reviewArt.persistAttributesAndRelations();
 
    }
 
@@ -123,6 +132,8 @@ public class DemoDbReviews {
       if (result.isFalse()) {
          throw new IllegalStateException("Failed transitioning review to Review: " + result.getText());
       }
+      reviewArt.persistAttributesAndRelations();
+
       // Create a PeerToPeer review and transition to Completed
       reviewArt =
             secondCodeArt.getSmaMgr().getReviewManager().createNewPeerToPeerReview(
