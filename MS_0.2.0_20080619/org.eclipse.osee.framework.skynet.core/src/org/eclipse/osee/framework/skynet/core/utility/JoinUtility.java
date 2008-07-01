@@ -22,10 +22,10 @@ public class JoinUtility {
    private static final String INSERT_INTO_JOIN_ARTIFACT =
          "INSERT INTO osee_join_artifact (query_id, insert_time, art_id, branch_id) VALUES (?, ?, ?, ?)";
 
-   public static final String INSERT_INTO_JOIN_ATTRIBUTE =
+   private static final String INSERT_INTO_JOIN_ATTRIBUTE =
          "INSERT INTO osee_join_attribute (attr_query_id, insert_time, value) VALUES (?, ?, ?)";
 
-   public static final String INSERT_INTO_JOIN_TRANSACTION =
+   private static final String INSERT_INTO_JOIN_TRANSACTION =
          "INSERT INTO osee_join_transaction (query_id, insert_time, gamma_id, transaction_id) VALUES (?, ?, ?, ?)";
 
    private static final String DELETE_FROM_JOIN_TRANSACTION = "DELETE FROM osee_join_transaction WHERE query_id = ?";
@@ -52,12 +52,14 @@ public class JoinUtility {
    }
 
    private static abstract class JoinQueryEntry {
-      private String deleteSql;
-      private String insertSql;
-      private int queryId;
+      private final String deleteSql;
+      private final String insertSql;
+      private final int queryId;
       protected List<IJoinRow> entries;
+      private boolean wasStored;
 
       public JoinQueryEntry(String insertSql, String deleteSql) {
+         this.wasStored = false;
          this.deleteSql = deleteSql;
          this.insertSql = insertSql;
          this.queryId = getNewQueryId();
@@ -77,11 +79,16 @@ public class JoinUtility {
       }
 
       public void store(Connection connection) throws SQLException {
-         List<Object[]> data = new ArrayList<Object[]>();
-         for (IJoinRow joinArray : entries) {
-            data.add(joinArray.toArray());
+         if (this.wasStored != true) {
+            List<Object[]> data = new ArrayList<Object[]>();
+            for (IJoinRow joinArray : entries) {
+               data.add(joinArray.toArray());
+            }
+            ConnectionHandler.runPreparedUpdate(connection, insertSql, data);
+            this.wasStored = true;
+         } else {
+            throw new SQLException("Cannot store query id twice");
          }
-         ConnectionHandler.runPreparedUpdate(connection, insertSql, data);
       }
 
       public int delete(Connection connection) throws SQLException {
