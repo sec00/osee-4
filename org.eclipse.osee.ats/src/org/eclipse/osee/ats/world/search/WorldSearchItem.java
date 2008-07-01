@@ -35,7 +35,7 @@ public abstract class WorldSearchItem {
    public static enum SearchType {
       Search, ReSearch
    };
-   public static enum ShowType {
+   public static enum ShowActionType {
       ShowAction, ShowTeamWorkflow
    }
 
