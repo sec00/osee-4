@@ -87,18 +87,18 @@ public class ReviewManager {
       return null;
    }
 
-   public PeerToPeerReviewArtifact createNewPeerToPeerReview(String againstState) throws OseeCoreException, SQLException {
-      return createNewPeerToPeerReview(againstState, SkynetAuthentication.getUser(), new Date());
+   public PeerToPeerReviewArtifact createNewPeerToPeerReview(String reviewTitle, String againstState) throws OseeCoreException, SQLException {
+      return createNewPeerToPeerReview(reviewTitle, againstState, SkynetAuthentication.getUser(), new Date());
    }
 
-   public PeerToPeerReviewArtifact createNewPeerToPeerReview(String againstState, User origUser, Date origDate) throws OseeCoreException, SQLException {
-      return createNewPeerToPeerReview(smaMgr.getSma(), againstState, origUser, origDate);
+   public PeerToPeerReviewArtifact createNewPeerToPeerReview(String reviewTitle, String againstState, User origUser, Date origDate) throws OseeCoreException, SQLException {
+      return createNewPeerToPeerReview(smaMgr.getSma(), reviewTitle, againstState, origUser, origDate);
    }
 
-   public static PeerToPeerReviewArtifact createNewPeerToPeerReview(StateMachineArtifact teamParent, String againstState, User origUser, Date origDate) throws OseeCoreException, SQLException {
+   public static PeerToPeerReviewArtifact createNewPeerToPeerReview(StateMachineArtifact teamParent, String reviewTitle, String againstState, User origUser, Date origDate) throws OseeCoreException, SQLException {
       PeerToPeerReviewArtifact peerToPeerRev =
             (PeerToPeerReviewArtifact) ArtifactTypeManager.addArtifact(PeerToPeerReviewArtifact.ARTIFACT_NAME,
-                  BranchPersistenceManager.getAtsBranch(), "Peer to Peer Review");
+                  BranchPersistenceManager.getAtsBranch(), reviewTitle == null ? "Peer to Peer Review" : reviewTitle);
 
       if (teamParent != null) {
          teamParent.addRelation(AtsRelation.TeamWorkflowToReview_Review, peerToPeerRev);
