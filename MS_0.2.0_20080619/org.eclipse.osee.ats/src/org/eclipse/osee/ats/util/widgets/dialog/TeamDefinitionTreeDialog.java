@@ -39,6 +39,7 @@ public class TeamDefinitionTreeDialog extends TeamDefinitionTreeWithChildrenDial
 
       if (showFinished != null) {
          showFinishedCheck.createWidgets(dialogComp, 2);
+         showFinishedCheck.set(showFinished);
          showFinishedCheck.addSelectionListener(new SelectionListener() {
             public void widgetDefaultSelected(SelectionEvent e) {
             }

@@ -33,6 +33,7 @@ import org.eclipse.osee.ats.world.search.ShowOpenWorkflowsByArtifactType;
 import org.eclipse.osee.ats.world.search.StateWorldSearchItem;
 import org.eclipse.osee.ats.world.search.TeamVersionWorldSearchItem;
 import org.eclipse.osee.ats.world.search.TeamWorldSearchItem;
+import org.eclipse.osee.ats.world.search.UnReleasedTeamWorldSearchItem;
 import org.eclipse.osee.ats.world.search.UserCommunitySearchItem;
 import org.eclipse.osee.ats.world.search.UserSearchItem;
 import org.eclipse.osee.ats.world.search.VersionTargetedForTeamSearchItem;
@@ -186,18 +187,25 @@ public class AtsNavigateItemsToWorldViewTest extends TestCase {
    }
 
    public void testTeamDefinitionSearch() throws Exception {
-      XNavigateItem item = NavigateTestUtil.getAtsNavigateItem("Team Actions");
+      XNavigateItem item = NavigateTestUtil.getAtsNavigateItem("Team Workflows");
       assertTrue(((SearchNavigateItem) item).getWorldSearchItem() instanceof TeamWorldSearchItem);
       ((TeamWorldSearchItem) (((SearchNavigateItem) item).getWorldSearchItem())).setSelectedTeamDefs(TeamDefinitionArtifact.getTeamDefinitions(Arrays.asList("SAW Code")));
       runGeneralLoadingTest(item, TeamWorkFlowArtifact.class, 3);
    }
 
    public void testTeamDefinitionByVersionSearch() throws Exception {
-      XNavigateItem item = NavigateTestUtil.getAtsNavigateItem("Team Actions by Version");
+      XNavigateItem item = NavigateTestUtil.getAtsNavigateItem("Team Workflows by Version");
       assertTrue(((SearchNavigateItem) item).getWorldSearchItem() instanceof TeamVersionWorldSearchItem);
       ((TeamVersionWorldSearchItem) (((SearchNavigateItem) item).getWorldSearchItem())).setSelectedTeamDefs(TeamDefinitionArtifact.getTeamDefinitions(Arrays.asList("SAW Code")));
       ((TeamVersionWorldSearchItem) (((SearchNavigateItem) item).getWorldSearchItem())).setSelectedVersion(VersionArtifact.getVersions(
             Arrays.asList("SAW_Bld_2")).iterator().next());
+      runGeneralLoadingTest(item, TeamWorkFlowArtifact.class, 3);
+   }
+
+   public void testUnReleasedTeamActionsSearch() throws Exception {
+      XNavigateItem item = NavigateTestUtil.getAtsNavigateItem("Un-Released Team Actions");
+      assertTrue(((SearchNavigateItem) item).getWorldSearchItem() instanceof UnReleasedTeamWorldSearchItem);
+      ((UnReleasedTeamWorldSearchItem) (((SearchNavigateItem) item).getWorldSearchItem())).setSelectedTeamDefs(TeamDefinitionArtifact.getTeamDefinitions(Arrays.asList("SAW Code")));
       runGeneralLoadingTest(item, TeamWorkFlowArtifact.class, 3);
    }
 
