@@ -151,7 +151,7 @@ public class ValidateAssignees extends XNavigateItemAutoRunAction implements IAu
             rd.logError(sma.getArtifactTypeName() + " " + sma.getHumanReadableId() + " In Work without assignees");
          }
          if (art instanceof StateMachineArtifact) {
-            List<Artifact> assigned = art.getArtifacts(CoreRelationEnumeration.Users_Artifact, Artifact.class);
+            List<Artifact> assigned = art.getArtifacts(CoreRelationEnumeration.Users_User, Artifact.class);
             if ((smaMgr.isCompleted() || smaMgr.isCancelled()) && assigned.size() > 0) {
                rd.logError(sma.getArtifactTypeName() + " " + sma.getHumanReadableId() + " cancel/complete with related assignees");
             } else if (smaMgr.getStateMgr().getAssignees().size() != assigned.size()) {

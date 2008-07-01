@@ -118,16 +118,20 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
       new SearchNavigateItem(otherItems, new MyTaskSearchItem("My Tasks (WorldView)", user, LoadView.WorldView));
       new SearchNavigateItem(otherItems, new MyTaskSearchItem("My Tasks (Editor)", user, LoadView.TaskEditor));
       new SearchNavigateItem(otherItems, new MySubscribedSearchItem("My Subscribed", user));
-      new SearchNavigateItem(otherItems, new MyOrigSearchItem("My Originator - InWork", user, true));
-      new SearchNavigateItem(otherItems, new MyOrigSearchItem("My Originator - All", user, false));
+      new SearchNavigateItem(otherItems, new MyOrigSearchItem("My Originator - InWork", user,
+            MyOrigSearchItem.OriginatedState.InWork));
+      new SearchNavigateItem(otherItems, new MyOrigSearchItem("My Originator - All", user,
+            MyOrigSearchItem.OriginatedState.All));
       new SearchNavigateItem(otherItems, new MyCompletedSearchItem("My Completed", user));
       new SearchNavigateItem(otherItems, new MyReviewWorkflowItem("My Reviews - All", user, ReviewState.All));
       items.add(otherItems);
 
       otherItems = new XNavigateItem(null, "Other User Searches");
       new SearchNavigateItem(otherItems, new MyWorldSearchItem("User's World"));
-      new SearchNavigateItem(otherItems, new MyOrigSearchItem("User's Originator - InWork", null, true));
-      new SearchNavigateItem(otherItems, new MyOrigSearchItem("User's Originator - All", null, false));
+      new SearchNavigateItem(otherItems, new MyOrigSearchItem("User's Originator - InWork", null,
+            MyOrigSearchItem.OriginatedState.InWork));
+      new SearchNavigateItem(otherItems, new MyOrigSearchItem("User's Originator - All", null,
+            MyOrigSearchItem.OriginatedState.All));
       new SearchNavigateItem(otherItems, new MyTeamWFSearchItem("User's Team Workflows"));
       new SearchNavigateItem(otherItems, new MyTaskSearchItem("User's Tasks (WorldView)", LoadView.WorldView));
       new SearchNavigateItem(otherItems, new MyTaskSearchItem("User's Tasks (Editor)", LoadView.TaskEditor));
@@ -153,7 +157,7 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
       items.add(aiTeam);
 
       XNavigateItem teamItem = new XNavigateItem(null, "Teams");
-      new SearchNavigateItem(teamItem, new TeamWorldSearchItem("Team Actions", null, false, true, false, null));
+      new SearchNavigateItem(teamItem, new TeamWorldSearchItem("Team Actions", null, false, false, false, null));
       new SearchNavigateItem(teamItem, new TeamVersionWorldSearchItem("Team Actions by Version", (String[]) null,
             false, false, false));
       new SearchNavigateItem(teamItem, new UnReleasedTeamWorldSearchItem("Un-Released Team Actions", (String[]) null,

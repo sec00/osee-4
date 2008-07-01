@@ -36,10 +36,7 @@ public abstract class WorldSearchItem {
       Search, ReSearch
    };
    public static enum ShowType {
-      ShowAction, ShowTeamWorkflow
-   }
-   public static enum RecurseType {
-      None, RecurseChildren
+      ShowAction, ShowTeamWorkflow, RecurseChildren, NoRecurseChildren, ShowAll, ShowFinished, None
    }
 
    public WorldSearchItem(String name) {
