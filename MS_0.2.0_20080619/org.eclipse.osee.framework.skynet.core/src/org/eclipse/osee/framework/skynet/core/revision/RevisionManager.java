@@ -409,12 +409,12 @@ public class RevisionManager implements IEventReceiver {
    private Collection<Change> getChangesPerBranch(Branch sourceBranch, int transactionNumber) throws SQLException, OseeCoreException {
       ArrayList<Change> changes = new ArrayList<Change>();
       Set<Integer> artIds = new HashSet<Integer>();
-      Set<Integer> deletedArtifactIds = new HashSet<Integer>();
+      Set<Integer> newAndDeletedArtifactIds = new HashSet<Integer>();
       boolean hasBranch = sourceBranch != null;
 
-      loadNewOrDeletedArtifactChanges(sourceBranch, transactionNumber, artIds, changes, deletedArtifactIds);
-      loadAttributeChanges(sourceBranch, transactionNumber, artIds, changes, deletedArtifactIds);
-      loadRelationChanges(sourceBranch, transactionNumber, artIds, changes, deletedArtifactIds);
+      loadNewOrDeletedArtifactChanges(sourceBranch, transactionNumber, artIds, changes, newAndDeletedArtifactIds);
+      loadAttributeChanges(sourceBranch, transactionNumber, artIds, changes, newAndDeletedArtifactIds);
+      loadRelationChanges(sourceBranch, transactionNumber, artIds, changes, newAndDeletedArtifactIds);
 
       Branch branch =
             hasBranch ? sourceBranch : BranchPersistenceManager.getInstance().getBranchForTransactionNumber(
@@ -448,7 +448,7 @@ public class RevisionManager implements IEventReceiver {
     * @throws TransactionDoesNotExist
     * @throws BranchDoesNotExist
     */
-   private void loadNewOrDeletedArtifactChanges(Branch sourceBranch, int transactionNumber, Set<Integer> artIds, ArrayList<Change> changes, Set<Integer> deletedArtifactIds) throws SQLException, BranchDoesNotExist, TransactionDoesNotExist {
+   private void loadNewOrDeletedArtifactChanges(Branch sourceBranch, int transactionNumber, Set<Integer> artIds, ArrayList<Change> changes, Set<Integer> newAndDeletedArtifactIds) throws SQLException, BranchDoesNotExist, TransactionDoesNotExist {
       ConnectionHandlerStatement connectionHandlerStatement = null;
       Map<Integer, ArtifactChanged> artifactChanges = new HashMap<Integer, ArtifactChanged>();
       boolean hasBranch = sourceBranch != null;
@@ -496,7 +496,7 @@ public class RevisionManager implements IEventReceiver {
                artifactChanges.put(artId, artifactChanged);
             } else {
                changes.remove(artifactChanges.get(artId));
-               deletedArtifactIds.add(artId);
+               newAndDeletedArtifactIds.add(artId);
             }
          }
       } finally {
@@ -510,7 +510,7 @@ public class RevisionManager implements IEventReceiver {
     * @throws SQLException
     * @throws OseeCoreException
     */
-   private void loadRelationChanges(Branch sourceBranch, int transactionNumber, Set<Integer> artIds, ArrayList<Change> changes, Set<Integer> deletedArtifactIds) throws SQLException, OseeCoreException {
+   private void loadRelationChanges(Branch sourceBranch, int transactionNumber, Set<Integer> artIds, ArrayList<Change> changes, Set<Integer> newAndDeletedArtifactIds) throws SQLException, OseeCoreException {
       ConnectionHandlerStatement connectionHandlerStatement = null;
       try {
          //Changes per a branch
@@ -530,7 +530,7 @@ public class RevisionManager implements IEventReceiver {
             int bArtId = resultSet.getInt("b_art_id");
             int relLinkId = resultSet.getInt("rel_link_id");
 
-            if (!deletedArtifactIds.contains(aArtId) && !deletedArtifactIds.contains(bArtId)) {
+            if (!newAndDeletedArtifactIds.contains(aArtId) && !newAndDeletedArtifactIds.contains(bArtId)) {
                artIds.add(aArtId);
                artIds.add(bArtId);
 
@@ -552,7 +552,7 @@ public class RevisionManager implements IEventReceiver {
     * @throws TransactionDoesNotExist
     * @throws BranchDoesNotExist
     */
-   private void loadAttributeChanges(Branch sourceBranch, int transactionNumber, Set<Integer> artIds, ArrayList<Change> changes, Set<Integer> deletedArtifactIds) throws SQLException, BranchDoesNotExist, TransactionDoesNotExist {
+   private void loadAttributeChanges(Branch sourceBranch, int transactionNumber, Set<Integer> artIds, ArrayList<Change> changes, Set<Integer> newAndDeletedArtifactIds) throws SQLException, BranchDoesNotExist, TransactionDoesNotExist {
       Map<Integer, Change> mightNeedWasValue = new HashMap<Integer, Change>();
       Map<Integer, ModificationType> artModTypes = new HashMap<Integer, ModificationType>();
       ConnectionHandlerStatement connectionHandlerStatement = null;
@@ -604,7 +604,7 @@ public class RevisionManager implements IEventReceiver {
                artModType = ModificationType.CHANGE;
             }
 
-            if (!deletedArtifactIds.contains(artId)) {
+            if (!newAndDeletedArtifactIds.contains(artId)) {
                attributeChanged =
                      new AttributeChanged(sourceBranch, artTypeId, sourceGamma, artId, toTransactionId,
                            fromTransactionId, hasBranch ? ModificationType.NEW : ModificationType.getMod(modType),
