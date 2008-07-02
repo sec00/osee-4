@@ -14,6 +14,7 @@ package org.eclipse.osee.framework.ui.skynet.widgets.xchange;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -276,6 +277,8 @@ public class XChangeViewer extends XWidget implements IEventReceiver, IActionabl
                      try {
                         if (changes.length == 0) {
                            extraInfoLabel.setText(NOT_CHANGES);
+                           xChangeViewer.setChanges(changes);
+                           xChangeViewer.refresh();
                         } else {
                            TransactionId transId =
                                  hasBranch ? null : TransactionIdManager.getInstance().getPossiblyEditableTransactionId(
