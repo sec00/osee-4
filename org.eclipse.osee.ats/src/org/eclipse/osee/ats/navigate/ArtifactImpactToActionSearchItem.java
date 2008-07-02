@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osee.ats.AtsPlugin;
 import org.eclipse.osee.ats.artifact.TeamWorkFlowArtifact;
 import org.eclipse.osee.framework.jdk.core.util.AHTML;
+import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
@@ -28,6 +29,7 @@ import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.revision.RevisionManager;
 import org.eclipse.osee.framework.skynet.core.revision.TransactionData;
+import org.eclipse.osee.framework.skynet.core.user.UserEnum;
 import org.eclipse.osee.framework.ui.plugin.util.Displays;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.dialog.ArtifactCheckTreeDialog;
@@ -127,11 +129,28 @@ public class ArtifactImpactToActionSearchItem extends XNavigateItemAction {
             Collection<TransactionData> transactions =
                   RevisionManager.getInstance().getTransactionsPerArtifact(srchArt, true);
             int y = 1;
-            boolean found = false;
             StringBuffer sb = new StringBuffer();
             sb.append(AHTML.beginMultiColumnTable(95, 1));
             sb.append(AHTML.addHeaderRowMultiColumnTable(new String[] {"Type", "HRID", "Title"}));
+
+            // Check for changes on working branches
+            boolean workingBranchesFound = false;
+            for (Branch branch : RevisionManager.getInstance().getOtherEdittedBranches(srchArt)) {
+               Artifact assocArt = branch.getAssociatedArtifact();
+               if (assocArt != null && !assocArt.equals(SkynetAuthentication.getUser(UserEnum.NoOne))) {
+                  sb.append(AHTML.addRowMultiColumnTable(new String[] {
+                        assocArt.getArtifactTypeName() + " (working branch)", assocArt.getHumanReadableId(),
+                        assocArt.getDescriptiveName()}));
+               } else {
+                  sb.append(AHTML.addRowMultiColumnTable(new String[] {"Branch", "", branch.getBranchName()}));
+               }
+               workingBranchesFound = true;
+            }
+            if (!workingBranchesFound) {
+               sb.append(AHTML.addRowSpanMultiColumnTable("No Impacting Working Branches Found", 3));
+            }
             // Add committed changes
+            boolean committedChanges = false;
             for (TransactionData transData : transactions) {
                String transStr = String.format("Tranaction %d/%d", y++, transactions.size());
                System.out.println(transStr);
@@ -141,23 +160,15 @@ public class ArtifactImpactToActionSearchItem extends XNavigateItemAction {
                         ArtifactQuery.getArtifactFromId(transData.getCommitArtId(),
                               BranchPersistenceManager.getAtsBranch());
                   if (assocArt instanceof TeamWorkFlowArtifact) {
-                     sb.append(AHTML.addRowMultiColumnTable(new String[] {assocArt.getArtifactTypeName(),
-                           assocArt.getHumanReadableId(), assocArt.getDescriptiveName()}));
-                     found = true;
+                     sb.append(AHTML.addRowMultiColumnTable(new String[] {
+                           assocArt.getArtifactTypeName() + " (committed)", assocArt.getHumanReadableId(),
+                           assocArt.getDescriptiveName()}));
+                     committedChanges = true;
                   }
                }
             }
-            if (!found) {
+            if (!committedChanges) {
                sb.append(AHTML.addRowSpanMultiColumnTable("No Impacting Actions Found", 3));
-            }
-            boolean workingBranchesFound = false;
-            // Check for changes on working branches
-            for (Branch branch : RevisionManager.getInstance().getOtherEdittedBranches(srchArt)) {
-               sb.append(AHTML.addRowMultiColumnTable(new String[] {"Branch", "", branch.getBranchName()}));
-               workingBranchesFound = true;
-            }
-            if (!workingBranchesFound) {
-               sb.append(AHTML.addRowSpanMultiColumnTable("No Impacting Working Branches Found", 3));
             }
             sb.append(AHTML.endMultiColumnTable());
             rd.addRaw(sb.toString().replaceAll("\n", ""));
