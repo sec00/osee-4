@@ -98,7 +98,7 @@ public class ArtifactImpactToActionSearchItem extends XNavigateItemAction {
                      BranchPersistenceManager.getInstance().getDefaultBranch());
          final Set<Artifact> processArts = new HashSet<Artifact>();
          if (srchArts.size() == 0) return;
-         if (srchArts.size() > 0) {
+         if (srchArts.size() > 1) {
             Displays.ensureInDisplayThread(new Runnable() {
                /* (non-Javadoc)
                 * @see java.lang.Runnable#run()
@@ -147,16 +147,20 @@ public class ArtifactImpactToActionSearchItem extends XNavigateItemAction {
                   }
                }
             }
+            if (!found) {
+               sb.append(AHTML.addRowSpanMultiColumnTable("No Impacting Actions Found", 3));
+            }
+            boolean workingBranchesFound = false;
             // Check for changes on working branches
             for (Branch branch : RevisionManager.getInstance().getOtherEdittedBranches(srchArt)) {
                sb.append(AHTML.addRowMultiColumnTable(new String[] {"Branch", "", branch.getBranchName()}));
-               found = true;
+               workingBranchesFound = true;
+            }
+            if (!workingBranchesFound) {
+               sb.append(AHTML.addRowSpanMultiColumnTable("No Impacting Working Branches Found", 3));
             }
             sb.append(AHTML.endMultiColumnTable());
-            if (found)
-               rd.addRaw(sb.toString().replaceAll("\n", ""));
-            else
-               rd.log("  No Action Changes Found");
+            rd.addRaw(sb.toString().replaceAll("\n", ""));
          }
       }
    }
