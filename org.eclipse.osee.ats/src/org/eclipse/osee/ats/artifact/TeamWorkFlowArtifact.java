@@ -36,8 +36,8 @@ import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
 import org.eclipse.osee.framework.skynet.core.artifact.IATSStateMachineArtifact;
 import org.eclipse.osee.framework.skynet.core.artifact.search.Active;
 import org.eclipse.osee.framework.skynet.core.exception.ArtifactDoesNotExist;
-import org.eclipse.osee.framework.skynet.core.exception.MultipleBranchesExist;
 import org.eclipse.osee.framework.skynet.core.exception.MultipleAttributesExist;
+import org.eclipse.osee.framework.skynet.core.exception.MultipleBranchesExist;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.transaction.AbstractSkynetTxTemplate;
 import org.eclipse.osee.framework.skynet.core.utility.Artifacts;
@@ -407,6 +407,14 @@ public class TeamWorkFlowArtifact extends TaskableStateMachineArtifact implement
    @Override
    public StateMachineArtifact getParentSMA() throws SQLException {
       return null;
+   }
+
+   /* (non-Javadoc)
+    * @see org.eclipse.osee.ats.artifact.StateMachineArtifact#getParentAtsArtifact()
+    */
+   @Override
+   public Artifact getParentAtsArtifact() throws SQLException {
+      return getParentActionArtifact();
    }
 
    /*

@@ -836,7 +836,7 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IWorld
     * 
     * @see org.eclipse.osee.framework.skynet.core.artifact.IATSArtifact#getParentSMArt()
     */
-   public Artifact getParentSMArt() throws SQLException {
+   public Artifact getParentAtsArtifact() throws SQLException {
       return getParentSMA();
    }
 
