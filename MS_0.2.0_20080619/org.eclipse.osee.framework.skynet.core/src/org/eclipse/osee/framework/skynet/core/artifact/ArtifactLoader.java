@@ -99,6 +99,46 @@ public final class ArtifactLoader {
    }
 
    /**
+    * loads or reloads artifacts based on pre-populated query id
+    * 
+    * @param queryId
+    * @param loadLevel
+    * @param confirmer
+    * @param insertParameters
+    * @param reload
+    * @return
+    * @throws SQLException
+    */
+   public static List<Artifact> loadArtifactsFromQuery(int queryId, ArtifactLoad loadLevel, ISearchConfirmer confirmer, int fetchSize, boolean reload) throws SQLException {
+      List<Artifact> artifacts = new ArrayList<Artifact>(fetchSize);
+      try {
+         ConnectionHandlerStatement chStmt = null;
+         try {
+            chStmt = ConnectionHandler.runPreparedQuery(fetchSize, SELECT_ARTIFACTS, SQL3DataType.INTEGER, queryId);
+            ResultSet rSet = chStmt.getRset();
+            while (chStmt.next()) {
+               artifacts.add(retrieveShallowArtifact(rSet, reload));
+            }
+         } finally {
+            DbUtil.close(chStmt);
+         }
+
+         if (confirmer == null || confirmer.canProceed(artifacts.size())) {
+            loadArtifactsData(queryId, artifacts, loadLevel, reload);
+         }
+      } catch (OseeCoreException ex) {
+         throw new SQLException(ex);
+      } finally {
+         try {
+            clearQuery(queryId);
+         } catch (OseeDataStoreException ex) {
+            throw new SQLException(ex);
+         }
+      }
+      return artifacts;
+   }
+
+   /**
     * loads or reloads artifacts based on artifact ids and branch ids in the insertParameters
     * 
     * @param queryId
@@ -110,37 +150,15 @@ public final class ArtifactLoader {
     * @throws SQLException
     */
    public static List<Artifact> loadArtifacts(int queryId, ArtifactLoad loadLevel, ISearchConfirmer confirmer, Collection<Object[]> insertParameters, boolean reload) throws SQLException {
-      int numberLoaded = 0;
+      List<Artifact> artifacts = Collections.emptyList();
       if (insertParameters.size() > 0) {
          long time = System.currentTimeMillis();
          try {
             selectArtifacts(insertParameters);
-            List<Artifact> artifacts = new ArrayList<Artifact>(insertParameters.size());
-            ConnectionHandlerStatement chStmt = null;
-
-            try {
-               chStmt =
-                     ConnectionHandler.runPreparedQuery(insertParameters.size(), SELECT_ARTIFACTS,
-                           SQL3DataType.INTEGER, queryId);
-               ResultSet rSet = chStmt.getRset();
-
-               while (rSet.next()) {
-                  artifacts.add(retrieveShallowArtifact(rSet, reload));
-               }
-            } finally {
-               DbUtil.close(chStmt);
-            }
-
-            if (confirmer == null || confirmer.canProceed(insertParameters.size())) {
-               loadArtifactsData(queryId, artifacts, loadLevel, reload);
-            }
-            numberLoaded = artifacts.size();
-            return artifacts;
-         } catch (OseeCoreException ex) {
-            throw new SQLException(ex);
+            artifacts = loadArtifactsFromQuery(queryId, loadLevel, confirmer, insertParameters.size(), reload);
          } finally {
             OseeLog.log(SkynetActivator.class, Level.FINE, String.format(
-                  "Artifact Load Time [%s] for [%d] artifacts. ", Lib.getElapseString(time), numberLoaded),
+                  "Artifact Load Time [%s] for [%d] artifacts. ", Lib.getElapseString(time), artifacts.size()),
                   new Exception());
             try {
                clearQuery(queryId);
@@ -149,7 +167,7 @@ public final class ArtifactLoader {
             }
          }
       }
-      return Collections.emptyList();
+      return artifacts;
    }
 
    /**
