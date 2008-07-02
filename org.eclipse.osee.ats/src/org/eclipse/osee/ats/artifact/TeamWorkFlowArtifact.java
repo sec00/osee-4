@@ -39,6 +39,7 @@ import org.eclipse.osee.framework.skynet.core.exception.ArtifactDoesNotExist;
 import org.eclipse.osee.framework.skynet.core.exception.MultipleAttributesExist;
 import org.eclipse.osee.framework.skynet.core.exception.MultipleBranchesExist;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
+import org.eclipse.osee.framework.skynet.core.relation.IRelationEnumeration;
 import org.eclipse.osee.framework.skynet.core.transaction.AbstractSkynetTxTemplate;
 import org.eclipse.osee.framework.skynet.core.utility.Artifacts;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
@@ -56,6 +57,7 @@ public class TeamWorkFlowArtifact extends TaskableStateMachineArtifact implement
 
    public static String ARTIFACT_NAME = "Team Workflow";
    private XActionableItemsDam actionableItemsDam;
+   private Set<IRelationEnumeration> nonVersionRelations;
    public static enum DefaultTeamState {
 
       Endorse, Analyze, Authorize, Implement, Completed, Cancelled
@@ -83,6 +85,19 @@ public class TeamWorkFlowArtifact extends TaskableStateMachineArtifact implement
    @Override
    public String getArtifactSuperTypeName() {
       return "Team Workflow";
+   }
+
+   @Override
+   public boolean hasChildren() throws OseeCoreException {
+      if (nonVersionRelations == null) {
+         nonVersionRelations = new HashSet<IRelationEnumeration>();
+         nonVersionRelations.addAll(getSmaRelations());
+         nonVersionRelations.remove(AtsRelation.TeamWorkflowTargetedForVersion_Version);
+      }
+      for (IRelationEnumeration iRelationEnumeration : nonVersionRelations) {
+         if (getRelatedArtifactsCount(iRelationEnumeration) > 0) return true;
+      }
+      return false;
    }
 
    /*
