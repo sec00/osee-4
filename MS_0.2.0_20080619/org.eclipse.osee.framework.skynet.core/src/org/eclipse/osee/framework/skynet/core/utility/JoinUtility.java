@@ -57,6 +57,7 @@ public class JoinUtility {
       private final int queryId;
       protected List<IJoinRow> entries;
       private boolean wasStored;
+      private int storedSize;
 
       public JoinQueryEntry(String insertSql, String deleteSql) {
          this.wasStored = false;
@@ -64,14 +65,15 @@ public class JoinUtility {
          this.insertSql = insertSql;
          this.queryId = getNewQueryId();
          this.entries = new ArrayList<IJoinRow>();
+         this.storedSize = -1;
       }
 
       public boolean isEmpty() {
-         return entries.isEmpty();
+         return this.wasStored != true ? entries.isEmpty() : this.storedSize > 0;
       }
 
       public int size() {
-         return entries.size();
+         return this.wasStored != true ? entries.size() : this.storedSize;
       }
 
       public int getQueryId() {
@@ -85,7 +87,9 @@ public class JoinUtility {
                data.add(joinArray.toArray());
             }
             ConnectionHandler.runPreparedUpdate(connection, insertSql, data);
+            this.storedSize = this.entries.size();
             this.wasStored = true;
+            this.entries.clear();
          } else {
             throw new SQLException("Cannot store query id twice");
          }
@@ -96,7 +100,6 @@ public class JoinUtility {
          if (queryId != -1) {
             updated = ConnectionHandler.runPreparedUpdate(connection, deleteSql, SQL3DataType.INTEGER, queryId);
          }
-         entries.clear();
          return updated;
       }
 
@@ -107,10 +110,16 @@ public class JoinUtility {
       public int delete() throws SQLException {
          return delete(ConnectionHandler.getConnection());
       }
+
+      public String toString() {
+         return String.format("id: [%s] entrySize: [%d]", getQueryId(), size());
+      }
    }
 
    private interface IJoinRow {
       public Object[] toArray();
+
+      public String toString();
    }
 
    public static final class TransactionJoinQuery extends JoinQueryEntry {
@@ -128,6 +137,10 @@ public class JoinUtility {
             Timestamp insertTime = GlobalTime.GreenwichMeanTimestamp();
             return new Object[] {SQL3DataType.INTEGER, getQueryId(), SQL3DataType.TIMESTAMP, insertTime,
                   SQL3DataType.INTEGER, gammaId, SQL3DataType.INTEGER, transactionId};
+         }
+
+         public String toString() {
+            return String.format("gamma_id=%d, tx_id=%d", gammaId, transactionId);
          }
       }
 
@@ -156,6 +169,10 @@ public class JoinUtility {
             return new Object[] {SQL3DataType.INTEGER, getQueryId(), SQL3DataType.TIMESTAMP, insertTime,
                   SQL3DataType.INTEGER, art_id, SQL3DataType.INTEGER, branch_id};
          }
+
+         public String toString() {
+            return String.format("art_id=%d, branch_id=%d", art_id, branch_id);
+         }
       }
 
       private ArtifactJoinQuery() {
@@ -180,6 +197,10 @@ public class JoinUtility {
             Timestamp insertTime = GlobalTime.GreenwichMeanTimestamp();
             return new Object[] {SQL3DataType.INTEGER, getQueryId(), SQL3DataType.TIMESTAMP, insertTime,
                   SQL3DataType.VARCHAR, value};
+         }
+
+         public String toString() {
+            return String.format("attr_value=%s", value);
          }
       }
 
