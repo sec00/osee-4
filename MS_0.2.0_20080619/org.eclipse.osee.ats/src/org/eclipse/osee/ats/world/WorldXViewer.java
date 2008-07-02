@@ -861,9 +861,11 @@ public class WorldXViewer extends XViewer implements IEventReceiver {
             if (art != null && (art instanceof IATSArtifact)) {
                modArts.add(art);
                try {
-                  if (art instanceof StateMachineArtifact) {
-                     StateMachineArtifact sma = ((StateMachineArtifact) art).getParentSMA();
-                     if (sma != null) modArts.add(sma);
+                  if (art instanceof IATSArtifact) {
+                     Artifact parentArt = ((IATSArtifact) art).getParentAtsArtifact();
+                     if (parentArt != null) {
+                        modArts.add(parentArt);
+                     }
                   }
                } catch (Exception ex) {
                   // do nothing
@@ -877,7 +879,9 @@ public class WorldXViewer extends XViewer implements IEventReceiver {
          modArts.clear();
          for (int artId : artIds) {
             Artifact art = ArtifactCache.getActive(artId, AtsPlugin.getAtsBranch());
-            if (art != null && (art instanceof IATSArtifact)) modArts.add(art);
+            if (art != null && (art instanceof IATSArtifact)) {
+               modArts.add(art);
+            }
          }
          if (modArts.size() > 0) remove(modArts.toArray());
 
@@ -888,9 +892,11 @@ public class WorldXViewer extends XViewer implements IEventReceiver {
             if (art != null && (art instanceof IATSArtifact)) {
                modArts.add(art);
                try {
-                  if (art instanceof StateMachineArtifact) {
-                     StateMachineArtifact sma = ((StateMachineArtifact) art).getParentSMA();
-                     if (sma != null) modArts.add(sma);
+                  if (art instanceof IATSArtifact) {
+                     Artifact parentArt = ((IATSArtifact) art).getParentAtsArtifact();
+                     if (parentArt != null) {
+                        modArts.add(parentArt);
+                     }
                   }
                } catch (Exception ex) {
                   // do nothing
