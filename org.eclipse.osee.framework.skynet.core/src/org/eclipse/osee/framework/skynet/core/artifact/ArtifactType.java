@@ -15,6 +15,7 @@ import static org.eclipse.osee.framework.skynet.core.change.ChangeType.INCOMING;
 import static org.eclipse.osee.framework.skynet.core.change.ChangeType.OUTGOING;
 import static org.eclipse.osee.framework.skynet.core.change.ModificationType.CHANGE;
 import static org.eclipse.osee.framework.skynet.core.change.ModificationType.DELETED;
+import static org.eclipse.osee.framework.skynet.core.change.ModificationType.MERGED;
 import static org.eclipse.osee.framework.skynet.core.change.ModificationType.NEW;
 
 import java.io.IOException;
@@ -55,6 +56,7 @@ public class ArtifactType implements Serializable, Comparable<ArtifactType> {
    private static final ImageDescriptor incDeleted = SkynetActivator.getInstance().getImageDescriptor("inc_delete.gif");
    private static final ImageDescriptor conChange = SkynetActivator.getInstance().getImageDescriptor("con_change.gif");
    private static final ImageDescriptor conDeleted = SkynetActivator.getInstance().getImageDescriptor("con_delete.gif");
+   private static final ImageDescriptor merge = SkynetActivator.getInstance().getImageDescriptor("branch_merge.gif");
    private static final ImageDescriptor conChangeSmall =
          SkynetActivator.getInstance().getImageDescriptor("con_change_2.gif");
    private static final ImageDescriptor conDeletedSmall =
@@ -257,6 +259,7 @@ public class ArtifactType implements Serializable, Comparable<ArtifactType> {
          imageRegistry.put(BASE + INCOMING + NEW, new OverlayImage(imageRegistry.get(BASE), incNew));
          imageRegistry.put(BASE + OUTGOING + DELETED, new OverlayImage(imageRegistry.get(BASE), outDeleted));
          imageRegistry.put(BASE + OUTGOING + CHANGE, new OverlayImage(imageRegistry.get(BASE), outChange));
+         imageRegistry.put(BASE + OUTGOING + MERGED, new OverlayImage(imageRegistry.get(BASE), merge));
          imageRegistry.put(BASE + OUTGOING + NEW, new OverlayImage(imageRegistry.get(BASE), outNew));
          imageRegistry.put(BASE + CONFLICTING + DELETED, new OverlayImage(imageRegistry.get(BASE), conDeleted));
          imageRegistry.put(BASE + CONFLICTING + CHANGE, new OverlayImage(imageRegistry.get(BASE), conChange));
