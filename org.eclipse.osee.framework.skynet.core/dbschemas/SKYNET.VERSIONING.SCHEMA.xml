@@ -440,6 +440,13 @@
 	<!--                                                            -->
 	<!-- __________________________________________________________ -->
 	   
+	<Table name="OSEE_SEARCH_TAGS" schema="OSEE">
+		<Column id="ATTR_ID" defaultValue="not null" type="INTEGER" />
+		<Column id="GAMMA_ID" defaultValue="not null" type="BIGINT" />
+		<Column id="CODED_TAG_ID" defaultValue="not null" type="BIGINT" />
+		<Constraint schema="OSEE" id="OSEE_SEARCH_TAGS__PK" type="PRIMARY KEY" appliesTo="ATTR_ID, GAMMA_ID" />
+	</Table>
+	   
    <Table name="OSEE_TAG_ART_MAP" schema="OSEE">
 		<Column id="TAG_ID" defaultValue="not null" type="INTEGER" />
 		<Column id="ART_ID" defaultValue="not null" type="INTEGER" />
