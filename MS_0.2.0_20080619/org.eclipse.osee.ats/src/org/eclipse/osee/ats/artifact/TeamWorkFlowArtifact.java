@@ -74,6 +74,7 @@ public class TeamWorkFlowArtifact extends TaskableStateMachineArtifact implement
    public TeamWorkFlowArtifact(ArtifactFactory parentFactory, String guid, String humanReadableId, Branch branch, ArtifactType artifactType) {
       super(parentFactory, guid, humanReadableId, branch, artifactType);
       registerSMARelation(AtsRelation.TeamWorkflowToReview_Review);
+      // register targeted version so ATS Editor can dirty when target changed
       registerSMARelation(AtsRelation.TeamWorkflowTargetedForVersion_Version);
    }
 
