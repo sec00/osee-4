@@ -28,6 +28,7 @@ import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.revision.RevisionManager;
 import org.eclipse.osee.framework.skynet.core.revision.TransactionData;
+import org.eclipse.osee.framework.ui.plugin.util.Displays;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.dialog.ArtifactCheckTreeDialog;
 import org.eclipse.osee.framework.ui.skynet.widgets.dialog.EntryDialog;
@@ -60,7 +61,7 @@ public class ArtifactImpactToActionSearchItem extends XNavigateItemAction {
       EntryDialog ed =
             new EntryDialog(
                   getName(),
-                  "Searching on current default branch \"" + BranchPersistenceManager.getInstance().getDefaultBranch().getBranchName() + "\"\n\nEnter Artifact Name (or string) to search");
+                  "Searching on current default branch \"" + BranchPersistenceManager.getInstance().getDefaultBranch().getBranchName() + "\"\n\nEnter Artifact Name (or string) to search (no wildcards)");
       if (ed.open() == 0) {
          ActionToArtifactImpactJob job = new ActionToArtifactImpactJob(ed.getEntry());
          job.setUser(true);
@@ -92,24 +93,32 @@ public class ArtifactImpactToActionSearchItem extends XNavigateItemAction {
       }
 
       private void getMatrixItems() throws OseeCoreException, SQLException {
-         Collection<Artifact> srchArts =
+         final Collection<Artifact> srchArts =
                ArtifactQuery.getArtifactsFromName("%" + artifactName + "%",
                      BranchPersistenceManager.getInstance().getDefaultBranch());
-         Set<Artifact> processArts = new HashSet<Artifact>();
+         final Set<Artifact> processArts = new HashSet<Artifact>();
          if (srchArts.size() == 0) return;
          if (srchArts.size() > 0) {
-            ArtifactCheckTreeDialog dialog = new ArtifactCheckTreeDialog(srchArts);
-            dialog.setTitle(TITLE);
-            dialog.setMessage("Select Artifacts to Search");
-            if (dialog.open() == 0) {
-               processArts.addAll(dialog.getSelection());
-            }
+            Displays.ensureInDisplayThread(new Runnable() {
+               /* (non-Javadoc)
+                * @see java.lang.Runnable#run()
+                */
+               @Override
+               public void run() {
+                  ArtifactCheckTreeDialog dialog = new ArtifactCheckTreeDialog(srchArts);
+                  dialog.setTitle(TITLE);
+                  dialog.setMessage("Select Artifacts to Search");
+                  if (dialog.open() == 0) {
+                     processArts.addAll(dialog.getSelection());
+                  }
+               }
+            }, true);
+
          } else {
             processArts.addAll(srchArts);
          }
          int x = 1;
-         rd.log("Searching for \"" + artifactName + "\"on current default branch \"" + BranchPersistenceManager.getInstance().getDefaultBranch().getBranchName() + "\"");
-         rd.log("Found " + processArts.size() + " matching artifacts.");
+         rd.log("Artifact Impact to Action for artifact(s) on default branch \"" + BranchPersistenceManager.getInstance().getDefaultBranch().getBranchName() + "\"");
          for (Artifact srchArt : processArts) {
             String str = String.format("Processing %d/%d - %s ", x++, processArts.size(), srchArt.getDescriptiveName());
             System.out.println(str);
