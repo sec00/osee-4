@@ -555,6 +555,7 @@ public class RevisionManager implements IEventReceiver {
    private void loadAttributeChanges(Branch sourceBranch, int transactionNumber, Set<Integer> artIds, ArrayList<Change> changes, Set<Integer> newAndDeletedArtifactIds) throws SQLException, BranchDoesNotExist, TransactionDoesNotExist {
       Map<Integer, Change> mightNeedWasValue = new HashMap<Integer, Change>();
       Map<Integer, ModificationType> artModTypes = new HashMap<Integer, ModificationType>();
+      Set<Integer> modifiedArtifacts = new HashSet<Integer>();
       ConnectionHandlerStatement connectionHandlerStatement = null;
       ModificationType artModType;
       boolean hasBranch = sourceBranch != null;
@@ -605,6 +606,16 @@ public class RevisionManager implements IEventReceiver {
             }
 
             if (!newAndDeletedArtifactIds.contains(artId)) {
+               // Want to add an artifact changed item once if any attribute was modified && artifact was not
+               // NEW or DELETED
+               if (artModType == ModificationType.CHANGE && !modifiedArtifacts.contains(artId)) {
+                  ArtifactChanged artifactChanged =
+                        new ArtifactChanged(sourceBranch, artTypeId, sourceGamma, artId, toTransactionId,
+                              fromTransactionId, ModificationType.CHANGE, ChangeType.OUTGOING);
+
+                  changes.add(artifactChanged);
+                  modifiedArtifacts.add(artId);
+               }
                attributeChanged =
                      new AttributeChanged(sourceBranch, artTypeId, sourceGamma, artId, toTransactionId,
                            fromTransactionId, hasBranch ? ModificationType.NEW : ModificationType.getMod(modType),
