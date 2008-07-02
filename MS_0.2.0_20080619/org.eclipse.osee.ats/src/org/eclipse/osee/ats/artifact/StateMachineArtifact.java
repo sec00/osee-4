@@ -1194,4 +1194,11 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IWorld
       return getPercentCompleteSMATotal();
    }
 
+   /**
+    * @return the smaRelations
+    */
+   public Set<IRelationEnumeration> getSmaRelations() {
+      return smaRelations;
+   }
+
 }
