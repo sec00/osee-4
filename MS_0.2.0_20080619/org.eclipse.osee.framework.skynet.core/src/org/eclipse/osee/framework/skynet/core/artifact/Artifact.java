@@ -1074,15 +1074,6 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
       ArtifactPersistenceManager.getInstance().purgeArtifactFromBranch(this);
    }
 
-   /**
-    * Remove artifact from the database
-    * 
-    * @throws SQLException
-    */
-   public void purge() throws SQLException {
-      ArtifactPersistenceManager.purgeArtifact(this);
-   }
-
    public boolean isDeleted() {
       return deleted;
    }
