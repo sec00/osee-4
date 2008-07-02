@@ -707,7 +707,7 @@ public class WorldXViewer extends XViewer implements IEventReceiver {
                         protected void handleTxWork() throws OseeCoreException, SQLException {
                            for (Artifact loopArt : deleteArts) {
                               if (purge)
-                                 loopArt.purge();
+                                 loopArt.purgeFromBranch();
                               else {
                                  loopArt.delete();
                               }
