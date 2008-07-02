@@ -14,6 +14,7 @@ package org.eclipse.osee.framework.skynet.core.conflict;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.eclipse.osee.framework.plugin.core.config.ConfigUtil;
 import org.eclipse.osee.framework.skynet.core.SkynetActivator;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -205,7 +206,6 @@ public class ArtifactConflict extends Conflict {
 
    public void revertSourceArtifact() throws OseeCoreException, SQLException {
       ArtifactPersistenceManager.getInstance().revertArtifact(getSourceArtifact());
-      getSourceArtifact().reloadArtifact();
    }
 
    public int getMergeGammaId() throws OseeCoreException, SQLException {
