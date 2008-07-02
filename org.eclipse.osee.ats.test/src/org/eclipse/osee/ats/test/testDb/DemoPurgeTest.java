@@ -87,12 +87,12 @@ public class DemoPurgeTest extends TestCase {
 
       // Purge Action, Workflow and Tasks
       for (Artifact artifact : artsToPurge) {
-         artifact.purge();
+         artifact.purgeFromBranch();
       }
 
       // Count rows and check that same as when began
       getTableCounts(postPurgeCount);
-      checkThatEqual(preCreateActionCount, postCreateActionCount);
+      checkThatEqual(preCreateActionCount, postPurgeCount);
 
       System.out.println("End Demo Purge Test.");
    }
@@ -105,7 +105,8 @@ public class DemoPurgeTest extends TestCase {
 
    private void checkThatEqual(Map<String, Integer> prevTableCount, Map<String, Integer> postTableCount) {
       for (String tableName : prevTableCount.keySet()) {
-         assertTrue(postTableCount.get(tableName) == prevTableCount.get(tableName));
+         assertTrue(String.format("%s post[%d] vs pre[%d]", tableName, postTableCount.get(tableName),
+               prevTableCount.get(tableName)), postTableCount.get(tableName).equals(prevTableCount.get(tableName)));
       }
    }
 
