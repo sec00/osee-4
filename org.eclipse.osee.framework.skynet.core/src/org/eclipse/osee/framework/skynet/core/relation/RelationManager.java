@@ -102,7 +102,7 @@ public class RelationManager {
       if (artifact != null) {// && (!artifact.isLinksLoaded() || !relation.isInDb())) {
          List<RelationLink> artifactsRelations = artifactToRelations.get(artifact);
          if (artifactsRelations == null) {
-            artifactsRelations = Collections.synchronizedList(new ArrayList<RelationLink>(4));
+            artifactsRelations = new CopyOnWriteArrayList<RelationLink>();
             artifactToRelations.put(artifact, artifactsRelations);
          }
          if (artifactsRelations.contains(relation)) {
