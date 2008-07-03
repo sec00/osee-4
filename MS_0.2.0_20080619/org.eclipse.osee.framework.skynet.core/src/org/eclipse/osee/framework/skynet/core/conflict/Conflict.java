@@ -31,7 +31,7 @@ import org.eclipse.swt.graphics.Image;
  */
 public abstract class Conflict implements IAdaptable {
    public static enum Status {
-      UNTOUCHED(1), EDITED(2), RESOLVED(3), OUT_OF_DATE(4), NOT_RESOLVABLE(5), COMMITED(6);
+      UNTOUCHED(1), EDITED(2), RESOLVED(3), OUT_OF_DATE(4), NOT_RESOLVABLE(5), COMMITED(6), INFORMATIONAL(7);
       private final int value;
 
       Status(int value) {
@@ -77,6 +77,9 @@ public abstract class Conflict implements IAdaptable {
    protected Branch mergeBranch;
    protected Branch sourceBranch;
    protected Branch destBranch;
+
+   private String sourceDiffFile = null;
+   private String destDiffFile = null;
 
    /**
     * @param sourceGamma
@@ -278,6 +281,10 @@ public abstract class Conflict implements IAdaptable {
       return status.equals(Status.RESOLVED);
    }
 
+   public boolean statusCommited() {
+      return status.equals(Status.COMMITED);
+   }
+
    public boolean statusEdited() {
       return status.equals(Status.EDITED);
    }
@@ -288,6 +295,10 @@ public abstract class Conflict implements IAdaptable {
 
    public boolean statusNotResolvable() {
       return status.equals(Status.NOT_RESOLVABLE);
+   }
+
+   public boolean statusInformational() {
+      return status.equals(Status.INFORMATIONAL);
    }
 
    public int getMergeBranchID() {
@@ -306,6 +317,34 @@ public abstract class Conflict implements IAdaptable {
       } else if (status.equals(Conflict.Status.OUT_OF_DATE)) {
          setStatus(Conflict.Status.RESOLVED);
       }
+   }
+
+   /**
+    * @return the sourceDiffFile
+    */
+   public String getSourceDiffFile() {
+      return sourceDiffFile;
+   }
+
+   /**
+    * @param sourceDiffFile the sourceDiffFile to set
+    */
+   public void setSourceDiffFile(String sourceDiffFile) {
+      this.sourceDiffFile = sourceDiffFile;
+   }
+
+   /**
+    * @return the destDiffFile
+    */
+   public String getDestDiffFile() {
+      return destDiffFile;
+   }
+
+   /**
+    * @param destDiffFile the destDiffFile to set
+    */
+   public void setDestDiffFile(String destDiffFile) {
+      this.destDiffFile = destDiffFile;
    }
 
    public abstract Image getImage() throws SQLException;

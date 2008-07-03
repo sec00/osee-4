@@ -587,6 +587,7 @@
 		<Column id="SOURCE_BRANCH_ID" defaultValue="not null" type="INTEGER" />
 		<Column id="DEST_BRANCH_ID" defaultValue="not null" type="INTEGER" />
 		<Column id="MERGE_BRANCH_ID" defaultValue="not null" type="INTEGER" />
+		<Column id="TRANSACTION_ID" type="INTEGER" />
 		<Constraint schema="OSEE" id="OSEE_BRANCH_DEF__ODM_FK" type="FOREIGN KEY" appliesTo="MERGE_BRANCH_ID">
 			<References schema="OSEE" table="OSEE_DEFINE_BRANCH" column="BRANCH_ID" onDelete="CASCADE" />
 		</Constraint>
