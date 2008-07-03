@@ -41,18 +41,18 @@ import org.eclipse.swt.widgets.Display;
 /**
  * @author Donald G. Dunne
  */
-public class ValidateTargetedForWorkflows extends XNavigateItemAutoRunAction implements IAutoRunTask {
+public class ValidateWorkflows extends XNavigateItemAutoRunAction implements IAutoRunTask {
 
    boolean fixIt = false;
 
    /**
     * @param parent
     */
-   public ValidateTargetedForWorkflows(XNavigateItem parent) {
-      super(parent, "Validate Targeted-For Workflows have 0 or 1 version.");
+   public ValidateWorkflows(XNavigateItem parent) {
+      super(parent, "Validate Workflows");
    }
 
-   public ValidateTargetedForWorkflows() {
+   public ValidateWorkflows() {
       this(null);
    }
 
@@ -151,7 +151,7 @@ public class ValidateTargetedForWorkflows extends XNavigateItemAutoRunAction imp
     * @see org.eclipse.osee.framework.ui.skynet.autoRun.IAutoRunTask#getDescription()
     */
    public String getDescription() {
-      return getName();
+      return "Validate Targeted-For Workflows have 0 or 1 version.";
    }
 
    /* (non-Javadoc)

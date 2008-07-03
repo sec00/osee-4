@@ -277,7 +277,7 @@
          id="TeamWorkflowsHaveZeroOrOneVersion"
          point="org.eclipse.osee.framework.skynet.core.AutoRunTask">
       <AutoRunTask
-            classname="org.eclipse.osee.ats.health.ValidateTargetedForWorkflows">
+            classname="org.eclipse.osee.ats.health.ValidateWorkflows">
       </AutoRunTask>
    </extension>
    <extension

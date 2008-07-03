@@ -32,7 +32,7 @@ import org.eclipse.osee.ats.artifact.TeamWorkflowExtensions;
 import org.eclipse.osee.ats.health.ValidateActions;
 import org.eclipse.osee.ats.health.ValidateAssignees;
 import org.eclipse.osee.ats.health.ValidateAttributeValues;
-import org.eclipse.osee.ats.health.ValidateTargetedForWorkflows;
+import org.eclipse.osee.ats.health.ValidateWorkflows;
 import org.eclipse.osee.ats.health.ValidateTasks;
 import org.eclipse.osee.ats.navigate.EmailTeamsItem.MemberType;
 import org.eclipse.osee.ats.report.ExtendedStatusReportItem;
@@ -271,7 +271,7 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
          new ValidateTasks(healthItems);
          new ValidateActions(healthItems);
          new ValidateAssignees(healthItems);
-         new ValidateTargetedForWorkflows(healthItems);
+         new ValidateWorkflows(healthItems);
          new ValidateAttributeValues(healthItems);
 
          // new ActionNavigateItem(adminItems, new XViewerViewAction());
