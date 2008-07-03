@@ -1316,12 +1316,9 @@ public class RevisionManager implements IEventReceiver {
       return transactions.getKey() != transactions.getValue();
    }
 
-   private static final String OTHER_EDIT_SQL_OLD =
+   private static final String OTHER_EDIT_SQL =
          "SELECT distinct(t3.branch_id) " + "FROM " + SkynetDatabase.ARTIFACT_VERSION_TABLE + " t1, " + "  " + SkynetDatabase.TRANSACTIONS_TABLE + " t2, " + "  " + SkynetDatabase.TRANSACTION_DETAIL_TABLE + " t3, " + "    (SELECT " + TRANSACTION_DETAIL_TABLE.min(
                "transaction_id", "min_tx_id") + ", branch_id " + "   FROM " + SkynetDatabase.TRANSACTION_DETAIL_TABLE + " " + "   GROUP BY branch_id) t4, " + "   osee_define_branch t5 " + "WHERE t1.art_id = ? " + " AND t1.gamma_id = t2.gamma_id " + " AND t2.transaction_id <> t4.min_tx_id " + " AND t2.transaction_id = t3.transaction_id " + " and t3.branch_id = t4.branch_id " + " and t4.branch_id <> ?" + " and t5.parent_branch_id = ?" + " and t4.branch_id = t5.branch_id" + " and t5.archived = 0";
-
-   private static final String OTHER_EDIT_SQL =
-         "SELECT distinct td2.branch_id FROM osee_define_txs tx1, osee_define_tx_details td2, osee_Define_artifact_version av3, osee_define_branch br4 WHERE tx1.transaction_id = td2.transaction_id AND tx1.gamma_id = av3.gamma_id AND br4.archived = 0 AND tx1.tx_current = 0  AND br4.branch_id = td2.branch_id AND av3.art_id = ?";
 
    /**
     * Returns all the other branches this artifact has been editted on, besides modifications to program branch.
@@ -1336,7 +1333,10 @@ public class RevisionManager implements IEventReceiver {
          ConnectionHandlerStatement chStmt = null;
 
          try {
-            chStmt = ConnectionHandler.runPreparedQuery(OTHER_EDIT_SQL, SQL3DataType.INTEGER, artifact.getArtId());
+            chStmt =
+                  ConnectionHandler.runPreparedQuery(OTHER_EDIT_SQL, SQL3DataType.INTEGER, artifact.getArtId(),
+                        SQL3DataType.INTEGER, artifact.getBranch().getBranchId(), SQL3DataType.INTEGER,
+                        artifact.getBranch().getParentBranchId());
 
             ResultSet rset = chStmt.getRset();
 
