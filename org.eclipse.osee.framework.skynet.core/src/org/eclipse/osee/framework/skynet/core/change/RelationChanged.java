@@ -12,6 +12,7 @@
 package org.eclipse.osee.framework.skynet.core.change;
 
 import java.sql.SQLException;
+
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactCache;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
@@ -156,7 +157,7 @@ public class RelationChanged extends Change {
     */
    @Override
    public String getName() throws IllegalArgumentException, ArtifactDoesNotExist, MultipleArtifactsExist, SQLException {
-      return getArtifactName() + " <-> " + getBArtifact().getDescriptiveName();
+      return getArtifactName() + " <-> " + getBArtifact().getInternalDescriptiveName();
    }
 
    /* (non-Javadoc)
