@@ -112,8 +112,9 @@ public class XMergeViewer extends XWidget implements IEventReceiver, IActionable
 
       xCommitViewer = new MergeXViewer(mainComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION, this);
       xCommitViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
-
-      xCommitViewer.setSorter(new MergeXViewerSorter(xCommitViewer));
+      XMergeLabelProvider labelProvider = new XMergeLabelProvider(xCommitViewer);
+      xCommitViewer.addLabelProvider(labelProvider);
+      xCommitViewer.setSorter(new MergeXViewerSorter(xCommitViewer, labelProvider));
       xCommitViewer.setContentProvider(new XMergeContentProvider(xCommitViewer));
       xCommitViewer.setLabelProvider(new XMergeLabelProvider(xCommitViewer));
       xCommitViewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -308,16 +309,21 @@ public class XMergeViewer extends XWidget implements IEventReceiver, IActionable
       setLabelError();
       refreshActionEnablement();
       int resolved = 0;
+      int informational = 0;
       if (conflicts != null && conflicts.length != 0) {
          for (Conflict conflict : conflicts) {
             if (conflict.statusResolved()) {
                resolved++;
             }
+            if (conflict.statusInformational()) {
+               informational++;
+            }
          }
          if (resolved == conflicts.length) {
             extraInfoLabel.setText(displayLabelText + CONFLICTS_RESOLVED);
          } else {
-            extraInfoLabel.setText(displayLabelText + "\nConflicts : " + conflicts.length + " <=> Resovled : " + resolved);
+            extraInfoLabel.setText(displayLabelText + "\nConflicts : " + (conflicts.length - informational) + " <=> Resovled : " + resolved + (informational == 0 ? " " : ("\nInformational Conflicts : " + informational)));
+
          }
       }
    }
@@ -441,19 +447,23 @@ public class XMergeViewer extends XWidget implements IEventReceiver, IActionable
       this.conflicts = conflicts;
       loadTable();
       int resolved = 0;
+      int informational = 0;
       for (Conflict conflict : conflicts) {
          if (conflict.statusResolved()) {
             resolved++;
+         }
+         if (conflict.statusInformational()) {
+            informational++;
          }
       }
       xCommitViewer.setConflicts(conflicts);
       if (conflicts != null && conflicts.length != 0) {
          displayLabelText =
                "Source Branch :  " + conflicts[0].getSourceBranch().getBranchName() + "\nDestination Branch :  " + conflicts[0].getDestBranch().getBranchName();
-         if (resolved == conflicts.length) {
+         if (resolved == (conflicts.length - informational)) {
             extraInfoLabel.setText(displayLabelText + CONFLICTS_RESOLVED);
          } else {
-            extraInfoLabel.setText(displayLabelText + "\nConflicts : " + conflicts.length + " <=> Resovled : " + resolved);
+            extraInfoLabel.setText(displayLabelText + "\nConflicts : " + (conflicts.length - informational) + " <=> Resovled : " + resolved + "\nInformational Conflicts : " + informational);
          }
 
       }

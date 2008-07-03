@@ -12,7 +12,6 @@
 package org.eclipse.osee.framework.ui.skynet.widgets.xmerge;
 
 import java.sql.SQLException;
-
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactPersistenceManager;
@@ -45,6 +44,8 @@ public class MergeUtility {
          "You can not change the value for a conflict that has been marked resolved or has already been commited.  Change the conflict status if the source branch has not been commited and you wish to modify the value.";
    public static final String ARTIFACT_DELETED_PROMPT =
          "This Artifact has been changed on the source branch, but has been deleted on the destination branch.  In order to commit this branch and resolve this conflict the Artifact will need to be reverted on the source branch.  \n\nReverting the artifact is irreversible and you will need to restart OSEE after reverting to see changes.";
+   public static final String INFORMATIONAL_CONFLICT =
+         "This Artifact has been deleted on the Source Branch, but has been changed on the destination branch.  This conflict is informational only and will not prevent your from commiting, however when you commit it will delete the artifact on the destination branch.";
 
    public static void clearValue(Conflict conflict, Shell shell, boolean prompt) throws SQLException, MultipleArtifactsExist, ArtifactDoesNotExist, Exception {
       if (conflict == null) return;
@@ -100,44 +101,43 @@ public class MergeUtility {
       showDiff(attrConflict, attrConflict.getSourceDestDiffFile());
    }
 
-   public static void showSourceCompareFile(AttributeConflict attrConflict) {
-      if (attrConflict == null) return;
-      if (attrConflict.getSourceDiffFile() == null) {
+   public static void showSourceCompareFile(Conflict conflict) {
+      if (conflict == null) return;
+      if (conflict.getSourceDiffFile() == null) {
          try {
             IRenderer renderer =
-                  RendererManager.getInstance().getBestRenderer(PresentationType.DIFF, attrConflict.getDestArtifact());
-            String diffFileName = "Source_Branch_Changes_For_Artifact_" + attrConflict.getArtifact().getGuid() + ".xml";
-            attrConflict.setSourceDiffFile(renderer.compare(getStartArtifact(attrConflict),
-                  attrConflict.getSourceArtifact(), "", null, diffFileName, false));
+                  RendererManager.getInstance().getBestRenderer(PresentationType.DIFF, conflict.getDestArtifact());
+            String diffFileName = "Source_Branch_Changes_For_Artifact_" + conflict.getArtifact().getGuid() + ".xml";
+            conflict.setSourceDiffFile(renderer.compare(getStartArtifact(conflict), conflict.getSourceArtifact(), "",
+                  null, diffFileName, false));
          } catch (Exception ex) {
             OSEELog.logException(MergeUtility.class, ex, false);
          }
       }
-      showDiff(attrConflict, attrConflict.getSourceDiffFile());
+      showDiff(conflict, conflict.getSourceDiffFile());
    }
 
-   public static void showDestCompareFile(AttributeConflict attrConflict) {
-      if (attrConflict == null) return;
-      if (attrConflict.getDestDiffFile() == null) {
+   public static void showDestCompareFile(Conflict conflict) {
+      if (conflict == null) return;
+      if (conflict.getDestDiffFile() == null) {
          try {
             IRenderer renderer =
-                  RendererManager.getInstance().getBestRenderer(PresentationType.DIFF, attrConflict.getDestArtifact());
+                  RendererManager.getInstance().getBestRenderer(PresentationType.DIFF, conflict.getDestArtifact());
             String diffFileName =
-                  "Destination_Branch_Changes_For_Artifact_" + attrConflict.getArtifact().getGuid() + ".xml";
-            attrConflict.setDestDiffFile(renderer.compare(getStartArtifact(attrConflict),
-                  attrConflict.getDestArtifact(), "", null, diffFileName, false));
+                  "Destination_Branch_Changes_For_Artifact_" + conflict.getArtifact().getGuid() + ".xml";
+            conflict.setDestDiffFile(renderer.compare(getStartArtifact(conflict), conflict.getDestArtifact(), "", null,
+                  diffFileName, false));
          } catch (Exception ex) {
             OSEELog.logException(MergeUtility.class, ex, false);
          }
       }
-      showDiff(attrConflict, attrConflict.getDestDiffFile());
+      showDiff(conflict, conflict.getDestDiffFile());
    }
 
-   private static Artifact getStartArtifact(AttributeConflict attrConflict) {
+   private static Artifact getStartArtifact(Conflict conflict) {
       try {
-         TransactionId id =
-               TransactionIdManager.getInstance().getStartEndPoint(attrConflict.getSourceBranch()).getKey();
-         return ArtifactPersistenceManager.getInstance().getArtifact(attrConflict.getArtifact().getGuid(), id);
+         TransactionId id = TransactionIdManager.getInstance().getStartEndPoint(conflict.getSourceBranch()).getKey();
+         return ArtifactPersistenceManager.getInstance().getArtifact(conflict.getArtifact().getGuid(), id);
 
       } catch (Exception ex) {
          OSEELog.logException(MergeUtility.class, ex, false);
@@ -145,12 +145,12 @@ public class MergeUtility {
       return null;
    }
 
-   private static void showDiff(AttributeConflict attrConflict, String diffFile) {
+   private static void showDiff(Conflict conflict, String diffFile) {
       try {
          IRenderer renderer =
-               RendererManager.getInstance().getBestRenderer(PresentationType.DIFF, attrConflict.getDestArtifact());
+               RendererManager.getInstance().getBestRenderer(PresentationType.DIFF, conflict.getDestArtifact());
          if (renderer instanceof FileSystemRenderer) {
-            ((FileSystemRenderer) renderer).getAssociatedProgram(attrConflict.getArtifact()).execute(diffFile);
+            ((FileSystemRenderer) renderer).getAssociatedProgram(conflict.getArtifact()).execute(diffFile);
          }
       } catch (Exception ex) {
          OSEELog.logException(MergeUtility.class, ex, false);
@@ -163,7 +163,7 @@ public class MergeUtility {
    public static boolean showArtifactDeletedConflict(Conflict conflict, Shell shell) {
       if (conflict.getConflictType().equals(ConflictType.ARTIFACT)) {
          MessageDialog dialog =
-               new MessageDialog(shell, "Unresovable Conflict", null, ARTIFACT_DELETED_PROMPT, 3, new String[] {
+               new MessageDialog(shell, "Unresovable Conflict", null, ARTIFACT_DELETED_PROMPT, 1, new String[] {
                      "Revert Source Artifact", "Handle Later"}, 1);
          if (dialog.open() == 0) {
             try {
@@ -174,6 +174,13 @@ public class MergeUtility {
             }
          }
       }
+      return false;
+   }
+
+   public static boolean showInformationalConflict(Shell shell) {
+      MessageDialog dialog =
+            new MessageDialog(shell, "Informational Conflict", null, INFORMATIONAL_CONFLICT, 2, new String[] {"OK"}, 1);
+      dialog.open();
       return false;
    }
 }

@@ -207,10 +207,12 @@ class CommitJob extends Job {
          //add in all merge branch changes over any other source branch changes.
          if (conflictManager.originalConflictsExist()) {
             for (Conflict conflict : conflictManager.getOriginalConflicts()) {
-               //               ConnectionHandler.runPreparedUpdateReturnCount(UPDATE_MERGE_TRANSACTIONS, SQL3DataType.INTEGER,
-               //                     conflict.getMergeGammaId(), SQL3DataType.INTEGER, newTransactionNumber, SQL3DataType.INTEGER,
-               //                     conflict.getSourceGamma());
-               conflict.setStatus(Conflict.Status.COMMITED);
+               if (!conflict.statusInformational()) {
+                  ConnectionHandler.runPreparedUpdateReturnCount(UPDATE_MERGE_TRANSACTIONS, SQL3DataType.INTEGER,
+                        conflict.getMergeGammaId(), SQL3DataType.INTEGER, newTransactionNumber, SQL3DataType.INTEGER,
+                        conflict.getSourceGamma());
+                  conflict.setStatus(Conflict.Status.COMMITED);
+               }
                //TODO add source, destination values for merge branch history
             }
             //insert transaction id into the branch table
