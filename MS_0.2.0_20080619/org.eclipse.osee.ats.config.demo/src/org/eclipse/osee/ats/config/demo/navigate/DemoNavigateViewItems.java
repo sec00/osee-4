@@ -26,7 +26,7 @@ import org.eclipse.osee.ats.config.demo.util.DemoTeams.Team;
 import org.eclipse.osee.ats.health.ValidateActions;
 import org.eclipse.osee.ats.health.ValidateAssignees;
 import org.eclipse.osee.ats.health.ValidateAttributeValues;
-import org.eclipse.osee.ats.health.ValidateTargetedForWorkflows;
+import org.eclipse.osee.ats.health.ValidateWorkflows;
 import org.eclipse.osee.ats.health.ValidateTasks;
 import org.eclipse.osee.ats.navigate.CreateNewVersionItem;
 import org.eclipse.osee.ats.navigate.IAtsNavigateItem;
@@ -142,7 +142,7 @@ public class DemoNavigateViewItems implements IAtsNavigateItem {
       new ValidateTasks(healthItems);
       new ValidateActions(healthItems);
       new ValidateAssignees(healthItems);
-      new ValidateTargetedForWorkflows(healthItems);
+      new ValidateWorkflows(healthItems);
       new ValidateAttributeValues(healthItems);
 
       XNavigateItem demoItems = new XNavigateItem(adminItems, "Demo Data");
