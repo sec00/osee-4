@@ -75,6 +75,11 @@ public class XMergeViewer extends XWidget implements IEventReceiver, IActionable
    private Label extraInfoLabel;
    private Conflict[] conflicts;
    private String displayLabelText;
+   private ToolItem openAssociatedArtifactItem;
+   private Branch sourceBranch;
+   private Branch destBranch;
+   private TransactionId tranId;
+   private MergeView mergeView;
    private final static String CONFLICTS_RESOLVED = "\nAll Conflicts Are Resolved";
 
    /**
@@ -139,11 +144,6 @@ public class XMergeViewer extends XWidget implements IEventReceiver, IActionable
       tree.setLinesVisible(true);
 
    }
-
-   private ToolItem openAssociatedArtifactItem;
-   private Branch sourceBranch;
-   private Branch destBranch;
-   private TransactionId tranId;
 
    private void refreshAssociatedArtifactItem(Branch sourceBranch) {
       try {
@@ -239,7 +239,7 @@ public class XMergeViewer extends XWidget implements IEventReceiver, IActionable
       item.setToolTipText("Refresh");
       item.addSelectionListener(new SelectionAdapter() {
          public void widgetSelected(SelectionEvent e) {
-            refreshTable();
+            setInputData(sourceBranch, destBranch, tranId, mergeView);
          }
       });
 
@@ -405,10 +405,11 @@ public class XMergeViewer extends XWidget implements IEventReceiver, IActionable
    /* (non-Javadoc)
     * @see org.eclipse.osee.framework.ui.skynet.widgets.IDamWidget#setArtifact(org.eclipse.osee.framework.skynet.core.artifact.Artifact, java.lang.String)
     */
-   public void setInputData(final Branch sourceBranch, final Branch destBranch, final TransactionId tranId, final MergeView mergeView) throws IllegalStateException, SQLException {
+   public void setInputData(final Branch sourceBranch, final Branch destBranch, final TransactionId tranId, final MergeView mergeView) {
       this.sourceBranch = sourceBranch;
       this.destBranch = destBranch;
       this.tranId = tranId;
+      this.mergeView = mergeView;
       extraInfoLabel.setText(LOADING);
       Job job = new Job("") {
          @Override
