@@ -50,16 +50,9 @@ import org.eclipse.osee.framework.ui.skynet.widgets.xnavigate.XNavigateComposite
  */
 public class AtsNavigateItemsToWorldViewTest extends TestCase {
 
-   private User kayJones;
-
-   /* (non-Javadoc)
-    * @see junit.framework.TestCase#setUp()
-    */
-   protected void setUp() throws Exception {
-      super.setUp();
+   public void testDemoDatabase() throws Exception {
       DemoTestUtil.setUpTest();
-      kayJones = DemoUsers.getDemoUser(DemoUsers.Kay_Jones);
-      assertTrue(kayJones != null);
+      assertTrue(DemoUsers.getDemoUser(DemoUsers.Kay_Jones) != null);
    }
 
    public void testMyWorld() throws Exception {
@@ -119,40 +112,48 @@ public class AtsNavigateItemsToWorldViewTest extends TestCase {
    }
 
    public void testOtherUsersWorld() throws Exception {
-      OSEELog.logInfo(AtsPlugin.class, "Testing User's items relating to " + kayJones, false);
+      OSEELog.logInfo(AtsPlugin.class,
+            "Testing User's items relating to " + DemoUsers.getDemoUser(DemoUsers.Kay_Jones), false);
       XNavigateItem item = NavigateTestUtil.getAtsNavigateItems("User's World").iterator().next();
-      runGeneralLoadingTest(item, ActionArtifact.class, 4, kayJones);
+      runGeneralLoadingTest(item, ActionArtifact.class, 4, DemoUsers.getDemoUser(DemoUsers.Kay_Jones));
    }
 
    public void testOtherUsersReviews() throws Exception {
-      runGeneralLoadingTest("User's Reviews - InWork", PeerToPeerReviewArtifact.class, 1, kayJones);
-      runGeneralLoadingTest("User's Reviews - All", PeerToPeerReviewArtifact.class, 2, kayJones);
+      runGeneralLoadingTest("User's Reviews - InWork", PeerToPeerReviewArtifact.class, 1,
+            DemoUsers.getDemoUser(DemoUsers.Kay_Jones));
+      runGeneralLoadingTest("User's Reviews - All", PeerToPeerReviewArtifact.class, 2,
+            DemoUsers.getDemoUser(DemoUsers.Kay_Jones));
    }
 
    public void testOtherUsersSubscribed() throws Exception {
-      runGeneralLoadingTest("User's Subscribed", TeamWorkFlowArtifact.class, 0, kayJones);
+      runGeneralLoadingTest("User's Subscribed", TeamWorkFlowArtifact.class, 0,
+            DemoUsers.getDemoUser(DemoUsers.Kay_Jones));
    }
 
    public void testOtherUsersTasks() throws Exception {
       runGeneralLoadingTest("User's Tasks (WorldView)", TaskArtifact.class, DemoDbTasks.getTaskTitles(true).size(),
-            kayJones);
+            DemoUsers.getDemoUser(DemoUsers.Kay_Jones));
    }
 
    public void testOtherUsersFavorites() throws Exception {
-      runGeneralLoadingTest("User's Favorites", TeamWorkFlowArtifact.class, 0, kayJones);
+      runGeneralLoadingTest("User's Favorites", TeamWorkFlowArtifact.class, 0,
+            DemoUsers.getDemoUser(DemoUsers.Kay_Jones));
    }
 
    public void testOtherUsersWorkflows() throws Exception {
-      runGeneralLoadingTest("User's Team Workflows", TeamWorkFlowArtifact.class, 7, kayJones);
+      runGeneralLoadingTest("User's Team Workflows", TeamWorkFlowArtifact.class, 7,
+            DemoUsers.getDemoUser(DemoUsers.Kay_Jones));
    }
 
    public void testOtherUsersOriginator() throws Exception {
-      runGeneralLoadingTest("User's Originator - InWork", PeerToPeerReviewArtifact.class, 0, kayJones);
-      runGeneralLoadingTest("User's Originator - All", PeerToPeerReviewArtifact.class, 1, kayJones);
+      runGeneralLoadingTest("User's Originator - InWork", PeerToPeerReviewArtifact.class, 0,
+            DemoUsers.getDemoUser(DemoUsers.Kay_Jones));
+      runGeneralLoadingTest("User's Originator - All", PeerToPeerReviewArtifact.class, 1,
+            DemoUsers.getDemoUser(DemoUsers.Kay_Jones));
    }
 
    public void testOtherUsersCompleted() throws Exception {
-      runGeneralLoadingTest("User's Completed", ActionArtifact.class, 0, kayJones);
+      runGeneralLoadingTest("User's Completed", ActionArtifact.class, 0, DemoUsers.getDemoUser(DemoUsers.Kay_Jones));
    }
 
    public void testGroupsSearch() throws Exception {
@@ -203,7 +204,7 @@ public class AtsNavigateItemsToWorldViewTest extends TestCase {
    }
 
    public void testUnReleasedTeamActionsSearch() throws Exception {
-      XNavigateItem item = NavigateTestUtil.getAtsNavigateItem("Un-Released Team Actions");
+      XNavigateItem item = NavigateTestUtil.getAtsNavigateItem("Un-Released Team Workflows");
       assertTrue(((SearchNavigateItem) item).getWorldSearchItem() instanceof UnReleasedTeamWorldSearchItem);
       ((UnReleasedTeamWorldSearchItem) (((SearchNavigateItem) item).getWorldSearchItem())).setSelectedTeamDefs(TeamDefinitionArtifact.getTeamDefinitions(Arrays.asList("SAW Code")));
       runGeneralLoadingTest(item, TeamWorkFlowArtifact.class, 3);
