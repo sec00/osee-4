@@ -126,21 +126,18 @@ public class ArtifactImpactToActionSearchItem extends XNavigateItemAction {
             System.out.println(str);
             rd.log("\n" + AHTML.bold(srchArt.getDescriptiveName()));
             monitor.subTask(str);
-            Collection<TransactionData> transactions =
-                  RevisionManager.getInstance().getTransactionsPerArtifact(srchArt, true);
             int y = 1;
             StringBuffer sb = new StringBuffer();
             sb.append(AHTML.beginMultiColumnTable(95, 1));
-            sb.append(AHTML.addHeaderRowMultiColumnTable(new String[] {"Type", "HRID", "Title"}));
+            sb.append(AHTML.addHeaderRowMultiColumnTable(new String[] {"Type", "Status", "HRID", "Title"}));
 
             // Check for changes on working branches
             boolean workingBranchesFound = false;
             for (Branch branch : RevisionManager.getInstance().getOtherEdittedBranches(srchArt)) {
                Artifact assocArt = branch.getAssociatedArtifact();
                if (assocArt != null && !assocArt.equals(SkynetAuthentication.getUser(UserEnum.NoOne))) {
-                  sb.append(AHTML.addRowMultiColumnTable(new String[] {
-                        assocArt.getArtifactTypeName() + " (working branch)", assocArt.getHumanReadableId(),
-                        assocArt.getDescriptiveName()}));
+                  sb.append(AHTML.addRowMultiColumnTable(new String[] {assocArt.getArtifactTypeName(), "Working",
+                        assocArt.getHumanReadableId(), assocArt.getDescriptiveName()}));
                } else {
                   sb.append(AHTML.addRowMultiColumnTable(new String[] {"Branch", "", branch.getBranchName()}));
                }
@@ -151,6 +148,8 @@ public class ArtifactImpactToActionSearchItem extends XNavigateItemAction {
             }
             // Add committed changes
             boolean committedChanges = false;
+            Collection<TransactionData> transactions =
+                  RevisionManager.getInstance().getTransactionsPerArtifact(srchArt, true);
             for (TransactionData transData : transactions) {
                String transStr = String.format("Tranaction %d/%d", y++, transactions.size());
                System.out.println(transStr);
@@ -160,9 +159,8 @@ public class ArtifactImpactToActionSearchItem extends XNavigateItemAction {
                         ArtifactQuery.getArtifactFromId(transData.getCommitArtId(),
                               BranchPersistenceManager.getAtsBranch());
                   if (assocArt instanceof TeamWorkFlowArtifact) {
-                     sb.append(AHTML.addRowMultiColumnTable(new String[] {
-                           assocArt.getArtifactTypeName() + " (committed)", assocArt.getHumanReadableId(),
-                           assocArt.getDescriptiveName()}));
+                     sb.append(AHTML.addRowMultiColumnTable(new String[] {assocArt.getArtifactTypeName(), "Committed",
+                           assocArt.getHumanReadableId(), assocArt.getDescriptiveName()}));
                      committedChanges = true;
                   }
                }
