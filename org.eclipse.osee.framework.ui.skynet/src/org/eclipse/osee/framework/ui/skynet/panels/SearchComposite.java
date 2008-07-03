@@ -11,8 +11,11 @@
 
 package org.eclipse.osee.framework.ui.skynet.panels;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
@@ -163,7 +166,7 @@ public class SearchComposite extends Composite implements Listener {
    }
 
    private void updateFromSourceField() {
-      setSearchQuery(getSearch());
+      setSearchQuery(getQuery());
       updateWidgetEnablements();
    }
 
@@ -188,7 +191,7 @@ public class SearchComposite extends Composite implements Listener {
       }
    }
 
-   public String getSearch() {
+   public String getQuery() {
       String toReturn = "";
       if (isWidgetAccessible(this.searchArea)) {
          String query = this.searchArea.getText();
@@ -253,10 +256,10 @@ public class SearchComposite extends Composite implements Listener {
       return this.searchArea.getItems();
    }
 
-   private void setCombo(String[] values, String lastSelected) {
+   private void setCombo(List<String> values, String lastSelected) {
       int toSelect = 0;
-      for (int i = 0; i < values.length; i++) {
-         String toStore = values[i];
+      for (int i = 0; i < values.size(); i++) {
+         String toStore = values.get(i);
          if (Strings.isValid(toStore)) {
             this.searchArea.add(toStore);
             if (toStore.equals(lastSelected)) {
@@ -267,8 +270,8 @@ public class SearchComposite extends Composite implements Listener {
       }
    }
 
-   public void restoreWidgetValues(String[] querySearches, String lastSelected, Map<String, Boolean> options) {
-      String currentSearch = getSearch();
+   public void restoreWidgetValues(List<String> querySearches, String lastSelected, Map<String, Boolean> options) {
+      String currentSearch = getQuery();
 
       // Add stored directories into selector
       if (Strings.isValid(lastSelected) == false && currentSearch != null) {
@@ -277,9 +280,10 @@ public class SearchComposite extends Composite implements Listener {
 
       if (querySearches == null) {
          if (Strings.isValid(lastSelected)) {
-            querySearches = new String[] {lastSelected};
+            querySearches = new ArrayList<String>();
+            querySearches.add(lastSelected);
          } else {
-            querySearches = new String[0];
+            querySearches = Collections.emptyList();
          }
       }
       setCombo(querySearches, lastSelected);

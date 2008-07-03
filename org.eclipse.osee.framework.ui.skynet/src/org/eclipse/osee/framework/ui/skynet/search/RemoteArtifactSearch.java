@@ -40,11 +40,13 @@ import org.eclipse.search.ui.text.Match;
 public class RemoteArtifactSearch implements ISearchQuery {
    private RemoteArtifactSearchResult searchResult;
    private Map<String, String> parameters;
+   private int numberOfMatches;
    private boolean isSearchComplete;
 
    public RemoteArtifactSearch(String query, Map<String, Boolean> options) {
       this.searchResult = new RemoteArtifactSearchResult();
       this.isSearchComplete = false;
+      this.numberOfMatches = 0;
       this.parameters = new HashMap<String, String>();
       this.parameters.put("query", query);
       if (options != null) {
@@ -89,7 +91,7 @@ public class RemoteArtifactSearch implements ISearchQuery {
    private void reset() {
       this.isSearchComplete = false;
       this.searchResult.removeAll();
-
+      this.numberOfMatches = 0;
    }
 
    /* (non-Javadoc)
@@ -107,6 +109,7 @@ public class RemoteArtifactSearch implements ISearchQuery {
             for (Artifact artifact : artifacts) {
                Match match = new Match(artifact, 1, 2);
                searchResult.addMatch(match);
+               this.numberOfMatches++;
             }
          }
       } catch (Exception ex) {
@@ -132,7 +135,8 @@ public class RemoteArtifactSearch implements ISearchQuery {
       }
       return toReturn;
    }
-   private final class RemoteArtifactSearchResult extends AbstractArtifactSearchResult {
+
+   public final class RemoteArtifactSearchResult extends AbstractArtifactSearchResult {
 
       /* (non-Javadoc)
        * @see org.eclipse.search.ui.ISearchResult#getImageDescriptor()
@@ -147,7 +151,7 @@ public class RemoteArtifactSearch implements ISearchQuery {
        */
       @Override
       public String getLabel() {
-         return parameters.get("query") + " - " + (isSearchComplete ? (getMatchCount() + " matches") : "busy");
+         return parameters.get("query") + " - " + (isSearchComplete ? (numberOfMatches + " matches") : "busy");
       }
 
       /* (non-Javadoc)
