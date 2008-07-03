@@ -58,6 +58,7 @@ public class DemoPurgeTest extends TestCase {
          return;
       }
       System.out.println("Begin Demo Purge Test...");
+      System.out.println("Pre Purge Table Counts.");
       // Count rows in tables prior to purge
       getTableCounts(preCreateActionCount);
 
@@ -82,6 +83,7 @@ public class DemoPurgeTest extends TestCase {
       }
 
       // Count rows and check that increased
+      System.out.println("Post Create Action Table Counts.");
       getTableCounts(postCreateActionCount);
       checkThatIncreased(preCreateActionCount, postCreateActionCount);
 
@@ -91,6 +93,7 @@ public class DemoPurgeTest extends TestCase {
       }
 
       // Count rows and check that same as when began
+      System.out.println("Post Purge Table Counts.");
       getTableCounts(postPurgeCount);
       checkThatEqual(preCreateActionCount, postPurgeCount);
 
