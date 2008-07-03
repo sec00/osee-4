@@ -11,6 +11,7 @@
 package org.eclipse.osee.framework.ui.skynet.commandHandlers;
 
 import java.util.List;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -72,7 +73,7 @@ public class RevertArtifactHandler extends AbstractHandler {
             monitor.beginTask("Reverting ...", artifactChanges.size());
 
             for (ArtifactChange artifactChange : artifactChanges) {
-               monitor.setTaskName(artifactChange.getArtifact().getDescriptiveName());
+               monitor.setTaskName(artifactChange.getArtifact().getInternalDescriptiveName());
                ArtifactPersistenceManager.getInstance().revertArtifact(artifactChange.getArtifact());
                monitor.worked(1);
             }
