@@ -514,7 +514,7 @@
     <Cell ss:StyleID="s24"/>
    </Row>
    <Row ss:AutoFitHeight="0" ss:Height="13.5">
-    <Cell ss:StyleID="s25"><Data ss:Type="String">org.eclipse.osee.framework.skynet.core.SimpleDateAttribute</Data></Cell>
+    <Cell ss:StyleID="s25"><Data ss:Type="String">org.eclipse.osee.framework.skynet.core.DateAttribute</Data></Cell>
     <Cell ss:StyleID="s25"><Data ss:Type="String">org.eclipse.osee.framework.skynet.core.DefaultAttributeDataProvider</Data></Cell>
     <Cell ss:StyleID="s24"><Data ss:Type="String">Execution Date</Data></Cell>
     <Cell ss:StyleID="s24"/>
@@ -1522,10 +1522,11 @@
     <VerticalResolution>600</VerticalResolution>
    </Print>
    <Selected/>
+   <TopRowVisible>12</TopRowVisible>
    <Panes>
     <Pane>
      <Number>3</Number>
-     <ActiveRow>38</ActiveRow>
+     <ActiveRow>33</ActiveRow>
     </Pane>
    </Panes>
    <ProtectObjects>False</ProtectObjects>
