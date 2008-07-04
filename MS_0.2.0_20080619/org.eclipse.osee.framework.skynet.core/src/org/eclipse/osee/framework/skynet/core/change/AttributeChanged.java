@@ -136,9 +136,9 @@ public class AttributeChanged extends Change {
    private ArtifactChange getArtifactChange() throws SQLException, IllegalArgumentException, ArtifactDoesNotExist, MultipleArtifactsExist {
       if (artifactChange == null) {
          artifactChange =
-               new ArtifactChange(getChangeType(), getArtModType(), getArtifactName(),
-                     ArtifactTypeManager.getType(getArtTypeId()), getArtifact(), null, null, getFromTransactionId(),
-                     getFromTransactionId(), getToTransactionId(), getArtId(), getGamma(), null);
+               new ArtifactChange(getChangeType(), getArtModType(), 
+                     getArtifact(), null, null, getFromTransactionId(),
+                     getFromTransactionId(), getToTransactionId(), getGamma());
       }
       return artifactChange;
    }

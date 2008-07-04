@@ -333,15 +333,15 @@ public class BranchContentProvider implements ITreeContentProvider, ArtifactChan
                   revisionManager.getDeletedArtifactChanges(null, null, baseParentTransaction, headParentTransaction,
                         null);
             for (ArtifactChange change : artDelConflicts) {
-               parentBranchDelConflicts.add(change.getArtId());
+               parentBranchDelConflicts.add(change.getArtifact().getArtId());
             }
 
             for (ArtifactChange change : newAndModArtChanges) {
-               if (parentBranchDelConflicts.contains(change.getArtId())) {
+               if (parentBranchDelConflicts.contains(change.getArtifact().getArtId())) {
                   change.setChangeType(ChangeType.CONFLICTING);
                   change.setConflictingModArtifact(change.getArtifact());
-               } else if (parentBranchModConflicts.containsKey(change.getArtId())) {
-                  change.setConflictingModArtifact(parentBranchModConflicts.get(change.getArtId()));
+               } else if (parentBranchModConflicts.containsKey(change.getArtifact().getArtId())) {
+                  change.setConflictingModArtifact(parentBranchModConflicts.get(change.getArtifact().getArtId()));
                }
             }
          }
