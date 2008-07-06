@@ -23,11 +23,7 @@ import org.eclipse.osee.ats.config.demo.OseeAtsConfigDemoPlugin;
 import org.eclipse.osee.ats.config.demo.config.PopulateDemoActions;
 import org.eclipse.osee.ats.config.demo.util.DemoTeams;
 import org.eclipse.osee.ats.config.demo.util.DemoTeams.Team;
-import org.eclipse.osee.ats.health.ValidateActions;
-import org.eclipse.osee.ats.health.ValidateAssignees;
-import org.eclipse.osee.ats.health.ValidateAttributeValues;
-import org.eclipse.osee.ats.health.ValidateWorkflows;
-import org.eclipse.osee.ats.health.ValidateTasks;
+import org.eclipse.osee.ats.health.ValidateAtsDatabase;
 import org.eclipse.osee.ats.navigate.CreateNewVersionItem;
 import org.eclipse.osee.ats.navigate.IAtsNavigateItem;
 import org.eclipse.osee.ats.navigate.ReleaseVersionItem;
@@ -139,11 +135,7 @@ public class DemoNavigateViewItems implements IAtsNavigateItem {
       new SearchNavigateItem(adminItems, new CriteriaSearchItem("Show All Tasks", criteria, true));
 
       XNavigateItem healthItems = new XNavigateItem(adminItems, "Health");
-      new ValidateTasks(healthItems);
-      new ValidateActions(healthItems);
-      new ValidateAssignees(healthItems);
-      new ValidateWorkflows(healthItems);
-      new ValidateAttributeValues(healthItems);
+      new ValidateAtsDatabase(healthItems);
 
       XNavigateItem demoItems = new XNavigateItem(adminItems, "Demo Data");
       new PopulateDemoActions(demoItems);
