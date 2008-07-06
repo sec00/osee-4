@@ -98,6 +98,7 @@ public class ValidateChangeReports extends XNavigateItemAutoRunAction {
          for (Artifact artifact : ArtifactQuery.getArtifactsFromType(artifactTypeName, AtsPlugin.getAtsBranch())) {
             TeamWorkFlowArtifact teamArt = (TeamWorkFlowArtifact) artifact;
             if (teamArt.getSmaMgr().getBranchMgr().isCommittedBranch()) {
+               System.err.println("Unhandled committed branch");
 
             } else if (teamArt.getSmaMgr().getBranchMgr().isWorkingBranch()) {
                Collection<Change> changes =
