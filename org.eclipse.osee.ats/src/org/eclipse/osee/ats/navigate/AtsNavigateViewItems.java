@@ -29,11 +29,7 @@ import org.eclipse.osee.ats.artifact.PeerToPeerReviewArtifact;
 import org.eclipse.osee.ats.artifact.TaskArtifact;
 import org.eclipse.osee.ats.artifact.TeamDefinitionArtifact;
 import org.eclipse.osee.ats.artifact.TeamWorkflowExtensions;
-import org.eclipse.osee.ats.health.ValidateActions;
-import org.eclipse.osee.ats.health.ValidateAssignees;
-import org.eclipse.osee.ats.health.ValidateAttributeValues;
-import org.eclipse.osee.ats.health.ValidateWorkflows;
-import org.eclipse.osee.ats.health.ValidateTasks;
+import org.eclipse.osee.ats.health.ValidateAtsDatabase;
 import org.eclipse.osee.ats.navigate.EmailTeamsItem.MemberType;
 import org.eclipse.osee.ats.report.ExtendedStatusReportItem;
 import org.eclipse.osee.ats.util.DoesNotWorkItem;
@@ -268,11 +264,7 @@ public class AtsNavigateViewItems extends XNavigateViewItems {
          new DoesNotWorkItem(adminItems);
 
          XNavigateItem healthItems = new XNavigateItem(adminItems, "Health");
-         new ValidateTasks(healthItems);
-         new ValidateActions(healthItems);
-         new ValidateAssignees(healthItems);
-         new ValidateWorkflows(healthItems);
-         new ValidateAttributeValues(healthItems);
+         new ValidateAtsDatabase(healthItems);
 
          // new ActionNavigateItem(adminItems, new XViewerViewAction());
          // new ActionNavigateItem(adminItems, new OpenEditorAction());
