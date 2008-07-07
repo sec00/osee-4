@@ -399,11 +399,10 @@ public class RelationManager {
     * @throws SQLException
     */
    public static void addRelation(RelationType relationType, Artifact artifactA, Artifact artifactB, String rationale) throws SQLException {
-      ensureRelationCanBeAdded(relationType, artifactA, artifactB);
-
       RelationLink relation = getLoadedRelation(artifactA, artifactA.getArtId(), artifactB.getArtId(), relationType);
 
       if (relation == null) {
+         ensureRelationCanBeAdded(relationType, artifactA, artifactB);
          relation = new RelationLink(artifactA, artifactB, relationType, rationale);
          relation.setDirty();
 
@@ -411,10 +410,11 @@ public class RelationManager {
 
          RelationManager.manageRelation(relation, RelationSide.SIDE_A);
          RelationManager.manageRelation(relation, RelationSide.SIDE_B);
+         
+         SkynetEventManager.getInstance().kick(
+               new CacheRelationModifiedEvent(relation, relation.getABranch(), relation.getRelationType().getTypeName(),
+                     relation.getASideName(), ModType.Added, RelationManager.class));
       }
-      SkynetEventManager.getInstance().kick(
-            new CacheRelationModifiedEvent(relation, relation.getABranch(), relation.getRelationType().getTypeName(),
-                  relation.getASideName(), ModType.Added, RelationManager.class));
    }
 
    public static void ensureRelationCanBeAdded(RelationType relationType, Artifact artifactA, Artifact artifactB) throws SQLException {
