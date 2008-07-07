@@ -46,6 +46,7 @@ public class SearchComposite extends Composite implements Listener {
    private Set<Listener> listeners;
    private Combo searchArea;
    private Button executeSearch;
+   private Button clear;
    private Map<String, Boolean> optionsMap;
    private Map<String, Button> optionsButtons;
    private boolean entryChanged;
@@ -70,7 +71,10 @@ public class SearchComposite extends Composite implements Listener {
    }
 
    private void createControl(Composite parent) {
-      parent.setLayout(new GridLayout());
+      GridLayout gL = new GridLayout();
+      gL.marginHeight = 0;
+      gL.marginWidth = 0;
+      parent.setLayout(gL);
       parent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
       createSearchInputArea(parent);
@@ -79,7 +83,7 @@ public class SearchComposite extends Composite implements Listener {
 
    private void createSearchInputArea(Composite parent) {
       Group group = new Group(parent, SWT.NONE);
-      group.setLayout(new GridLayout(2, false));
+      group.setLayout(new GridLayout());
       group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
       group.setText("Enter Search String");
 
@@ -124,12 +128,35 @@ public class SearchComposite extends Composite implements Listener {
             }
          }
       });
+      createButtonBar(group);
+   }
 
-      this.executeSearch = new Button(group, SWT.NONE);
+   private void createButtonBar(Composite parent) {
+      Composite composite = new Composite(parent, SWT.NONE);
+      GridLayout gL = new GridLayout(2, false);
+      gL.marginWidth = 0;
+      gL.marginHeight = 0;
+      composite.setLayout(gL);
+      composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+      this.executeSearch = new Button(composite, SWT.NONE);
       this.executeSearch.setText("Search");
       this.executeSearch.addListener(SWT.Selection, this);
       this.executeSearch.setEnabled(false);
       this.executeSearch.setFont(getFont());
+
+      this.clear = new Button(composite, SWT.NONE);
+      this.clear.setText("Clear History");
+      this.clear.addSelectionListener(new SelectionAdapter() {
+         public void widgetSelected(SelectionEvent e) {
+            if (searchArea.getItemCount() > 0) {
+               searchArea.removeAll();
+            }
+         }
+      });
+      this.clear.addListener(SWT.Selection, this);
+      this.clear.setEnabled(false);
+      this.clear.setFont(getFont());
    }
 
    private void createOptionsArea(Composite parent) {
@@ -207,12 +234,13 @@ public class SearchComposite extends Composite implements Listener {
    }
 
    private void updateWidgetEnablements() {
-      if (isWidgetAccessible(this.searchArea) && isWidgetAccessible(this.executeSearch)) {
+      if (isWidgetAccessible(this.searchArea) && isWidgetAccessible(this.executeSearch) && isWidgetAccessible(this.clear)) {
          String value = this.searchArea.getText();
          if (value != null) {
             value = value.trim();
          }
          this.executeSearch.setEnabled(Strings.isValid(value));
+         this.clear.setEnabled(this.searchArea.getItemCount() > 0);
       }
    }
 
@@ -278,7 +306,7 @@ public class SearchComposite extends Composite implements Listener {
          lastSelected = currentSearch;
       }
 
-      if (querySearches == null) {
+      if (querySearches == null || querySearches.isEmpty()) {
          if (Strings.isValid(lastSelected)) {
             querySearches = new ArrayList<String>();
             querySearches.add(lastSelected);
