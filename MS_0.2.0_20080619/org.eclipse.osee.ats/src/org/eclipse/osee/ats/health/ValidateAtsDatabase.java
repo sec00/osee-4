@@ -249,6 +249,14 @@ public class ValidateAtsDatabase extends XNavigateItemAutoRunAction implements I
                   }
                } else if (smaMgr.getStateMgr().getAssignees().size() != assigned.size()) {
                   xResultData.logError(sma.getArtifactTypeName() + " " + sma.getHumanReadableId() + " attribute assignees doesn't match related assignees");
+                  if (fixAssignees) {
+                     try {
+                        ((StateMachineArtifact) art).updateAssigneeRelations();
+                     } catch (OseeCoreException ex) {
+                        OSEELog.logException(AtsPlugin.class, ex, false);
+                     }
+                     xResultData.log("Fixed");
+                  }
                }
             }
          }
