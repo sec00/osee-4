@@ -411,7 +411,7 @@ public class XMergeViewer extends XWidget implements IEventReceiver, IActionable
       this.tranId = tranId;
       this.mergeView = mergeView;
       extraInfoLabel.setText(LOADING);
-      Job job = new Job("") {
+      Job job = new Job("Loading Merge Manager") {
          @Override
          protected IStatus run(IProgressMonitor monitor) {
             try {
