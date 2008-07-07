@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Display;
 public class ValidateAtsDatabase extends XNavigateItemAutoRunAction implements IAutoRunTask {
 
    private boolean fixAssignees = true;
-   private boolean fixAttributeValues = true;
+   private boolean fixAttributeValues = false;
 
    /**
     * @param parent
@@ -242,6 +242,7 @@ public class ValidateAtsDatabase extends XNavigateItemAutoRunAction implements I
                   if (fixAssignees) {
                      try {
                         ((StateMachineArtifact) art).updateAssigneeRelations();
+                        art.persistAttributesAndRelations();
                      } catch (OseeCoreException ex) {
                         OSEELog.logException(AtsPlugin.class, ex, false);
                      }
@@ -252,6 +253,7 @@ public class ValidateAtsDatabase extends XNavigateItemAutoRunAction implements I
                   if (fixAssignees) {
                      try {
                         ((StateMachineArtifact) art).updateAssigneeRelations();
+                        art.persistAttributesAndRelations();
                      } catch (OseeCoreException ex) {
                         OSEELog.logException(AtsPlugin.class, ex, false);
                      }
