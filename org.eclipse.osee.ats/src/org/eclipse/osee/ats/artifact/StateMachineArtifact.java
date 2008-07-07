@@ -891,6 +891,7 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IWorld
     * @see org.eclipse.osee.framework.ui.plugin.event.IEventReceiver#onEvent(org.eclipse.osee.framework.ui.plugin.event.Event)
     */
    public void onEvent(Event event) {
+      if (isDeleted()) return;
       try {
          // Check if LocalEvent and NOT RemoteEvent. Since EventService will handle moving access
          // control changes across the OSEE instances, only handle local events
