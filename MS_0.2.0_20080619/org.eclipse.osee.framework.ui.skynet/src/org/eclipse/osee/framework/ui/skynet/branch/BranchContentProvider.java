@@ -390,7 +390,7 @@ public class BranchContentProvider implements ITreeContentProvider, ArtifactChan
       }
    }
 
-   private Collection<Object> summarize(Collection<RevisionChange> changes) throws IllegalArgumentException, SQLException {
+   public static Collection<Object> summarize(Collection<RevisionChange> changes) throws IllegalArgumentException, SQLException {
       Collection<Object> summary = new LinkedList<Object>();
       HashCollection<Integer, AttributeChange> attrChanges = new HashCollection<Integer, AttributeChange>();
       HashCollection<Integer, RelationLinkChange> linkChanges = new HashCollection<Integer, RelationLinkChange>();
