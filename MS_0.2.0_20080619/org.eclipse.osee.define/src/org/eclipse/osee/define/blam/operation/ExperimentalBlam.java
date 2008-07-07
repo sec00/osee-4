@@ -13,7 +13,9 @@ package org.eclipse.osee.define.blam.operation;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.osee.framework.db.connection.ConnectionHandler;
+import org.eclipse.osee.framework.skynet.core.EveryoneGroup;
+import org.eclipse.osee.framework.skynet.core.User;
+import org.eclipse.osee.framework.skynet.core.relation.CoreRelationEnumeration;
 import org.eclipse.osee.framework.ui.skynet.blam.BlamVariableMap;
 import org.eclipse.osee.framework.ui.skynet.blam.operation.AbstractBlam;
 
@@ -82,7 +84,8 @@ public class ExperimentalBlam extends AbstractBlam {
 
       //      StringBuilder sb 
       //      
-      ConnectionHandler.runPreparedUpdateBatch(UpdateRelationModType, updateParameters);
-      ConnectionHandler.runPreparedUpdateBatch(UpdateTxsCurrent, updateParameters);
+      //ConnectionHandler.runPreparedUpdateBatch(UpdateRelationModType, updateParameters);
+      //ConnectionHandler.runPreparedUpdateBatch(UpdateTxsCurrent, updateParameters);
+      EveryoneGroup.getEveryoneGroup().getArtifacts(CoreRelationEnumeration.Users_User, User.class);
    }
 }
