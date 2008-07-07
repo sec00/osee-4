@@ -17,14 +17,12 @@ import static org.eclipse.osee.framework.skynet.core.change.ModificationType.CHA
 import static org.eclipse.osee.framework.skynet.core.change.ModificationType.DELETED;
 import static org.eclipse.osee.framework.skynet.core.change.ModificationType.MERGED;
 import static org.eclipse.osee.framework.skynet.core.change.ModificationType.NEW;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.sql.SQLException;
-
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.osee.framework.skynet.core.SkynetActivator;
@@ -33,7 +31,6 @@ import org.eclipse.osee.framework.skynet.core.change.ChangeType;
 import org.eclipse.osee.framework.skynet.core.change.ModificationType;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.revision.ConflictionType;
-import org.eclipse.osee.framework.ui.plugin.util.InputStreamImageDescriptor;
 import org.eclipse.osee.framework.ui.plugin.util.OverlayImage;
 import org.eclipse.swt.graphics.Image;
 
@@ -84,9 +81,9 @@ public class ArtifactType implements Serializable, Comparable<ArtifactType> {
    private String name;
    private String namespace;
    transient private ImageRegistry imageRegistry;
-   transient private InputStreamImageDescriptor imageDescriptor;
+   transient private ImageDescriptor imageDescriptor;
 
-   ArtifactType(int artTypeId, String factoryKey, ArtifactFactory factory, String namespace, String name, InputStreamImageDescriptor imageDescriptor) {
+   ArtifactType(int artTypeId, String factoryKey, ArtifactFactory factory, String namespace, String name, ImageDescriptor imageDescriptor) {
       this.artTypeId = artTypeId;
       this.factory = factory;
       this.name = name;
@@ -148,13 +145,14 @@ public class ArtifactType implements Serializable, Comparable<ArtifactType> {
    public String getName() {
       return name;
    }
-   
+
    /**
     * determines if this artifact type is equal to or a subclass of the artifact type referenced by artifactTypeName
+    * 
     * @return
     */
    public boolean isTypeCompatible(String artifactTypeName) {
-       return name.equals(artifactTypeName);
+      return name.equals(artifactTypeName);
    }
 
    /**
@@ -277,7 +275,7 @@ public class ArtifactType implements Serializable, Comparable<ArtifactType> {
    /**
     * @return Returns the imageDescriptor.
     */
-   public InputStreamImageDescriptor getImageDescriptor() {
+   public ImageDescriptor getImageDescriptor() {
       return imageDescriptor;
    }
 
@@ -334,7 +332,7 @@ public class ArtifactType implements Serializable, Comparable<ArtifactType> {
    /**
     * @param imageDescriptor the imageDescriptor to set
     */
-   public void setImageDescriptor(InputStreamImageDescriptor imageDescriptor) {
+   public void setImageDescriptor(ImageDescriptor imageDescriptor) {
       this.imageDescriptor = imageDescriptor;
       // Clear out the image cache so it will be re-created
       if (imageRegistry != null) imageRegistry = null;
