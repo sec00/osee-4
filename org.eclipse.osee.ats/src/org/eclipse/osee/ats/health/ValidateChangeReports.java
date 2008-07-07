@@ -28,8 +28,12 @@ import org.eclipse.osee.framework.skynet.core.change.Change;
 import org.eclipse.osee.framework.skynet.core.change.ModificationType;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.revision.ArtifactChange;
+import org.eclipse.osee.framework.skynet.core.revision.ArtifactNameDescriptorCache;
+import org.eclipse.osee.framework.skynet.core.revision.AttributeChange;
+import org.eclipse.osee.framework.skynet.core.revision.AttributeSummary;
 import org.eclipse.osee.framework.skynet.core.revision.RevisionManager;
 import org.eclipse.osee.framework.ui.plugin.util.Jobs;
+import org.eclipse.osee.framework.ui.skynet.branch.BranchContentProvider;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
 import org.eclipse.osee.framework.ui.skynet.widgets.xnavigate.XNavigateItem;
 import org.eclipse.osee.framework.ui.skynet.widgets.xnavigate.XNavigateItemAutoRunAction;
@@ -41,6 +45,7 @@ import org.eclipse.swt.widgets.Display;
  * @author Donald G. Dunne
  */
 public class ValidateChangeReports extends XNavigateItemAutoRunAction {
+   private static ArtifactNameDescriptorCache artifactNameDescriptorCache = new ArtifactNameDescriptorCache();
 
    /**
     * @param parent
@@ -90,6 +95,10 @@ public class ValidateChangeReports extends XNavigateItemAutoRunAction {
       }
    }
 
+   // Lba SA11 Req Team Workflow
+   // Lba B3 Req Team Workflow
+   // Lba V11 REU Req Team Workflow
+   // Lba V13 Req Team Workflow
    private void runIt(IProgressMonitor monitor, XResultData rd) throws OseeCoreException, SQLException {
       StringBuffer sb = new StringBuffer(AHTML.beginMultiColumnTable(100, 1));
       String[] columnHeaders = new String[] {"Team", "Working", "Mod", "New", "Del", "Notes"};
@@ -98,7 +107,13 @@ public class ValidateChangeReports extends XNavigateItemAutoRunAction {
       for (String artifactTypeName : new String[] {"Lba SA11 Req Team Workflow"}) {
          rd.log(AHTML.addRowSpanMultiColumnTable(artifactTypeName, columnHeaders.length));
          try {
-            for (Artifact artifact : ArtifactQuery.getArtifactsFromType(artifactTypeName, AtsPlugin.getAtsBranch())) {
+            int x = 1;
+            Collection<Artifact> artifacts =
+                  ArtifactQuery.getArtifactsFromType(artifactTypeName, AtsPlugin.getAtsBranch());
+            for (Artifact artifact : artifacts) {
+               String result = String.format("Processing %s/%s  - %s", x++, artifacts.size(), artifact);
+               OSEELog.logInfo(AtsPlugin.class, result, false);
+               //               if (!artifact.getHumanReadableId().equals("1PL1U")) continue;
                TeamWorkFlowArtifact teamArt = (TeamWorkFlowArtifact) artifact;
                try {
                   Collection<Change> changes = null;
@@ -134,7 +149,13 @@ public class ValidateChangeReports extends XNavigateItemAutoRunAction {
                      Set<Artifact> oldNewArt = new HashSet<Artifact>();
                      for (ArtifactChange artifactChange : teamArt.getSmaMgr().getBranchMgr().getArtifactChanges()) {
                         if (artifactChange.getModType() == ModificationType.CHANGE) {
-                           oldModArt.add(artifactChange.getArtifact());
+                           // If there was at least one attribute changed, count it; don't count relation only changes
+                           for (Object obj : BranchContentProvider.summarize(RevisionManager.getInstance().getTransactionChanges(
+                                 artifactChange, artifactNameDescriptorCache))) {
+                              if ((obj instanceof AttributeSummary) || (obj instanceof AttributeChange)) {
+                                 oldModArt.add(artifactChange.getArtifact());
+                              }
+                           }
                         }
                         if (artifactChange.getModType() == ModificationType.DELETED) {
                            oldDelArt.add(artifactChange.getArtifact());
