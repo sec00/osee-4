@@ -702,7 +702,10 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IWorld
 
    public void saveSMA() {
       try {
-         saveArtifactsFromRelations(smaRelations);
+         Set<Artifact> artifacts = new HashSet<Artifact>();
+         getSmaArtifactsOneLevel(this, artifacts);
+         for (Artifact artifact : artifacts)
+            artifact.persistAttributesAndRelations();
       } catch (Exception ex) {
          OSEELog.logException(AtsPlugin.class, "Can't save artifact " + getHumanReadableId(), ex, true);
       }
@@ -710,9 +713,21 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IWorld
 
    public void revertSMA() {
       try {
-         revertArtifactsFromRelations(smaRelations);
-      } catch (SQLException ex) {
+         Set<Artifact> artifacts = new HashSet<Artifact>();
+         getSmaArtifactsOneLevel(this, artifacts);
+         for (Artifact artifact : artifacts)
+            artifact.reloadAttributesAndRelations();
+      } catch (Exception ex) {
          OSEELog.logException(AtsPlugin.class, "Can't revert artifact " + getHumanReadableId(), ex, true);
+      }
+   }
+
+   public static void getSmaArtifactsOneLevel(StateMachineArtifact smaArtifact, Set<Artifact> artifacts) throws OseeCoreException, SQLException {
+      artifacts.add(smaArtifact);
+      for (IRelationEnumeration side : smaArtifact.getSmaRelations()) {
+         for (Artifact artifact : smaArtifact.getRelatedArtifacts(side)) {
+            artifacts.add(artifact);
+         }
       }
    }
 
