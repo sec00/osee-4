@@ -86,52 +86,38 @@ public class MergeUtility {
     */
    public static void showSourceDestCompareFile(AttributeConflict attrConflict) {
       if (attrConflict == null) return;
-      if (attrConflict.getSourceDestDiffFile() == null) {
-         try {
-            IRenderer renderer =
-                  RendererManager.getInstance().getBestRenderer(PresentationType.DIFF, attrConflict.getDestArtifact());
-            String diffFileName =
-                  "Destination_Source_Changes_For_Artifact_" + attrConflict.getDestArtifact().getGuid() + ".xml";
-            attrConflict.setSourceDestDiffFile(renderer.compare(attrConflict.getDestArtifact(),
-                  attrConflict.getSourceArtifact(), "", null, diffFileName, false));
-         } catch (Exception ex) {
-            OSEELog.logException(MergeUtility.class, ex, false);
-         }
+      try {
+         IRenderer renderer =
+               RendererManager.getInstance().getBestRenderer(PresentationType.DIFF, attrConflict.getDestArtifact());
+         showDiff(attrConflict, renderer.compare(attrConflict.getDestArtifact(), attrConflict.getSourceArtifact(), "",
+               null, null, false));
+      } catch (Exception ex) {
+         OSEELog.logException(MergeUtility.class, ex, false);
       }
-      showDiff(attrConflict, attrConflict.getSourceDestDiffFile());
    }
 
    public static void showSourceCompareFile(Conflict conflict) {
       if (conflict == null) return;
-      if (conflict.getSourceDiffFile() == null) {
-         try {
-            IRenderer renderer =
-                  RendererManager.getInstance().getBestRenderer(PresentationType.DIFF, conflict.getDestArtifact());
-            String diffFileName = "Source_Branch_Changes_For_Artifact_" + conflict.getArtifact().getGuid() + ".xml";
-            conflict.setSourceDiffFile(renderer.compare(getStartArtifact(conflict), conflict.getSourceArtifact(), "",
-                  null, diffFileName, false));
-         } catch (Exception ex) {
-            OSEELog.logException(MergeUtility.class, ex, false);
-         }
+      try {
+         IRenderer renderer =
+               RendererManager.getInstance().getBestRenderer(PresentationType.DIFF, conflict.getDestArtifact());
+         showDiff(conflict, renderer.compare(getStartArtifact(conflict), conflict.getSourceArtifact(), "", null, null,
+               false));
+      } catch (Exception ex) {
+         OSEELog.logException(MergeUtility.class, ex, false);
       }
-      showDiff(conflict, conflict.getSourceDiffFile());
    }
 
    public static void showDestCompareFile(Conflict conflict) {
       if (conflict == null) return;
-      if (conflict.getDestDiffFile() == null) {
-         try {
-            IRenderer renderer =
-                  RendererManager.getInstance().getBestRenderer(PresentationType.DIFF, conflict.getDestArtifact());
-            String diffFileName =
-                  "Destination_Branch_Changes_For_Artifact_" + conflict.getArtifact().getGuid() + ".xml";
-            conflict.setDestDiffFile(renderer.compare(getStartArtifact(conflict), conflict.getDestArtifact(), "", null,
-                  diffFileName, false));
-         } catch (Exception ex) {
-            OSEELog.logException(MergeUtility.class, ex, false);
-         }
+      try {
+         IRenderer renderer =
+               RendererManager.getInstance().getBestRenderer(PresentationType.DIFF, conflict.getDestArtifact());
+         showDiff(conflict, renderer.compare(getStartArtifact(conflict), conflict.getDestArtifact(), "", null, null,
+               false));
+      } catch (Exception ex) {
+         OSEELog.logException(MergeUtility.class, ex, false);
       }
-      showDiff(conflict, conflict.getDestDiffFile());
    }
 
    private static Artifact getStartArtifact(Conflict conflict) {

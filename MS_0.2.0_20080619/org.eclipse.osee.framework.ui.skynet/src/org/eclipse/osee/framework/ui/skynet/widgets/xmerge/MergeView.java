@@ -90,7 +90,7 @@ public class MergeView extends ViewPart implements IActionable {
       Job job = new Job("Open Merge View") {
 
          @Override
-         protected IStatus run(IProgressMonitor monitor) {
+         protected IStatus run(final IProgressMonitor monitor) {
             Displays.ensureInDisplayThread(new Runnable() {
                public void run() {
                   try {
@@ -382,11 +382,8 @@ public class MergeView extends ViewPart implements IActionable {
       this.sourceBranch = sourceBranch;
       this.destBranch = destBranch;
       this.transactionId = transactionId;
-      //      this.conflicts = conflicts;
       try {
-         //         if (conflicts != null) {
          xMergeViewer.setInputData(sourceBranch, destBranch, transactionId, this);
-         //         }
          setPartName("Merge Manager: " + sourceBranch.getBranchShortName());
 
       } catch (Exception ex) {
