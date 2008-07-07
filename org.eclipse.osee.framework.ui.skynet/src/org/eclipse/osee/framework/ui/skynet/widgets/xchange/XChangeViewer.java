@@ -257,7 +257,7 @@ public class XChangeViewer extends XWidget implements IEventReceiver, IActionabl
 
       extraInfoLabel.setText(LOADING);
 
-      Job job = new Job("") {
+      Job job = new Job("Open Change View") {
 
          @Override
          protected IStatus run(IProgressMonitor monitor) {
