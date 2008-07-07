@@ -31,6 +31,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.db.connection.ConnectionHandler;
 import org.eclipse.osee.framework.db.connection.ConnectionHandlerStatement;
 import org.eclipse.osee.framework.db.connection.DbUtil;
+import org.eclipse.osee.framework.db.connection.core.JoinUtility;
+import org.eclipse.osee.framework.db.connection.core.JoinUtility.TransactionJoinQuery;
 import org.eclipse.osee.framework.db.connection.core.schema.LocalAliasTable;
 import org.eclipse.osee.framework.db.connection.core.schema.SkynetDatabase;
 import org.eclipse.osee.framework.db.connection.core.transaction.AbstractDbTxTemplate;
@@ -67,9 +69,7 @@ import org.eclipse.osee.framework.skynet.core.transaction.SkynetTransactionManag
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionDetailsType;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionId;
 import org.eclipse.osee.framework.skynet.core.transaction.data.ArtifactTransactionData;
-import org.eclipse.osee.framework.skynet.core.utility.JoinUtility;
 import org.eclipse.osee.framework.skynet.core.utility.RemoteArtifactEventFactory;
-import org.eclipse.osee.framework.skynet.core.utility.JoinUtility.TransactionJoinQuery;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
 
 /**
