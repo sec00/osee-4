@@ -21,13 +21,13 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osee.ats.AtsPlugin;
 import org.eclipse.osee.ats.artifact.TeamWorkFlowArtifact;
-import org.eclipse.osee.ats.artifact.TeamWorkflowExtensions;
 import org.eclipse.osee.framework.jdk.core.util.AHTML;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 import org.eclipse.osee.framework.skynet.core.change.Change;
 import org.eclipse.osee.framework.skynet.core.change.ModificationType;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
+import org.eclipse.osee.framework.skynet.core.revision.ArtifactChange;
 import org.eclipse.osee.framework.skynet.core.revision.RevisionManager;
 import org.eclipse.osee.framework.ui.plugin.util.Jobs;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
@@ -91,39 +91,84 @@ public class ValidateChangeReports extends XNavigateItemAutoRunAction {
    }
 
    private void runIt(IProgressMonitor monitor, XResultData rd) throws OseeCoreException, SQLException {
-      rd.log(AHTML.beginMultiColumnTable(100, 1));
-      rd.log(AHTML.addHeaderRowMultiColumnTable(new String[] {"Team", "New", "Del", "Mod", "OldNew", "OldDel", "OldMod"}));
-      for (String artifactTypeName : TeamWorkflowExtensions.getInstance().getAllTeamWorkflowArtifactNames()) {
-         rd.log(AHTML.addRowSpanMultiColumnTable(artifactTypeName, 7));
-         for (Artifact artifact : ArtifactQuery.getArtifactsFromType(artifactTypeName, AtsPlugin.getAtsBranch())) {
-            TeamWorkFlowArtifact teamArt = (TeamWorkFlowArtifact) artifact;
-            if (teamArt.getSmaMgr().getBranchMgr().isCommittedBranch()) {
-               System.err.println("Unhandled committed branch");
+      StringBuffer sb = new StringBuffer(AHTML.beginMultiColumnTable(100, 1));
+      String[] columnHeaders = new String[] {"Team", "Working", "Mod", "New", "Del", "Notes"};
+      sb.append(AHTML.addHeaderRowMultiColumnTable(columnHeaders));
+      //    for (String artifactTypeName : TeamWorkflowExtensions.getInstance().getAllTeamWorkflowArtifactNames()) {
+      for (String artifactTypeName : new String[] {"Lba SA11 Req Team Workflow"}) {
+         rd.log(AHTML.addRowSpanMultiColumnTable(artifactTypeName, columnHeaders.length));
+         try {
+            for (Artifact artifact : ArtifactQuery.getArtifactsFromType(artifactTypeName, AtsPlugin.getAtsBranch())) {
+               TeamWorkFlowArtifact teamArt = (TeamWorkFlowArtifact) artifact;
+               try {
+                  Collection<Change> changes = null;
+                  if (teamArt.getSmaMgr().getBranchMgr().isCommittedBranch()) {
+                     changes =
+                           RevisionManager.getInstance().getChangesPerTransaction(
+                                 teamArt.getSmaMgr().getBranchMgr().getTransactionId().getTransactionNumber());
 
-            } else if (teamArt.getSmaMgr().getBranchMgr().isWorkingBranch()) {
-               Collection<Change> changes =
-                     RevisionManager.getInstance().getChangesPerBranch(
-                           teamArt.getSmaMgr().getBranchMgr().getWorkingBranch());
-               Set<Artifact> modArt = new HashSet<Artifact>();
-               Set<Artifact> delArt = new HashSet<Artifact>();
-               Set<Artifact> newArt = new HashSet<Artifact>();
-               for (Change change : changes) {
-                  if (change.getModificationType() == ModificationType.CHANGE) {
-                     modArt.add(change.getArtifact());
+                  } else if (teamArt.getSmaMgr().getBranchMgr().isWorkingBranch()) {
+                     changes =
+                           RevisionManager.getInstance().getChangesPerBranch(
+                                 teamArt.getSmaMgr().getBranchMgr().getWorkingBranch());
                   }
-                  if (change.getModificationType() == ModificationType.DELETED) {
-                     delArt.add(change.getArtifact());
+                  if (changes != null) {
+                     Set<Artifact> modArt = new HashSet<Artifact>();
+                     Set<Artifact> delArt = new HashSet<Artifact>();
+                     Set<Artifact> newArt = new HashSet<Artifact>();
+                     for (Change change : changes) {
+                        if (change.getItemKind().equals("Artifact")) {
+                           if (change.getModificationType() == ModificationType.CHANGE) {
+                              modArt.add(change.getArtifact());
+                           }
+                           if (change.getModificationType() == ModificationType.DELETED) {
+                              delArt.add(change.getArtifact());
+                           }
+                           if (change.getModificationType() == ModificationType.NEW) {
+                              newArt.add(change.getArtifact());
+                           }
+                        }
+                     }
+                     Set<Artifact> oldModArt = new HashSet<Artifact>();
+                     Set<Artifact> oldDelArt = new HashSet<Artifact>();
+                     Set<Artifact> oldNewArt = new HashSet<Artifact>();
+                     for (ArtifactChange artifactChange : teamArt.getSmaMgr().getBranchMgr().getArtifactChanges()) {
+                        if (artifactChange.getModType() == ModificationType.CHANGE) {
+                           oldModArt.add(artifactChange.getArtifact());
+                        }
+                        if (artifactChange.getModType() == ModificationType.DELETED) {
+                           oldDelArt.add(artifactChange.getArtifact());
+                        }
+                        if (artifactChange.getModType() == ModificationType.NEW) {
+                           oldNewArt.add(artifactChange.getArtifact());
+                        }
+                     }
+                     boolean modMismatch = false;
+                     boolean newMismatch = false;
+                     boolean delMismatch = false;
+                     StringBuffer notes = new StringBuffer();
+                     if (modArt.size() != oldModArt.size()) modMismatch = true;
+                     if (newArt.size() != oldNewArt.size()) newMismatch = true;
+                     if (delArt.size() != oldDelArt.size()) delMismatch = true;
+                     sb.append(AHTML.addRowMultiColumnTable(new String[] {teamArt.getHumanReadableId(),
+                           teamArt.getSmaMgr().getBranchMgr().isWorkingBranch() ? "Working" : "Committed",
+                           String.format("%s%d/%d", (modMismatch ? "Error: " : ""), modArt.size(), oldModArt.size()),
+                           String.format("%s%d/%d", (newMismatch ? "Error: " : ""), newArt.size(), oldNewArt.size()),
+                           String.format("%s%d/%d", (delMismatch ? "Error: " : ""), delArt.size(), oldDelArt.size()),
+                           notes.toString()}));
+
                   }
-                  if (change.getModificationType() == ModificationType.NEW) {
-                     newArt.add(change.getArtifact());
-                  }
+               } catch (Exception ex) {
+                  sb.append(AHTML.addRowSpanMultiColumnTable(
+                        "Artifact " + artifact.getHumanReadableId() + " - Exception: " + ex.getLocalizedMessage(),
+                        columnHeaders.length));
                }
-               rd.log(AHTML.addRowMultiColumnTable(new String[] {teamArt.getHumanReadableId(),
-                     String.valueOf(newArt.size()), String.valueOf(delArt.size()), String.valueOf(modArt.size()),
-                     "OldNew", "OldDel", "OldMod"}));
             }
+         } catch (Exception ex) {
+            sb.append(AHTML.addRowSpanMultiColumnTable("Exception: " + ex.getLocalizedMessage(), columnHeaders.length));
          }
       }
-      rd.log(AHTML.endMultiColumnTable());
+      sb.append(AHTML.endMultiColumnTable());
+      rd.addRaw(sb.toString().replaceAll("\n", ""));
    }
 }

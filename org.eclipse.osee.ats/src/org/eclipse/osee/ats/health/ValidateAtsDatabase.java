@@ -107,12 +107,12 @@ public class ValidateAtsDatabase extends XNavigateItemAutoRunAction implements I
    private void runIt(IProgressMonitor monitor, XResultData xResultData) throws OseeCoreException, SQLException {
       this.xResultData = xResultData;
       loadAtsBranchArtifacts();
-      testAtsBranchAttributeValues();
-      testAtsActionsHaveTeamWorkflow();
-      testAtsWorkflowsHaveAction();
-      testAtsWorkflowsHaveZeroOrOneVersion();
-      testTasksHaveParentWorkflow();
-      testReviewsHaveParentWorkflowOrActionableItems();
+      //      testAtsBranchAttributeValues();
+      //      testAtsActionsHaveTeamWorkflow();
+      //      testAtsWorkflowsHaveAction();
+      //      testAtsWorkflowsHaveZeroOrOneVersion();
+      //      testTasksHaveParentWorkflow();
+      //      testReviewsHaveParentWorkflowOrActionableItems();
       testStateMachineAssignees();
       xResultData.log("Completed processing " + artifacts.size() + " artifacts.");
    }
@@ -217,7 +217,7 @@ public class ValidateAtsDatabase extends XNavigateItemAutoRunAction implements I
                xResultData.logError(sma.getArtifactTypeName() + " " + sma.getHumanReadableId() + " cancel/complete with attribute assignees");
                if (fixAssignees) {
                   smaMgr.getStateMgr().clearAssignees();
-                  smaMgr.getSma().persistAttributes();
+                  smaMgr.getSma().persistAttributesAndRelations();
                   xResultData.log("Fixed");
                }
             }
@@ -226,6 +226,7 @@ public class ValidateAtsDatabase extends XNavigateItemAutoRunAction implements I
                xResultData.logError(sma.getArtifactTypeName() + " " + sma.getHumanReadableId() + " is unassigned and assigned => " + Artifacts.commaArts(smaMgr.getStateMgr().getAssignees()));
                if (fixAssignees) {
                   smaMgr.getStateMgr().removeAssignee(unAssignedUser);
+                  xResultData.log("Fixed");
                }
             }
             if (smaMgr.getStateMgr().getAssignees().contains(noOneUser)) {
@@ -238,6 +239,14 @@ public class ValidateAtsDatabase extends XNavigateItemAutoRunAction implements I
                List<Artifact> assigned = art.getArtifacts(CoreRelationEnumeration.Users_User, Artifact.class);
                if ((smaMgr.isCompleted() || smaMgr.isCancelled()) && assigned.size() > 0) {
                   xResultData.logError(sma.getArtifactTypeName() + " " + sma.getHumanReadableId() + " cancel/complete with related assignees");
+                  if (fixAssignees) {
+                     try {
+                        ((StateMachineArtifact) art).updateAssigneeRelations();
+                     } catch (OseeCoreException ex) {
+                        OSEELog.logException(AtsPlugin.class, ex, false);
+                     }
+                     xResultData.log("Fixed");
+                  }
                } else if (smaMgr.getStateMgr().getAssignees().size() != assigned.size()) {
                   xResultData.logError(sma.getArtifactTypeName() + " " + sma.getHumanReadableId() + " attribute assignees doesn't match related assignees");
                }
