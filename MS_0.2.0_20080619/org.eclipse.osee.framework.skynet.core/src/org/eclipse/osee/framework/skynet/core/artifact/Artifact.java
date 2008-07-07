@@ -910,12 +910,13 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
    }
 
    /**
-    * Reverts this artifact back to the last state saved. This will have no effect if the artifact has never been saved.
+    * Reverts this artifact's attributes and relations back to the last state saved. This will have no effect if the
+    * artifact has never been saved.
     * 
     * @throws SQLException
     * @throws IllegalStateException if the artifact is deleted
     */
-   public void reloadArtifact() throws SQLException {
+   public void reloadAttributesAndRelations() throws SQLException {
       if (!isInDb()) return;
 
       prepareForReload();
@@ -1300,69 +1301,6 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
          SkynetActivator.getLogger().log(Level.SEVERE, ex.getLocalizedMessage(), ex);
       }
       return Result.FalseResult;
-   }
-
-   /**
-    * Save artifact, any of it's links specified, and any of the artifacts on the other side of the links that are dirty
-    * 
-    * @throws ArtifactDoesNotExist
-    */
-   public void saveArtifactsFromRelations(Set<IRelationEnumeration> links) throws SQLException, ArtifactDoesNotExist {
-      saveRevertArtifactsFromRelations(links, false);
-   }
-
-   /**
-    * Revert artifact, any of it's links specified, and any of the artifacts on the other side of the links that are
-    * dirty
-    * 
-    * @throws ArtifactDoesNotExist
-    */
-   public void revertArtifactsFromRelations(Set<IRelationEnumeration> links) throws SQLException {
-      try {
-         saveRevertArtifactsFromRelations(links, true);
-      } catch (ArtifactDoesNotExist ex) {
-         throw new SQLException(ex);
-      }
-   }
-
-   @Deprecated
-   //  use persistAttributesAndLinks() instead
-   private void saveRevertArtifactsFromRelations(Set<IRelationEnumeration> links, boolean revert) throws SQLException, ArtifactDoesNotExist {
-      Set<Artifact> artifactToManipulate = new HashSet<Artifact>();
-      artifactToManipulate.add(this);
-      Set<RelationLink> linksToManipulate = new HashSet<RelationLink>();
-
-      // Loop through all relations and collect all artifact to operate on
-      for (IRelationEnumeration side : links) {
-         for (Artifact artifact : getRelatedArtifacts(side)) {
-            artifactToManipulate.add(artifact);
-            // Check the links to this artifact
-            for (RelationLink link : getRelations(artifact)) {
-               linksToManipulate.add(link);
-            }
-         }
-      }
-      // Loop through all relations and persist/revert as necessary
-      for (RelationLink link : linksToManipulate) {
-         if (link.isDirty()) {
-            if (revert) {
-               link.delete();
-            } else {
-               link.persist();
-            }
-         }
-      }
-      // Loop through all artifacts and persist/revert as necessary
-      for (Artifact artifact : artifactToManipulate) {
-         if (revert) {
-            artifact.reloadArtifact();
-         } else {
-            artifact.persistAttributes();
-         }
-      }
-      // Persist link manager to ensure deleted links get persisted
-      //TODO: this defeats the whole purpose of a selective persist based on link type
-      persistRelations();
    }
 
    /**

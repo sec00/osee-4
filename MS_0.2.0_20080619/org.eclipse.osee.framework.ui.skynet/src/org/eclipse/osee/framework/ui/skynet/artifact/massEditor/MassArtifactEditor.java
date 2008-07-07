@@ -174,7 +174,7 @@ public class MassArtifactEditor extends AbstractArtifactEditor implements IDirti
       super.dispose();
       for (Artifact taskArt : artifacts)
          try {
-            if (taskArt != null && !taskArt.isDeleted() && taskArt.isDirty()) taskArt.reloadArtifact();
+            if (taskArt != null && !taskArt.isDeleted() && taskArt.isDirty()) taskArt.reloadAttributesAndRelations();
          } catch (SQLException ex) {
             OSEELog.logException(SkynetGuiPlugin.class, ex, false);
          }
