@@ -34,6 +34,9 @@
 		<Column id="BRANCH_ID" defaultValue="not null" type="INTEGER" />
 		<Column id="INSERT_TIME" type="TIMESTAMP" />
 		<Constraint schema="OSEE" id="OSEE_JOIN_ARTIFACT_Q_A_B_PK" type="PRIMARY KEY" appliesTo="QUERY_ID, ART_ID, BRANCH_ID" />
+		<Index id="OSEE_JOIN_ARTIFACT_Q_IDX">
+			<AppliesTo id="QUERY_ID"/>
+		</Index>
 	</Table>
 	
 	<Table name="OSEE_JOIN_ATTRIBUTE" schema="OSEE">
