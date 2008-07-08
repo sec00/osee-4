@@ -67,6 +67,6 @@ public class CleanUpCommitTransactions extends AbstractBlam {
 	 */
 	@Override
 	public String getXWidgetsXml() {
-		return "";
+		return "<xWidgets></xWidgets>";
 	}
 }
