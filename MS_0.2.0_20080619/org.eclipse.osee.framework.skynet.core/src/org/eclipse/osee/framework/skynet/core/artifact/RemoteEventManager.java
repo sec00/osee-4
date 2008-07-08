@@ -91,9 +91,6 @@ public class RemoteEventManager implements IServiceLookupListener {
    private ASkynetEventListener listener;
    private ISkynetEventListener myReference;
 
-   private SkynetEventManager eventManager;
-   private static BranchPersistenceManager branchPersistenceManager;
-
    private static final RemoteEventManager instance = new RemoteEventManager();
 
    private RemoteEventManager() {
@@ -108,7 +105,6 @@ public class RemoteEventManager implements IServiceLookupListener {
       try {
          this.listener = new EventListener();
          this.myReference = (ISkynetEventListener) OseeJini.getRemoteReference(listener);
-         this.eventManager = SkynetEventManager.getInstance();
 
          addListenerForEventService();
       } catch (ExportException e) {
@@ -174,7 +170,7 @@ public class RemoteEventManager implements IServiceLookupListener {
       try {
          logger.log(Level.INFO, "Skynet Event Service connection established " + ACCEPTABLE_SERVICE);
          skynetEventService.register(myReference);
-         eventManager.kick(new SkynetServiceEvent(this, true));
+         SkynetEventManager.getInstance().kick(new SkynetServiceEvent(this, true));
 
       } catch (ExportException e) {
          logger.log(Level.SEVERE, e.toString(), e);
@@ -186,7 +182,7 @@ public class RemoteEventManager implements IServiceLookupListener {
    private void disconnectService(Exception e) {
       logger.log(Level.WARNING, "Skynet Event Service connection lost\n" + e.toString(), e);
       skynetEventService = null;
-      eventManager.kick(new SkynetServiceEvent(this, false));
+      SkynetEventManager.getInstance().kick(new SkynetServiceEvent(this, false));
    }
 
    /*
@@ -283,7 +279,7 @@ public class RemoteEventManager implements IServiceLookupListener {
                   if (event instanceof NetworkRenameBranchEvent) {
                      int branchId = ((NetworkRenameBranchEvent) event).getBranchId();
                      try {
-                        Branch branch = branchPersistenceManager.getBranch(branchId);
+                        Branch branch = BranchPersistenceManager.getInstance().getBranch(branchId);
                         branch.setBranchName(((NetworkRenameBranchEvent) event).getBranchName());
                         branch.setBranchShortName(((NetworkRenameBranchEvent) event).getShortName(), false);
                         eventManager.kick(new RemoteRenameBranchEvent(this, branchId, branch.getBranchName(),
@@ -295,11 +291,11 @@ public class RemoteEventManager implements IServiceLookupListener {
                      eventManager.kick(new RemoteNewBranchEvent(this, ((NetworkNewBranchEvent) event).getBranchId()));
                   } else if (event instanceof NetworkDeletedBranchEvent) {
                      int branchId = ((NetworkDeletedBranchEvent) event).getBranchId();
-                     branchPersistenceManager.removeBranchFromCache(branchId);
+                     BranchPersistenceManager.getInstance().removeBranchFromCache(branchId);
                      eventManager.kick(new RemoteDeletedBranchEvent(this, branchId));
                   } else if (event instanceof NetworkCommitBranchEvent) {
                      int branchId = ((NetworkCommitBranchEvent) event).getBranchId();
-                     branchPersistenceManager.removeBranchFromCache(branchId);
+                     BranchPersistenceManager.getInstance().removeBranchFromCache(branchId);
                      eventManager.kick(new RemoteCommitBranchEvent(this, branchId));
                   } else if (event instanceof NetworkBroadcastEvent) {
                      handleBroadcastMessageEvent((NetworkBroadcastEvent) event);
