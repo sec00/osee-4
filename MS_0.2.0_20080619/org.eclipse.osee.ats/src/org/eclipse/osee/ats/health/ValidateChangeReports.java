@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osee.ats.AtsPlugin;
 import org.eclipse.osee.ats.artifact.TeamWorkFlowArtifact;
+import org.eclipse.osee.ats.artifact.TeamWorkflowExtensions;
 import org.eclipse.osee.framework.jdk.core.util.AHTML;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
@@ -103,8 +104,8 @@ public class ValidateChangeReports extends XNavigateItemAutoRunAction {
       StringBuffer sb = new StringBuffer(AHTML.beginMultiColumnTable(100, 1));
       String[] columnHeaders = new String[] {"Team", "Working", "Mod", "New", "Del", "Notes"};
       sb.append(AHTML.addHeaderRowMultiColumnTable(columnHeaders));
-      //    for (String artifactTypeName : TeamWorkflowExtensions.getInstance().getAllTeamWorkflowArtifactNames()) {
-      for (String artifactTypeName : new String[] {"Lba SA11 Req Team Workflow"}) {
+      for (String artifactTypeName : TeamWorkflowExtensions.getInstance().getAllTeamWorkflowArtifactNames()) {
+         //      for (String artifactTypeName : new String[] {"Lba V13 Req Team Workflow"}) {
          rd.log(AHTML.addRowSpanMultiColumnTable(artifactTypeName, columnHeaders.length));
          try {
             int x = 1;
