@@ -9,7 +9,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.eclipse.osee.framework.db.connection.ConnectionHandler;
 import org.eclipse.osee.framework.db.connection.info.SQL3DataType;
 import org.eclipse.osee.framework.jdk.core.util.time.GlobalTime;
@@ -55,7 +57,7 @@ public class JoinUtility {
       private final String deleteSql;
       private final String insertSql;
       private final int queryId;
-      protected List<IJoinRow> entries;
+      protected Set<IJoinRow> entries;
       private boolean wasStored;
       private int storedSize;
 
@@ -64,7 +66,7 @@ public class JoinUtility {
          this.deleteSql = deleteSql;
          this.insertSql = insertSql;
          this.queryId = getNewQueryId();
-         this.entries = new ArrayList<IJoinRow>();
+         this.entries = new HashSet<IJoinRow>();
          this.storedSize = -1;
       }
 
@@ -139,6 +141,25 @@ public class JoinUtility {
                   SQL3DataType.INTEGER, gammaId, SQL3DataType.INTEGER, transactionId};
          }
 
+         /* (non-Javadoc)
+          * @see java.lang.Object#equals(java.lang.Object)
+          */
+         @Override
+         public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (!(obj instanceof TempTransactionEntry)) return false;
+            TempTransactionEntry other = (TempTransactionEntry) obj;
+            return other.gammaId == this.gammaId && other.transactionId == this.transactionId;
+         }
+
+         /* (non-Javadoc)
+          * @see java.lang.Object#hashCode()
+          */
+         @Override
+         public int hashCode() {
+            return 37 * gammaId * transactionId;
+         }
+
          public String toString() {
             return String.format("gamma_id=%d, tx_id=%d", gammaId, transactionId);
          }
@@ -156,22 +177,41 @@ public class JoinUtility {
    public static final class ArtifactJoinQuery extends JoinQueryEntry {
 
       private final class Entry implements IJoinRow {
-         private int art_id;
-         private int branch_id;
+         private int artId;
+         private int branchId;
 
-         private Entry(int art_id, int branch_id) {
-            this.art_id = art_id;
-            this.branch_id = branch_id;
+         private Entry(int artId, int branchId) {
+            this.artId = artId;
+            this.branchId = branchId;
          }
 
          public Object[] toArray() {
             Timestamp insertTime = GlobalTime.GreenwichMeanTimestamp();
             return new Object[] {SQL3DataType.INTEGER, getQueryId(), SQL3DataType.TIMESTAMP, insertTime,
-                  SQL3DataType.INTEGER, art_id, SQL3DataType.INTEGER, branch_id};
+                  SQL3DataType.INTEGER, artId, SQL3DataType.INTEGER, branchId};
          }
 
          public String toString() {
-            return String.format("art_id=%d, branch_id=%d", art_id, branch_id);
+            return String.format("art_id=%d, branch_id=%d", artId, branchId);
+         }
+
+         /* (non-Javadoc)
+          * @see java.lang.Object#equals(java.lang.Object)
+          */
+         @Override
+         public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (!(obj instanceof Entry)) return false;
+            Entry other = (Entry) obj;
+            return other.artId == this.artId && other.branchId == this.branchId;
+         }
+
+         /* (non-Javadoc)
+          * @see java.lang.Object#hashCode()
+          */
+         @Override
+         public int hashCode() {
+            return 37 * artId * branchId;
          }
       }
 
@@ -197,6 +237,25 @@ public class JoinUtility {
             Timestamp insertTime = GlobalTime.GreenwichMeanTimestamp();
             return new Object[] {SQL3DataType.INTEGER, getQueryId(), SQL3DataType.TIMESTAMP, insertTime,
                   SQL3DataType.VARCHAR, value};
+         }
+
+         /* (non-Javadoc)
+          * @see java.lang.Object#equals(java.lang.Object)
+          */
+         @Override
+         public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (!(obj instanceof Entry)) return false;
+            Entry other = (Entry) obj;
+            return other.value == null && this.value == null || (other.value != null && this.value != null && this.value.equals(other.value));
+         }
+
+         /* (non-Javadoc)
+          * @see java.lang.Object#hashCode()
+          */
+         @Override
+         public int hashCode() {
+            return 37 * (value != null ? value.hashCode() : -1);
          }
 
          public String toString() {
