@@ -67,6 +67,7 @@ public class AddPeerToPeerReviewService extends WorkPageService {
                            "Select state to that review will be associated with.",
                            smaMgr.getWorkFlowDefinition().getPageNames());
                dialog.setInitialSelections(new Object[] {smaMgr.getStateMgr().getCurrentStateName()});
+               dialog.setReviewTitle("Review \"" + smaMgr.getSma().getArtifactTypeName() + "\" titled \"" + smaMgr.getSma().getDescriptiveName() + "\"");
                if (dialog.open() == 0) {
                   if (dialog.getReviewTitle() == null || dialog.getReviewTitle().equals("")) {
                      AWorkbench.popup("ERROR", "Must enter review title");
