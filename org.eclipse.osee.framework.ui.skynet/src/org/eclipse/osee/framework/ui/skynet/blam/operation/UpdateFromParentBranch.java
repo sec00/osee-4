@@ -57,38 +57,43 @@ public class UpdateFromParentBranch extends AbstractBlam {
       Timestamp insertTime = GlobalTime.GreenwichMeanTimestamp();
       List<Object[]> datas = new LinkedList<Object[]>();
 
-      // insert into the artifact_join_table
-      for (Artifact artifact : artifacts) {
-         datas.add(new Object[] {SQL3DataType.INTEGER, queryId, SQL3DataType.TIMESTAMP, insertTime,
-               SQL3DataType.INTEGER, artifact.getArtId(), SQL3DataType.INTEGER, parentBranch.getBranchId()});
+      try{
+	      // insert into the artifact_join_table
+	      for (Artifact artifact : artifacts) {
+	         datas.add(new Object[] {SQL3DataType.INTEGER, queryId, SQL3DataType.TIMESTAMP, insertTime,
+	               SQL3DataType.INTEGER, artifact.getArtId(), SQL3DataType.INTEGER, parentBranch.getBranchId()});
+	      }
+	      ArtifactLoader.selectArtifacts(datas);
+	      
+	      int count =
+	            ConnectionHandler.runPreparedUpdateReturnCount(DELETE_GAMMAS_FOR_UPDATES, SQL3DataType.INTEGER, childBranch.getBranchId(), SQL3DataType.INTEGER, parentBranch.getBranchId(), SQL3DataType.INTEGER, queryId,
+	            		SQL3DataType.INTEGER, childBranch.getBranchId(), SQL3DataType.INTEGER, parentBranch.getBranchId(), SQL3DataType.INTEGER, queryId,
+	            		SQL3DataType.INTEGER, childBranch.getBranchId(), SQL3DataType.INTEGER, parentBranch.getBranchId(), SQL3DataType.INTEGER, queryId);
+	      OSEELog.logInfo(SkynetGuiPlugin.class, "deleted " + count + " gammas", false);
+	
+	      count =
+	            ConnectionHandler.runPreparedUpdateReturnCount(INSERT_UPDATED_ARTIFACTS, SQL3DataType.INTEGER,
+	                  baselineTransactionNumber, SQL3DataType.INTEGER, parentBranch.getBranchId(), SQL3DataType.INTEGER,
+	                  queryId);
+	      OSEELog.logInfo(SkynetGuiPlugin.class, "inserted " + count + " artifacts", false);
+	
+	      count =
+	            ConnectionHandler.runPreparedUpdateReturnCount(INSERT_UPDATED_ATTRIBUTES_GAMMAS, SQL3DataType.INTEGER,
+	                    baselineTransactionNumber, SQL3DataType.INTEGER, parentBranch.getBranchId(), SQL3DataType.INTEGER,
+	                    queryId);
+	      OSEELog.logInfo(SkynetGuiPlugin.class, "inserted " + count + " attributes", false);
+	
+	      count =
+	            ConnectionHandler.runPreparedUpdateReturnCount(INSERT_UPDATED_LINKS_GAMMAS, SQL3DataType.INTEGER,
+	                    baselineTransactionNumber, SQL3DataType.INTEGER, parentBranch.getBranchId(), SQL3DataType.INTEGER,
+	                    queryId);
+	      OSEELog.logInfo(SkynetGuiPlugin.class, "inserted " + count + " relations", false);
+	
+	      monitor.done();
       }
-      ArtifactLoader.selectArtifacts(datas);
-      
-      int count =
-            ConnectionHandler.runPreparedUpdateReturnCount(DELETE_GAMMAS_FOR_UPDATES, SQL3DataType.INTEGER, childBranch.getBranchId(), SQL3DataType.INTEGER, parentBranch.getBranchId(), SQL3DataType.INTEGER, queryId,
-            		SQL3DataType.INTEGER, childBranch.getBranchId(), SQL3DataType.INTEGER, parentBranch.getBranchId(), SQL3DataType.INTEGER, queryId,
-            		SQL3DataType.INTEGER, childBranch.getBranchId(), SQL3DataType.INTEGER, parentBranch.getBranchId(), SQL3DataType.INTEGER, queryId);
-      OSEELog.logInfo(SkynetGuiPlugin.class, "deleted " + count + " gammas", false);
-
-      count =
-            ConnectionHandler.runPreparedUpdateReturnCount(INSERT_UPDATED_ARTIFACTS, SQL3DataType.INTEGER,
-                  baselineTransactionNumber, SQL3DataType.INTEGER, parentBranch.getBranchId(), SQL3DataType.INTEGER,
-                  queryId);
-      OSEELog.logInfo(SkynetGuiPlugin.class, "inserted " + count + " artifacts", false);
-
-      count =
-            ConnectionHandler.runPreparedUpdateReturnCount(INSERT_UPDATED_ATTRIBUTES_GAMMAS, SQL3DataType.INTEGER,
-                    baselineTransactionNumber, SQL3DataType.INTEGER, parentBranch.getBranchId(), SQL3DataType.INTEGER,
-                    queryId);
-      OSEELog.logInfo(SkynetGuiPlugin.class, "inserted " + count + " attributes", false);
-
-      count =
-            ConnectionHandler.runPreparedUpdateReturnCount(INSERT_UPDATED_LINKS_GAMMAS, SQL3DataType.INTEGER,
-                    baselineTransactionNumber, SQL3DataType.INTEGER, parentBranch.getBranchId(), SQL3DataType.INTEGER,
-                    queryId);
-      OSEELog.logInfo(SkynetGuiPlugin.class, "inserted " + count + " relations", false);
-
-      monitor.done();
+      finally{
+    	  ArtifactLoader.clearQuery(queryId);
+      }
    }
 
    /* (non-Javadoc)
