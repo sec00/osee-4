@@ -166,7 +166,7 @@ public class ExcelAtsTaskArtifactExtractor extends AbstractArtifactExtractor imp
                            str, rowNum));
                   }
                   int percentInt = percent.intValue();
-                  taskArt.getSmaMgr().getStateMgr().setPercentComplete(percentInt);
+                  smaMgr.getStateMgr().updateMetrics(0, percentInt, true);
                }
             } else if (headerRow[i].equalsIgnoreCase("Hours Spent")) {
                String str = row[i];
@@ -178,7 +178,7 @@ public class ExcelAtsTaskArtifactExtractor extends AbstractArtifactExtractor imp
                      throw new IllegalArgumentException(String.format("Invalid Hours Spent \"%s\" for row %d", str,
                            rowNum));
                   }
-                  taskArt.getSmaMgr().getStateMgr().setHoursSpent(hours);
+                  smaMgr.getStateMgr().updateMetrics(hours, smaMgr.getStateMgr().getPercentComplete(), true);
                }
             } else if (headerRow[i].equalsIgnoreCase("Estimated Hours")) {
                String str = row[i];

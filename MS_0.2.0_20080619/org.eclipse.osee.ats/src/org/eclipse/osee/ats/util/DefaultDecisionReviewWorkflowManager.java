@@ -81,8 +81,7 @@ public class DefaultDecisionReviewWorkflowManager {
       if (!reviewArt.getSmaMgr().getStateMgr().getCurrentStateName().equals(
             DecisionReviewArtifact.StateNames.Prepare.name())) return new Result("Action not in Prepare state");
       reviewArt.setSoleAttributeValue(ATSAttributes.ESTIMATED_HOURS_ATTRIBUTE.getStoreName(), estimateHours);
-      reviewArt.getSmaMgr().getStateMgr().setHoursSpent(stateHoursSpent);
-      reviewArt.getSmaMgr().getStateMgr().setPercentComplete(statePercentComplete);
+      reviewArt.getSmaMgr().getStateMgr().updateMetrics(stateHoursSpent, statePercentComplete, true);
       return Result.TrueResult;
    }
 
@@ -90,8 +89,7 @@ public class DefaultDecisionReviewWorkflowManager {
       if (!reviewArt.getSmaMgr().getStateMgr().getCurrentStateName().equals(
             DecisionReviewArtifact.StateNames.Decision.name())) return new Result("Action not in Decision state");
       reviewArt.setSoleAttributeValue(ATSAttributes.DECISION_ATTRIBUTE.getStoreName(), decision ? "Yes" : "No");
-      reviewArt.getSmaMgr().getStateMgr().setHoursSpent(stateHoursSpent);
-      reviewArt.getSmaMgr().getStateMgr().setPercentComplete(statePercentComplete);
+      reviewArt.getSmaMgr().getStateMgr().updateMetrics(stateHoursSpent, statePercentComplete, true);
       return Result.TrueResult;
    }
 

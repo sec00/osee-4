@@ -457,8 +457,7 @@ public class SMAManager {
                   hours = hours / smas.size();
                }
                for (StateMachineArtifact sma : smas) {
-                  sma.getSmaMgr().getStateMgr().setHoursSpent(hours + sma.getSmaMgr().getStateMgr().getHoursSpent());
-                  sma.getSmaMgr().getStateMgr().setPercentComplete(tsd.getPercent().getInt());
+                  sma.getSmaMgr().getStateMgr().updateMetrics(hours, tsd.getPercent().getInt(), true);
                   sma.setSoleAttributeValue(ATSAttributes.RESOLUTION_ATTRIBUTE.getStoreName(),
                         tsd.getSelectedOptionDef().getName());
                   sma.statusChanged();
@@ -477,8 +476,7 @@ public class SMAManager {
                   hours = hours / smas.size();
                }
                for (StateMachineArtifact sma : smas) {
-                  sma.getSmaMgr().getStateMgr().setHoursSpent(hours + sma.getSmaMgr().getStateMgr().getHoursSpent());
-                  sma.getSmaMgr().getStateMgr().setPercentComplete(tsd.getPercent().getInt());
+                  sma.getSmaMgr().getStateMgr().updateMetrics(hours, tsd.getPercent().getInt(), true);
                   sma.statusChanged();
                }
                return true;
