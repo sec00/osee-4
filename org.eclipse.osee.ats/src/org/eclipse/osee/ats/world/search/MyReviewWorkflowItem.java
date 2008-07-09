@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.eclipse.osee.ats.AtsPlugin;
@@ -49,19 +50,17 @@ public class MyReviewWorkflowItem extends UserSearchItem {
 
       Set<Artifact> assigned =
             RelationManager.getRelatedArtifacts(Arrays.asList(user), 1, CoreRelationEnumeration.Users_Artifact);
-
-      Collection<Artifact> artifacts = null;
-      if (reviewState == ReviewState.InWork) {
-         artifacts = RelationManager.getRelatedArtifacts(assigned, 1, AtsRelation.SmaToTask_Sma);
-      } else {
-         artifacts =
-               ArtifactQuery.getArtifactsFromAttribute(ATSAttributes.STATE_ATTRIBUTE.getStoreName(),
-                     "%<" + user.getUserId() + ">%", AtsPlugin.getAtsBranch());
-      }
-
+      Set<Artifact> artifacts = new HashSet<Artifact>(50);
       // Because user can be assigned directly to review or through being assigned to task, add in
       // all the original artifacts.
       artifacts.addAll(assigned);
+
+      if (reviewState == ReviewState.InWork) {
+         artifacts.addAll(RelationManager.getRelatedArtifacts(assigned, 1, AtsRelation.SmaToTask_Sma));
+      } else {
+         artifacts.addAll(ArtifactQuery.getArtifactsFromAttribute(ATSAttributes.STATE_ATTRIBUTE.getStoreName(),
+               "%<" + user.getUserId() + ">%", AtsPlugin.getAtsBranch()));
+      }
 
       List<Artifact> artifactsToReturn = new ArrayList<Artifact>(artifacts.size());
       for (Artifact artifact : artifacts) {
