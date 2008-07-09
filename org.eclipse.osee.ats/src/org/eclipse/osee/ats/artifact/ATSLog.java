@@ -66,7 +66,9 @@ public class ATSLog {
    public String getHtml(boolean showLog) {
       if (getLogItems().size() == 0) return "";
       StringBuffer sb = new StringBuffer();
-      if (showLog) sb.append(AHTML.addSpace(1) + AHTML.getLabelStr(AHTML.LABEL_FONT, "Log"));
+      if (showLog) sb.append(AHTML.addSpace(1) + AHTML.getLabelStr(
+            AHTML.LABEL_FONT,
+            "History for \"" + artifact.getArtifactTypeName() + "\" - " + artifact.getHumanReadableId() + " - titled \"" + artifact.getDescriptiveName() + "\""));
       sb.append(getTable());
       return sb.toString();
    }
