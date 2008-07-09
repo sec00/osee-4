@@ -285,7 +285,7 @@ public class ArtifactPersistenceManager {
                   factory.loadExisitingArtifact(rSet.getInt("art_id"), rSet.getInt("gamma_id"), rSet.getString("guid"),
                         rSet.getString("human_readable_id"), artifactType.getFactoryKey(), transactionId.getBranch(),
                         artifactType, rSet.getInt("transaction_id"), ModificationType.getMod(rSet.getInt("mod_type")),
-                        false);
+                        rSet.getDate("time"), false);
 
             setAttributesOnHistoricalArtifact(artifact);
 

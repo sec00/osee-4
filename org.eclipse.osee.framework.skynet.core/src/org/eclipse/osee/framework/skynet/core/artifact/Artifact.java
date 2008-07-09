@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,6 +86,7 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
    private int transactionId;
    private int artId;
    private int gammaId;
+   private Date lastModified;
    private boolean linksLoaded;
 
    protected Artifact(ArtifactFactory parentFactory, String guid, String humanReadableId, Branch branch, ArtifactType artifactType) {
@@ -1550,9 +1552,21 @@ public class Artifact implements IAdaptable, Comparable<Artifact> {
       return RelationManager.getRelatedArtifactsAll(this);
    }
 
-   void initPersistenceData(int gammaId, int transactionId, ModificationType modType, boolean active) {
+   void initPersistenceData(int gammaId, int transactionId, ModificationType modType, Date lastModified, boolean active) {
+      this.lastModified = lastModified;
       this.deleted = modType == ModificationType.DELETED;
       this.gammaId = gammaId;
       this.transactionId = active ? 0 : transactionId;
+   }
+
+   public Date getLastModified() throws OseeCoreException, SQLException {
+      return lastModified;
+   }
+
+   /**
+    * @param lastModified the lastModified to set
+    */
+   public void setLastModified(Date lastModified) {
+      this.lastModified = lastModified;
    }
 }

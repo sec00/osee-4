@@ -1217,4 +1217,11 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IWorld
       return smaRelations;
    }
 
+   public String getWorldViewLastUpdated() throws OseeCoreException, SQLException {
+      return XDate.getDateStr(getLastModified(), XDate.MMDDYYHHMM);
+   }
+
+   public String getWorldViewLastStatused() throws OseeCoreException, SQLException {
+      return XDate.getDateStr(getLog().getLastStatusedDate(), XDate.MMDDYYHHMM);
+   }
 }
