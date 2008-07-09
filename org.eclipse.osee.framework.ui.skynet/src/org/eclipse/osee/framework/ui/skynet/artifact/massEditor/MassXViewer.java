@@ -18,14 +18,23 @@ import java.util.HashSet;
 import java.util.Set;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.artifact.ArtifactCache;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactData;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactTransfer;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchPersistenceManager;
+import org.eclipse.osee.framework.skynet.core.artifact.IATSArtifact;
 import org.eclipse.osee.framework.skynet.core.attribute.AttributeType;
 import org.eclipse.osee.framework.skynet.core.attribute.BooleanAttribute;
 import org.eclipse.osee.framework.skynet.core.attribute.DateAttribute;
 import org.eclipse.osee.framework.skynet.core.attribute.FloatingPointAttribute;
 import org.eclipse.osee.framework.skynet.core.attribute.IntegerAttribute;
+import org.eclipse.osee.framework.skynet.core.event.LocalTransactionEvent;
+import org.eclipse.osee.framework.skynet.core.event.RemoteTransactionEvent;
+import org.eclipse.osee.framework.skynet.core.event.SkynetEventManager;
+import org.eclipse.osee.framework.skynet.core.event.TransactionEvent;
+import org.eclipse.osee.framework.skynet.core.event.TransactionEvent.TransactionChangeType;
+import org.eclipse.osee.framework.ui.plugin.event.Event;
+import org.eclipse.osee.framework.ui.plugin.event.IEventReceiver;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.artifact.ArtifactPromptChange;
@@ -55,7 +64,7 @@ import org.eclipse.swt.widgets.TreeItem;
 /**
  * @author Donald G. Dunne
  */
-public class MassXViewer extends XViewer {
+public class MassXViewer extends XViewer implements IEventReceiver {
 
    private static String NAMESPACE = "org.eclipse.osee.framework.ui.skynet.massEditor.ArtifactXViewer";
    private String title;
@@ -81,6 +90,8 @@ public class MassXViewer extends XViewer {
             handleDoubleClick();
          };
       });
+      SkynetEventManager.getInstance().register(RemoteTransactionEvent.class, this);
+      SkynetEventManager.getInstance().register(LocalTransactionEvent.class, this);
    }
 
    @Override
@@ -230,6 +241,8 @@ public class MassXViewer extends XViewer {
     * Release resources
     */
    public void dispose() {
+      SkynetEventManager.getInstance().unRegisterAll(this);
+      SkynetEventManager.getInstance().unRegisterAll(this);
       // Tell the label provider to release its ressources
       getLabelProvider().dispose();
    }
@@ -324,6 +337,74 @@ public class MassXViewer extends XViewer {
     */
    public Collection<? extends Artifact> getArtifacts() {
       return artifacts;
+   }
+
+   public void onEvent(final Event event) {
+      if (getTree() == null || getTree().isDisposed()) {
+         dispose();
+         return;
+      }
+      if (event instanceof TransactionEvent) {
+         TransactionEvent transEvent = (TransactionEvent) event;
+         Set<Integer> artIds = transEvent.getArtIds(TransactionChangeType.Modified);
+         Set<Artifact> modArts = new HashSet<Artifact>(20);
+         for (int artId : artIds) {
+            Artifact art = ArtifactCache.getActive(artId, ((MassArtifactEditor) editor).getBranch());
+            if (art != null && (art instanceof IATSArtifact)) {
+               modArts.add(art);
+               try {
+                  if (art instanceof IATSArtifact) {
+                     Artifact parentArt = ((IATSArtifact) art).getParentAtsArtifact();
+                     if (parentArt != null) {
+                        modArts.add(parentArt);
+                     }
+                  }
+               } catch (Exception ex) {
+                  // do nothing
+               }
+            }
+         }
+         if (modArts.size() > 0) update(modArts.toArray(), null);
+
+         artIds = transEvent.getArtIds(TransactionChangeType.Deleted);
+         artIds.addAll(transEvent.getArtIds(TransactionChangeType.Purged));
+         modArts.clear();
+         for (int artId : artIds) {
+            Artifact art = ArtifactCache.getActive(artId, ((MassArtifactEditor) editor).getBranch());
+            if (art != null && (art instanceof IATSArtifact)) {
+               modArts.add(art);
+            }
+         }
+         if (modArts.size() > 0) remove(modArts.toArray());
+
+         modArts.clear();
+         for (int artId : artIds) {
+            Artifact art = ArtifactCache.getActive(artId, ((MassArtifactEditor) editor).getBranch());
+            if (art != null && (art instanceof IATSArtifact)) {
+               modArts.add(art);
+               try {
+                  if (art instanceof IATSArtifact) {
+                     Artifact parentArt = ((IATSArtifact) art).getParentAtsArtifact();
+                     if (parentArt != null) {
+                        modArts.add(parentArt);
+                     }
+                  }
+               } catch (Exception ex) {
+                  // do nothing
+               }
+            }
+         }
+         if (modArts.size() > 0) {
+            for (Artifact art : modArts) {
+               refresh(art);
+            }
+         }
+      } else
+         OSEELog.logSevere(SkynetGuiPlugin.class, "Unexpected event => " + event, true);
+   }
+
+   public boolean runOnEventInDisplayThread() {
+      return true;
    }
 
 }
