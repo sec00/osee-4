@@ -115,7 +115,7 @@ public class ExcelAtsTaskArtifactExtractor extends AbstractArtifactExtractor imp
                   u = SkynetAuthentication.getUserByName(userName, false);
                if (u == null) OSEELog.logSevere(AtsPlugin.class, String.format(
                      "Invalid Originator \"%s\" for row %d\nSetting to current user.", userName, rowNum), false);
-               taskArt.getLog().setOriginator(u);
+               taskArt.getSmaMgr().getLog().setOriginator(u);
             } else if (headerRow[i].equalsIgnoreCase("Assignees")) {
                Set<User> assignees = new HashSet<User>();
                for (String userName : row[i].split(";")) {

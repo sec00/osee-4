@@ -53,7 +53,7 @@ public class XCurrentStateDam extends XStateAssigneesDam {
    public static void logMetrics(StateMachineArtifact sma, String percent, String hours, User user, Date date) throws SQLException, MultipleAttributesExist {
       LogItem logItem =
             new LogItem(LogType.Metrics, date, user, "", String.format("Percent %s Hours %s", percent, hours));
-      sma.getLog().addLogItem(logItem);
+      sma.getSmaMgr().getLog().addLogItem(logItem);
    }
 
    /**
