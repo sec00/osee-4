@@ -88,7 +88,7 @@ public class MassXViewer extends XViewer {
       String colName = treeColumn.getText();
       Set<Artifact> useArts = new HashSet<Artifact>();
       for (TreeItem item : treeItems) {
-         useArts.add(((MassArtifactItem) item.getData()).getArtifact());
+         useArts.add((Artifact) item.getData());
       }
       try {
          if (ArtifactPromptChange.promptChangeAttribute(colName, colName, useArts, false)) {
@@ -126,7 +126,7 @@ public class MassXViewer extends XViewer {
          if (colName.equals(Extra_Columns.Artifact_Type.name()) || colName.equals(Extra_Columns.HRID.name()) || colName.equals(Extra_Columns.GUID.name())) {
             AWorkbench.popup("ERROR", "Can't change the field " + colName);
          }
-         Artifact useArt = ((MassArtifactItem) treeItem.getData()).getArtifact();
+         Artifact useArt = ((Artifact) treeItem.getData());
          if (ArtifactPromptChange.promptChangeAttribute(colName, colName, Arrays.asList(useArt), persist)) {
             refresh();
             editor.onDirtied();
@@ -213,8 +213,8 @@ public class MassXViewer extends XViewer {
    }
 
    public void handleDoubleClick() {
-      if (getSelectedArtifactItems().size() == 0) return;
-      Artifact art = getSelectedArtifactItems().iterator().next().getArtifact();
+      if (getSelectedArtifacts().size() == 0) return;
+      Artifact art = getSelectedArtifacts().iterator().next();
       ArtifactEditor.editArtifact(art);
    }
 
@@ -222,7 +222,7 @@ public class MassXViewer extends XViewer {
       ArrayList<Artifact> arts = new ArrayList<Artifact>();
       TreeItem items[] = getTree().getItems();
       if (items.length > 0) for (TreeItem item : items)
-         arts.add(((MassArtifactItem) item.getData()).getArtifact());
+         arts.add((Artifact) item.getData());
       return arts;
    }
 
@@ -238,7 +238,7 @@ public class MassXViewer extends XViewer {
       ArrayList<Artifact> arts = new ArrayList<Artifact>();
       TreeItem items[] = getTree().getSelection();
       if (items.length > 0) for (TreeItem item : items)
-         arts.add((Artifact) ((MassArtifactItem) item.getData()).getArtifact());
+         arts.add((Artifact) item.getData());
       return arts;
    }
 
@@ -250,20 +250,14 @@ public class MassXViewer extends XViewer {
    }
 
    public void add(Collection<Artifact> artifacts) {
-      Set<MassArtifactItem> items = new HashSet<MassArtifactItem>();
-      for (Artifact art : artifacts)
-         items.add(new MassArtifactItem(this, art, null));
       resetColumns(artifacts);
-      ((MassContentProvider) getContentProvider()).add(items);
+      ((MassContentProvider) getContentProvider()).add(artifacts);
    }
 
    public void set(Collection<? extends Artifact> artifacts) {
-      Set<MassArtifactItem> items = new HashSet<MassArtifactItem>();
-      for (Artifact art : artifacts)
-         items.add(new MassArtifactItem(this, art, null));
       resetColumns(artifacts);
       this.artifacts = artifacts;
-      ((MassContentProvider) getContentProvider()).set(items);
+      ((MassContentProvider) getContentProvider()).set(artifacts);
    }
 
    public void resetColumns(Collection<? extends Artifact> artifacts) {
@@ -323,18 +317,6 @@ public class MassXViewer extends XViewer {
       custData.getSortingData().setSortingNames(Arrays.asList("Name"));
       getCustomize().setCustomization(custData);
       ((MassXViewerFactory) getXViewerFactory()).setDefaultCustData(custData);
-   }
-
-   public ArrayList<MassArtifactItem> getSelectedArtifactItems() {
-      ArrayList<MassArtifactItem> arts = new ArrayList<MassArtifactItem>();
-      TreeItem items[] = getTree().getSelection();
-      if (items.length > 0) for (TreeItem item : items)
-         arts.add((MassArtifactItem) item.getData());
-      return arts;
-   }
-
-   public Object[] getSelectedArtifactItemsArray() {
-      return getSelectedArtifactItems().toArray(new MassArtifactItem[getSelectedArtifactItems().size()]);
    }
 
    /**
