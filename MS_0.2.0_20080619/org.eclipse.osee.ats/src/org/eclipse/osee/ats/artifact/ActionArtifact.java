@@ -807,7 +807,7 @@ public class ActionArtifact extends ATSArtifact implements IWorldViewArtifact {
                      BranchPersistenceManager.getAtsBranch(), guid, hrid);
       setArtifactIdentifyData(this, teamArt);
 
-      teamArt.getLog().addLog(LogType.Originated, "", "");
+      teamArt.getSmaMgr().getLog().addLog(LogType.Originated, "", "");
 
       // Relate Workflow to ActionableItems (by guid) if team is responsible
       // for that AI
@@ -816,7 +816,7 @@ public class ActionArtifact extends ATSArtifact implements IWorldViewArtifact {
 
       // Initialize state machine
       teamArt.getSmaMgr().getStateMgr().initializeStateMachine(DefaultTeamState.Endorse.name(), assignees);
-      teamArt.getLog().addLog(LogType.StateEntered, DefaultTeamState.Endorse.name(), "");
+      teamArt.getSmaMgr().getLog().addLog(LogType.StateEntered, DefaultTeamState.Endorse.name(), "");
 
       // Relate WorkFlow to Team Definition (by guid due to relation loading
       // issues)

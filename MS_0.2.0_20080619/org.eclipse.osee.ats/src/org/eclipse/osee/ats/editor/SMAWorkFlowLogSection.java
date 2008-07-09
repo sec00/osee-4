@@ -55,7 +55,7 @@ public class SMAWorkFlowLogSection extends SMAWorkFlowSection {
       GridData gd = new GridData(GridData.FILL_BOTH);
       gd.heightHint = 500;
       xResultsComp.setLayoutData(gd);
-      xResultsComp.setHtmlText(smaMgr.getSma().getLog().getHtml(false), title);
+      xResultsComp.setHtmlText(smaMgr.getLog().getHtml(false), title);
 
       return workComp;
    }
@@ -84,7 +84,7 @@ public class SMAWorkFlowLogSection extends SMAWorkFlowSection {
    @Override
    public void refresh() {
       super.refresh();
-      xResultsComp.setHtmlText(smaMgr.getSma().getLog().getHtml(false), title);
+      xResultsComp.setHtmlText(smaMgr.getLog().getHtml(false), title);
    }
 
 }

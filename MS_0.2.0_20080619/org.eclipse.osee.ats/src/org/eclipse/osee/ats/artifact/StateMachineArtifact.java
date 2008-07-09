@@ -63,8 +63,6 @@ import org.eclipse.swt.graphics.Image;
 public abstract class StateMachineArtifact extends ATSArtifact implements IWorldViewArtifact, IEventReceiver, ISubscribableArtifact, IFavoriteableArtifact {
 
    protected SMAManager smaMgr;
-   private ATSLog atsLog;
-   private ATSNote atsNote;
    private Set<IRelationEnumeration> smaRelations = new HashSet<IRelationEnumeration>();
    private Collection<User> preSaveStateAssignees;
    private User preSaveOriginator;
@@ -96,8 +94,6 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IWorld
    public void onInitializationComplete() {
       super.onInitializationComplete();
       smaMgr = new SMAManager(this);
-      atsLog = new ATSLog(this);
-      atsNote = new ATSNote(this);
       try {
          preSaveStateAssignees = smaMgr.getStateMgr().getAssignees();
          if (smaMgr.getOriginator() == null)
@@ -300,7 +296,7 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IWorld
 
    public boolean isUnCancellable() {
       try {
-         LogItem item = smaMgr.getSma().getLog().getStateEvent(LogType.StateCancelled);
+         LogItem item = smaMgr.getLog().getStateEvent(LogType.StateCancelled);
          if (item == null) throw new IllegalArgumentException("No Cancelled Event");
          for (WorkPageDefinition toWorkPageDefinition : smaMgr.getWorkFlowDefinition().getToPages(
                smaMgr.getWorkPageDefinition()))
@@ -318,14 +314,6 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IWorld
 
    public boolean showTaskTab() {
       return isTaskable();
-   }
-
-   public ATSLog getLog() {
-      return atsLog;
-   }
-
-   public ATSNote getNotes() {
-      return atsNote;
    }
 
    public String getEditorTitle() {
@@ -482,7 +470,7 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IWorld
    }
 
    public Date getWorldViewCreatedDate() throws OseeCoreException, SQLException {
-      return getLog().getCreationDate();
+      return smaMgr.getLog().getCreationDate();
    }
 
    public String getWorldViewOriginator() throws OseeCoreException, SQLException {
@@ -501,13 +489,13 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IWorld
    }
 
    public Date getWorldViewCompletedDate() throws OseeCoreException, SQLException {
-      LogItem item = getLog().getStateEvent(LogType.StateEntered, DefaultTeamState.Completed.name());
+      LogItem item = smaMgr.getLog().getStateEvent(LogType.StateEntered, DefaultTeamState.Completed.name());
       if (item != null) return item.getDate();
       return null;
    }
 
    public Date getWorldViewCancelledDate() throws OseeCoreException, SQLException {
-      LogItem item = getLog().getStateEvent(LogType.StateEntered, DefaultTeamState.Cancelled.name());
+      LogItem item = smaMgr.getLog().getStateEvent(LogType.StateEntered, DefaultTeamState.Cancelled.name());
       if (item != null) return item.getDate();
       return null;
    }
@@ -1222,6 +1210,6 @@ public abstract class StateMachineArtifact extends ATSArtifact implements IWorld
    }
 
    public String getWorldViewLastStatused() throws OseeCoreException, SQLException {
-      return XDate.getDateStr(getLog().getLastStatusedDate(), XDate.MMDDYYHHMM);
+      return XDate.getDateStr(smaMgr.getLog().getLastStatusedDate(), XDate.MMDDYYHHMM);
    }
 }
