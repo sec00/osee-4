@@ -229,11 +229,6 @@ public class SMAWorkFlowTab extends FormPage implements IActionable {
          }
       }
 
-      logSection = new SMAWorkFlowLogSection(body, toolkit, SWT.NONE, smaMgr);
-      control = logSection.getMainComp();
-      sections.add(logSection);
-      managedForm.addPart(logSection);
-
       if (AtsPlugin.isAtsAdmin()) {
          SMAWorkFlowDebugSection section = new SMAWorkFlowDebugSection(body, toolkit, SWT.NONE, smaMgr);
          control = section.getMainComp();
@@ -251,7 +246,6 @@ public class SMAWorkFlowTab extends FormPage implements IActionable {
       }
    }
    private Control control = null;
-   private SMAWorkFlowLogSection logSection;
 
    private void storeScrollLocation() {
       if (scrolledForm != null) {

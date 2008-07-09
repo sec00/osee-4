@@ -16,7 +16,6 @@ import java.util.Set;
 import org.eclipse.osee.ats.artifact.ATSAttributes;
 import org.eclipse.osee.ats.artifact.LogItem;
 import org.eclipse.osee.ats.artifact.StateMachineArtifact;
-import org.eclipse.osee.ats.artifact.TaskArtifact;
 import org.eclipse.osee.ats.artifact.ATSLog.LogType;
 import org.eclipse.osee.ats.util.AtsLib;
 import org.eclipse.osee.framework.skynet.core.SkynetAuthentication;
@@ -62,8 +61,8 @@ public class XCurrentStateDam extends XStateAssigneesDam {
    }
 
    public void logMetrics() throws OseeCoreException, SQLException {
-      if (sma instanceof TaskArtifact) logMetrics(sma, sma.getPercentCompleteSMATotal() + "",
-            AtsLib.doubleToStrString(sma.getHoursSpentSMATotal()), "", SkynetAuthentication.getUser(), new Date());
+      logMetrics(sma, sma.getPercentCompleteSMATotal() + "", AtsLib.doubleToStrString(sma.getHoursSpentSMATotal()), "",
+            SkynetAuthentication.getUser(), new Date());
    }
 
    public static void logMetrics(StateMachineArtifact sma, String percent, String hours, String stateName, User user, Date date) throws SQLException, MultipleAttributesExist {
