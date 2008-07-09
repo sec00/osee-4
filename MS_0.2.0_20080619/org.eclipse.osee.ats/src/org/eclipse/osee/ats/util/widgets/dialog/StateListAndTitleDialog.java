@@ -46,6 +46,7 @@ public class StateListAndTitleDialog extends StateListDialog {
       comp.setLayoutData(new GridData(SWT.FILL, SWT.LEFT, true, false));
       titleText = new XText("Review Title");
       titleText.createWidgets(comp, 1);
+      if (reviewTitle != null) titleText.set(reviewTitle);
       titleText.getStyledText().setLayoutData(new GridData(SWT.FILL, SWT.LEFT, true, false));
       titleText.addXModifiedListener(new XModifiedListener() {
          /* (non-Javadoc)
@@ -74,6 +75,13 @@ public class StateListAndTitleDialog extends StateListDialog {
     */
    public String getReviewTitle() {
       return reviewTitle;
+   }
+
+   /**
+    * @param reviewTitle the reviewTitle to set
+    */
+   public void setReviewTitle(String reviewTitle) {
+      this.reviewTitle = reviewTitle;
    }
 
 }

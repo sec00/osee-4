@@ -13,6 +13,7 @@ package org.eclipse.osee.ats.editor;
 import java.sql.SQLException;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
+import org.eclipse.osee.framework.ui.skynet.artifact.editor.ArtifactEditor;
 import org.eclipse.osee.framework.ui.skynet.history.RevisionHistoryView;
 import org.eclipse.osee.framework.ui.skynet.widgets.xresults.XResultsComposite;
 import org.eclipse.swt.SWT;
@@ -21,6 +22,9 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
@@ -47,6 +51,19 @@ public class SMAHistoryComposite extends Composite {
       gd.heightHint = 500;
       xResultsComp.setLayoutData(gd);
       xResultsComp.setHtmlText(smaMgr.getLog().getHtml(true), smaMgr.getSma().getArtifactTypeName() + " History");
+
+      Label button = new Label(this, SWT.NONE);
+      button.setText("    ");
+      final SMAManager fSmaMgr = smaMgr;
+      button.addListener(SWT.MouseUp, new Listener() {
+         /* (non-Javadoc)
+          * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+          */
+         @Override
+         public void handleEvent(Event event) {
+            ArtifactEditor.editArtifact(fSmaMgr.getSma());
+         }
+      });
    }
 
    public void createTaskActionBar() throws OseeCoreException, SQLException {
@@ -77,7 +94,6 @@ public class SMAHistoryComposite extends Composite {
             RevisionHistoryView.open(smaMgr.getSma());
          }
       });
-
    }
 
 }
