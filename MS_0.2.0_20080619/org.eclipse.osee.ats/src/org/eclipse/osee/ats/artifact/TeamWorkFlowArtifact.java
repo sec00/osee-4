@@ -279,7 +279,8 @@ public class TeamWorkFlowArtifact extends TaskableStateMachineArtifact implement
          return XViewerCells.getCellExceptionString(errStr);
       }
       VersionArtifact verArt = verArts.iterator().next();
-      if (!smaMgr.isCompleted() && verArt.getSoleAttributeValue(ATSAttributes.RELEASED_ATTRIBUTE.getStoreName(), false)) {
+      if (!smaMgr.isCompleted() && !smaMgr.isCancelled() && verArt.getSoleAttributeValue(
+            ATSAttributes.RELEASED_ATTRIBUTE.getStoreName(), false)) {
          String errStr =
                "Workflow " + smaMgr.getSma().getHumanReadableId() + " targeted for released version, but not completed: " + verArt;
          OSEELog.logException(AtsPlugin.class, errStr, null, false);

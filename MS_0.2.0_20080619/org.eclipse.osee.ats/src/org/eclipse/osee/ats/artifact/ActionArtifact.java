@@ -1404,4 +1404,12 @@ public class ActionArtifact extends ATSArtifact implements IWorldViewArtifact {
       return rollPercent.intValue();
    }
 
+   public String getWorldViewLastUpdated() throws OseeCoreException, SQLException {
+      return XDate.getDateStr(getLastModified(), XDate.MMDDYYHHMM);
+   }
+
+   public String getWorldViewLastStatused() throws OseeCoreException, SQLException {
+      return "(see children)";
+   }
+
 }
