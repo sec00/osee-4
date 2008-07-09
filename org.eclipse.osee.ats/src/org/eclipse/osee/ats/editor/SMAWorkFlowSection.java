@@ -654,8 +654,7 @@ public class SMAWorkFlowSection extends SectionPart {
          if (hoursSinceCreation < 0.02) hoursSinceCreation = (new Float(0.02)).floatValue();
          // System.out.println("hoursSinceCreation *" + hoursSinceCreation + "*");
          if (minSinceCreation < 5) {
-            smaMgr.getStateMgr().setPercentComplete(100);
-            smaMgr.getStateMgr().setHoursSpent(hoursSinceCreation);
+            smaMgr.getStateMgr().updateMetrics(hoursSinceCreation, 100, true);
             return true;
          }
       }
@@ -668,8 +667,7 @@ public class SMAWorkFlowSection extends SectionPart {
                   msg, false, Arrays.asList(smaMgr.getSma()));
       int result = tsd.open();
       if (result == 0) {
-         smaMgr.getStateMgr().setPercentComplete(100);
-         smaMgr.getStateMgr().setHoursSpent(smaMgr.getStateMgr().getHoursSpent() + tsd.getHours().getFloat());
+         smaMgr.getStateMgr().updateMetrics(tsd.getHours().getFloat(), 100, true);
          return true;
       }
       return false;
