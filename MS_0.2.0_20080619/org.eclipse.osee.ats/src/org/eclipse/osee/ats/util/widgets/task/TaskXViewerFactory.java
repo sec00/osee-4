@@ -54,7 +54,7 @@ public class TaskXViewerFactory extends SkynetXViewerFactory {
          XViewerColumn newCol = atsXCol.getXViewerColumn(atsXCol);
          newCol.setWidth(widths.get(x));
          newCol.setOrderNum(x++);
-         newCol.setTreeViewer(xViewer);
+         newCol.setXViewer(xViewer);
          newCol.setShow(true);
          cols.add(newCol);
          handled.add(atsXCol);
@@ -65,7 +65,7 @@ public class TaskXViewerFactory extends SkynetXViewerFactory {
          if (!handled.contains(atsXCol)) {
             XViewerColumn newCol = atsXCol.getXViewerColumn(atsXCol);
             newCol.setOrderNum(x++);
-            newCol.setTreeViewer(xViewer);
+            newCol.setXViewer(xViewer);
             newCol.setShow(false);
             cols.add(newCol);
             handled.add(atsXCol);
