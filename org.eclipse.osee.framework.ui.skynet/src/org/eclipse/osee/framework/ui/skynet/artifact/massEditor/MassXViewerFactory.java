@@ -37,7 +37,7 @@ public class MassXViewerFactory extends SkynetXViewerFactory {
       return new XViewerSorter(xViewer);
    }
 
-   public CustomizeData getDefaultTableCustomizeData() {
+   public CustomizeData getDefaultTableCustomizeData(XViewer xViewer) {
       CustomizeData custData = new CustomizeData();
       int x = 0;
       ArrayList<XViewerColumn> cols = new ArrayList<XViewerColumn>();

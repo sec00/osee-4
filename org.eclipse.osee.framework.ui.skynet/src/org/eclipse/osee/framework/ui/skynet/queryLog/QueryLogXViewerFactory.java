@@ -25,14 +25,17 @@ import org.eclipse.swt.SWT;
  */
 public class QueryLogXViewerFactory extends SkynetXViewerFactory {
 
+   private XViewer viewer;
+
    public QueryLogXViewerFactory() {
    }
 
    public XViewerSorter createNewXSorter(XViewer xViewer) {
+      viewer = xViewer;
       return new XViewerSorter(xViewer);
    }
 
-   public CustomizeData getDefaultTableCustomizeData() {
+   public CustomizeData getDefaultTableCustomizeData(XViewer xViewer) {
       CustomizeData custData = new CustomizeData();
       List<XViewerColumn> defaultColumns = new ArrayList<XViewerColumn>();
       defaultColumns.add(new XViewerColumn(QueryLogView.ITEM, 400, 400, SWT.LEFT, true, SortDataType.String, 0));
@@ -48,7 +51,7 @@ public class QueryLogXViewerFactory extends SkynetXViewerFactory {
     * @see org.eclipse.osee.framework.ui.skynet.widgets.xviewer.IXViewerFactory#getDefaultXViewerColumn()
     */
    public XViewerColumn getDefaultXViewerColumn(String name) {
-      for (XViewerColumn xCol : getDefaultTableCustomizeData().getColumnData().getColumns()) {
+      for (XViewerColumn xCol : getDefaultTableCustomizeData(viewer).getColumnData().getColumns()) {
          if (xCol.getSystemName().equals(name)) {
             return xCol;
          }
