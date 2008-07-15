@@ -98,7 +98,8 @@ public class MassArtifactEditor extends AbstractArtifactEditor implements IDirti
                if (accessibleArts.size() == 0)
                   AWorkbench.popup("ERROR", "No Artifacts to edit");
                else
-                  AWorkbench.getActivePage().openEditor(new MassArtifactEditorInput(name, accessibleArts), EDITOR_ID);
+                  AWorkbench.getActivePage().openEditor(new MassArtifactEditorInput(name, accessibleArts, null),
+                        EDITOR_ID);
                if (accessControlFilteredResults) AWorkbench.popup("ERROR",
                      "Some Artifacts not loaded due to access control limitations.");
             } catch (PartInitException ex) {
@@ -157,13 +158,21 @@ public class MassArtifactEditor extends AbstractArtifactEditor implements IDirti
       OseeAts.addButtonToEditorToolBar(this, SkynetGuiPlugin.getInstance(), toolBar, EDITOR_ID, "Mass Artifact Editor");
    }
 
-   public static void editArtifacts(MassArtifactEditorInput input) {
-      IWorkbenchPage page = AWorkbench.getActivePage();
-      try {
-         page.openEditor(input, EDITOR_ID);
-      } catch (PartInitException ex) {
-         OSEELog.logException(SkynetGuiPlugin.class, ex, true);
-      }
+   public static void editArtifacts(final MassArtifactEditorInput input) {
+      Displays.ensureInDisplayThread(new Runnable() {
+         /* (non-Javadoc)
+          * @see java.lang.Runnable#run()
+          */
+         @Override
+         public void run() {
+            try {
+               IWorkbenchPage page = AWorkbench.getActivePage();
+               page.openEditor(input, EDITOR_ID);
+            } catch (PartInitException ex) {
+               OSEELog.logException(SkynetGuiPlugin.class, ex, true);
+            }
+         }
+      });
    }
 
    public boolean isSaveOnCloseNeeded() {

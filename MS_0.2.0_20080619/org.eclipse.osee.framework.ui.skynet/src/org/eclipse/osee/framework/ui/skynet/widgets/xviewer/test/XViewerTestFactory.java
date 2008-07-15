@@ -40,7 +40,7 @@ public class XViewerTestFactory implements IXViewerFactory {
       for (XViewerTestColumns atsXCol : XViewerTestColumns.values()) {
          XViewerColumn newCol = atsXCol.getXViewerColumn(atsXCol);
          newCol.setOrderNum(x++);
-         newCol.setTreeViewer(xViewer);
+         newCol.setXViewer(xViewer);
          cols.add(newCol);
       }
       custData.getColumnData().setColumns(cols);
