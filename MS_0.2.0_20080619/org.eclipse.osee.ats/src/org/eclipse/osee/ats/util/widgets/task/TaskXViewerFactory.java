@@ -35,7 +35,7 @@ public class TaskXViewerFactory extends SkynetXViewerFactory {
       return new TaskXViewerSorter(xViewer);
    }
 
-   public CustomizeData getDefaultTableCustomizeData() {
+   public CustomizeData getDefaultTableCustomizeData(XViewer xViewer) {
       CustomizeData custData = new CustomizeData();
       // Title, State, POC, Percent_Complete, Hours_Spent, Resolution, Est_Hours, Remain_Hours
       List<AtsXColumn> taskColumnOrder =
