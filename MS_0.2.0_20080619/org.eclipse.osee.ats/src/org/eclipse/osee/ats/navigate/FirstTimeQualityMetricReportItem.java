@@ -145,10 +145,10 @@ public class FirstTimeQualityMetricReportItem extends XNavigateItemAction {
          Date endDate = verMet.getVerArt().getReleaseDate();
          Integer numOrigDurning = null;
          if (startDate != null && endDate != null) {
+            if (numOrigDurning == null) numOrigDurning = new Integer(0);
             Collection<TeamWorkFlowArtifact> arts = teamMet.getWorkflowsOriginatedBetween(startDate, endDate);
             for (TeamWorkFlowArtifact team : arts) {
                if (team.getChangeType() == ChangeType.Problem && (team.getPriority() == PriorityType.Priority_1 || team.getPriority() == PriorityType.Priority_2)) {
-                  if (numOrigDurning == null) numOrigDurning = new Integer(0);
                   numOrigDurning++;
                }
             }
