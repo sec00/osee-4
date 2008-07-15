@@ -47,7 +47,7 @@ public class ChangeXViewerFactory extends SkynetXViewerFactory {
       for (ChangeColumn atsXCol : ChangeColumn.values()) {
          XViewerColumn newCol = atsXCol.getXViewerColumn(atsXCol);
          newCol.setOrderNum(x++);
-         newCol.setTreeViewer(xViewer);
+         newCol.setXViewer(xViewer);
          cols.add(newCol);
       }
       try {

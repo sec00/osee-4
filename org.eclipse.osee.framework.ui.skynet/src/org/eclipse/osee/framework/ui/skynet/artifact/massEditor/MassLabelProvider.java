@@ -19,6 +19,7 @@ import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.artifact.massEditor.MassXViewer.Extra_Columns;
 import org.eclipse.osee.framework.ui.skynet.util.OSEELog;
+import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewerValueColumn;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeColumn;
 
@@ -32,21 +33,25 @@ public class MassLabelProvider implements ITableLabelProvider {
    }
 
    public String getColumnText(Object element, int columnIndex) {
-      if (element instanceof String) {
-         if (columnIndex == 1)
-            return (String) element;
-         else
-            return "";
-      }
-      Artifact artifact = (Artifact) element;
-      if (artifact == null || artifact.isDeleted()) return "";
-      // Handle case where columns haven't been loaded yet
-      if (columnIndex > (getTreeViewer().getTree().getColumns().length - 1)) {
-         return "";
-      }
-
       try {
-         TreeColumn treeCol = getTreeViewer().getTree().getColumns()[columnIndex];
+         TreeColumn treeCol = getTreeViewer().getTree().getColumn(columnIndex);
+         if (treeCol.getData() instanceof XViewerValueColumn) {
+            return ((XViewerValueColumn) treeCol.getData()).getColumnText(element,
+                  (XViewerValueColumn) treeCol.getData());
+         }
+         if (element instanceof String) {
+            if (columnIndex == 1)
+               return (String) element;
+            else
+               return "";
+         }
+         Artifact artifact = (Artifact) element;
+         if (artifact == null || artifact.isDeleted()) return "";
+         // Handle case where columns haven't been loaded yet
+         if (columnIndex > (getTreeViewer().getTree().getColumns().length - 1)) {
+            return "";
+         }
+
          String colName = treeCol.getText();
          if (colName.equals(Extra_Columns.HRID.name()))
             return artifact.getHumanReadableId();
@@ -87,9 +92,18 @@ public class MassLabelProvider implements ITableLabelProvider {
    }
 
    public Image getColumnImage(Object element, int columnIndex) {
-      Artifact artifact = (Artifact) element;
-      if (artifact == null || artifact.isDeleted()) return null;
-      if (columnIndex == 0) return artifact.getImage();
+      try {
+         TreeColumn treeCol = getTreeViewer().getTree().getColumn(columnIndex);
+         if (treeCol.getData() instanceof XViewerValueColumn) {
+            return ((XViewerValueColumn) treeCol.getData()).getColumnImage(element,
+                  (XViewerValueColumn) treeCol.getData());
+         }
+         Artifact artifact = (Artifact) element;
+         if (artifact == null || artifact.isDeleted()) return null;
+         if (columnIndex == 0) return artifact.getImage();
+      } catch (Exception ex) {
+         // do nothing
+      }
       return null;
    }
 

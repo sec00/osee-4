@@ -42,7 +42,7 @@ public class MergeXViewerFactory extends SkynetXViewerFactory {
       for (MergeColumn atsXCol : MergeColumn.values()) {
          XViewerColumn newCol = atsXCol.getXViewerColumn(atsXCol);
          newCol.setOrderNum(x++);
-         newCol.setTreeViewer(xViewer);
+         newCol.setXViewer(xViewer);
          cols.add(newCol);
       }
       custData.getColumnData().setColumns(cols);

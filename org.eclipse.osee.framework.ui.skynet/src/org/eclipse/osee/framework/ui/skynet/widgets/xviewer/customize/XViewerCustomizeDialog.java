@@ -539,13 +539,13 @@ public class XViewerCustomizeDialog extends MessageDialog {
          xCol.setShow(true);
          xCol.setOrderNum(x);
          xCol.setColumnNum(x++);
-         xCol.setTreeViewer(xViewer);
+         xCol.setXViewer(xViewer);
          xCols.add(xCol);
       }
       for (XViewerColumn xCol : getTableXViewerColumns(hiddenColTable)) {
          xCol.setShow(false);
          xCol.setOrderNum(x++);
-         xCol.setTreeViewer(xViewer);
+         xCol.setXViewer(xViewer);
          xCols.add(xCol);
       }
       return xCols;

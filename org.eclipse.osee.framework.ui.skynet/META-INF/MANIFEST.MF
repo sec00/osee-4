@@ -76,7 +76,8 @@ Export-Package: org.eclipse.osee.framework.ui.skynet,
  org.eclipse.osee.framework.ui.skynet.widgets.xresults,
  org.eclipse.osee.framework.ui.skynet.widgets.xviewer,
  org.eclipse.osee.framework.ui.skynet.widgets.xviewer.customize,
- org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet
+ org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet,
+ org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet.column
 Bundle-Vendor: Eclipse.org
 Bundle-ClassPath: skynet.jar
 Import-Package: org.eclipse.nebula.widgets.calendarcombo,

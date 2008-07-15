@@ -269,7 +269,7 @@ public class XViewerColumn {
    /**
     * @param treeViewer the treeViewer to set
     */
-   public void setTreeViewer(XViewer treeViewer) {
+   public void setXViewer(XViewer treeViewer) {
       this.xViewer = treeViewer;
    }
 

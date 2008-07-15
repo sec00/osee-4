@@ -42,7 +42,7 @@ public class CommitXViewerFactory extends SkynetXViewerFactory {
       for (CommitColumn atsXCol : CommitColumn.values()) {
          XViewerColumn newCol = atsXCol.getXViewerColumn(atsXCol);
          newCol.setOrderNum(x++);
-         newCol.setTreeViewer(xViewer);
+         newCol.setXViewer(xViewer);
          cols.add(newCol);
       }
       custData.getColumnData().setColumns(cols);

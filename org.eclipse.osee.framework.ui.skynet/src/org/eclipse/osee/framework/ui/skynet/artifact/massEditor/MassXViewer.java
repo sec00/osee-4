@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -45,6 +46,9 @@ import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewer;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewerColumn;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewerColumn.SortDataType;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.customize.CustomizeData;
+import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet.column.XViewerArtifactNameColumn;
+import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet.column.XViewerGuidColumn;
+import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet.column.XViewerHridColumn;
 import org.eclipse.osee.framework.ui.swt.IDirtiableEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
@@ -276,6 +280,24 @@ public class MassXViewer extends XViewer implements IEventReceiver {
    public void resetColumns(Collection<? extends Artifact> artifacts) {
       CustomizeData custData = new CustomizeData();
 
+      List<XViewerColumn> columns =
+            ((MassArtifactEditorInput) ((MassArtifactEditor) editor).getEditorInput()).getColumns();
+      if (columns == null) {
+         columns = getDefaultArtifactColumns(this, artifacts);
+         custData.getSortingData().setSortingNames(Arrays.asList("Name"));
+      }
+      int order = 0;
+      for (XViewerColumn col : columns) {
+         col.setOrderNum(order++);
+         col.setXViewer(this);
+      }
+
+      custData.getColumnData().setColumns(columns);
+      getCustomize().setCustomization(custData);
+      ((MassXViewerFactory) getXViewerFactory()).setDefaultCustData(custData);
+   }
+
+   public static List<XViewerColumn> getDefaultArtifactColumns(XViewer xViewer, Collection<? extends Artifact> artifacts) {
       Set<AttributeType> attributeTypes = new HashSet<AttributeType>();
 
       try {
@@ -286,15 +308,10 @@ public class MassXViewer extends XViewer implements IEventReceiver {
          OSEELog.logException(SkynetGuiPlugin.class, ex, true);
       }
 
-      ArrayList<XViewerColumn> cols = new ArrayList<XViewerColumn>();
+      List<XViewerColumn> columns = new ArrayList<XViewerColumn>();
       Set<String> attrNames = new HashSet<String>();
       // Add Name first
-      XViewerColumn newCol = new XViewerColumn(this, "Name", 150, 150, SWT.LEFT);
-
-      int x = 0;
-      newCol.setOrderNum(x++);
-      newCol.setTreeViewer(this);
-      cols.add(newCol);
+      columns.add(new XViewerArtifactNameColumn("Name", null, 0));
       attrNames.add("Name");
 
       // Add other attributes
@@ -309,27 +326,17 @@ public class MassXViewer extends XViewer implements IEventReceiver {
                sortType = SortDataType.Integer;
             else if (attributeType.getBaseAttributeClass().equals(BooleanAttribute.class)) sortType =
                   SortDataType.Boolean;
-            newCol = new XViewerColumn(this, attributeType.getName(), 75, 75, SWT.CENTER);
+            XViewerColumn newCol = new XViewerColumn(xViewer, attributeType.getName(), 75, 75, SWT.CENTER);
             newCol.setSortDataType(sortType);
-            newCol.setOrderNum(x++);
-            newCol.setTreeViewer(this);
-            cols.add(newCol);
+            columns.add(newCol);
             attrNames.add(attributeType.getName());
          }
       }
 
-      // Add HRID and GUID
-      for (Extra_Columns col : Extra_Columns.values()) {
-         newCol = new XViewerColumn(this, col.name(), 75, 75, SWT.LEFT);
-         newCol.setOrderNum(x++);
-         newCol.setTreeViewer(this);
-         cols.add(newCol);
-      }
+      columns.add(new XViewerHridColumn("ID", null, 0));
+      columns.add(new XViewerGuidColumn("Guid", null, 0));
 
-      custData.getColumnData().setColumns(cols);
-      custData.getSortingData().setSortingNames(Arrays.asList("Name"));
-      getCustomize().setCustomization(custData);
-      ((MassXViewerFactory) getXViewerFactory()).setDefaultCustData(custData);
+      return columns;
    }
 
    /**
