@@ -32,6 +32,8 @@ import org.eclipse.osee.ats.world.search.MyReviewWorkflowItem.ReviewState;
 import org.eclipse.osee.framework.jdk.core.util.AHTML;
 import org.eclipse.osee.framework.skynet.core.User;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.attribute.AttributeType;
+import org.eclipse.osee.framework.skynet.core.attribute.AttributeTypeManager;
 import org.eclipse.osee.framework.skynet.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.skynet.artifact.massEditor.MassArtifactEditor;
@@ -46,10 +48,13 @@ import org.eclipse.osee.framework.ui.skynet.widgets.xresults.XResultPage;
 import org.eclipse.osee.framework.ui.skynet.widgets.xresults.XResultView;
 import org.eclipse.osee.framework.ui.skynet.widgets.xresults.XResultPage.Manipulations;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewerColumn;
+import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet.XViewerAttributeSortDataType;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet.column.XViewerArtifactNameColumn;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet.column.XViewerArtifactTypeColumn;
+import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet.column.XViewerAttributeColumn;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet.column.XViewerGuidColumn;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet.column.XViewerHridColumn;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -140,7 +145,7 @@ public class GenerateReviewParticipationReport extends XNavigateItemAction {
       return sb.toString();
    }
 
-   private static List<XViewerColumn> getColumns(User user) {
+   private static List<XViewerColumn> getColumns(User user) throws OseeCoreException, SQLException {
       List<XViewerColumn> columns = new ArrayList<XViewerColumn>();
       columns.add(new XViewerArtifactTypeColumn("Type", null, 0));
       columns.add(new XViewerHridColumn("ID", null, 0));
@@ -151,6 +156,10 @@ public class GenerateReviewParticipationReport extends XNavigateItemAction {
       columns.add(AtsXColumn.Related_To_State_Col.getXViewerAttributeColumn(true));
       columns.add(new XViewerArtifactNameColumn("Name", null, 0));
       columns.add(new XViewerGuidColumn("Guid", null, 0));
+      for (AttributeType attributeType : AttributeTypeManager.getTypes(AtsPlugin.getAtsBranch())) {
+         columns.add(new XViewerAttributeColumn(null, attributeType.getName(), attributeType.getName(), 75, 75,
+               SWT.LEFT, false, XViewerAttributeSortDataType.get(attributeType), 0));
+      }
       return columns;
    }
 
