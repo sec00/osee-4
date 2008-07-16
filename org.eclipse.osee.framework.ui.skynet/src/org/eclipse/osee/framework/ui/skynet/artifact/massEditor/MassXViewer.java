@@ -282,9 +282,7 @@ public class MassXViewer extends XViewer implements IEventReceiver {
          columns = getDefaultArtifactColumns(this, artifacts);
          custData.getSortingData().setSortingNames(Arrays.asList("Name"));
       }
-      int order = 0;
       for (XViewerColumn col : columns) {
-         col.setOrderNum(order++);
          col.setXViewer(this);
       }
 

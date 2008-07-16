@@ -41,7 +41,6 @@ public class AutoRunXViewerFactory extends SkynetXViewerFactory {
       ArrayList<XViewerColumn> cols = new ArrayList<XViewerColumn>();
       for (AutoRunColumn atsXCol : AutoRunColumn.values()) {
          XViewerColumn newCol = atsXCol.getXViewerColumn(atsXCol);
-         newCol.setOrderNum(x++);
          newCol.setXViewer(xViewer);
          cols.add(newCol);
       }

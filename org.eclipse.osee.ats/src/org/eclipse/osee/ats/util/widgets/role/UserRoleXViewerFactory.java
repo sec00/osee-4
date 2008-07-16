@@ -41,7 +41,6 @@ public class UserRoleXViewerFactory extends SkynetXViewerFactory {
       ArrayList<XViewerColumn> cols = new ArrayList<XViewerColumn>();
       for (UserRoleColumn atsXCol : UserRoleColumn.values()) {
          XViewerColumn newCol = atsXCol.getXViewerColumn(atsXCol);
-         newCol.setOrderNum(x++);
          newCol.setXViewer(xViewer);
          cols.add(newCol);
       }

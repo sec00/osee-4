@@ -27,10 +27,8 @@ public class XViewerColumn {
    private int defaultWidth;
    private int align;
    private boolean sortForward = true; // if true, sort alphabetically; else reverse
-   private int columnNum = Integer.MAX_VALUE;
    private boolean show = true;
    private TreeColumn treeColumn;
-   private int orderNum = Integer.MAX_VALUE;
    private SortDataType sortDataType = SortDataType.String;
    private static ArrayList<XViewerColumn> registeredColumns = new ArrayList<XViewerColumn>();
    private String toolTip = "";
@@ -46,7 +44,6 @@ public class XViewerColumn {
       this.width = defaultWidth;
       this.align = align;
       this.show = show;
-      this.orderNum = orderNum;
       this.sortDataType = sortDataType;
    }
 
@@ -97,7 +94,6 @@ public class XViewerColumn {
       sb.append(AXml.addTagData(ALIGN, getAlignStoreName(align)));
       sb.append(AXml.addTagData(SORT_FORWARD, sortForward + ""));
       sb.append(AXml.addTagData(SHOW, show + ""));
-      sb.append(AXml.addTagData(ORDER_NUM, orderNum + ""));
       sb.append("</" + XTREECOLUMN_TAG + ">");
       return sb.toString();
    }
@@ -112,7 +108,6 @@ public class XViewerColumn {
       align = getAlignStoreValue(AXml.getTagData(xml, ALIGN));
       sortForward = AXml.getTagBooleanData(xml, SORT_FORWARD);
       show = AXml.getTagBooleanData(xml, SHOW);
-      orderNum = AXml.getTagIntData(xml, ORDER_NUM);
    }
 
    public static String getSystemName(String xml) {
@@ -195,14 +190,6 @@ public class XViewerColumn {
       setSortForward(!sortForward);
    }
 
-   public int getColumnNum() {
-      return columnNum;
-   }
-
-   public void setColumnNum(int columnNum) {
-      this.columnNum = columnNum;
-   }
-
    public boolean isShow() {
       return show;
    }
@@ -217,14 +204,6 @@ public class XViewerColumn {
 
    public void setTreeColumn(TreeColumn treeColumn) {
       this.treeColumn = treeColumn;
-   }
-
-   public int getOrderNum() {
-      return orderNum;
-   }
-
-   public void setOrderNum(int orderNum) {
-      this.orderNum = orderNum;
    }
 
    public String getAlternateName() {

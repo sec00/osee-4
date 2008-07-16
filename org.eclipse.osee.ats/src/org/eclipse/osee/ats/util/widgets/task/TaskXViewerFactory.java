@@ -53,7 +53,6 @@ public class TaskXViewerFactory extends SkynetXViewerFactory {
       for (AtsXColumn atsXCol : taskColumnOrder) {
          XViewerColumn newCol = atsXCol.getXViewerColumn(atsXCol);
          newCol.setWidth(widths.get(x));
-         newCol.setOrderNum(x++);
          newCol.setXViewer(xViewer);
          newCol.setShow(true);
          cols.add(newCol);
@@ -64,7 +63,6 @@ public class TaskXViewerFactory extends SkynetXViewerFactory {
       for (AtsXColumn atsXCol : AtsXColumn.values()) {
          if (!handled.contains(atsXCol)) {
             XViewerColumn newCol = atsXCol.getXViewerColumn(atsXCol);
-            newCol.setOrderNum(x++);
             newCol.setXViewer(xViewer);
             newCol.setShow(false);
             cols.add(newCol);

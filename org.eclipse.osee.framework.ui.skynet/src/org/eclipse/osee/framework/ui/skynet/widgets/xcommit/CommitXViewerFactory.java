@@ -37,11 +37,9 @@ public class CommitXViewerFactory extends SkynetXViewerFactory {
 
    public CustomizeData getDefaultTableCustomizeData(XViewer xViewer) {
       CustomizeData custData = new CustomizeData();
-      int x = 0;
       ArrayList<XViewerColumn> cols = new ArrayList<XViewerColumn>();
       for (CommitColumn atsXCol : CommitColumn.values()) {
          XViewerColumn newCol = atsXCol.getXViewerColumn(atsXCol);
-         newCol.setOrderNum(x++);
          newCol.setXViewer(xViewer);
          cols.add(newCol);
       }
