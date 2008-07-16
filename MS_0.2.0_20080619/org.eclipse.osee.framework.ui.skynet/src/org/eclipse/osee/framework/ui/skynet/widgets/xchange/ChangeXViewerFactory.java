@@ -24,6 +24,9 @@ import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewerColumn;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.XViewerSorter;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.customize.CustomizeData;
 import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet.SkynetXViewerFactory;
+import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet.XViewerAttributeSortDataType;
+import org.eclipse.osee.framework.ui.skynet.widgets.xviewer.skynet.column.XViewerAttributeFromChangeColumn;
+import org.eclipse.swt.SWT;
 
 /**
  * @author Donald G. Dunne
@@ -42,17 +45,22 @@ public class ChangeXViewerFactory extends SkynetXViewerFactory {
 
    public CustomizeData getDefaultTableCustomizeData(XViewer xViewer) {
       CustomizeData custData = new CustomizeData();
-      int x = 0;
+      int columnNum = 0;
       ArrayList<XViewerColumn> cols = new ArrayList<XViewerColumn>();
       for (ChangeColumn atsXCol : ChangeColumn.values()) {
          XViewerColumn newCol = atsXCol.getXViewerColumn(atsXCol);
-         newCol.setOrderNum(x++);
+         newCol.setOrderNum(columnNum++);
          newCol.setXViewer(xViewer);
          cols.add(newCol);
       }
       try {
          for (AttributeType attributeType : AttributeTypeManager.getTypes(getBranch(xViewer))) {
-            System.out.println("Attribute " + attributeType);
+            XViewerAttributeFromChangeColumn newCol =
+                  new XViewerAttributeFromChangeColumn(xViewer, attributeType.getName(), attributeType.getName(), 75,
+                        75, SWT.LEFT, false, XViewerAttributeSortDataType.get(attributeType), 0);
+            newCol.setOrderNum(columnNum++);
+            newCol.setXViewer(xViewer);
+            cols.add(newCol);
          }
       } catch (Exception ex) {
          OSEELog.logException(SkynetGuiPlugin.class, ex, false);
