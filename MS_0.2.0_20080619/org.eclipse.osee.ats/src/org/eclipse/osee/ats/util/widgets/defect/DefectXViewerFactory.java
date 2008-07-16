@@ -41,7 +41,6 @@ public class DefectXViewerFactory extends SkynetXViewerFactory {
       ArrayList<XViewerColumn> cols = new ArrayList<XViewerColumn>();
       for (DefectColumn atsXCol : DefectColumn.values()) {
          XViewerColumn newCol = atsXCol.getXViewerColumn(atsXCol);
-         newCol.setOrderNum(x++);
          newCol.setXViewer(xViewer);
          cols.add(newCol);
       }

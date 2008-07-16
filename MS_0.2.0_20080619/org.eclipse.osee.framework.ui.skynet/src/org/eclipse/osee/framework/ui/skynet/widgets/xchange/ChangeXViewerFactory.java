@@ -12,6 +12,7 @@ package org.eclipse.osee.framework.ui.skynet.widgets.xchange;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.osee.framework.skynet.core.artifact.Branch;
 import org.eclipse.osee.framework.skynet.core.attribute.AttributeType;
 import org.eclipse.osee.framework.skynet.core.attribute.AttributeTypeManager;
@@ -45,11 +46,9 @@ public class ChangeXViewerFactory extends SkynetXViewerFactory {
 
    public CustomizeData getDefaultTableCustomizeData(XViewer xViewer) {
       CustomizeData custData = new CustomizeData();
-      int columnNum = 0;
-      ArrayList<XViewerColumn> cols = new ArrayList<XViewerColumn>();
+      List<XViewerColumn> cols = new ArrayList<XViewerColumn>();
       for (ChangeColumn atsXCol : ChangeColumn.values()) {
          XViewerColumn newCol = atsXCol.getXViewerColumn(atsXCol);
-         newCol.setOrderNum(columnNum++);
          newCol.setXViewer(xViewer);
          cols.add(newCol);
       }
@@ -58,7 +57,6 @@ public class ChangeXViewerFactory extends SkynetXViewerFactory {
             XViewerAttributeFromChangeColumn newCol =
                   new XViewerAttributeFromChangeColumn(xViewer, attributeType.getName(), attributeType.getName(), 75,
                         75, SWT.LEFT, false, XViewerAttributeSortDataType.get(attributeType), 0);
-            newCol.setOrderNum(columnNum++);
             newCol.setXViewer(xViewer);
             cols.add(newCol);
          }

@@ -60,7 +60,7 @@ public abstract class XViewerLabelProvider implements ITableLabelProvider {
       return "";
    }
 
-   protected abstract Image getColumnImage(Object element, XViewerColumn column);
+   public abstract Image getColumnImage(Object element, XViewerColumn column);
 
-   protected abstract String getColumnText(Object element, XViewerColumn column);
+   public abstract String getColumnText(Object element, XViewerColumn column);
 }
