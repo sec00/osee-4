@@ -38,7 +38,6 @@ public class MassXViewerFactory extends SkynetXViewerFactory {
 
    public CustomizeData getDefaultTableCustomizeData(XViewer xViewer) {
       CustomizeData custData = new CustomizeData();
-      int x = 0;
       ArrayList<XViewerColumn> cols = new ArrayList<XViewerColumn>();
       custData.getColumnData().setColumns(cols);
       return custData;
