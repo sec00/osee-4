@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.pde.ui.JunitLaunchConfig">
+<booleanAttribute key="append.args" value="true"/>
+<booleanAttribute key="askclear" value="false"/>
+<booleanAttribute key="automaticAdd" value="true"/>
+<booleanAttribute key="automaticValidate" value="false"/>
+<stringAttribute key="bootstrap" value=""/>
+<stringAttribute key="checked" value="[NONE]"/>
+<booleanAttribute key="clearConfig" value="true"/>
+<booleanAttribute key="clearws" value="true"/>
+<booleanAttribute key="clearwslog" value="false"/>
+<stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/pde-junit"/>
+<booleanAttribute key="default" value="false"/>
+<stringAttribute key="deselected_workspace_plugins" value="lba.feature.source,org.eclipse.osee.ote.ui.host.cmd,lba.tte,lba.help,lba.ote.test.manager,lba.ote.ui.mp.versions,lba.ote.crewinput,lba.ote.message.support,org.eclipse.osee.ote.feature.source,org.eclipse.osee.ote.ui.output,lba.skynet.config,org.eclipse.osee.ote.ui.test.output,lba.ote.msg.gen,org.eclipse.osee.ote.ui.mux"/>
+<booleanAttribute key="includeOptional" value="true"/>
+<stringAttribute key="location" value="${workspace_loc}/../junit-workspace-atsTest"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/org.eclipse.osee.ats.test/src/org/eclipse/osee/ats/test/config/AtsConfigurationTestSuite.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
+<stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value=""/>
+<booleanAttribute key="org.eclipse.jdt.junit.KEEPRUNNING_ATTR" value="false"/>
+<stringAttribute key="org.eclipse.jdt.junit.TESTNAME" value=""/>
+<stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit3"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.eclipse.osee.ats.test.config.AtsConfigurationTestSuite"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -nosplash"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="org.eclipse.osee.ats.test"/>
+<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx1024M&#13;&#10;-XX:MaxPermSize=256m&#13;&#10;-Dosee.log.default=INFO&#13;&#10;-Dequinox.ds.debug=true &#13;&#10;-Dosee.local.http.worker.port=8018&#13;&#10;-Dosee.db.connection.id=postgresqlLocalhost&#13;&#10;-Dosee.application.server=http://localhost:8089&#13;&#10;-Dosee.authentication.protocol=lba"/>
+<stringAttribute key="pde.version" value="3.3"/>
+<stringAttribute key="product" value="org.eclipse.osee.framework.ui.product.osee"/>
+<stringAttribute key="selected_target_plugins" value="org.eclipse.team.svn.help,org.eclipse.swt.win32.win32.x86,org.eclipse.team.cvs.ssh2,org.eclipse.equinox.util,org.eclipse.core.filesystem.win32.x86,org.eclipse.equinox.p2.artifact.repository,org.eclipse.team.ui,org.apache.lucene.analysis,org.eclipse.osgi.util,org.eclipse.equinox.jsp.jasper.registry,org.eclipse.ui.workbench.texteditor,org.eclipse.equinox.p2.metadata.repository,org.eclipse.ltk.ui.refactoring,org.eclipse.jdt.junit4.runtime,org.eclipse.gef.doc.isv,org.eclipse.osgi.services,org.eclipse.core.commands,org.eclipse.equinox.http.jetty,org.eclipse.help.appserver,org.eclipse.equinox.p2.core,org.eclipse.equinox.common,org.apache.ant.source,org.eclipse.ui.ide.application,org.eclipse.team.svn.resource.ignore.rules.jdt,org.eclipse.gef.source,org.eclipse.team.cvs.ui,org.apache.jasper,org.eclipse.equinox.launcher,org.eclipse.draw2d,org.eclipse.jdt.compiler.apt,org.eclipse.ui.ide,org.eclipse.jsch.ui,org.eclipse.jface.text,org.eclipse.team.core,org.eclipse.ecf.filetransfer,org.eclipse.team.svn,org.eclipse.core.net,org.eclipse.ui.views,org.eclipse.pde.source,org.eclipse.equinox.frameworkadmin.equinox,org.eclipse.sdk,org.eclipse.swt,org.eclipse.jdt.debug,org.eclipse.jdt.apt.pluggable.core,org.eclipse.gef.examples.flow,org.eclipse.gef.examples.ui.pde,org.eclipse.core.net.win32.x86,org.eclipse.jdt.source,org.eclipse.core.filesystem,org.eclipse.equinox.frameworkadmin,org.eclipse.team.svn.core.nl1,org.eclipse.gef.examples.logic,javax.servlet.source,org.eclipse.team.cvs.ssh,com.jcraft.jsch,org.eclipse.ui.cheatsheets,org.eclipse.debug.ui,org.eclipse.pde.core,org.eclipse.update.core,javax.servlet.jsp.source,org.eclipse.update.ui,org.eclipse.gef,org.eclipse.text,org.junit.source,org.eclipse.core.resources.win32.x86,org.eclipse.equinox.app,org.eclipse.core.resources.compatibility,org.eclipse.ui.views.log,org.eclipse.platform,javax.servlet.jsp,org.eclipse.ui.presentations.r21,org.eclipse.ecf.ssl,org.eclipse.equinox.http.servlet,org.eclipse.rcp,org.eclipse.equinox.preferences,org.apache.commons.logging,org.apache.ant,org.eclipse.pde.doc.user,org.eclipse.ui.forms,org.eclipse.core.expressions,org.mortbay.jetty.source,org.eclipse.gef.examples.source,org.eclipse.core.boot,org.eclipse.team.cvs.core,org.apache.commons.logging.source,org.eclipse.ecf.identity,org.eclipse.equinox.launcher.win32.win32.x86,org.eclipse.platform.doc.isv,org.eclipse.update.core.win32,org.eclipse.jsch.core,org.eclipse.platform.doc.user,org.eclipse.jdt.ui,org.eclipse.ui,org.eclipse.pde.junit.runtime,org.eclipse.debug.core,org.eclipse.team.svn.ui,org.eclipse.ui.externaltools,org.eclipse.help.ui,org.eclipse.jdt.launching,org.eclipse.core.databinding.beans,org.eclipse.ui.intro.universal,org.eclipse.jdt.doc.isv,org.junit4,org.eclipse.ant.core,com.ibm.icu,org.eclipse.jface.databinding,org.apache.lucene,javax.servlet,org.eclipse.draw2d.doc.isv,org.eclipse.search,org.eclipse.jdt.debug.ui,org.eclipse.team.svn.nl1,org.eclipse.jdt.compiler.tool,org.eclipse.core.filebuffers,org.eclipse.equinox.ds,org.eclipse.pde.runtime,org.eclipse.jdt.junit.runtime,org.eclipse.gef.examples.text,org.eclipse.pde.ui.templates,org.eclipse.ui.net,org.eclipse.help,org.eclipse.ui.workbench.compatibility,org.eclipse.help.webapp,org.eclipse.equinox.http.registry,org.eclipse.jdt.apt.core,org.eclipse.core.runtime.compatibility,org.eclipse.ltk.core.refactoring,org.eclipse.ui.console,org.eclipse.jdt.doc.user,org.eclipse.ant.ui,org.apache.commons.el,org.eclipse.platform.source,org.eclipse.ui.browser,org.eclipse.equinox.registry,org.eclipse.osgi,org.eclipse.update.scheduler,org.eclipse.core.runtime.compatibility.auth,org.eclipse.core.resources,org.eclipse.update.configurator,org.eclipse.jdt.core.manipulation,org.eclipse.ui.views.properties.tabbed,org.eclipse.ui.navigator.resources,org.polarion.eclipse.team.svn.connector,org.eclipse.cvs.source,org.eclipse.core.variables,org.eclipse.help.base,org.eclipse.ui.navigator,org.eclipse.core.contenttype,org.eclipse.jface,org.eclipse.ui.intro,org.apache.lucene.source,org.eclipse.equinox.security,org.eclipse.team.svn.core,org.eclipse.ui.workbench,org.polarion.eclipse.team.svn.connector.svnkit,org.eclipse.rcp.source,org.eclipse.core.runtime,com.ibm.icu.source,org.junit,org.eclipse.pde.build,org.eclipse.jdt.apt.ui,org.eclipse.jdt.junit,org.eclipse.team.svn.ui.nl1,org.eclipse.equinox.p2.metadata.generator,org.eclipse.pde,org.eclipse.gef.examples.shapes,org.eclipse.ui.win32,org.apache.lucene.analysis.source,org.eclipse.ecf,org.eclipse.jdt,org.eclipse.equinox.jsp.jasper,org.eclipse.jdt.core,org.eclipse.core.databinding,org.eclipse.core.jobs,org.mortbay.jetty,org.eclipse.ui.editors,org.eclipse.equinox.p2.jarprocessor,org.eclipse.compare,org.eclipse.pde.ui,org.apache.commons.el.source,org.apache.jasper.source,org.eclipse.equinox.security.win32.x86,org.eclipse.cvs,org.eclipse.core.runtime.compatibility.registry,org.eclipse.equinox.p2.metadata"/>
+<booleanAttribute key="show_selected_only" value="false"/>
+<booleanAttribute key="tracing" value="false"/>
+<booleanAttribute key="useDefaultConfig" value="true"/>
+<booleanAttribute key="useDefaultConfigArea" value="false"/>
+<booleanAttribute key="useProduct" value="true"/>
+</launchConfiguration>
