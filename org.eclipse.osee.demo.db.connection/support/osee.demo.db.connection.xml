@@ -1,0 +1,30 @@
+<DbConnection>
+	
+	<DatabaseInfo id="postgresqlInfo">
+		<DatabaseHome key="#DBHOME#" />
+		<DatabaseName key="#DBNAME#" value="OSEE" />
+		<DatabaseType key="#TYPE#" value="postgresql" />
+		<Prefix key="#PREFIX#" value="jdbc:postgresql" />
+		<UserName key="#USERNAME#" value="osee" />
+		<Password key="#PASSWORD#" value="osee" />
+		<Host key="#HOST#" value="@AvailableDbServices.hostAddress" />
+		<Port key="#PORT#" value="@AvailableDbServices.port" />
+	</DatabaseInfo>
+
+	<ConnectionDescription id="postgresql">
+		<Driver>org.postgresql.Driver</Driver>
+		<Url>#PREFIX#://#HOST#:#PORT#/#DBHOME##DBNAME#</Url>		
+	</ConnectionDescription>
+
+	<AvailableDbServices>
+
+		<Server id="osee.microdoc" dbInfo="postgresqlInfo"
+			hostAddress="78.46.71.230" port="5432"
+			connectsWith="postgresql" applicationServer="http://osee.microdoc.com:8089/" />
+
+		<Server id="postgresqlLocalhost" dbInfo="postgresqlInfo"
+			hostAddress="localhost" port="5432"
+			connectsWith="postgresql" applicationServer="http://localhost:8089/" />
+
+	</AvailableDbServices>
+</DbConnection>
