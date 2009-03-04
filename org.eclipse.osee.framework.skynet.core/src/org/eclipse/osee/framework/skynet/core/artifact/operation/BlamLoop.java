@@ -1,0 +1,45 @@
+/*******************************************************************************
+ * Copyright (c) 2004, 2007 Boeing.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Boeing - initial API and implementation
+ *******************************************************************************/
+package org.eclipse.osee.framework.skynet.core.artifact.operation;
+
+import java.util.List;
+import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.artifact.ArtifactFactory;
+import org.eclipse.osee.framework.skynet.core.artifact.ArtifactType;
+import org.eclipse.osee.framework.skynet.core.artifact.Branch;
+
+/**
+ * @author Ryan D. Brooks
+ */
+public abstract class BlamLoop extends Artifact {
+   public static final String ARTIFACT_NAME = "Blam Loop";
+
+   /**
+    * @param parentFactory
+    * @param guid
+    * @param branch
+    */
+   public BlamLoop(ArtifactFactory parentFactory, String guid, String humanReadableId, Branch branch, ArtifactType artifactType) {
+      super(parentFactory, guid, humanReadableId, branch, artifactType);
+   }
+
+   public void execute(List<Artifact> artifacts) throws IllegalArgumentException {
+
+   }
+
+   /* (non-Javadoc)
+    * @see java.lang.Object#toString()
+    */
+   @Override
+   public String toString() {
+      return ARTIFACT_NAME + " - " + getDescriptiveName();
+   }
+}

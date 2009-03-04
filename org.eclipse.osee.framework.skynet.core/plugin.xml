@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+   <extension-point id="ArtifactFactory" name="ArtifactFactory" schema="schema/ArtifactFactory.exsd"/>
+   <extension-point id="ArtifactTypeImage" name="ArtifactTypeImage" schema="schema/ArtifactTypeImage.exsd"/>
+   <extension-point id="HttpServerRequest" name="HttpServerRequest" schema="schema/HttpServerRequest.exsd"/>
+   <extension-point id="OseeTypes" name="OseeTypes" schema="schema/OseeTypes.exsd"/>
+   <extension-point id="AtsLib" name="AtsLib" schema="schema/AtsLib.exsd"/>
+   <extension-point id="DefaultInitialBranchProvider" name="DefaultInitialBranchProvider" schema="schema/DefaultInitialBranchProvider.exsd"/>
+   <extension-point id="ArtifactAnnotation" name="ArtifactAnnotation" schema="schema/ArtifactAnnotation.exsd"/>
+   <extension-point id="OseeDbSchema" name="OseeDbSchema" schema="schema/OseeDbSchema.exsd"/>
+   <extension-point id="WebPage" name="WebPage" schema="schema/WebPage.exsd"/>
+   <extension-point id="ArtifactCheck" name="ArtifactCheck" schema="schema/ArtifactCheck.exsd"/>
+   <extension-point id="AttributeType" name="AttributeType" schema="schema/AttributeType.exsd"/>
+   <extension-point id="AttributeDataProvider" name="AttributeDataProvider" schema="schema/AttributeDataProvider.exsd"/>
+   <extension-point id="OseeDbImportData" name="OseeDbImportData" schema="schema/OseeDbImportData.exsd"/>
+   <extension-point id="ClientLoopbackCmd" name="ClientLoopbackCmd" schema="schema/ClientLoopbackCmd.exsd"/>
+   <extension-point id="CommitActions" name="CommitActions" schema="schema/CommitActions.exsd"/>
+   
+      <extension
+            id="SkynetDbInit"
+            name="SkynetDbInit"
+            point="org.eclipse.osee.framework.database.IDbInitializationTask">
+         <DatabaseTask
+               classname="org.eclipse.osee.framework.skynet.core.dbinit.SkynetDbInit">
+         </DatabaseTask>
+      </extension>
+      <extension
+            id="SkynetDbBranchDataImport"
+            name="SkynetDbBranchDataImport"
+            point="org.eclipse.osee.framework.database.IDbInitializationTask">
+         <DatabaseTask
+               classname="org.eclipse.osee.framework.skynet.core.dbinit.SkynetDbBranchDataImport">
+         </DatabaseTask>
+      </extension>
+      <extension
+            point="org.eclipse.osee.framework.skynet.core.ArtifactTypeImage">
+         <ArtifactImage
+               ArtifactTypeName="Heading"
+               ImagePath="images/heading.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Narrative"
+               ImagePath="images/narrative.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="User"
+               ImagePath="images/user.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Folder"
+               ImagePath="images/folder.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Component"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Document"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Support Document"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Root Artifact"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Stylesheet"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Url"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Url"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Group"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Global Preferences"
+               ImagePath="images/gear.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Visio"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="General Document"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="General Data"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="XViewer Global Customization"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Blam Workflow"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="PowerPoint"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Workspace File"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Word Renderer"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="User Group"
+               ImagePath="images/users2.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Code Unit"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Spreadsheet"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Component"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Renderer Template"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Test Information Sheet"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Work Flow Definition"
+               ImagePath="images/workflow.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Work Page Definition"
+               ImagePath="images/page.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Work Rule Definition"
+               ImagePath="images/rule.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Work Widget Definition"
+               ImagePath="images/widget.gif">
+         </ArtifactImage>
+         <ArtifactImage
+               ArtifactTypeName="Artifact"
+               ImagePath="images/laser_16_16.gif">
+         </ArtifactImage>
+      </extension>
+      <extension
+            point="org.eclipse.osee.framework.skynet.core.ArtifactFactory">
+         <ArtifactFactory
+               classname="org.eclipse.osee.framework.skynet.core.artifact.factory.SkynetCoreArtifactFactory">
+         </ArtifactFactory>
+      </extension>
+      <extension
+            id="OseeTypes_CommonBranch"
+            name="OseeTypes_Common Branch"
+            point="org.eclipse.osee.framework.skynet.core.OseeTypes">
+         <ExcelFile
+               file="support/OseeTypes_CommonBranch.xml">
+         </ExcelFile>
+      </extension>
+      <extension
+            id="OseeTypes_ProgramBranch"
+            name="OseeTypes_Program Branch"
+            point="org.eclipse.osee.framework.skynet.core.OseeTypes">
+         <ExcelFile
+               file="support/OseeTypes_ProgramBranch.xml">
+         </ExcelFile>
+      </extension>
+      <extension
+            id="OseeTypes_ProgramAndCommon"
+            name="OseeTypes_ProgramAndCommon"
+            point="org.eclipse.osee.framework.skynet.core.OseeTypes">
+         <ExcelFile
+               file="support/OseeTypes_ProgramAndCommon.xml">
+         </ExcelFile>
+      </extension>
+      <extension
+            point="org.eclipse.osee.framework.plugin.core.logHandler">
+         <handler
+               name="org.eclipse.osee.framework.skynet.core.usage.SkynetUsageHandler">
+         </handler>
+      </extension>
+      <extension
+            id="SkynetSchemaDefinition"
+            name="SkynetSchemaDefinition"
+            point="org.eclipse.osee.framework.skynet.core.OseeDbSchema">
+         <Schema
+               SchemaFile="dbschemas/SKYNET.VERSIONING.SCHEMA.xml">
+         </Schema>
+      </extension>
+
+      <extension
+            id="BooleanAttribute"
+            name="BooleanAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.BooleanAttribute">
+         </CharacterBackedAttributeType>
+      </extension>
+      <extension
+            id="DateAttribute"
+            name="DateAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.DateAttribute">
+         </CharacterBackedAttributeType>
+      </extension>  
+      <extension
+            id="EnumeratedAttribute"
+            name="EnumeratedAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.EnumeratedAttribute">
+         </CharacterBackedAttributeType>
+      </extension>
+      <extension
+            id="FloatingPointAttribute"
+            name="FloatingPointAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.FloatingPointAttribute">
+         </CharacterBackedAttributeType>
+      </extension>
+      <extension
+            id="IntegerAttribute"
+            name="IntegerAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.IntegerAttribute">
+         </CharacterBackedAttributeType>
+      </extension>                        
+      <extension
+            id="StringAttribute"
+            name="StringAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.StringAttribute">
+         </CharacterBackedAttributeType>
+      </extension>
+      <extension
+            id="WordAttribute"
+            name="WordAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.WordAttribute">
+         </CharacterBackedAttributeType>
+      </extension>
+      <extension
+            id="WordTemplateAttribute"
+            name="WordTemplateAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.WordTemplateAttribute">
+         </CharacterBackedAttributeType>
+      </extension>
+      <extension
+            id="WordWholeDocumentAttribute"
+            name="WordWholeDocumentAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.WordWholeDocumentAttribute">
+         </CharacterBackedAttributeType>
+      </extension>
+       <extension
+             id="JavaObjectAttribute"
+             name="JavaObjectAttribute"
+             point="org.eclipse.osee.framework.skynet.core.AttributeType">
+          <BinaryBackedAttributeType
+                class="org.eclipse.osee.framework.skynet.core.attribute.JavaObjectAttribute">
+          </BinaryBackedAttributeType>
+       </extension>
+       <extension
+             id="CompressedContentAttribute"
+             name="CompressedContentAttribute"
+             point="org.eclipse.osee.framework.skynet.core.AttributeType">
+          <BinaryBackedAttributeType
+                class="org.eclipse.osee.framework.skynet.core.attribute.CompressedContentAttribute">
+          </BinaryBackedAttributeType>
+       </extension>  
+      <extension
+            id="DefaultAttributeDataProvider"
+            name="DefaultAttributeDataProvider"
+            point="org.eclipse.osee.framework.skynet.core.AttributeDataProvider">
+         <BinaryAttributeDataProvider
+               class="org.eclipse.osee.framework.skynet.core.attribute.providers.DefaultAttributeDataProvider">
+         </BinaryAttributeDataProvider>
+      </extension>                     
+      <extension
+            id="UriAttributeDataProvider"
+            name="UriAttributeDataProvider"
+            point="org.eclipse.osee.framework.skynet.core.AttributeDataProvider">
+         <BinaryAttributeDataProvider
+               class="org.eclipse.osee.framework.skynet.core.attribute.providers.UriAttributeDataProvider">
+         </BinaryAttributeDataProvider>
+      </extension>
+      <extension
+            id="ClobAttributeDataProvider"
+            name="ClobAttributeDataProvider"
+            point="org.eclipse.osee.framework.skynet.core.AttributeDataProvider">
+         <CharacterAttributeDataProvider
+               class="org.eclipse.osee.framework.skynet.core.attribute.providers.ClobAttributeDataProvider">
+         </CharacterAttributeDataProvider>
+      </extension>
+      <extension
+            id="PostDbUserCleanUp"
+            name="PostDbUserCleanUp"
+            point="org.eclipse.osee.framework.database.IDbInitializationTask">
+         <DatabaseTask
+               classname="org.eclipse.osee.framework.skynet.core.dbinit.PostDbUserCleanUp">
+         </DatabaseTask>
+      </extension>
+        <extension
+        point="org.eclipse.osee.framework.skynet.core.HttpServerRequest">
+     <IHttpServerRequest
+           classname="org.eclipse.osee.framework.skynet.core.httpRequests.ClientLoopbackHandler">
+     </IHttpServerRequest>
+  </extension>
+        <extension
+              id="CatchTrackedChanges"
+              name="CatchTrackedChanges"
+              point="org.eclipse.osee.framework.skynet.core.CommitActions">
+           <commitActions
+                 className="org.eclipse.osee.framework.skynet.core.commit.actions.CatchTrackedChanges">
+           </commitActions>
+        </extension>
+</plugin>
