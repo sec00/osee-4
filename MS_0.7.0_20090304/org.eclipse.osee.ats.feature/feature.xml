@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.osee.ats.feature"
+      label="ATS (Incubation)"
+      version="1.0.0.qualifier"
+      provider-name="Eclipse.org"
+      plugin="org.eclipse.osee.framework.ui.product">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="Osee Update Site" url="http://www.eclipse.org/downloads/download.php?file=/technology/osee/updatesite"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.gef"/>
+      <import plugin="org.eclipse.osee.framework.jdk.core"/>
+      <import plugin="org.eclipse.ui.forms"/>
+      <import plugin="org.eclipse.osee.framework.database"/>
+      <import plugin="org.eclipse.osee.framework.skynet.core"/>
+      <import plugin="org.eclipse.osee.framework.ui.skynet"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.help"/>
+      <import plugin="org.eclipse.osee.framework.ui.plugin"/>
+      <import plugin="org.eclipse.osee.framework.ui.swt"/>
+      <import plugin="org.eclipse.osee.framework.plugin.core"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.zest.layouts"/>
+      <import plugin="org.eclipse.osee.framework.db.connection"/>
+      <import plugin="org.eclipse.osee.framework.logging"/>
+      <import plugin="org.eclipse.pde.core"/>
+      <import plugin="javax.mail.glassfish"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.osee.ats"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.osee.ats.feature.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
