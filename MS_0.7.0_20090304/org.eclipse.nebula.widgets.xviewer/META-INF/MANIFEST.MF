@@ -7,8 +7,8 @@ Bundle-Activator: org.eclipse.nebula.widgets.xviewer.Activator
 Bundle-Vendor: Eclipse Nebula Project
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.nebula.widgets.calendarcombo;bundle-version="1.0.0",
- org.eclipse.ui.forms;bundle-version="3.3.100"
+ org.eclipse.nebula.widgets.calendarcombo,
+ org.eclipse.ui.forms
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.nebula.widgets.xviewer,

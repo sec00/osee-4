@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.pde.ui.RuntimeWorkbench">
-<stringAttribute key="application" value="org.eclipse.osee.framework.application.server.DbInit"/>
 <booleanAttribute key="askclear" value="true"/>
 <booleanAttribute key="automaticAdd" value="true"/>
 <booleanAttribute key="automaticValidate" value="false"/>
@@ -9,7 +8,7 @@
 <booleanAttribute key="clearConfig" value="false"/>
 <booleanAttribute key="clearws" value="false"/>
 <booleanAttribute key="clearwslog" value="false"/>
-<stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/DB Config [postgresql localhost, skynet import]"/>
+<stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/DB Config [localhost, skynet import]"/>
 <booleanAttribute key="default" value="true"/>
 <booleanAttribute key="includeFragments" value="false"/>
 <booleanAttribute key="includeOptional" value="true"/>
