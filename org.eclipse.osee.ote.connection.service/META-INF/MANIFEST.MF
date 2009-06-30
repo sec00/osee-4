@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Service Plug-in  (Incubation)
+Bundle-SymbolicName: org.eclipse.osee.ote.connection.service;singleton:=true
+Bundle-Version: 0.4.0.qualifier
+Bundle-Activator: org.eclipse.osee.connection.service.Activator
+Bundle-Vendor: Eclipse.org
+Bundle-ActivationPolicy: lazy
+Import-Package: org.eclipse.osee.framework.logging,
+ org.osgi.framework,
+ org.osgi.util.tracker
+Export-Package: org.eclipse.osee.connection.service
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.eclipse.equinox.ds,
+ org.eclipse.osee.framework.jdk.core,
+ org.eclipse.osee.framework.plugin.core
