@@ -1,0 +1,338 @@
+import
+"platform:/plugin/org.eclipse.osee.framework.skynet.core/support/OseeTypes_Framework.osee"
+artifactType "Test Case" extends "Test Unit" {
+   guid "AAMFDikEi0TGK27TKPgA"
+}
+
+artifactType "Test Support" extends "Test Unit" {
+   guid "AAMFDj+FW0f_Ut72ocQA"
+}
+
+artifactType "Test Run Disposition" extends "Artifact" {
+   guid "AAMFDjeNxhi0KmXZcKQA"
+   attribute "Disposition"
+}
+
+artifactType "Test Run" extends "Artifact" {
+   guid "AAMFDjqDHWo+orlSpaQA"
+   attribute "Test Script GUID"
+   attribute "Test Script URL"
+   attribute "Outfile URL"
+   attribute "User Id"
+   attribute "Revision"
+   attribute "Modified Flag"
+   attribute "Last Author"
+   attribute "Last Modified Date"
+   attribute "OS Architecture"
+   attribute "OS Name"
+   attribute "OS Version"
+   attribute "OSEE Version"
+   attribute "OSEE Server Title"
+   attribute "OSEE Server Jar Version"
+   attribute "Processor ID"
+   attribute "Start Date"
+   attribute "End Date"
+   attribute "Elapsed Date"
+   attribute "Ran In Batch Mode"
+   attribute "Is Batch Mode Allowed"
+   attribute "Passed"
+   attribute "Failed"
+   attribute "Total Test Points"
+   attribute "Script Aborted"
+   attribute "Last Date Uploaded"
+   attribute "Qualification Level"
+   attribute "Build Id"
+   attribute "Checksum"
+   attribute "Extension"
+}
+
+attributeType "Outfile URL" extends StringAttribute {
+   guid "AAMFEVlyBndUvySg+gwA"
+   dataProvider MappedAttributeDataProvider
+   min 1
+   max 1 description "Test Run Content"
+   defaultValue "\"\"" fileExtension "tmo"
+}
+
+attributeType "Test Script URL" extends StringAttribute {
+   guid "AAMFEVn0+mhxtCuACgAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "Url of the test script used"
+}
+
+attributeType "Revision" extends StringAttribute {
+   guid "AAMFEWAal2I3j7EJligA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "Version"
+}
+
+attributeType "Modified Flag" extends StringAttribute {
+   guid "AAMFEWCruiS26nCN68wA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "File Modification Flag from Repository"
+}
+
+attributeType "Last Author" extends StringAttribute {
+   guid "AAMFEWE83iPq3+2DGrQA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider description "Last Author"
+}
+
+attributeType "Last Modified Date" extends DateAttribute {
+   guid "AAMFEWHw7V1uWv4IKcQA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "Last Modified"
+}
+
+attributeType "OS Architecture" extends StringAttribute {
+   guid "AAMFEWKJtG+Jc8OkRYgA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider description "OS Architecture"
+}
+
+attributeType "OS Name" extends StringAttribute {
+   guid "AAMFEWMdBmP9aCgsysgA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "OS Name"
+}
+
+attributeType "OS Version" extends StringAttribute {
+   guid "AAMFEWOvQWV6JJvh9NQA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "OS Version"
+}
+
+attributeType "OSEE Version" extends StringAttribute {
+   guid "AAMFEWQ_TTkstJvjnGQA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "OSEE Version"
+}
+
+attributeType "OSEE Server Title" extends StringAttribute {
+   guid "AAMFEWTnXGYRfdzY3gAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "OSEE Server Title"
+}
+
+attributeType "OSEE Server Jar Version" extends StringAttribute {
+   guid "AAMFEWV1OQtXL67OfOQA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "OSEE Server Jar Version"
+}
+
+attributeType "Processor ID" extends StringAttribute {
+   guid "AAMFEWYOAGkplo4RjTQA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "Processor ID"
+}
+
+attributeType "Start Date" extends DateAttribute {
+   guid "AAMFEWpeXjfr2W5ZT5QA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "Start Date"
+}
+
+attributeType "End Date" extends DateAttribute {
+   guid "AAMFEWryxym0P9FFckgA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "Stop Date"
+}
+
+attributeType "Elapsed Date" extends StringAttribute {
+   guid "AAMFEWuD6yH04y89M3wA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "Time Elapsed from the start to the end of the script"
+}
+
+attributeType "Passed" extends IntegerAttribute {
+   guid "AAMFEWwT92IzQp6Dh3gA"
+   dataProvider DefaultAttributeDataProvider
+   min 1
+   max 1 description "Number of test points that passed"
+   defaultValue "0"
+}
+
+attributeType "Failed" extends IntegerAttribute {
+   guid "AAMFEWynSU+XeRG7nRAA"
+   dataProvider DefaultAttributeDataProvider
+   min 1
+   max 1 description "Number of test points that failed"
+   defaultValue "0"
+}
+
+attributeType "Total Test Points" extends IntegerAttribute {
+   guid "AAMFEW05hBfECFGfZkgA"
+   dataProvider DefaultAttributeDataProvider
+   min 1
+   max 1 description "Total test points"
+   defaultValue "0"
+}
+
+attributeType "Script Aborted" extends BooleanAttribute {
+   guid "AAMFEW3M12AqHsCve4AA"
+   dataProvider DefaultAttributeDataProvider
+   min 1
+   max 1
+   taggerId DefaultAttributeTaggerProvider description "Test Abort status"
+   defaultValue "yes"
+}
+
+attributeType "Test Script GUID" extends StringAttribute {
+   guid "AAMFEW5fEhinpcjeZ0wA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "Test Case GUID"
+}
+
+attributeType "Ran In Batch Mode" extends BooleanAttribute {
+   guid "AAMFEW7uBlg0KLp8mhQA"
+   dataProvider DefaultAttributeDataProvider
+   min 1
+   max 1 description "Run was performed as part of a batch"
+   defaultValue "no"
+}
+
+attributeType "Is Batch Mode Allowed" extends BooleanAttribute {
+   guid "AAMFEW+CcA6F5GEjsSgA"
+   dataProvider DefaultAttributeDataProvider
+   min 1
+   max 1 description "Whether Test Script is allowed to run as part of a batch"
+   defaultValue "yes"
+}
+
+attributeType "Last Date Uploaded" extends DateAttribute {
+   guid "AAMFEXCm5ju5gvq142QA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "Last time outfile was uploaded"
+}
+
+attributeType "Qualification Level" extends StringAttribute {
+   guid "AAMFEXEvTztOWwoGyRAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider description "Qualification level"
+   defaultValue "DEVELOPMENT"
+}
+
+attributeType "Build Id" extends StringAttribute {
+   guid "AAMFEXG6_W9diA9nUXAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider description "Build Id"
+   defaultValue "unknown"
+}
+
+attributeType "Checksum" extends StringAttribute {
+   guid "AAMFEXJbaHt5uKG9kogA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "Test Case Checksum"
+}
+
+attributeType "Disposition" extends StringAttribute {
+   guid "AAMFEXfoPWRZHNiOR3gA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "Disposition"
+}
+
+oseeEnumType "enum.test.run.status" {
+   guid "ABbjHCGo_TQNo1pha8AA"
+   entry "Pass"
+   entry "Fail"
+   entry "Aborted"
+   entry "Exception"
+}
+
+attributeType "Test Status" extends EnumeratedAttribute {
+   guid "AAMFERRDznjwkYn+ugAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   enumType "enum.test.run.status"
+   description "Test Status"
+}
+
+attributeType "Test Pass" extends IntegerAttribute {
+   guid "AAMFERTXIHAmwjVkjFgA"
+   dataProvider DefaultAttributeDataProvider
+   min 1
+   max 1
+   defaultValue "0"
+}
+
+attributeType "Test Fail" extends IntegerAttribute {
+   guid "AAMFERVnLHThpASHn1wA"
+   dataProvider DefaultAttributeDataProvider
+   min 1
+   max 1
+   defaultValue "0"
+}
+
+attributeType "Version" extends StringAttribute {
+   guid "AAMFERX4UAvPcLnvswwA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "Version"
+}
+
+attributeType "Repository Type" extends StringAttribute {
+   guid "AAMFERaLojPfsL4I2AwA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "Repository Type"
+}
+
+attributeType "Modification Flag" extends StringAttribute {
+   guid "AAMFERccxh8La5wlEmgA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1 description "File Modification Flag from Repository"
+}
+
+attributeType "Test Log" extends CompressedContentAttribute {
+   guid "AAMFERet6VP3iltwxMwA"
+   dataProvider UriAttributeDataProvider
+   min 0
+   max 1 description "Compressed Data" fileExtension "txt"
+}
+
+relationType "Test Case to Run Relation" {
+   guid "AAMFE+jMyBDK7CV479wA"
+   sideAName "Test Case"
+   sideAArtifactType "Test Case"
+   sideBName "Test Run"
+   sideBArtifactType "Test Run"
+   defaultOrderType Unordered
+   multiplicity ONE_TO_MANY
+}
+
+relationType "Uses" {
+   guid "AAMFE_GV43rvba32QqwA"
+   sideAName "requirement"
+   sideAArtifactType "Requirement"
+   sideBName "Test Unit"
+   sideBArtifactType "Test Unit"
+   defaultOrderType Unordered
+   multiplicity MANY_TO_MANY
+}
