@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+   <extension-point id="ArtifactFactory" name="ArtifactFactory" schema="schema/ArtifactFactory.exsd"/>
+   <extension-point id="HttpServerRequest" name="HttpServerRequest" schema="schema/HttpServerRequest.exsd"/>
+   <extension-point id="OseeTypes" name="OseeTypes" schema="schema/OseeTypes.exsd"/>
+   <extension-point id="AtsLib" name="AtsLib" schema="schema/AtsLib.exsd"/>
+   <extension-point id="DefaultInitialBranchProvider" name="DefaultInitialBranchProvider" schema="schema/DefaultInitialBranchProvider.exsd"/>
+   <extension-point id="ArtifactAnnotation" name="ArtifactAnnotation" schema="schema/ArtifactAnnotation.exsd"/>
+   <extension-point id="OseeDbSchema" name="OseeDbSchema" schema="schema/OseeDbSchema.exsd"/>
+   <extension-point id="WebPage" name="WebPage" schema="schema/WebPage.exsd"/>
+   <extension-point id="ArtifactCheck" name="ArtifactCheck" schema="schema/ArtifactCheck.exsd"/>
+   <extension-point id="AttributeType" name="AttributeType" schema="schema/AttributeType.exsd"/>
+   <extension-point id="AttributeDataProvider" name="AttributeDataProvider" schema="schema/AttributeDataProvider.exsd"/>
+   <extension-point id="OseeDbImportData" name="OseeDbImportData" schema="schema/OseeDbImportData.exsd"/>
+   <extension-point id="ClientLoopbackCmd" name="ClientLoopbackCmd" schema="schema/ClientLoopbackCmd.exsd"/>
+   <extension-point id="CommitActions" name="CommitActions" schema="schema/CommitActions.exsd"/>
+   <extension-point id="OseeValidator" name="OseeValidator" schema="schema/OseeValidator.exsd"/>
+   <extension-point id="ArtifactExtractor" name="ArtifactExtractor" schema="schema/ArtifactExtractor.exsd"/>
+   <extension-point id="ArtifactExtractorDelegate" name="ArtifactExtractorDelegate" schema="schema/ArtifactExtractorDelegate.exsd"/>
+   <extension-point id="OseeTypesHandler" name="OseeTypesHandler" schema="schema/OseeTypesHandler.exsd"/>
+   
+      <extension
+         id="MappedAttributeDataProvider"
+         name="MappedAttributeDataProvider"
+         point="org.eclipse.osee.framework.skynet.core.AttributeDataProvider">
+      <BinaryAttributeDataProvider
+            class="org.eclipse.osee.framework.skynet.core.attribute.providers.MappedAttributeDataProvider">
+      </BinaryAttributeDataProvider>
+   </extension>
+  <extension
+        id="OseeTypes_Framework"
+        name="OseeTypes_Framework"
+        point="org.eclipse.osee.framework.skynet.core.OseeTypes">
+     <OseeTypes
+           resource="support/OseeTypes_Framework.osee">
+     </OseeTypes>
+  </extension>
+
+       <extension
+            point="org.eclipse.osee.framework.skynet.core.ArtifactFactory">
+         <ArtifactFactory
+               classname="org.eclipse.osee.framework.skynet.core.artifact.factory.UserArtifactFactory">
+         </ArtifactFactory>
+      </extension>
+      <extension
+            id="SkynetSchemaDefinition"
+            name="SkynetSchemaDefinition"
+            point="org.eclipse.osee.framework.skynet.core.OseeDbSchema">
+         <Schema
+               SchemaFile="dbschemas/SKYNET.VERSIONING.SCHEMA.xml">
+         </Schema>
+      </extension>
+
+      <extension
+            id="BooleanAttribute"
+            name="BooleanAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.BooleanAttribute">
+         </CharacterBackedAttributeType>
+      </extension>
+      <extension
+            id="DateAttribute"
+            name="DateAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.DateAttribute">
+         </CharacterBackedAttributeType>
+      </extension>  
+      <extension
+            id="EnumeratedAttribute"
+            name="EnumeratedAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.EnumeratedAttribute">
+         </CharacterBackedAttributeType>
+      </extension>
+      <extension
+            id="FloatingPointAttribute"
+            name="FloatingPointAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.FloatingPointAttribute">
+         </CharacterBackedAttributeType>
+      </extension>
+      <extension
+            id="IntegerAttribute"
+            name="IntegerAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.IntegerAttribute">
+         </CharacterBackedAttributeType>
+      </extension>                        
+      <extension
+            id="StringAttribute"
+            name="StringAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.StringAttribute">
+         </CharacterBackedAttributeType>
+      </extension>
+      <extension
+            id="WordAttribute"
+            name="WordAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.WordAttribute">
+         </CharacterBackedAttributeType>
+      </extension>
+      <extension
+            id="WordTemplateAttribute"
+            name="WordTemplateAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.WordTemplateAttribute">
+         </CharacterBackedAttributeType>
+      </extension>
+      <extension
+            id="WordWholeDocumentAttribute"
+            name="WordWholeDocumentAttribute"
+            point="org.eclipse.osee.framework.skynet.core.AttributeType">
+         <CharacterBackedAttributeType
+               class="org.eclipse.osee.framework.skynet.core.attribute.WordWholeDocumentAttribute">
+         </CharacterBackedAttributeType>
+      </extension>
+       <extension
+             id="JavaObjectAttribute"
+             name="JavaObjectAttribute"
+             point="org.eclipse.osee.framework.skynet.core.AttributeType">
+          <BinaryBackedAttributeType
+                class="org.eclipse.osee.framework.skynet.core.attribute.JavaObjectAttribute">
+          </BinaryBackedAttributeType>
+       </extension>
+       <extension
+             id="CompressedContentAttribute"
+             name="CompressedContentAttribute"
+             point="org.eclipse.osee.framework.skynet.core.AttributeType">
+          <BinaryBackedAttributeType
+                class="org.eclipse.osee.framework.skynet.core.attribute.CompressedContentAttribute">
+          </BinaryBackedAttributeType>
+       </extension>  
+      <extension
+            id="DefaultAttributeDataProvider"
+            name="DefaultAttributeDataProvider"
+            point="org.eclipse.osee.framework.skynet.core.AttributeDataProvider">
+         <BinaryAttributeDataProvider
+               class="org.eclipse.osee.framework.skynet.core.attribute.providers.DefaultAttributeDataProvider">
+         </BinaryAttributeDataProvider>
+      </extension>                     
+      <extension
+            id="UriAttributeDataProvider"
+            name="UriAttributeDataProvider"
+            point="org.eclipse.osee.framework.skynet.core.AttributeDataProvider">
+         <BinaryAttributeDataProvider
+               class="org.eclipse.osee.framework.skynet.core.attribute.providers.UriAttributeDataProvider">
+         </BinaryAttributeDataProvider>
+      </extension>
+      <extension
+            id="ClobAttributeDataProvider"
+            name="ClobAttributeDataProvider"
+            point="org.eclipse.osee.framework.skynet.core.AttributeDataProvider">
+         <CharacterAttributeDataProvider
+               class="org.eclipse.osee.framework.skynet.core.attribute.providers.ClobAttributeDataProvider">
+         </CharacterAttributeDataProvider>
+      </extension>
+        <extension
+        point="org.eclipse.osee.framework.skynet.core.HttpServerRequest">
+     <IHttpServerRequest
+           classname="org.eclipse.osee.framework.skynet.core.httpRequests.ClientLoopbackHandler">
+     </IHttpServerRequest>
+  </extension>
+        <extension
+              id="CatchTrackedChanges"
+              name="CatchTrackedChanges"
+              point="org.eclipse.osee.framework.skynet.core.CommitActions">
+           <commitActions
+                 className="org.eclipse.osee.framework.skynet.core.commit.actions.CatchTrackedChanges">
+           </commitActions>
+        </extension>
+        <extension
+              point="org.eclipse.osee.framework.skynet.core.OseeValidator">
+           <OseeValidator
+                 classname="org.eclipse.osee.framework.skynet.core.attribute.OseeEnumerationValidation">
+           </OseeValidator>
+        </extension>
+        <extension
+              point="org.eclipse.osee.framework.skynet.core.HttpServerRequest">
+           <IHttpServerRequest
+                 classname="org.eclipse.osee.framework.skynet.core.httpRequests.ClientDashboardRequestHandler">
+           </IHttpServerRequest>
+        </extension>
+        <extension
+              point="org.eclipse.osee.framework.skynet.core.ArtifactExtractor">
+           <ArtifactExtractor
+                 classname="org.eclipse.osee.framework.skynet.core.importing.parsers.ExcelArtifactExtractor">
+           </ArtifactExtractor>
+        </extension>
+ <extension
+        point="org.eclipse.osee.framework.skynet.core.ArtifactExtractor">
+     <ArtifactExtractor
+           classname="org.eclipse.osee.framework.skynet.core.importing.parsers.NativeDocumentExtractor">
+     </ArtifactExtractor>
+  </extension>
+  <extension
+        point="org.eclipse.osee.framework.skynet.core.ArtifactExtractor">
+     <ArtifactExtractor
+           classname="org.eclipse.osee.framework.skynet.core.importing.parsers.WholeWordDocumentExtractor">
+     </ArtifactExtractor>
+  </extension>
+  <extension
+       point="org.eclipse.osee.framework.skynet.core.ArtifactExtractor">
+     <ArtifactExtractor
+           classname="org.eclipse.osee.framework.skynet.core.importing.parsers.WordOutlineExtractor">
+     </ArtifactExtractor>
+  </extension>
+  <extension
+      point="org.eclipse.osee.framework.skynet.core.ArtifactExtractor">
+     <ArtifactExtractor
+           classname="org.eclipse.osee.framework.skynet.core.importing.parsers.XmlDataExtractor">
+     </ArtifactExtractor>
+  </extension>
+  <extension
+        point="org.eclipse.osee.framework.skynet.core.ArtifactExtractorDelegate">
+     <ArtifactExtractorDelegate
+           classname="org.eclipse.osee.framework.skynet.core.importing.parsers.WordOutlineExtractorDelegate">
+     </ArtifactExtractorDelegate>
+  </extension>
+        
+</plugin>
