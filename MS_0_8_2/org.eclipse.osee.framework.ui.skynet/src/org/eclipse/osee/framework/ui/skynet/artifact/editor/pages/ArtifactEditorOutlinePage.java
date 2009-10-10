@@ -1,0 +1,239 @@
+/*******************************************************************************
+ * Copyright (c) 2004, 2007 Boeing.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Boeing - initial API and implementation
+ *******************************************************************************/
+package org.eclipse.osee.framework.ui.skynet.artifact.editor.pages;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.osee.framework.core.exception.OseeCoreException;
+import org.eclipse.osee.framework.jdk.core.util.Lib;
+import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.attribute.AttributeType;
+import org.eclipse.osee.framework.ui.skynet.FrameworkImage;
+import org.eclipse.osee.framework.ui.skynet.ImageManager;
+import org.eclipse.osee.framework.ui.skynet.artifact.editor.ArtifactEditor;
+import org.eclipse.osee.framework.ui.skynet.artifact.editor.BaseArtifactEditorInput;
+import org.eclipse.osee.framework.ui.skynet.artifact.editor.sections.AttributeTypeUtil;
+import org.eclipse.osee.framework.ui.swt.Widgets;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
+
+/**
+ * @author Roberto E. Escobar
+ */
+public class ArtifactEditorOutlinePage extends ContentOutlinePage {
+
+   private ArtifactEditor editor;
+
+   @Override
+   public void createControl(Composite parent) {
+      super.createControl(parent);
+
+      Tree tree = getTreeViewer().getTree();
+      tree.setLayout(new FillLayout(SWT.VERTICAL));
+      getTreeViewer().setContentProvider(new InternalContentProvider());
+      getTreeViewer().setLabelProvider(new InternalLabelProvider());
+      setInput(editor != null ? editor : "No Input Available");
+
+      getSite().getActionBars().getToolBarManager().add(
+            new Action("Refresh", ImageManager.getImageDescriptor(FrameworkImage.REFRESH)) {
+               @Override
+               public void run() {
+                  refresh();
+               }
+            });
+      getSite().getActionBars().getToolBarManager().update(true);
+   }
+
+   @Override
+   public void selectionChanged(SelectionChangedEvent event) {
+      ISelection selection = event.getSelection();
+      if (selection instanceof IStructuredSelection) {
+         IStructuredSelection sSelection = (IStructuredSelection) selection;
+         if (!sSelection.isEmpty()) {
+            System.out.println("Outline Selection");
+         }
+      }
+   }
+
+   public void setInput(Object input) {
+      if (input instanceof ArtifactEditor) {
+         this.editor = (ArtifactEditor) input;
+         if (getTreeViewer() != null) {
+            getTreeViewer().setInput(editor != null ? editor : "No Input Available");
+         }
+      }
+   }
+
+   public void refresh() {
+      TreeViewer viewer = getTreeViewer();
+      if (viewer != null && Widgets.isAccessible(viewer.getTree())) {
+         viewer.refresh();
+      }
+   }
+
+   private final class InternalLabelProvider extends LabelProvider {
+
+      private final List<AttributeTypeContainer> containers;
+
+      public InternalLabelProvider() {
+         this.containers = new ArrayList<AttributeTypeContainer>();
+      }
+
+      @Override
+      public String getText(Object element) {
+         if (element instanceof BaseArtifactEditorInput) {
+            return ((BaseArtifactEditorInput) element).getName();
+         } else if (element instanceof AttributeTypeContainer) {
+            return ((AttributeTypeContainer) element).getName();
+         }
+         return String.valueOf(element);
+      }
+
+      @Override
+      public Image getImage(Object element) {
+         if (element instanceof BaseArtifactEditorInput) {
+            containers.clear();
+            return ((BaseArtifactEditorInput) element).getImage();
+         } else if (element instanceof AttributeTypeContainer) {
+            AttributeTypeContainer container = ((AttributeTypeContainer) element);
+            containers.add(container);
+            return container.isEditable() ? ImageManager.getImage(FrameworkImage.EDIT_ARTIFACT) : ImageManager.getImage(FrameworkImage.ADD_GREEN);
+         } else if (element instanceof AttributeType) {
+            AttributeType type = (AttributeType) element;
+            for (AttributeTypeContainer container : containers) {
+               if (container.contains(type)) {
+                  return container.isEditable() ? ImageManager.getImage(FrameworkImage.ATTRIBUTE_SUB_A) : ImageManager.getImage(FrameworkImage.ATTRIBUTE_DISABLED);
+               }
+            }
+         }
+         return null;
+      }
+   }
+
+   private final class InternalContentProvider implements ITreeContentProvider {
+
+      @Override
+      public void dispose() {
+      }
+
+      @Override
+      public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+      }
+
+      @Override
+      public Object[] getChildren(Object element) {
+         List<Object> items = new ArrayList<Object>();
+
+         if (element instanceof ArtifactEditor) {
+            BaseArtifactEditorInput editorInput = ((ArtifactEditor) element).getEditorInput();
+            items.add(editorInput);
+         } else if (element instanceof BaseArtifactEditorInput) {
+            try {
+               Artifact artifact = ((BaseArtifactEditorInput) element).getArtifact();
+               boolean isEditable = !artifact.isReadOnly();
+               items.add(new AttributeTypeContainer(isEditable ? "Editable" : "Readable", true,
+                     AttributeTypeUtil.getTypesWithData(artifact)));
+               items.add(new AttributeTypeContainer(isEditable ? "Add to form before editing" : "Empty Types", false,
+                     AttributeTypeUtil.getEmptyTypes(artifact)));
+            } catch (OseeCoreException ex) {
+               items.add(Lib.exceptionToString(ex));
+            }
+         } else if (element instanceof AttributeTypeContainer) {
+            return ((AttributeTypeContainer) element).getTypes().toArray();
+         } else if (element instanceof String) {
+            items.add(element);
+         }
+         return items.toArray(new Object[items.size()]);
+      }
+
+      @Override
+      public Object getParent(Object element) {
+         if (element instanceof BaseArtifactEditorInput) {
+            return editor;
+         } else if (element instanceof String) {
+            return editor;
+         } else if (element instanceof AttributeType) {
+         }
+         return null;
+      }
+
+      @Override
+      public boolean hasChildren(Object element) {
+         if (element instanceof String) {
+            return false;
+         } else if (element instanceof BaseArtifactEditorInput) {
+            return ((BaseArtifactEditorInput) element).getArtifact() != null;
+         } else if (element instanceof AttributeTypeContainer) {
+            return !((AttributeTypeContainer) element).getTypes().isEmpty();
+         } else if (element instanceof Artifact) {
+            try {
+               Artifact artifact = (Artifact) element;
+               return !artifact.getAttributeTypes().isEmpty();
+            } catch (OseeCoreException ex) {
+               ex.printStackTrace();
+            }
+         }
+         return false;
+      }
+
+      @Override
+      public Object[] getElements(Object inputElement) {
+         return getChildren(inputElement);
+      }
+   }
+
+   private final static class AttributeTypeContainer {
+      private List<AttributeType> types;
+      private final String name;
+      private final boolean editable;
+
+      public AttributeTypeContainer(String name, boolean editable, AttributeType... data) {
+         this.name = name;
+         this.editable = editable;
+         if (data == null) {
+            this.types = Collections.emptyList();
+         } else {
+            this.types = Arrays.asList(data);
+         }
+      }
+
+      public String getName() {
+         return name;
+      }
+
+      public List<AttributeType> getTypes() {
+         return types;
+      }
+
+      public boolean isEditable() {
+         return editable;
+      }
+
+      public boolean contains(AttributeType type) {
+         return getTypes().contains(type);
+      }
+   }
+
+}
