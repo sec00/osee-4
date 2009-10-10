@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Connection Plug-in
+Bundle-SymbolicName: org.eclipse.osee.framework.db.connection;singleton:=true
+Bundle-Version: 0.4.0.qualifier
+Bundle-Vendor: Boeing
+OseeEarlyStart: true
+Service-Component: OSGI-INF/uri.connection.contributor.xml,
+ OSGI-INF/db.connection.consumer.xml,
+ OSGI-INF/db.connection.contributor.consumer.xml,
+ OSGI-INF/application.db.provider.consumer.xml
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
