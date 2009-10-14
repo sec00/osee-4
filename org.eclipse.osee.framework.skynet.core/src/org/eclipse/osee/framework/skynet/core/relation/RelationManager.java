@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
-
 import org.eclipse.osee.framework.core.enums.ModificationType;
 import org.eclipse.osee.framework.core.enums.RelationSide;
 import org.eclipse.osee.framework.core.enums.RelationTypeMultiplicity;
@@ -230,6 +229,8 @@ public class RelationManager {
    }
 
    private static List<Artifact> getRelatedArtifacts(Artifact artifact, RelationType relationType, RelationSide relationSide) throws OseeCoreException {
+      @SuppressWarnings("unused") // This is for bulk loading so we do not loose are references
+      Collection<Artifact> bulkLoadedArtifacts;
       List<RelationLink> selectedRelations = null;
       if (relationType == null) {
          selectedRelations = getFlattenedList(relationsByType.getValues(threadLocalKey.get().getKey(artifact)));
@@ -250,23 +251,20 @@ public class RelationManager {
       if (relationSide == null) {
          relationSide = RelationSide.OPPOSITE;
       }
-
       addRelatedArtifactIds(queryId, artifact, relatedArtifacts, insertParameters, insertMap, selectedRelations,
             relationSide);
 
       if (insertParameters.size() > 0) {
          ArtifactLoader.loadArtifacts(queryId, ArtifactLoad.FULL, null, insertParameters, false, false, false);
       }
-
       //now that bulk loading is done, put the artifacts in the right order and return them
       relatedArtifacts.clear();
       for (RelationLink relation : selectedRelations) {
          if (!relation.isDeleted()) {
             try {
-               if (relationSide == null) {
+               if (relation.getSide(artifact).isOppositeSide(relationSide)) {
+                  relationSide = relation.getSide(artifact).oppositeSide();
                   relatedArtifacts.add(relation.getArtifactOnOtherSide(artifact));
-               } else if (relation.getSide(artifact).isOppositeSide(relationSide)) {
-                  relatedArtifacts.add(relation.getArtifact(relationSide));
                }
             } catch (ArtifactDoesNotExist ex) {
                OseeLog.log(Activator.class, Level.WARNING, ex);
@@ -361,7 +359,7 @@ public class RelationManager {
    }
 
    public static List<Artifact> getRelatedArtifacts(Artifact artifact, RelationType relationType) throws OseeCoreException {
-      return getRelatedArtifacts(artifact, relationType, null);
+      return getRelatedArtifacts(artifact, relationType, RelationSide.OPPOSITE);
    }
 
    @SuppressWarnings("unchecked")
@@ -714,7 +712,7 @@ public class RelationManager {
          relation = RelationLink.getOrCreate(artifactA, artifactB, relationType, rationale, ModificationType.NEW);
          relation.setDirty();
 
-         RelationTypeSideSorter sorter = createTypeSideSorter(artifactA, relationType, RelationSide.SIDE_A);
+         RelationTypeSideSorter sorter = createTypeSideSorter(artifactA, relationType, RelationSide.SIDE_B);
          sorter.addItem(sorterId, artifactB);
 
          try {
