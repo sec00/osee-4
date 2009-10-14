@@ -166,8 +166,7 @@ public class WordTemplateProcessor {
 
       this.outlineNumber =
             outlineNumber == null ? peekAtFirstArtifactToGetParagraphNumber(template, null, artifacts) : outlineNumber;
-
-      template = wordMl.setHeadingNumbers(outlineNumber, template, outlineType);
+      template = wordMl.setHeadingNumbers(this.outlineNumber, template, outlineType);
       template = WordUtil.stripSpellCheck(template);
 
       Matcher matcher = headElementsPattern.matcher(template);
