@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Osee Server Build Tasks" default="build" basedir=".">
+	<!-- this ant file is assumed to be located at <workspace>\org.eclipse.osee.support.build\support, basedir will be the same -->
+
+	<import file="${basedir}/osee_common_build.xml" />
+
+	<target name="build">
+		<property name="releaseVersion" value="0.8.1" />
+		<property name="forceContextQualifier" value="200906250923" />
+		<property name="topLevelElementId" value="org.eclipse.osee.framework.server.feature" />
+		<property name="postBuildFile"  value="${ant.file}" />
+		<property name="postBuildTarget"  value="postBuild" />
+
+		<antcall target="PdeBuild" />
+	</target>
+
+	<target name="postBuild">
+		<copy todir="${buildDirectory}/repository/configuration/">
+			<fileset file="${basedir}/config.ini" />
+		</copy>
+	</target>
+</project>
+
+<!--
+eclipsec -application org.eclipse.ant.core.antRunner -buildfile c:\UserData\workspace\org.eclipse.osee.support.build\support\osee_server_build.xml
+C:\UserData\workspace\sandbox\repository>java -Xmx512m -Dosee.db.connection.id=oracle8 -jar org.eclipse.equinox.launcher_1.0.101.R34x_v20081125.jar -console
+-->

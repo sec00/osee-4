@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+    <extension
+       point="org.eclipse.osee.framework.database.init.DatabaseInitializationConfiguration">
+    <DatabaseInitializationConfiguration
+          classname="org.eclipse.osee.ats.config.demo.config.AddDbInitDemoChoice">
+    </DatabaseInitializationConfiguration>
+ </extension>
+      <extension
+      	id="DemoDatabaseConfig"
+         point="org.eclipse.osee.framework.database.init.DatabaseInitializationTask">
+   	<DatabaseInitializationTask
+   			rule="org.eclipse.osee.framework.database.init.NotOnProductionDbInitializationRule"
+      	   classname="org.eclipse.osee.ats.config.demo.config.DemoDatabaseConfig">
+   	</DatabaseInitializationTask>
+	</extension>
+   <extension
+         point="org.eclipse.osee.ats.AtsAIandTeamConfig">
+      <AtsAIandTeamConfig
+            vueFilename="support/Osee ATS Config Demo.vue">
+      </AtsAIandTeamConfig>
+   </extension>
+   <extension
+         point="org.eclipse.osee.ats.AtsNavigateItem">
+      <AtsNavigateItem
+            classname="org.eclipse.osee.ats.config.demo.navigate.DemoNavigateViewItems">
+      </AtsNavigateItem>
+   </extension>
+      <extension
+      	id="AddCommonBranchForAtsDemo"
+         point="org.eclipse.osee.framework.database.init.DatabaseInitializationTask">
+   	<DatabaseInitializationTask
+            classname="org.eclipse.osee.ats.config.demo.config.AddCommonBranchForAtsDemo">
+      </DatabaseInitializationTask>
+   </extension>
+   <extension
+         id="OseeTypes_Demo"
+         name="OseeTypes_Demo"
+         point="org.eclipse.osee.framework.skynet.core.OseeTypes">
+      <OseeTypes
+            resource="support/OseeTypes_Demo.osee">
+      </OseeTypes>
+   </extension>
+   <extension
+         point="org.eclipse.osee.ats.AtsTeamWorkflow">
+      <AtsTeamWorkflow
+            classname="org.eclipse.osee.ats.config.demo.artifact.DemoTeamWorkflows">
+      </AtsTeamWorkflow>
+   </extension>
+   <extension
+         point="org.eclipse.osee.framework.skynet.core.ArtifactFactory">
+      <ArtifactFactory
+            classname="org.eclipse.osee.ats.config.demo.artifact.DemoArtifactFactory">
+      </ArtifactFactory>
+   </extension>
+   <extension
+         point="org.eclipse.osee.framework.ui.skynet.ArtifactImageProvider">
+      <ArtifactImageProvider
+            class="org.eclipse.osee.ats.config.demo.DemoArtifactImageProvider">
+      </ArtifactImageProvider>
+   </extension>
+
+</plugin>

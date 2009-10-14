@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Test Fragment
+Bundle-SymbolicName: org.eclipse.osee.framework.ui.skynet.test;singleton:=true
+Bundle-Version: 1.0.0
+Fragment-Host: org.eclipse.osee.framework.ui.skynet
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.eclipse.osee.framework.ui.skynet.test,
+ org.eclipse.osee.framework.ui.skynet.test.cases
+Import-Package: org.eclipse.osee.framework.core.enums,
+ org.eclipse.osee.framework.jdk.core.util.windows,
+ org.eclipse.osee.support.test.util,
+ org.junit,
+ org.junit.runner,
+ org.junit.runners
