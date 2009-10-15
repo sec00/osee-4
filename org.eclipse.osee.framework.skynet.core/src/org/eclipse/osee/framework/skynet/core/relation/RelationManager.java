@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
-
 import org.eclipse.osee.framework.core.enums.ModificationType;
 import org.eclipse.osee.framework.core.enums.RelationSide;
 import org.eclipse.osee.framework.core.enums.RelationTypeMultiplicity;
@@ -190,7 +189,10 @@ public class RelationManager {
          // Verify that relation is unique by aArtId, bArtId and relTypeId; Needs to be cleaned up in DB, Only log problem.
          // Need to do this check before to catch the relations that are .equal but not ==
          for (RelationLink relation : artifactsRelations) {
-            if (relation.getAArtifactId() == newRelation.getAArtifactId() && relation.getBArtifactId() == newRelation.getBArtifactId() && relation.getRelationType() == newRelation.getRelationType() && relation != newRelation) {
+            if (relation.getAArtifactId() == newRelation.getAArtifactId() && //
+            relation.getBArtifactId() == newRelation.getBArtifactId() && //
+            relation.getRelationType() == newRelation.getRelationType() && //
+            relation != newRelation && relation.isDeleted() == newRelation.isDeleted()) {
                OseeLog.log(Activator.class, Level.SEVERE, String.format(
                      "Duplicate relation objects for same relation for RELATION 1 [%s] RELATION 2 [%s]", relation,
                      newRelation));
@@ -230,7 +232,8 @@ public class RelationManager {
    }
 
    private static List<Artifact> getRelatedArtifacts(Artifact artifact, RelationType relationType, RelationSide relationSide) throws OseeCoreException {
-      @SuppressWarnings("unused") // This is for bulk loading so we do not loose are references
+      @SuppressWarnings("unused")
+      // This is for bulk loading so we do not loose are references
       Collection<Artifact> bulkLoadedArtifacts;
       List<RelationLink> selectedRelations = null;
       if (relationType == null) {
@@ -256,7 +259,8 @@ public class RelationManager {
             relationSide);
 
       if (insertParameters.size() > 0) {
-    	  bulkLoadedArtifacts = ArtifactLoader.loadArtifacts(queryId, ArtifactLoad.FULL, null, insertParameters, false, false, false);
+         bulkLoadedArtifacts =
+               ArtifactLoader.loadArtifacts(queryId, ArtifactLoad.FULL, null, insertParameters, false, false, false);
       }
       //now that bulk loading is done, put the artifacts in the right order and return them
       relatedArtifacts.clear();
