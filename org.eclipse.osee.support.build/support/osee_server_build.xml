@@ -5,8 +5,8 @@
 	<import file="${basedir}/osee_common_build.xml" />
 
 	<target name="build">
-		<property name="releaseVersion" value="0.8.1" />
-		<property name="forceContextQualifier" value="200906250923" />
+		<property name="releaseVersion" value="0.8.3" />
+		<property name="forceContextQualifier" value="200910261431" />
 		<property name="topLevelElementId" value="org.eclipse.osee.framework.server.feature" />
 		<property name="postBuildFile"  value="${ant.file}" />
 		<property name="postBuildTarget"  value="postBuild" />
