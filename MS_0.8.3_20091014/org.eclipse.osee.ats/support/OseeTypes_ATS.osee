@@ -55,7 +55,7 @@ artifactType "Action" extends "ats.Ats Artifact" {
 
 artifactType "Team Definition" extends "ats.Ats Artifact" {
    guid "AAMFDhUrlytusKbaQGAA"
-   attribute "ats.Man Days Needed"
+   attribute "ats.Hours Per Work Day"
    attribute "ats.Full Name"
    attribute "ats.Team Uses Versions"
    attribute "ats.Require Targeted Version"
@@ -335,7 +335,7 @@ attributeType "ats.Weekly Benefit" extends FloatingPointAttribute {
    defaultValue "0"
 }
 
-attributeType "ats.Man Days Needed" extends FloatingPointAttribute {
+attributeType "ats.Hours Per Work Day" extends FloatingPointAttribute {
    guid "AAMFEdGlqFsZp22RMdAA"
    dataProvider DefaultAttributeDataProvider
    min 0
