@@ -5,6 +5,8 @@
 	<import file="${basedir}/osee_common_build.xml" />
 
 	<target name="build">
+		<property name="proxy_host" value="www-slb-proxy.boeing.com" />
+		<property name="proxy_port" value="31060" />
 		<property name="releaseVersion" value="0.8.3" />
 		<property name="forceContextQualifier" value="200910261431" />
 		<property name="topLevelElementId" value="org.eclipse.osee.framework.server.feature" />
@@ -15,7 +17,7 @@
 	</target>
 
 	<target name="postBuild">
-		<copy todir="${buildDirectory}/repository/configuration/">
+		<copy todir="${buildDirectory}/buildRepo/configuration/">
 			<fileset file="${basedir}/config.ini" />
 		</copy>
 	</target>
