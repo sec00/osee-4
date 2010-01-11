@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Eclipse OSEE Product (Incubation)
+Bundle-SymbolicName: org.eclipse.osee.framework.ui.product;singleton:=true
+Bundle-Version: 0.9.1.qualifier
+Bundle-Vendor: Eclipse.org
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.osee.framework.jdk.core,
+ org.eclipse.osee.framework.plugin.core,
+ org.eclipse.osee.framework.ui.plugin,
+ org.eclipse.ui.intro
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: library.jar
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

@@ -1,0 +1,33 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Demo Plug-in
+Bundle-SymbolicName: org.eclipse.osee.ats.config.demo;singleton:=true
+Bundle-Version: 0.9.1.qualifier
+Bundle-Activator: org.eclipse.osee.ats.config.demo.internal.OseeAtsConfigDemoActivator
+Bundle-Vendor: Boeing
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.osee.framework.plugin.core,
+ org.eclipse.osee.framework.database,
+ org.eclipse.osee.ats,
+ org.eclipse.osee.framework.jdk.core,
+ org.eclipse.osee.framework.ui.jdk,
+ org.eclipse.osee.framework.skynet.core,
+ org.eclipse.osee.framework.ui.skynet,
+ org.eclipse.osee.framework.ui.plugin,
+ org.junit4,
+ org.eclipse.osee.framework.core,
+ org.eclipse.ui.forms;bundle-version="3.3.101",
+ org.eclipse.osee.support.test.util
+Bundle-ActivationPolicy: lazy
+Import-Package: org.eclipse.osee.framework.core.client,
+ org.eclipse.osee.framework.core.data,
+ org.eclipse.osee.framework.core.exception,
+ org.eclipse.osee.framework.database.init,
+ org.eclipse.osee.framework.logging
+Export-Package: 
+ org.eclipse.osee.ats.config.demo.artifact,
+ org.eclipse.osee.ats.config.demo.config,
+ org.eclipse.osee.ats.config.demo.navigate,
+ org.eclipse.osee.ats.config.demo.util
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
