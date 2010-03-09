@@ -1,0 +1,434 @@
+import "platform:/plugin/org.eclipse.osee.ats/support/OseeTypes_ATS.osee"
+artifactType "Demo Code Team Workflow" extends "Team Workflow" {
+   guid "ABRNqDKnpGEKAyUm49gA"
+   attribute "demo.code.Change Type"
+   attribute "demo.code.Action"
+   attribute "demo.code.Category"
+   attribute "demo.code.Close Detection"
+   attribute "demo.code.Code Change Req"
+   attribute "demo.code.CSCI"
+   attribute "demo.code.Defect Code"
+   attribute "demo.code.Detection"
+   attribute "demo.code.Include Build"
+   attribute "demo.code.LOC Affected"
+   attribute "demo.code.Originating Build"
+   attribute "demo.code.Req Doc"
+   attribute "demo.code.Subsystem"
+   attribute "demo.code.Test Build"
+   attribute "demo.code.Test Mode"
+   attribute "demo.code.Test Notes"
+   attribute "demo.code.Test Script"
+   attribute "demo.code.Volume"
+   attribute "demo.code.Verify Date"
+   attribute "demo.code.Verifyer"
+   attribute "demo.code.Verify Note"
+   attribute "demo.code.Verify Detection"
+   attribute "demo.code.Hold Start"
+   attribute "demo.code.Hold End"
+   attribute "demo.code.Verify Mode"
+   attribute "demo.code.Verified Build"
+   attribute "demo.code.Peer Review Reqd"
+   attribute "demo.code.Peer Review Id"
+   attribute "demo.code.Ref PCR"
+   attribute "demo.code.References"
+   attribute "demo.code.Requirement Id"
+   attribute "demo.code.Dup CPCR No"
+   attribute "demo.code.Dup CSCI"
+   attribute "demo.code.Dup CPCR Type"
+   attribute "demo.code.Dup of CPCR no seq"
+   attribute "demo.code.Librarian"
+   attribute "demo.code.Promote Date"
+   attribute "demo.code.Authorization Notes"
+   attribute "demo.code.Rework Letter"
+   attribute "demo.code.Problem No"
+   attribute "demo.code.DP Effectivity"
+   attribute "demo.code.SP Effectivity"
+   attribute "demo.code.WP Effectivity"
+}
+
+artifactType "Demo Req Team Workflow" extends "Team Workflow" {
+   guid "ABRO5pC6kCmP35t06RwA"
+}
+
+artifactType "Demo Test Team Workflow" extends "Team Workflow" {
+   guid "ABRPeQO1qlCd4J7Bv5AA"
+}
+
+oseeEnumType "enum.demo.code.category" {
+   guid "ABRQJeuW4zJNV3RbrFgA"
+   entry "Code Problem" entryGuid "AHgPZbKmc3ysmzFjpZgA"
+   entry "Design/Implementation" entryGuid "AHgPZbUNIwI2P31Om0gA"
+   entry "Comment Change Only" entryGuid "AHgPZbadTBlE5CI67iwA"
+   entry "Non-Mission" entryGuid "AHgPZbdoMgmRBR6iuAgA"
+   entry "Workaround" entryGuid "AHgPZbj6MDAZRpyTSDQA"
+}
+
+attributeType "demo.code.Category" extends EnumeratedAttribute {
+   guid "ABRQ5humYCPEH5AYkWgA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   enumType "enum.demo.code.category"
+}
+
+attributeType "demo.code.Close Detection" extends StringAttribute {
+   guid "ABRRhx_p7TW7l9plqgAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Code Change Req" extends StringAttribute {
+   guid "ABRSFZmVcknSYAEyD9wA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.CSCI" extends StringAttribute {
+   guid "ABRTFh_tI33t10nIv+gA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+oseeEnumType "enum.demo.code.defect.code" {
+   guid "ABRTp7g+c3I+mmadl6AA"
+   entry "CL01 - Requirements Implemented Incorrectly" entryGuid "AHfrvF6LB3l2ASR0vEAA"
+   entry "CL02 - Initialization Error" entryGuid "AHfrwIxoUhI9nSogT6QA"
+   entry "CL03 - Out of Range Error" entryGuid "AHfzRJVB30_q_so4ppQA"
+   entry "CL04 - Data Conversion Error" entryGuid "AHfzSQWtX2T4nNigm+AA"
+   entry "CL05 - Buffer Sizing Error" entryGuid "AHfzSQam0XRx4prJvagA"
+   entry "CL06 - Timing Problem" entryGuid "AHfzSQeRBmQzmrcY6vwA"
+   entry "CL07 - Interface Error" entryGuid "AHfzSQh7FEjHhQPKR8AA"
+   entry "CL08 - Logic Control Error" entryGuid "AHfzSQllBATn27u98cQA"
+   entry "CL09 - TYPO" entryGuid "AHfzSQpJlizmRdu0IrwA"
+   entry "CL10 - Multiple Code Logic Problems" entryGuid "AHfzSQtEDTUdrtdqv7QA"
+   entry "CL99 - Other Code Logic Problem" entryGuid "AHfzSQwxmHKsPyBDF_AA"
+   entry "NC01 - Requirement Error" entryGuid "AHfzSQ_xzUibI7xCOTQA"
+   entry "NC02 - Test Script Error" entryGuid "AHf_QpZYYgwLGaFvbyAA"
+   entry "NC03 - CTE Error" entryGuid "AHf_QpdW6j0C5YHwUdgA"
+   entry "NC04 - Hardware Error" entryGuid "AHgDrndASh04zzKFOpAA"
+   entry "NC99 - Other NON-CODE Problem" entryGuid "AHgDrnxUSRDqOZDSq3QA"
+   entry "SV01 - Coding Standard Violation" entryGuid "AHgDroWS6TdaMT_hT8wA"
+   entry "TE01 - Compiler/Linker/Assembler Problem" entryGuid "AHgHAQbdFRvQmU0a2mgA"
+   entry "TE02 - APEX Problem" entryGuid "AHgHAQ4s01+9G8JHCYQA"
+   entry "TE99 - Other Tool Error" entryGuid "AHgHARH61nVDkVoWWewA"
+}
+
+attributeType "demo.code.Defect Code" extends EnumeratedAttribute {
+   guid "ABRUvxesmjJdsuST9mAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   enumType "enum.demo.code.defect.code"
+}
+
+oseeEnumType "enum.demo.code.detection" {
+   guid "ABRVcCZLEkYPujANarAA"
+   entry "Test Script(s)" entryGuid "AHfYTFIxP2WjivgIf5AA"
+   entry "Inspection (Test)" entryGuid "AHfYUIExngyljHlV5NwA"
+   entry "Hot Bench" entryGuid "AHfYUIIBaHndjAnnDVQA"
+   entry "Aircraft" entryGuid "AHfYUILOEUJvVLy5BkAA"
+   entry "Peer Review" entryGuid "AHfYUIOZXRNhn0bltBQA"
+   entry "TRAX Issue" entryGuid "AHfYUIRpfj0QUBOknawA"
+   entry "Other" entryGuid "AHfYUIUzQFakG8hrbcgA"
+}
+
+attributeType "demo.code.Detection" extends EnumeratedAttribute {
+   guid "ABRWElm_M2vkSNxZxKAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   enumType "enum.demo.code.detection"
+}
+
+attributeType "demo.code.Include Build" extends StringAttribute {
+   guid "ABRW2eTRvXDMD9VHxWQA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.LOC Affected" extends IntegerAttribute {
+   guid "ABRXfMzSnHm3zaDVu2gA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.Originating Build" extends StringAttribute {
+   guid "ABRYXiY6_n0X62c1BHAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+oseeEnumType "enum.demo.code.req.doc" {
+   guid "ABRZKN5hR0dFQUAklKQA"
+   entry "Unknown" entryGuid "AHfFYLyC6lm5ycsW5SQA"
+   entry "SubDD" entryGuid "AHfFYMLZl2C6DnGN8lgA"
+   entry "CSID" entryGuid "AHfFYMOhyQ7tbByHMcgA"
+   entry "SRS" entryGuid "AHfFYMVvYHa1PShzHhQA"
+   entry "Other" entryGuid "AHfFYMZNVF7T4VhhkgAA"
+}
+
+attributeType "demo.code.Req Doc" extends EnumeratedAttribute {
+   guid "ABRZvuRbTBDJ0sTqPcwA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   enumType "enum.demo.code.req.doc"
+}
+
+attributeType "demo.code.Subsystem" extends StringAttribute {
+   guid "ABRbxVuSmy1WApUHDnwA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Test Build" extends StringAttribute {
+   guid "ABReOcmlLy3e5IYTV2gA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Test Mode" extends StringAttribute {
+   guid "ABRfDcaDn3DrJdM34DgA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Test Notes" extends StringAttribute {
+   guid "ABRf1pY8MRiRGdE1zggA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Test Script" extends StringAttribute {
+   guid "ABRgW_jfy3u0j3WDf6AA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Change Type" extends StringAttribute {
+   guid "ABRg2j6gg3_6OmOWBqgA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Action" extends StringAttribute {
+   guid "ABRhr2WyvUsn9J_1VTAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Volume" extends IntegerAttribute {
+   guid "ABRiRvo9aBlJcoM8LTAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Verify Date" extends StringAttribute {
+   guid "ABRizqne4EQcA7N5ZcAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.Verifyer" extends StringAttribute {
+   guid "ABRjTuu2Piq+nq1TSrgA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Verify Note" extends StringAttribute {
+   guid "ABRjwmY6egOOF8erYBwA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Verify Detection" extends StringAttribute {
+   guid "ABRkUcZZJWJ9fkoNZgQA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Hold Start" extends StringAttribute {
+   guid "ABRlDUew92X89ymcZPgA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.Hold End" extends StringAttribute {
+   guid "ABRll8ChAW78H7QCKIwA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.Verify Mode" extends StringAttribute {
+   guid "ABRmJgFbVnOpQCAHx7wA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Verified Build" extends StringAttribute {
+   guid "ABRnYxlHAz5y9qbKqtAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Peer Review Reqd" extends StringAttribute {
+   guid "ABRoRaZy6Ak0R3okbuwA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.Peer Review Id" extends StringAttribute {
+   guid "ABRoy3Oj5D1qMO0UsjgA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.Ref PCR" extends StringAttribute {
+   guid "ABRpVgGfiDOgRk_kYjQA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.References" extends StringAttribute {
+   guid "ABRp07vMy0Fm+Rmx0zAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Requirement Id" extends StringAttribute {
+   guid "ABRzDPSHdHCSV+HKlfgA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.Dup CPCR No" extends StringAttribute {
+   guid "ABRqqRrPwhDA3wlufRwA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.Dup CSCI" extends StringAttribute {
+   guid "ABRrQury0TT0ewPrkdAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.Dup CPCR Type" extends StringAttribute {
+   guid "ABRsC9QrXn_ZFc7XJGwA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.Dup of CPCR no seq" extends StringAttribute {
+   guid "ABRsscEQlDjvm7LMw9wA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.Librarian" extends StringAttribute {
+   guid "ABRtoLTUgjGUAx38RSQA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Promote Date" extends StringAttribute {
+   guid "ABRuMFVPKnk5dLTCHjAA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.Authorization Notes" extends StringAttribute {
+   guid "ABRuqDcWHDzXnvbWy1AA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "demo.code.Rework Letter" extends StringAttribute {
+   guid "ABRvpbBrrU_jyRsYAIgA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.Problem No" extends StringAttribute {
+   guid "ABRwLk62FFNFKZD4JyQA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.DP Effectivity" extends BooleanAttribute {
+   guid "ABRxUL5UADKw0RgtXzgA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.SP Effectivity" extends BooleanAttribute {
+   guid "ABRw7cPf7DqrwZgaOcwA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
+
+attributeType "demo.code.WP Effectivity" extends BooleanAttribute {
+   guid "ABRyQVOyMkZKZPobp6QA"
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+}
