@@ -9,30 +9,32 @@ package org.eclipse.osee.framework.oseeTypes.provider;
 
 import java.util.Collection;
 import java.util.List;
+
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.util.ResourceLocator;
+
 import org.eclipse.emf.ecore.EStructuralFeature;
+
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
-import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
-import org.eclipse.osee.framework.oseeTypes.OseeTypeModel;
+
 import org.eclipse.osee.framework.oseeTypes.OseeTypesFactory;
 import org.eclipse.osee.framework.oseeTypes.OseeTypesPackage;
+import org.eclipse.osee.framework.oseeTypes.XOseeEnumType;
 
 /**
- * This is the item provider adapter for a {@link org.eclipse.osee.framework.oseeTypes.OseeTypeModel} object.
+ * This is the item provider adapter for a {@link org.eclipse.osee.framework.oseeTypes.XOseeEnumType} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class OseeTypeModelItemProvider
-   extends ItemProviderAdapter
+public class XOseeEnumTypeItemProvider
+   extends OseeTypeItemProvider
    implements
       IEditingDomainItemProvider,
       IStructuredItemContentProvider,
@@ -45,7 +47,7 @@ public class OseeTypeModelItemProvider
     * <!-- end-user-doc -->
     * @generated
     */
-   public OseeTypeModelItemProvider(AdapterFactory adapterFactory) {
+   public XOseeEnumTypeItemProvider(AdapterFactory adapterFactory) {
       super(adapterFactory);
    }
 
@@ -76,12 +78,7 @@ public class OseeTypeModelItemProvider
    public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
       if (childrenFeatures == null) {
          super.getChildrenFeatures(object);
-         childrenFeatures.add(OseeTypesPackage.Literals.OSEE_TYPE_MODEL__IMPORTS);
-         childrenFeatures.add(OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ARTIFACT_TYPES);
-         childrenFeatures.add(OseeTypesPackage.Literals.OSEE_TYPE_MODEL__RELATION_TYPES);
-         childrenFeatures.add(OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ATTRIBUTE_TYPES);
-         childrenFeatures.add(OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ENUM_TYPES);
-         childrenFeatures.add(OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ENUM_OVERRIDES);
+         childrenFeatures.add(OseeTypesPackage.Literals.XOSEE_ENUM_TYPE__ENUM_ENTRIES);
       }
       return childrenFeatures;
    }
@@ -100,14 +97,14 @@ public class OseeTypeModelItemProvider
    }
 
    /**
-    * This returns OseeTypeModel.gif.
+    * This returns XOseeEnumType.gif.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     */
    @Override
    public Object getImage(Object object) {
-      return overlayImage(object, getResourceLocator().getImage("full/obj16/OseeTypeModel"));
+      return overlayImage(object, getResourceLocator().getImage("full/obj16/XOseeEnumType"));
    }
 
    /**
@@ -118,7 +115,10 @@ public class OseeTypeModelItemProvider
     */
    @Override
    public String getText(Object object) {
-      return getString("_UI_OseeTypeModel_type");
+      String label = ((XOseeEnumType)object).getName();
+      return label == null || label.length() == 0 ?
+         getString("_UI_XOseeEnumType_type") :
+         getString("_UI_XOseeEnumType_type") + " " + label;
    }
 
    /**
@@ -132,13 +132,8 @@ public class OseeTypeModelItemProvider
    public void notifyChanged(Notification notification) {
       updateChildren(notification);
 
-      switch (notification.getFeatureID(OseeTypeModel.class)) {
-         case OseeTypesPackage.OSEE_TYPE_MODEL__IMPORTS:
-         case OseeTypesPackage.OSEE_TYPE_MODEL__ARTIFACT_TYPES:
-         case OseeTypesPackage.OSEE_TYPE_MODEL__RELATION_TYPES:
-         case OseeTypesPackage.OSEE_TYPE_MODEL__ATTRIBUTE_TYPES:
-         case OseeTypesPackage.OSEE_TYPE_MODEL__ENUM_TYPES:
-         case OseeTypesPackage.OSEE_TYPE_MODEL__ENUM_OVERRIDES:
+      switch (notification.getFeatureID(XOseeEnumType.class)) {
+         case OseeTypesPackage.XOSEE_ENUM_TYPE__ENUM_ENTRIES:
             fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
             return;
       }
@@ -158,44 +153,8 @@ public class OseeTypeModelItemProvider
 
       newChildDescriptors.add
          (createChildParameter
-            (OseeTypesPackage.Literals.OSEE_TYPE_MODEL__IMPORTS,
-             OseeTypesFactory.eINSTANCE.createImport()));
-
-      newChildDescriptors.add
-         (createChildParameter
-            (OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ARTIFACT_TYPES,
-             OseeTypesFactory.eINSTANCE.createXArtifactType()));
-
-      newChildDescriptors.add
-         (createChildParameter
-            (OseeTypesPackage.Literals.OSEE_TYPE_MODEL__RELATION_TYPES,
-             OseeTypesFactory.eINSTANCE.createXRelationType()));
-
-      newChildDescriptors.add
-         (createChildParameter
-            (OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ATTRIBUTE_TYPES,
-             OseeTypesFactory.eINSTANCE.createXAttributeType()));
-
-      newChildDescriptors.add
-         (createChildParameter
-            (OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ENUM_TYPES,
-             OseeTypesFactory.eINSTANCE.createXOseeEnumType()));
-
-      newChildDescriptors.add
-         (createChildParameter
-            (OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ENUM_OVERRIDES,
-             OseeTypesFactory.eINSTANCE.createXOseeEnumOverride()));
-   }
-
-   /**
-    * Return the resource locator for this item provider's resources.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
-   @Override
-   public ResourceLocator getResourceLocator() {
-      return OseeTypesEditPlugin.INSTANCE;
+            (OseeTypesPackage.Literals.XOSEE_ENUM_TYPE__ENUM_ENTRIES,
+             OseeTypesFactory.eINSTANCE.createXOseeEnumEntry()));
    }
 
 }

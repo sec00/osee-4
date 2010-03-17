@@ -9,8 +9,12 @@ package org.eclipse.osee.framework.oseeTypes.provider;
 
 import java.util.Collection;
 import java.util.List;
+
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
+
+import org.eclipse.emf.common.util.ResourceLocator;
+
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
@@ -19,18 +23,20 @@ import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
+import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
-import org.eclipse.osee.framework.oseeTypes.OseeType;
+
 import org.eclipse.osee.framework.oseeTypes.OseeTypesPackage;
+import org.eclipse.osee.framework.oseeTypes.XOseeEnumEntry;
 
 /**
- * This is the item provider adapter for a {@link org.eclipse.osee.framework.oseeTypes.OseeType} object.
+ * This is the item provider adapter for a {@link org.eclipse.osee.framework.oseeTypes.XOseeEnumEntry} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class OseeTypeItemProvider
-   extends OseeElementItemProvider
+public class XOseeEnumEntryItemProvider
+   extends ItemProviderAdapter
    implements
       IEditingDomainItemProvider,
       IStructuredItemContentProvider,
@@ -43,7 +49,7 @@ public class OseeTypeItemProvider
     * <!-- end-user-doc -->
     * @generated
     */
-   public OseeTypeItemProvider(AdapterFactory adapterFactory) {
+   public XOseeEnumEntryItemProvider(AdapterFactory adapterFactory) {
       super(adapterFactory);
    }
 
@@ -59,7 +65,8 @@ public class OseeTypeItemProvider
          super.getPropertyDescriptors(object);
 
          addNamePropertyDescriptor(object);
-         addTypeGuidPropertyDescriptor(object);
+         addOrdinalPropertyDescriptor(object);
+         addEntryGuidPropertyDescriptor(object);
       }
       return itemPropertyDescriptors;
    }
@@ -75,9 +82,9 @@ public class OseeTypeItemProvider
          (createItemPropertyDescriptor
             (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
              getResourceLocator(),
-             getString("_UI_OseeType_name_feature"),
-             getString("_UI_PropertyDescriptor_description", "_UI_OseeType_name_feature", "_UI_OseeType_type"),
-             OseeTypesPackage.Literals.OSEE_TYPE__NAME,
+             getString("_UI_XOseeEnumEntry_name_feature"),
+             getString("_UI_PropertyDescriptor_description", "_UI_XOseeEnumEntry_name_feature", "_UI_XOseeEnumEntry_type"),
+             OseeTypesPackage.Literals.XOSEE_ENUM_ENTRY__NAME,
              true,
              false,
              false,
@@ -87,19 +94,19 @@ public class OseeTypeItemProvider
    }
 
    /**
-    * This adds a property descriptor for the Type Guid feature.
+    * This adds a property descriptor for the Ordinal feature.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     */
-   protected void addTypeGuidPropertyDescriptor(Object object) {
+   protected void addOrdinalPropertyDescriptor(Object object) {
       itemPropertyDescriptors.add
          (createItemPropertyDescriptor
             (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
              getResourceLocator(),
-             getString("_UI_OseeType_typeGuid_feature"),
-             getString("_UI_PropertyDescriptor_description", "_UI_OseeType_typeGuid_feature", "_UI_OseeType_type"),
-             OseeTypesPackage.Literals.OSEE_TYPE__TYPE_GUID,
+             getString("_UI_XOseeEnumEntry_ordinal_feature"),
+             getString("_UI_PropertyDescriptor_description", "_UI_XOseeEnumEntry_ordinal_feature", "_UI_XOseeEnumEntry_type"),
+             OseeTypesPackage.Literals.XOSEE_ENUM_ENTRY__ORDINAL,
              true,
              false,
              false,
@@ -109,14 +116,36 @@ public class OseeTypeItemProvider
    }
 
    /**
-    * This returns OseeType.gif.
+    * This adds a property descriptor for the Entry Guid feature.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   protected void addEntryGuidPropertyDescriptor(Object object) {
+      itemPropertyDescriptors.add
+         (createItemPropertyDescriptor
+            (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+             getResourceLocator(),
+             getString("_UI_XOseeEnumEntry_entryGuid_feature"),
+             getString("_UI_PropertyDescriptor_description", "_UI_XOseeEnumEntry_entryGuid_feature", "_UI_XOseeEnumEntry_type"),
+             OseeTypesPackage.Literals.XOSEE_ENUM_ENTRY__ENTRY_GUID,
+             true,
+             false,
+             false,
+             ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+             null,
+             null));
+   }
+
+   /**
+    * This returns XOseeEnumEntry.gif.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     */
    @Override
    public Object getImage(Object object) {
-      return overlayImage(object, getResourceLocator().getImage("full/obj16/OseeType"));
+      return overlayImage(object, getResourceLocator().getImage("full/obj16/XOseeEnumEntry"));
    }
 
    /**
@@ -127,10 +156,10 @@ public class OseeTypeItemProvider
     */
    @Override
    public String getText(Object object) {
-      String label = ((OseeType)object).getName();
+      String label = ((XOseeEnumEntry)object).getName();
       return label == null || label.length() == 0 ?
-         getString("_UI_OseeType_type") :
-         getString("_UI_OseeType_type") + " " + label;
+         getString("_UI_XOseeEnumEntry_type") :
+         getString("_UI_XOseeEnumEntry_type") + " " + label;
    }
 
    /**
@@ -144,9 +173,10 @@ public class OseeTypeItemProvider
    public void notifyChanged(Notification notification) {
       updateChildren(notification);
 
-      switch (notification.getFeatureID(OseeType.class)) {
-         case OseeTypesPackage.OSEE_TYPE__NAME:
-         case OseeTypesPackage.OSEE_TYPE__TYPE_GUID:
+      switch (notification.getFeatureID(XOseeEnumEntry.class)) {
+         case OseeTypesPackage.XOSEE_ENUM_ENTRY__NAME:
+         case OseeTypesPackage.XOSEE_ENUM_ENTRY__ORDINAL:
+         case OseeTypesPackage.XOSEE_ENUM_ENTRY__ENTRY_GUID:
             fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
             return;
       }
@@ -163,6 +193,17 @@ public class OseeTypeItemProvider
    @Override
    protected void collectNewChildDescriptors(Collection<Object> newChildDescriptors, Object object) {
       super.collectNewChildDescriptors(newChildDescriptors, object);
+   }
+
+   /**
+    * Return the resource locator for this item provider's resources.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   @Override
+   public ResourceLocator getResourceLocator() {
+      return OseeTypesEditPlugin.INSTANCE;
    }
 
 }

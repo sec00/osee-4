@@ -9,30 +9,34 @@ package org.eclipse.osee.framework.oseeTypes.provider;
 
 import java.util.Collection;
 import java.util.List;
+
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.util.ResourceLocator;
+
 import org.eclipse.emf.ecore.EStructuralFeature;
+
+import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
-import org.eclipse.emf.edit.provider.ItemProviderAdapter;
+import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ViewerNotification;
-import org.eclipse.osee.framework.oseeTypes.OseeTypeModel;
+
 import org.eclipse.osee.framework.oseeTypes.OseeTypesFactory;
 import org.eclipse.osee.framework.oseeTypes.OseeTypesPackage;
+import org.eclipse.osee.framework.oseeTypes.XArtifactType;
 
 /**
- * This is the item provider adapter for a {@link org.eclipse.osee.framework.oseeTypes.OseeTypeModel} object.
+ * This is the item provider adapter for a {@link org.eclipse.osee.framework.oseeTypes.XArtifactType} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class OseeTypeModelItemProvider
-   extends ItemProviderAdapter
+public class XArtifactTypeItemProvider
+   extends OseeTypeItemProvider
    implements
       IEditingDomainItemProvider,
       IStructuredItemContentProvider,
@@ -45,7 +49,7 @@ public class OseeTypeModelItemProvider
     * <!-- end-user-doc -->
     * @generated
     */
-   public OseeTypeModelItemProvider(AdapterFactory adapterFactory) {
+   public XArtifactTypeItemProvider(AdapterFactory adapterFactory) {
       super(adapterFactory);
    }
 
@@ -60,8 +64,54 @@ public class OseeTypeModelItemProvider
       if (itemPropertyDescriptors == null) {
          super.getPropertyDescriptors(object);
 
+         addAbstractPropertyDescriptor(object);
+         addSuperArtifactTypesPropertyDescriptor(object);
       }
       return itemPropertyDescriptors;
+   }
+
+   /**
+    * This adds a property descriptor for the Abstract feature.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   protected void addAbstractPropertyDescriptor(Object object) {
+      itemPropertyDescriptors.add
+         (createItemPropertyDescriptor
+            (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+             getResourceLocator(),
+             getString("_UI_XArtifactType_abstract_feature"),
+             getString("_UI_PropertyDescriptor_description", "_UI_XArtifactType_abstract_feature", "_UI_XArtifactType_type"),
+             OseeTypesPackage.Literals.XARTIFACT_TYPE__ABSTRACT,
+             true,
+             false,
+             false,
+             ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
+             null,
+             null));
+   }
+
+   /**
+    * This adds a property descriptor for the Super Artifact Types feature.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   protected void addSuperArtifactTypesPropertyDescriptor(Object object) {
+      itemPropertyDescriptors.add
+         (createItemPropertyDescriptor
+            (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+             getResourceLocator(),
+             getString("_UI_XArtifactType_superArtifactTypes_feature"),
+             getString("_UI_PropertyDescriptor_description", "_UI_XArtifactType_superArtifactTypes_feature", "_UI_XArtifactType_type"),
+             OseeTypesPackage.Literals.XARTIFACT_TYPE__SUPER_ARTIFACT_TYPES,
+             true,
+             false,
+             true,
+             null,
+             null,
+             null));
    }
 
    /**
@@ -76,12 +126,7 @@ public class OseeTypeModelItemProvider
    public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
       if (childrenFeatures == null) {
          super.getChildrenFeatures(object);
-         childrenFeatures.add(OseeTypesPackage.Literals.OSEE_TYPE_MODEL__IMPORTS);
-         childrenFeatures.add(OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ARTIFACT_TYPES);
-         childrenFeatures.add(OseeTypesPackage.Literals.OSEE_TYPE_MODEL__RELATION_TYPES);
-         childrenFeatures.add(OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ATTRIBUTE_TYPES);
-         childrenFeatures.add(OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ENUM_TYPES);
-         childrenFeatures.add(OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ENUM_OVERRIDES);
+         childrenFeatures.add(OseeTypesPackage.Literals.XARTIFACT_TYPE__VALID_ATTRIBUTE_TYPES);
       }
       return childrenFeatures;
    }
@@ -100,14 +145,14 @@ public class OseeTypeModelItemProvider
    }
 
    /**
-    * This returns OseeTypeModel.gif.
+    * This returns XArtifactType.gif.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     */
    @Override
    public Object getImage(Object object) {
-      return overlayImage(object, getResourceLocator().getImage("full/obj16/OseeTypeModel"));
+      return overlayImage(object, getResourceLocator().getImage("full/obj16/XArtifactType"));
    }
 
    /**
@@ -118,7 +163,10 @@ public class OseeTypeModelItemProvider
     */
    @Override
    public String getText(Object object) {
-      return getString("_UI_OseeTypeModel_type");
+      String label = ((XArtifactType)object).getName();
+      return label == null || label.length() == 0 ?
+         getString("_UI_XArtifactType_type") :
+         getString("_UI_XArtifactType_type") + " " + label;
    }
 
    /**
@@ -132,13 +180,11 @@ public class OseeTypeModelItemProvider
    public void notifyChanged(Notification notification) {
       updateChildren(notification);
 
-      switch (notification.getFeatureID(OseeTypeModel.class)) {
-         case OseeTypesPackage.OSEE_TYPE_MODEL__IMPORTS:
-         case OseeTypesPackage.OSEE_TYPE_MODEL__ARTIFACT_TYPES:
-         case OseeTypesPackage.OSEE_TYPE_MODEL__RELATION_TYPES:
-         case OseeTypesPackage.OSEE_TYPE_MODEL__ATTRIBUTE_TYPES:
-         case OseeTypesPackage.OSEE_TYPE_MODEL__ENUM_TYPES:
-         case OseeTypesPackage.OSEE_TYPE_MODEL__ENUM_OVERRIDES:
+      switch (notification.getFeatureID(XArtifactType.class)) {
+         case OseeTypesPackage.XARTIFACT_TYPE__ABSTRACT:
+            fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
+            return;
+         case OseeTypesPackage.XARTIFACT_TYPE__VALID_ATTRIBUTE_TYPES:
             fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
             return;
       }
@@ -158,44 +204,8 @@ public class OseeTypeModelItemProvider
 
       newChildDescriptors.add
          (createChildParameter
-            (OseeTypesPackage.Literals.OSEE_TYPE_MODEL__IMPORTS,
-             OseeTypesFactory.eINSTANCE.createImport()));
-
-      newChildDescriptors.add
-         (createChildParameter
-            (OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ARTIFACT_TYPES,
-             OseeTypesFactory.eINSTANCE.createXArtifactType()));
-
-      newChildDescriptors.add
-         (createChildParameter
-            (OseeTypesPackage.Literals.OSEE_TYPE_MODEL__RELATION_TYPES,
-             OseeTypesFactory.eINSTANCE.createXRelationType()));
-
-      newChildDescriptors.add
-         (createChildParameter
-            (OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ATTRIBUTE_TYPES,
-             OseeTypesFactory.eINSTANCE.createXAttributeType()));
-
-      newChildDescriptors.add
-         (createChildParameter
-            (OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ENUM_TYPES,
-             OseeTypesFactory.eINSTANCE.createXOseeEnumType()));
-
-      newChildDescriptors.add
-         (createChildParameter
-            (OseeTypesPackage.Literals.OSEE_TYPE_MODEL__ENUM_OVERRIDES,
-             OseeTypesFactory.eINSTANCE.createXOseeEnumOverride()));
-   }
-
-   /**
-    * Return the resource locator for this item provider's resources.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
-   @Override
-   public ResourceLocator getResourceLocator() {
-      return OseeTypesEditPlugin.INSTANCE;
+            (OseeTypesPackage.Literals.XARTIFACT_TYPE__VALID_ATTRIBUTE_TYPES,
+             OseeTypesFactory.eINSTANCE.createXAttributeTypeRef()));
    }
 
 }
