@@ -26,7 +26,7 @@
       <import plugin="org.eclipse.core.jobs" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.contenttype" version="3.3.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.osgi"/>
-      <import plugin="com.lowagie.text"  version="1.5.4" match="greaterOrEqual"/>
+      <import plugin="com.lowagie.text" version="1.5.4" match="greaterOrEqual"/>
       <import plugin="org.eclipse.osgi" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.osgi.services"/>
       <import plugin="org.eclipse.equinox.app"/>
@@ -127,13 +127,6 @@
 
    <plugin
          id="org.eclipse.osee.framework.manager.servlet"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.osee.demo.db.connection"
          download-size="0"
          install-size="0"
          version="0.0.0"
