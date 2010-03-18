@@ -11,13 +11,16 @@
 package org.eclipse.osee.framework.ui.skynet.test.cases;
 
 import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.eclipse.osee.framework.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.jdk.core.util.xml.Jaxp;
@@ -58,12 +61,9 @@ public class WordArtifactElementExtractorTest {
 
 		Collection<Element> artElements = artifactElementExtractor.extractElements();
 		assertTrue(artifactElementExtractor.extractElements().size() == 1);
-
-		for(Element artelement : artElements){
-			assertTrue("Middle change".equals(WordUtil.textOnly(
-					Lib.inputStreamToString(new ByteArrayInputStream(
-							WordTemplateRenderer.getFormattedContent(artelement))))));
-		}
+		assertTrue("Middle change".equals(WordUtil.textOnly(
+				Lib.inputStreamToString(new ByteArrayInputStream(
+						WordTemplateRenderer.getFormattedContent(artElements.iterator().next()))))));
 	}
 	
 	@org.junit.Test
@@ -73,12 +73,9 @@ public class WordArtifactElementExtractorTest {
 
 		Collection<Element> artElements = artifactElementExtractor.extractElements();
 		assertTrue(artifactElementExtractor.extractElements().size() == 1);
-
-		for(Element artelement : artElements){
-			assertTrue("I am change".equals(WordUtil.textOnly(
-					Lib.inputStreamToString(new ByteArrayInputStream(
-							WordTemplateRenderer.getFormattedContent(artelement))))));
-		}
+		assertTrue("I am change".equals(WordUtil.textOnly(
+				Lib.inputStreamToString(new ByteArrayInputStream(
+						WordTemplateRenderer.getFormattedContent(artElements.iterator().next()))))));
 	}
 
 	@org.junit.Test
@@ -88,12 +85,9 @@ public class WordArtifactElementExtractorTest {
 
 		Collection<Element> artElements = artifactElementExtractor.extractElements();
 		assertTrue(artifactElementExtractor.extractElements().size() == 1);
-
-		for(Element artelement : artElements){
-			assertTrue("End Change".equals(WordUtil.textOnly(
-					Lib.inputStreamToString(new ByteArrayInputStream(
-							WordTemplateRenderer.getFormattedContent(artelement))))));
-		}
+		assertTrue("End Change".equals(WordUtil.textOnly(
+				Lib.inputStreamToString(new ByteArrayInputStream(
+						WordTemplateRenderer.getFormattedContent(artElements.iterator().next()))))));
 	}
 	
 	@org.junit.Test
@@ -103,16 +97,8 @@ public class WordArtifactElementExtractorTest {
 
 		List<Element> artElements = artifactElementExtractor.extractElements();
 		assertTrue("expected 2 got " + artifactElementExtractor.extractElements().size(), artifactElementExtractor.extractElements().size() == 2);
-
 		List<String> testText = Arrays.asList("One", "Two");
-
-		for(int i = 0; i < artElements.size() ; i++){
-			String artContent = WordUtil.textOnly(
-					Lib.inputStreamToString(new ByteArrayInputStream(
-							WordTemplateRenderer.getFormattedContent(artElements.get(i)))));
-			assertTrue("expected:*"+testText.get(i)+"* got:*"+ artContent + "*", testText.get(i).equals(artContent));
-		}
-
+		multiArtifactTest(artElements, testText);
 	}
 	
 	@org.junit.Test
@@ -122,28 +108,21 @@ public class WordArtifactElementExtractorTest {
 
 		Collection<Element> artElements = artifactElementExtractor.extractElements();
 		assertTrue(artifactElementExtractor.extractElements().size() == 1);
-
-		for(Element artelement : artElements){
-			assertTrue("This is a test-x".equals(WordUtil.textOnly(
-					Lib.inputStreamToString(new ByteArrayInputStream(
-							WordTemplateRenderer.getFormattedContent(artelement))))));
-		}
+		assertTrue("This is a test-x".equals(WordUtil.textOnly(
+				Lib.inputStreamToString(new ByteArrayInputStream(
+						WordTemplateRenderer.getFormattedContent(artElements.iterator().next()))))));
 	}
 	
 	@org.junit.Test
 	public void testStartEndChange2003() throws Exception {
 		WordArtifactElementExtractor artifactElementExtractor = new WordArtifactElementExtractor(
 				getDocument(START_END_CHANGE_2003));
-
 		Collection<Element> artElements = artifactElementExtractor.extractElements();
 		assertTrue(artifactElementExtractor.extractElements().size() == 1);
-
-		for(Element artelement : artElements){
-			String artContent = WordUtil.textOnly(
-					Lib.inputStreamToString(new ByteArrayInputStream(
-							WordTemplateRenderer.getFormattedContent(artelement))));
-			assertTrue("Got*"+artContent, "this This is a test that".equals(artContent));
-		}
+		String artContent = WordUtil.textOnly(
+				Lib.inputStreamToString(new ByteArrayInputStream(
+						WordTemplateRenderer.getFormattedContent(artElements.iterator().next()))));
+		assertTrue("Got*"+artContent, "this This is a test that".equals(artContent));
 	}
 
 	@org.junit.Test
@@ -153,16 +132,17 @@ public class WordArtifactElementExtractorTest {
 
 		List<Element> artElements = artifactElementExtractor.extractElements();
 		assertTrue("expected 2 got " + artifactElementExtractor.extractElements().size(), artifactElementExtractor.extractElements().size() == 2);
-
 		List<String> testText = Arrays.asList("This is a test-x", "This has a newline-y");
-
-		for(int i = 0; i < artElements.size() ; i++){
+		multiArtifactTest(artElements, testText);
+	}
+	
+	private void multiArtifactTest(List<Element> actuals, List<String> expected) throws IOException{
+		for(int i = 0; i < actuals.size() ; i++){
 			String artContent = WordUtil.textOnly(
 					Lib.inputStreamToString(new ByteArrayInputStream(
-							WordTemplateRenderer.getFormattedContent(artElements.get(i)))));
-			assertTrue("expected:*"+testText.get(i)+"* got:*"+ artContent + "*", testText.get(i).equals(artContent));
+							WordTemplateRenderer.getFormattedContent(actuals.get(i)))));
+			assertTrue("expected:*"+expected.get(i)+"* got:*"+ artContent + "*", expected.get(i).equals(artContent));
 		}
-
 	}
 
 	private Document getDocument(String string)
