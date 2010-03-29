@@ -1,16 +1,16 @@
-feature@org.eclipse.osee.core.runtime.feature=SVN,branches/MS_0_9_3_20100315,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,features/org.eclipse.osee.core.runtime.feature
+feature@org.eclipse.osee.core.runtime.feature=SVN,branches/MS_0_9_4_20100329,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,features/org.eclipse.osee.core.runtime.feature
 
-feature@org.eclipse.osee.core.feature=SVN,branches/MS_0_9_3_20100315,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,features/org.eclipse.osee.core.feature
-plugin@org.eclipse.osee.framework.core=SVN,branches/MS_0_9_3_20100315,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.core
-plugin@org.eclipse.osee.framework.jdk.core=SVN,branches/MS_0_9_3_20100315,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.jdk.core
-plugin@org.eclipse.osee.framework.jini=SVN,branches/MS_0_9_3_20100315,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.jini
-plugin@org.eclipse.osee.framework.logging=SVN,branches/MS_0_9_3_20100315,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.logging
-plugin@org.eclipse.osee.framework.messaging=SVN,branches/MS_0_9_3_20100315,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.messaging
-plugin@org.eclipse.osee.framework.plugin.core=SVN,branches/MS_0_9_3_20100315,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.plugin.core
+feature@org.eclipse.osee.core.feature=SVN,branches/MS_0_9_4_20100329,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,features/org.eclipse.osee.core.feature
+plugin@org.eclipse.osee.framework.core=SVN,branches/MS_0_9_4_20100329,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.core
+plugin@org.eclipse.osee.framework.jdk.core=SVN,branches/MS_0_9_4_20100329,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.jdk.core
+plugin@org.eclipse.osee.framework.jini=SVN,branches/MS_0_9_4_20100329,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.jini
+plugin@org.eclipse.osee.framework.logging=SVN,branches/MS_0_9_4_20100329,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.logging
+plugin@org.eclipse.osee.framework.messaging=SVN,branches/MS_0_9_4_20100329,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.messaging
+plugin@org.eclipse.osee.framework.plugin.core=SVN,branches/MS_0_9_4_20100329,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.plugin.core
 
-feature@org.eclipse.osee.core.ui.feature=SVN,branches/MS_0_9_3_20100315,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,features/org.eclipse.osee.core.ui.feature
-plugin@org.eclipse.osee.framework.svn=SVN,branches/MS_0_9_3_20100315,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.svn
-plugin@org.eclipse.osee.framework.ui.jdk=SVN,branches/MS_0_9_3_20100315,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.ui.jdk
-plugin@org.eclipse.osee.framework.ui.plugin=SVN,branches/MS_0_9_3_20100315,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.ui.plugin
-plugin@org.eclipse.osee.framework.ui.service.control=SVN,branches/MS_0_9_3_20100315,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.ui.service.control
-plugin@org.eclipse.osee.framework.ui.swt=SVN,branches/MS_0_9_3_20100315,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.ui.swt
+feature@org.eclipse.osee.core.ui.feature=SVN,branches/MS_0_9_4_20100329,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,features/org.eclipse.osee.core.ui.feature
+plugin@org.eclipse.osee.framework.svn=SVN,branches/MS_0_9_4_20100329,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.svn
+plugin@org.eclipse.osee.framework.ui.jdk=SVN,branches/MS_0_9_4_20100329,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.ui.jdk
+plugin@org.eclipse.osee.framework.ui.plugin=SVN,branches/MS_0_9_4_20100329,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.ui.plugin
+plugin@org.eclipse.osee.framework.ui.service.control=SVN,branches/MS_0_9_4_20100329,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.ui.service.control
+plugin@org.eclipse.osee.framework.ui.swt=SVN,branches/MS_0_9_4_20100329,https://dev.eclipse.org/svnroot/technology/org.eclipse.osee,,plugins/org.eclipse.osee.framework.ui.swt
