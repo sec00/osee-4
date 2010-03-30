@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.core.model.AttributeType;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -25,8 +26,6 @@ import org.eclipse.osee.framework.skynet.core.artifact.Attribute;
  */
 public class AttributeTypeUtil {
 
-   private final static String NAME_ATTRIBUTE_ID = "Name";
-
    private AttributeTypeUtil() {
    }
 
@@ -34,7 +33,7 @@ public class AttributeTypeUtil {
       List<AttributeType> items = new ArrayList<AttributeType>();
       for (AttributeType type : artifact.getAttributeTypes()) {
          String typeName = type.getName();
-         if (!NAME_ATTRIBUTE_ID.equals(typeName) && artifact.getAttributes(typeName).isEmpty()) {
+         if (!CoreAttributeTypes.NAME.equals(typeName) && artifact.getAttributes(typeName).isEmpty()) {
             items.add(type);
          }
       }
@@ -42,28 +41,30 @@ public class AttributeTypeUtil {
       return items.toArray(new AttributeType[items.size()]);
    }
 
+   public static Set<AttributeType> toTypes(List<Attribute<?>> attributes) {
+      Set<AttributeType> types = new HashSet<AttributeType>();
+      for (Attribute<?> attribute : attributes) {
+         types.add(attribute.getAttributeType());
+      }
+      return types;
+   }
+
    public static AttributeType[] getTypesWithData(Artifact artifact) throws OseeCoreException {
       List<AttributeType> items = new ArrayList<AttributeType>();
+
+      List<Attribute<?>> attributeInstances = artifact.getAttributes(artifact.isDeleted());
+      Set<AttributeType> typesInExistence = toTypes(attributeInstances);
+
       AttributeType nameType = null;
       AttributeType annotations = null;
 
-      Set<AttributeType> typesInExistence = new HashSet<AttributeType>();
-      List<Attribute<?>> attributeInstances = artifact.getAttributes();
-      for (Attribute<?> attribute : attributeInstances) {
-         typesInExistence.add(attribute.getAttributeType());
-      }
-      typesInExistence.addAll(artifact.getAttributeTypes());
       for (AttributeType type : typesInExistence) {
-         if (type.getName().equals(NAME_ATTRIBUTE_ID)) {
+         if (CoreAttributeTypes.NAME.equals(type)) {
             nameType = type;
+         } else if (CoreAttributeTypes.Annotation.equals(type)) {
+            annotations = type;
          } else {
-            if (!artifact.getAttributes(type.getName()).isEmpty()) {
-               if (type.getName().equals("Annotation")) {
-                  annotations = type;
-               } else {
-                  items.add(type);
-               }
-            }
+            items.add(type);
          }
       }
       Collections.sort(items);
