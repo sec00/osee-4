@@ -121,7 +121,7 @@ public class OseeBranchService implements IOseeBranchService {
       if (request.isHistorical()) {
          ops.add(new LoadChangeDataOperation(oseeDatabaseProvider, srcTx, destTx, response.getChangeItems()));
       } else {
-         TransactionRecord mergeTx = getMergeTx(srcTx, destTx);
+         TransactionRecord mergeTx = getMergeTransaction(srcTx, destTx);
          ops.add(new LoadChangeDataOperation(oseeDatabaseProvider, srcTx, destTx, mergeTx, response.getChangeItems()));
       }
       ops.add(new ComputeNetChangeOperation(response.getChangeItems()));
@@ -132,10 +132,11 @@ public class OseeBranchService implements IOseeBranchService {
       Operations.executeWorkAndCheckStatus(op, monitor, -1);
    }
 
-   private TransactionRecord getMergeTx(TransactionRecord sourceTx, TransactionRecord destinationTx) throws OseeCoreException {
+   private TransactionRecord getMergeTransaction(TransactionRecord sourceTx, TransactionRecord destinationTx) throws OseeCoreException {
       BranchCache cache = cachingService.getOseeCachingService().getBranchCache();
       Branch mergeBranch = cache.findMergeBranch(sourceTx.getBranch(), destinationTx.getBranch());
-      return mergeBranch != null ? mergeBranch.getBaseTransaction() : null;
+      return mergeBranch != null ? cachingService.getOseeCachingService().getTransactionCache().getTransaction(
+            mergeBranch, TransactionVersion.HEAD) : null;
    }
 
    @Override
