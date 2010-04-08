@@ -72,11 +72,10 @@ public class ChangeDataLoader {
       Collection<Artifact> bulkLoadedFromArtifacts =
             preloadArtifacts(changeItems, sourceBranch, toTransactionFromTransactionPair.getSecond(), true, monitor);
 
-      Map<Integer, ArtifactChangeItem> artifactChanges = new HashMap<Integer, ArtifactChangeItem>();
+      Map<Integer, ChangeItem> artifactChanges = new HashMap<Integer, ChangeItem>();
       for (ChangeItem item : changeItems) {
-         if (item instanceof ArtifactChangeItem) {
-            ArtifactChangeItem artItem = (ArtifactChangeItem) item;
-            artifactChanges.put(artItem.getArtId(), artItem);
+         if (item instanceof ArtifactChangeItem || item instanceof RelationChangeItem) {
+            artifactChanges.put(item.getArtId(), item);
          }
       }
 
@@ -92,8 +91,8 @@ public class ChangeDataLoader {
 
             Artifact fromArtifact = null;
 
-            ArtifactChangeItem artifactChangeItem = artifactChanges.get(item.getArtId());
-            ModificationType modType = artifactChangeItem.getBaselineVersion().getModType();
+            ChangeItem artChangeItem = artifactChanges.get(item.getArtId());
+            ModificationType modType = artChangeItem.getBaselineVersion().getModType();
 
             if (modType != ModificationType.NEW && modType != ModificationType.INTRODUCED) {
                fromArtifact =
