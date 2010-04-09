@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import org.eclipse.osee.framework.jdk.core.util.xml.Jaxp;
+import org.eclipse.osee.framework.resource.management.IResource;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -65,5 +66,9 @@ public class AtsXmlMessages {
       Element changeReportElement = node.getOwnerDocument().createElement("changeReportUrl");
       changeReportElement.setTextContent(changeReportUrl);
       return changeReportElement;
+   }
+
+   public void sendResource(HttpServletResponse response, String name, IResource resource) {
+      messenger.sendMessage(response, name, resource, false);
    }
 }
