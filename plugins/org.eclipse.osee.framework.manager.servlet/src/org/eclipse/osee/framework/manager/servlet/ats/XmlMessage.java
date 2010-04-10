@@ -140,17 +140,28 @@ public class XmlMessage {
          response.setContentLength(inputStream.available());
          response.setCharacterEncoding("ISO-8859-1");
 
-         String mimeType = HttpURLConnection.guessContentTypeFromStream(inputStream);
+         String mimeType = null;
+         if (name.endsWith("css")) {
+            mimeType = "text/css";
+         }
          if (mimeType == null) {
-            mimeType = HttpURLConnection.guessContentTypeFromName(resource.getLocation().toString());
+            mimeType = HttpURLConnection.guessContentTypeFromStream(inputStream);
             if (mimeType == null) {
-               mimeType = "application/*";
+               mimeType = HttpURLConnection.guessContentTypeFromName(resource.getLocation().toString());
+               if (mimeType == null) {
+                  mimeType = "application/*";
+               }
             }
          }
          response.setContentType(mimeType);
 
-         String location = resource.getLocation().toASCIIString();
-         boolean isReportDoc = location.contains("changeReports");
+         boolean isReportDoc = false;
+         try {
+            String location = resource.getLocation().toASCIIString();
+            isReportDoc = location.contains("changeReports");
+         } catch (Exception ex) {
+            // nothing here;
+         }
 
          if (!mimeType.startsWith("text") && resource.isCompressed() || isReportDoc) {
             response.setHeader("Content-Disposition", "attachment; filename=" + resource.getName());
