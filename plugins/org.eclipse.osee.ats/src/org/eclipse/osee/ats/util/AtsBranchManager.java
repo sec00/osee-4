@@ -154,13 +154,10 @@ public class AtsBranchManager {
          return CommitStatus.Committed;
       }
       Collection<TransactionRecord> transactions = TransactionManager.getCommittedArtifactTransactionIds(teamArt);
+      boolean mergeBranchExists = teamArt.getBranchMgr().isMergeBranchExists(branch);
       for (TransactionRecord transId : transactions) {
          if (transId.getBranchId() == branch.getId()) {
-            if (teamArt.getBranchMgr().isMergeBranchExists(branch)) {
-               return CommitStatus.Committed_With_Merge;
-            } else {
-               return CommitStatus.Committed;
-            }
+            return mergeBranchExists ? CommitStatus.Committed_With_Merge : CommitStatus.Committed;
          }
       }
 
@@ -171,7 +168,7 @@ public class AtsBranchManager {
       if (teamArt.getBranchMgr().getWorkingBranch(true, false) == null) {
          return CommitStatus.Working_Branch_Not_Created;
       }
-      if (teamArt.getBranchMgr().isMergeBranchExists(branch)) {
+      if (mergeBranchExists) {
          return CommitStatus.Merge_In_Progress;
       }
       return CommitStatus.Commit_Needed;
@@ -456,7 +453,6 @@ public class AtsBranchManager {
       }
    }
 
-
    public Branch getWorkingBranchInWorkOrCommitted() throws OseeCoreException {
       return getWorkingBranch(true, false);
    }
@@ -482,11 +478,8 @@ public class AtsBranchManager {
    public Branch getWorkingBranch(boolean includeCommitted, boolean includeDeleted) throws OseeCoreException {
       Set<Branch> branches = new HashSet<Branch>();
       for (Branch branch : BranchManager.getNormalAllBranches()) {
-         if (branch.getAssociatedArtifact().equals(teamArt) &&
-               !branch.getBranchState().isRebaselined()) {
-            if ((includeCommitted ||
-                  !branch.getBranchState().isCommitted()) &&
-                  (includeDeleted || !branch.getBranchState().isDeleted())) {
+         if (branch.getAssociatedArtifact().equals(teamArt) && !branch.getBranchState().isRebaselined()) {
+            if ((includeCommitted || !branch.getBranchState().isCommitted()) && (includeDeleted || !branch.getBranchState().isDeleted())) {
                branches.add(branch);
             }
          }

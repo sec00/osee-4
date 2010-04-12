@@ -60,7 +60,7 @@ import org.eclipse.osee.framework.skynet.core.transaction.TransactionManager;
 
 /**
  * Provides access to all branches as well as support for creating branches of all types
- * 
+ *
  * @author Ryan D. Brooks
  */
 public class BranchManager {
@@ -103,7 +103,7 @@ public class BranchManager {
 
    /**
     * Excludes branches of type MERGE and SYSTEM_ROOT
-    * 
+    *
     * @return branches that are not archived and are of type STANDARD, TOP_LEVEL, or BASELINE
     * @throws OseeCoreException
     */
@@ -116,7 +116,7 @@ public class BranchManager {
 
    /**
     * Excludes branches of type MERGE and SYSTEM_ROOT
-    * 
+    *
     * @return branches that are of type STANDARD, TOP_LEVEL, or BASELINE
     * @throws OseeCoreException
     */
@@ -206,8 +206,9 @@ public class BranchManager {
       // so refresh the cache.
       MergeBranch mergeBranch = cache.findMergeBranch(sourceBranch, destinationBranch);
       if (mergeBranch == null) {
-         cache.reloadCache();
-         mergeBranch = cache.findMergeBranch(sourceBranch, destinationBranch);
+         if (cache.reloadCache()) {
+            mergeBranch = cache.findMergeBranch(sourceBranch, destinationBranch);
+         }
       }
       return mergeBranch;
    }
@@ -229,7 +230,7 @@ public class BranchManager {
    }
 
    // Always exception for invalid id's, they won't ever be found in the
-   private static Branch getBranch(Integer branchId, boolean throwExcpetion) throws OseeCoreException {
+   private static Branch getBranch(Integer branchId, boolean throwException) throws OseeCoreException {
       // database or cache.
       if (branchId == null) {
          throw new BranchDoesNotExist("Branch Id is null");
@@ -238,11 +239,14 @@ public class BranchManager {
       BranchCache cache = getCache();
       // If someone else made a branch on another machine, we may not know about it
       // so refresh the cache.
-      if (cache.getById(branchId) == null) {
-         cache.reloadCache();
-      }
       Branch branch = cache.getById(branchId);
-      if (throwExcpetion && branch == null) {
+      if (branch == null) {
+         if (cache.reloadCache()) {
+            branch = cache.getById(branchId);
+         }
+      }
+
+      if (throwException && branch == null) {
          throw new BranchDoesNotExist("Branch could not be acquired for branch id: " + branchId);
       }
       return branch;
@@ -250,7 +254,7 @@ public class BranchManager {
 
    /**
     * Update branch
-    * 
+    *
     * @param Job
     */
    public static Job updateBranch(final Branch branch, final ConflictResolverOperation resolver) {
@@ -261,7 +265,7 @@ public class BranchManager {
    /**
     * Completes the update branch operation by committing latest parent based branch with branch with changes. Then
     * swaps branches so we are left with the most current branch containing latest changes.
-    * 
+    *
     * @param Job
     */
    public static Job completeUpdateBranch(final ConflictManagerExternal conflictManager, final boolean archiveSourceBranch, final boolean overwriteUnresolvedConflicts) {
@@ -294,7 +298,7 @@ public class BranchManager {
    /**
     * Delete a branch from the system. (This operation will set the branch state to deleted. This operation is
     * undo-able)
-    * 
+    *
     * @param branchId
     */
    public static Job deleteBranch(final Branch branch) {
@@ -304,7 +308,7 @@ public class BranchManager {
    /**
     * Commit the net changes from the source branch into the destination branch. If there are conflicts between the two
     * branches, the source branch changes will override those on the destination branch.
-    * 
+    *
     * @param monitor
     * @param conflictManager
     * @param archiveSourceBranch
@@ -336,7 +340,7 @@ public class BranchManager {
 
    /**
     * Permanently removes transactions and any of their backing data that is not referenced by any other transactions.
-    * 
+    *
     * @param transactionIdNumber
     */
    public static void purgeTransactions(final int... transactionIdNumbers) {
@@ -345,7 +349,7 @@ public class BranchManager {
 
    /**
     * Permanently removes transactions and any of their backing data that is not referenced by any other transactions.
-    * 
+    *
     * @param transactionIdNumber
     */
    public static void purgeTransactions(IJobChangeListener jobChangeListener, final int... transactionIdNumbers) {
@@ -354,7 +358,7 @@ public class BranchManager {
 
    /**
     * Permanently removes transactions and any of their backing data that is not referenced by any other transactions.
-    * 
+    *
     * @param transactionIdNumber
     */
    public static Job purgeTransactions(IJobChangeListener jobChangeListener, boolean force, final int... transactionIdNumbers) {
@@ -408,7 +412,7 @@ public class BranchManager {
 
    /**
     * Creates a new Branch based on the transaction number selected and the parent branch.
-    * 
+    *
     * @param parentTransactionId
     * @param childBranchName
     * @throws OseeCoreException
@@ -427,7 +431,7 @@ public class BranchManager {
 
    /**
     * Creates a new Branch based on the most recent transaction on the parent branch.
-    * 
+    *
     * @param parentTransactionId
     * @param childBranchName
     * @throws OseeCoreException
@@ -444,7 +448,7 @@ public class BranchManager {
 
    /**
     * Creates a new Branch based on the most recent transaction on the parent branch.
-    * 
+    *
     * @param parentTransactionId
     * @param childBranchName
     * @throws OseeCoreException
@@ -459,7 +463,7 @@ public class BranchManager {
 
    /**
     * Creates a new root branch, imports skynet types and initializes.
-    * 
+    *
     * @param branchName
     * @param initializeArtifacts adds common artifacts needed by most normal root branches
     * @throws Exception

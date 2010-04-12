@@ -1858,11 +1858,11 @@ public class Artifact implements IArtifact, IAdaptable, Comparable<Artifact>, IA
     */
    void internalSetPersistenceData(int gammaId, int transactionId, ModificationType modType, boolean historical) {
       this.gammaId = gammaId;
-      this.transactionId = transactionId;
       this.historical = historical;
       this.modType = modType;
       this.lastValidModType = modType;
       this.objectEditState = EditState.NO_CHANGE;
+      setTransactionId(transactionId);
    }
 
    /**

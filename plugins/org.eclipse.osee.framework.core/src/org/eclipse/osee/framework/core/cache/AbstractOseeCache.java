@@ -38,12 +38,16 @@ public abstract class AbstractOseeCache<T extends AbstractOseeType> implements I
    private final Map<Integer, T> idToTypeMap = new ConcurrentHashMap<Integer, T>();
    private final Map<String, T> guidToTypeMap = new ConcurrentHashMap<String, T>();
 
+   public static final long RELOAD_TIME_LIMIT_MS = 500;
+
    private final IOseeDataAccessor<T> dataAccessor;
    private final OseeCacheEnum cacheId;
    private final boolean uniqueName;
    private boolean ensurePopulatedRanOnce;
+   private long lastLoaded;
 
    protected AbstractOseeCache(OseeCacheEnum cacheId, IOseeDataAccessor<T> dataAccessor, boolean uniqueName) {
+      this.lastLoaded = 0;
       this.cacheId = cacheId;
       this.ensurePopulatedRanOnce = false;
       this.dataAccessor = dataAccessor;
@@ -256,8 +260,27 @@ public abstract class AbstractOseeCache<T extends AbstractOseeType> implements I
       storeItems(items);
    }
 
-   public synchronized void reloadCache() throws OseeCoreException {
-      getDataAccessor().load(this);
+   public long getLastLoaded() {
+      return lastLoaded;
+   }
+
+   private synchronized void setLastLoaded(long lastLoaded) {
+      this.lastLoaded = lastLoaded;
+   }
+
+   public boolean isReloadAllowed() {
+      long currentTime = System.currentTimeMillis();
+      return currentTime - getLastLoaded() > RELOAD_TIME_LIMIT_MS;
+   }
+
+   public synchronized boolean reloadCache() throws OseeCoreException {
+      boolean wasLoaded = false;
+      if (isReloadAllowed()) {
+         getDataAccessor().load(this);
+         wasLoaded = true;
+         setLastLoaded(System.currentTimeMillis());
+      }
+      return wasLoaded;
    }
 
    @Override
