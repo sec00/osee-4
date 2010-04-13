@@ -85,10 +85,12 @@ public class XmlMessage {
          writer.writeEndElement();
 
          if (!isError) {
+            //TODO: update if we want to return a partial set
             writer.writeStartElement("startRow");
             writer.writeCharacters("0");
             writer.writeEndElement();
 
+            //TODO: update if we want to return a partial set
             writer.writeStartElement("endRow");
             int size = 0;
             if (hasNodes) {
@@ -101,6 +103,7 @@ public class XmlMessage {
             writer.writeEndElement();
 
             writer.writeStartElement("totalRows");
+            writer.writeCharacters(String.valueOf(size));
             writer.writeEndElement();
          }
 
