@@ -182,19 +182,10 @@ public class TransactionCache implements IOseeCache<TransactionRecord> {
       this.lastLoaded = lastLoaded;
    }
 
-   public boolean isReloadAllowed() {
-      long currentTime = System.currentTimeMillis();
-      return currentTime - getLastLoaded() > RELOAD_TIME_LIMIT_MS;
-   }
-
    public synchronized boolean reloadCache() throws OseeCoreException {
-      boolean wasLoaded = false;
-      if (isReloadAllowed()) {
-         getDataAccessor().load(this);
-         wasLoaded = true;
-         setLastLoaded(System.currentTimeMillis());
-      }
-      return wasLoaded;
+      getDataAccessor().load(this);
+      setLastLoaded(System.currentTimeMillis());
+      return true;
    }
 
    public void decacheAll() {
