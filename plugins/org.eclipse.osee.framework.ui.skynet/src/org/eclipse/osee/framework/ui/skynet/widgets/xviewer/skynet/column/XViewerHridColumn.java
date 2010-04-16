@@ -30,6 +30,10 @@ public class XViewerHridColumn extends XViewerValueColumn {
             "Human Readable ID");
    }
 
+   public XViewerHridColumn(boolean show) {
+      this("framework.hrid", "HRID", 75, SWT.LEFT, show, SortDataType.String, false, "Human Readable ID");
+   }
+
    public XViewerHridColumn(String id, String name, int width, int align, boolean show, SortDataType sortDataType, boolean multiColumnEditable, String description) {
       super(id, name, width, align, show, sortDataType, multiColumnEditable, description);
    }
