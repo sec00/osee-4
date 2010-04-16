@@ -272,8 +272,7 @@ public final class ArtifactLoader {
          artifact =
                factory.loadExisitingArtifact(artifactId, chStmt.getString("guid"),
                      chStmt.getString("human_readable_id"), artifactType, chStmt.getInt("gamma_id"), branch,
-                     transactionId,
-                     ModificationType.getMod(chStmt.getInt("mod_type")), historical);
+                     transactionId, ModificationType.getMod(chStmt.getInt("mod_type")), historical);
 
       } else if (reload) {
          artifact.internalSetPersistenceData(chStmt.getInt("gamma_id"), transactionId,
@@ -282,6 +281,7 @@ public final class ArtifactLoader {
       return artifact;
    }
 
+   @SuppressWarnings("unchecked")
    static void loadArtifactData(Artifact artifact, ArtifactLoad loadLevel) throws OseeCoreException {
       int queryId = getNewQueryId();
       Timestamp insertTime = GlobalTime.GreenwichMeanTimestamp();
@@ -390,13 +390,7 @@ public final class ArtifactLoader {
 
             // if a different artifact than the previous iteration
             if (branchId != previousBranchId || artifactId != previousArtifactId) {
-               if (artifact != null) { // exclude the first pass because there is no previous artifact
-                  // meet minimum attributes for the previous artifact since its existing attributes have already been loaded
-                  setLastAttributePersistTransaction(artifact, transactionNumbers);
-                  transactionNumbers.clear();
-                  artifact.meetMinimumAttributeCounts(false);
-                  ArtifactCache.cachePostAttributeLoad(artifact);
-               }
+               finishSetupOfPreviousArtifact(artifact, transactionNumbers);
 
                if (historical) {
                   artifact = ArtifactCache.getHistorical(artifactId, chStmt.getInt("stripe_transaction_id"));
@@ -445,8 +439,18 @@ public final class ArtifactLoader {
             previousGammaId = gammaId;
             previousModType = modType;
          }
+         finishSetupOfPreviousArtifact(artifact, transactionNumbers);
       } finally {
          chStmt.close();
+      }
+   }
+
+   private static void finishSetupOfPreviousArtifact(Artifact artifact, List<Integer> transactionNumbers) throws OseeCoreException {
+      if (artifact != null) { // exclude the first pass because there is no previous artifact
+         setLastAttributePersistTransaction(artifact, transactionNumbers);
+         transactionNumbers.clear();
+         artifact.meetMinimumAttributeCounts(false);
+         ArtifactCache.cachePostAttributeLoad(artifact);
       }
    }
 
