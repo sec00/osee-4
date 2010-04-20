@@ -67,6 +67,7 @@ public class AttributeTransactionData extends BaseTransactionData {
       if (attribute.isOfType(StaticIdManager.STATIC_ID_ATTRIBUTE)) {
          ArtifactCache.cacheByStaticId((String) attribute.getValue(), attribute.getArtifact());
       }
+      attribute.getArtifact().setTransactionId(transactionId.getId());
    }
 
    @Override
