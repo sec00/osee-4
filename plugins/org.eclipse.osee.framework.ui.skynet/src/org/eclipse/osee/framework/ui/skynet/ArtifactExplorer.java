@@ -580,10 +580,8 @@ public class ArtifactExplorer extends ViewPart implements IRebuildMenuListener, 
                   ArtifactType type = dialog.getSelection();
                   String name = dialog.getEntryValue();
 
-                  IRelationSorterId sorterId = RelationOrderBaseTypes.USER_DEFINED;
-
                   SkynetTransaction transaction = new SkynetTransaction(branch, String.format("Created new %s \"%s\" in artifact explorer", type.getName(), name));
-                  parent.addNewChild(sorterId, type, name);
+                  parent.addNewChild(null, type, name);
                   parent.persist(transaction);
                   transaction.execute();
 
