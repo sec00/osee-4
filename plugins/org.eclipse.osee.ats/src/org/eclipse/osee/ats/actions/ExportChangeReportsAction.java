@@ -25,6 +25,7 @@ import org.eclipse.osee.framework.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.core.exception.OseeStateException;
 import org.eclipse.osee.framework.core.model.Branch;
 import org.eclipse.osee.framework.core.model.TransactionRecord;
+import org.eclipse.osee.framework.core.operation.Operations;
 import org.eclipse.osee.framework.logging.OseeLevel;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -34,7 +35,7 @@ import org.eclipse.osee.framework.skynet.core.revision.ChangeManager;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionManager;
 import org.eclipse.osee.framework.skynet.core.types.IArtifact;
 import org.eclipse.osee.framework.ui.skynet.FrameworkImage;
-import org.eclipse.osee.framework.ui.skynet.commandHandlers.change.ViewWordChangeReportHandler;
+import org.eclipse.osee.framework.ui.skynet.render.word.WordChangeReportOperation;
 import org.eclipse.osee.framework.ui.swt.ImageManager;
 
 /**
@@ -74,7 +75,6 @@ public class ExportChangeReportsAction extends Action {
    }
 
    private void export() throws OseeCoreException {
-      ViewWordChangeReportHandler handler = new ViewWordChangeReportHandler();
       branch = BranchManager.getBranchByGuid("NBdJRXpKwHF0bAvVHSwA");
       //      Collection<String> legacyIds = Arrays.asList();
       //      List<Artifact> workflows =
@@ -95,8 +95,9 @@ public class ExportChangeReportsAction extends Action {
             }
          }
          if (changes != null) {
-            handler.viewWordChangeReport(changes, true, workflow.getSoleAttributeValueAsString(
-                  AtsAttributeTypes.LegacyPCRId, null));
+            String folderName = workflow.getSoleAttributeValueAsString(AtsAttributeTypes.LegacyPCRId, null);
+            Operations.executeWorkAndCheckStatus(new WordChangeReportOperation(changes, true, folderName),
+                  new NullProgressMonitor(), 0);
          }
          //}
       }
