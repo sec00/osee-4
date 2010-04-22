@@ -12,15 +12,15 @@
 package org.eclipse.osee.framework.ui.skynet.widgets.xchange;
 
 import java.util.logging.Level;
-
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.nebula.widgets.xviewer.XViewerCells;
 import org.eclipse.nebula.widgets.xviewer.XViewerColumn;
 import org.eclipse.nebula.widgets.xviewer.XViewerLabelProvider;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.exception.OseeCoreException;
-import org.eclipse.osee.framework.logging.OseeLevel;
 import org.eclipse.osee.framework.logging.OseeLog;
+import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.change.ArtifactDelta;
 import org.eclipse.osee.framework.skynet.core.change.Change;
 import org.eclipse.osee.framework.skynet.core.change.ErrorChange;
 import org.eclipse.osee.framework.ui.skynet.ArtifactImageManager;
@@ -33,111 +33,99 @@ import org.eclipse.swt.graphics.Image;
 
 public class XChangeLabelProvider extends XViewerLabelProvider {
 
-	Font font = null;
-	private final ChangeXViewer changeXViewer;
+   Font font = null;
+   private final ChangeXViewer changeXViewer;
 
-	public XChangeLabelProvider(ChangeXViewer changeXViewer) {
-		super(changeXViewer);
-		this.changeXViewer = changeXViewer;
-	}
+   public XChangeLabelProvider(ChangeXViewer changeXViewer) {
+      super(changeXViewer);
+      this.changeXViewer = changeXViewer;
+   }
 
-	@Override
-	public String getColumnText(Object element, XViewerColumn cCol,
-			int columnIndex) throws OseeCoreException {
-		try {
-			if (!(element instanceof Change)) {
-				return "";
-			}
-			Change change = (Change) element;
+   @Override
+   public String getColumnText(Object element, XViewerColumn cCol, int columnIndex) throws OseeCoreException {
+      try {
+         if (!(element instanceof Change)) {
+            return "";
+         }
+         Change change = (Change) element;
 
-			if (cCol.equals(ChangeXViewerFactory.Name)) {
-				return change.getName();
-			}
+         if (cCol.equals(ChangeXViewerFactory.Name)) {
+            return change.getName();
+         }
 
-			if (change instanceof ErrorChange) {
-				return "";
-			}
+         ArtifactDelta delta = change.getDelta();
+         if (change instanceof ErrorChange) {
+            return "";
+         } else if (cCol.equals(ChangeXViewerFactory.Change_Type)) {
+            return change.getModificationType().getDisplayName();
+         } else if (cCol.equals(ChangeXViewerFactory.Item_Kind)) {
+            return change.getItemKind();
+         } else if (cCol.equals(ChangeXViewerFactory.Item_Type)) {
+            return change.getItemTypeName();
+         } else if (cCol.equals(ChangeXViewerFactory.Is_Value)) {
+            return change.getIsValue();
+         } else if (cCol.equals(ChangeXViewerFactory.Was_Value)) {
+            return change.getWasValue();
+         } else if (cCol.equals(ChangeXViewerFactory.Artifact_Type)) {
+            return change.getArtifactType().getName();
+         } else if (cCol.equals(ChangeXViewerFactory.Hrid)) {
+            return delta.getStartArtifact().getHumanReadableId();
+         } else if (cCol.equals(ChangeXViewerFactory.lastModDate)) {
+            return XDate.getDateStr(delta.getEndArtifact().getLastModified(), XDate.MMDDYYHHMM);
+         } else if (cCol.equals(ChangeXViewerFactory.paraNumber)) {
+            String paragraphNum = "";
+            Artifact artifact = delta.getStartArtifact();
+            if (artifact.isAttributeTypeValid(CoreAttributeTypes.PARAGRAPH_NUMBER)) {
+               paragraphNum = artifact.getSoleAttributeValue(CoreAttributeTypes.PARAGRAPH_NUMBER, "");
+            }
+            return paragraphNum;
+         }
+      } catch (Exception ex) {
+         return XViewerCells.getCellExceptionString(ex);
+      }
+      return "unhandled column";
+   }
 
-			else if (cCol.equals(ChangeXViewerFactory.Change_Type)) {
-				return change.getModificationType().getDisplayName();
-			} else if (cCol.equals(ChangeXViewerFactory.Item_Kind)) {
-				return change.getItemKind();
-			} else if (cCol.equals(ChangeXViewerFactory.Item_Type)) {
-				return change.getItemTypeName();
-			} else if (cCol.equals(ChangeXViewerFactory.Is_Value)) {
-				return change.getIsValue();
-			} else if (cCol.equals(ChangeXViewerFactory.Was_Value)) {
-				return change.getWasValue();
-			} else if (cCol.equals(ChangeXViewerFactory.Artifact_Type)) {
-				return change.getToArtifact().getArtifactTypeName();
-			} else if (cCol.equals(ChangeXViewerFactory.Hrid)) {
-				return change.getToArtifact().getHumanReadableId();
-			} else if (cCol.equals(ChangeXViewerFactory.lastModDate)) {
-				return XDate.getDateStr(change.getToArtifact()
-						.getLastModified(), XDate.MMDDYYHHMM);
-			} else if (cCol.equals(ChangeXViewerFactory.paraNumber)) {
-				String paragraphNum = "";
+   public void dispose() {
+      if (font != null) {
+         font.dispose();
+      }
+      font = null;
+   }
 
-				if (change.getToArtifact().isAttributeTypeValid(
-						CoreAttributeTypes.PARAGRAPH_NUMBER)) {
-					paragraphNum = change.getToArtifact()
-							.getSoleAttributeValue(
-									CoreAttributeTypes.PARAGRAPH_NUMBER, "");
-				}
-				return paragraphNum;
-			}
-		} catch (Exception ex) {
-			return XViewerCells.getCellExceptionString(ex);
-		}
-		return "unhandled column";
-	}
+   public boolean isLabelProperty(Object element, String property) {
+      return false;
+   }
 
-	public void dispose() {
-		if (font != null) {
-			font.dispose();
-		}
-		font = null;
-	}
+   public void addListener(ILabelProviderListener listener) {
+   }
 
-	public boolean isLabelProperty(Object element, String property) {
-		return false;
-	}
+   public void removeListener(ILabelProviderListener listener) {
+   }
 
-	public void addListener(ILabelProviderListener listener) {
-	}
+   public ChangeXViewer getTreeViewer() {
+      return changeXViewer;
+   }
 
-	public void removeListener(ILabelProviderListener listener) {
-	}
-
-	public ChangeXViewer getTreeViewer() {
-		return changeXViewer;
-	}
-
-	@Override
-	public Image getColumnImage(Object element, XViewerColumn xCol,
-			int columnIndex) throws OseeCoreException {
-		try {
-			if (!(element instanceof Change)) {
-				return null;
-			}
-			Change change = (Change) element;
-			if (xCol.equals(ChangeXViewerFactory.Name)) {
-				try {
-					if (change instanceof ErrorChange) {
-						return ImageManager.getImage(FrameworkImage.ERROR);
-					} else {
-						return ArtifactImageManager.getChangeKindImage(change);
-					}
-				} catch (OseeCoreException ex) {
-					OseeLog.log(SkynetGuiPlugin.class, OseeLevel.SEVERE_POPUP,
-							ex);
-				}
-			} else if (xCol.equals(ChangeXViewerFactory.Item_Type)) {
-				return ArtifactImageManager.getChangeTypeImage(change);
-			}
-		} catch (Exception ex) {
-			OseeLog.log(SkynetGuiPlugin.class, Level.SEVERE, ex);
-		}
-		return null;
-	}
+   @Override
+   public Image getColumnImage(Object element, XViewerColumn xCol, int columnIndex) throws OseeCoreException {
+      try {
+         if (!(element instanceof Change)) {
+            return null;
+         }
+         Change change = (Change) element;
+         if (xCol.equals(ChangeXViewerFactory.Name)) {
+            if (change instanceof ErrorChange) {
+               return ImageManager.getImage(FrameworkImage.ERROR);
+            } else {
+               return ArtifactImageManager.getChangeKindImage(change);
+            }
+         } else if (xCol.equals(ChangeXViewerFactory.Item_Type)) {
+            return ArtifactImageManager.getChangeTypeImage(change);
+         }
+      } catch (Exception ex) {
+         OseeLog.log(SkynetGuiPlugin.class, Level.SEVERE, ex);
+      }
+      return null;
+   }
 }

@@ -31,7 +31,7 @@ import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
  */
 public class XChangeTextFilter extends XViewerTextFilter {
 
-   private Map<Artifact, ArtifactChange> artifactToChangeMap;
+   private final Map<Artifact, ArtifactChange> artifactToChangeMap;
    private ArrayList<ArtifactChange> docOrderedChanges;
    private boolean showDocumentOrderFilter = false;
 
@@ -56,7 +56,9 @@ public class XChangeTextFilter extends XViewerTextFilter {
    }
 
    private void computeDocOrderedChanges(Collection<Change> changes) throws OseeCoreException {
-      if (docOrderedChanges != null) return;
+      if (docOrderedChanges != null) {
+         return;
+      }
       Set<Artifact> artifacts = new HashSet<Artifact>();
       if (this.docOrderedChanges == null) {
          this.docOrderedChanges = new ArrayList<ArtifactChange>();
@@ -64,7 +66,7 @@ public class XChangeTextFilter extends XViewerTextFilter {
       for (Object object : changes) {
          if (object instanceof ArtifactChange) {
             ArtifactChange artifactChanged = (ArtifactChange) object;
-            Artifact artifact = artifactChanged.getToArtifact();
+            Artifact artifact = artifactChanged.getDelta().getEndArtifact();
             if (artifact != null) {
                artifacts.add(artifact);
                artifactToChangeMap.put(artifact, artifactChanged);

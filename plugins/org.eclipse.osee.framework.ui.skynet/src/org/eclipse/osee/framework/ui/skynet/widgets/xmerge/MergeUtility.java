@@ -21,7 +21,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -39,6 +38,7 @@ import org.eclipse.osee.framework.plugin.core.util.Jobs;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 import org.eclipse.osee.framework.skynet.core.attribute.WordAttribute;
+import org.eclipse.osee.framework.skynet.core.change.ArtifactDelta;
 import org.eclipse.osee.framework.skynet.core.conflict.ArtifactConflict;
 import org.eclipse.osee.framework.skynet.core.conflict.AttributeConflict;
 import org.eclipse.osee.framework.skynet.core.conflict.Conflict;
@@ -86,17 +86,12 @@ public class MergeUtility {
          Pattern.compile("wsp:rsidP=\".*?\"", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
    private static final Pattern findSetRsidRDefault =
          Pattern.compile("wsp:rsidRDefault=\".*?\"", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
-   private static final Pattern amlTerminatingDefault =
-         Pattern.compile("aml:id[^\\>]*?/", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
    private static final Pattern annotationTag =
          Pattern.compile("(<aml:annotation[^\\>]*?[^/]\\>)|(</aml:annotation\\>)",
                Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
 
    private static final Pattern rsidPattern =
          Pattern.compile("wsp:rsid(RPr|P|R)=\"(.*?)\"", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
-
-   private static final boolean DEBUG =
-         "TRUE".equalsIgnoreCase(Platform.getDebugOption("org.eclipse.osee.framework.ui.skynet/debug/Merge"));
 
    public static void clearValue(Conflict conflict, Shell shell, boolean prompt) throws MultipleArtifactsExist, ArtifactDoesNotExist, Exception {
       if (conflict == null) {
@@ -145,7 +140,7 @@ public class MergeUtility {
       if (art1 == null || art2 == null) {
          return " ";
       }
-      return RendererManager.diff(art1, art2, true, new VariableMap("fileName", fileName));
+      return RendererManager.diff(new ArtifactDelta(art1, art2), true, new VariableMap("fileName", fileName));
    }
 
    /*

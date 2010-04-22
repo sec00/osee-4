@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.osee.ats.actions;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osee.ats.artifact.AtsAttributeTypes;
@@ -21,13 +21,14 @@ import org.eclipse.osee.ats.artifact.TeamWorkFlowArtifact;
 import org.eclipse.osee.ats.internal.AtsPlugin;
 import org.eclipse.osee.ats.util.AtsBranchManager;
 import org.eclipse.osee.ats.world.WorldEditor;
+import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.eclipse.osee.framework.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.core.exception.OseeStateException;
 import org.eclipse.osee.framework.core.model.Branch;
 import org.eclipse.osee.framework.core.model.TransactionRecord;
+import org.eclipse.osee.framework.core.operation.AbstractOperation;
+import org.eclipse.osee.framework.core.operation.IOperation;
 import org.eclipse.osee.framework.core.operation.Operations;
-import org.eclipse.osee.framework.logging.OseeLevel;
-import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchManager;
 import org.eclipse.osee.framework.skynet.core.change.Change;
@@ -43,7 +44,6 @@ import org.eclipse.osee.framework.ui.swt.ImageManager;
  */
 public class ExportChangeReportsAction extends Action {
    private final WorldEditor worldEditor;
-   private Branch branch;
 
    public ExportChangeReportsAction(WorldEditor worldEditor) {
       setText("Export Change Report(s)");
@@ -57,50 +57,8 @@ public class ExportChangeReportsAction extends Action {
 
    @Override
    public void run() {
-
-      try {
-         export();
-      } catch (OseeCoreException ex) {
-         OseeLog.log(AtsPlugin.class, OseeLevel.SEVERE_POPUP, ex);
-      }
-   }
-
-   private TransactionRecord pickTransaction(IArtifact workflow) throws OseeCoreException {
-      for (TransactionRecord transaction : TransactionManager.getCommittedArtifactTransactionIds(workflow)) {
-         if (transaction.getBranch().equals(branch)) {
-            return transaction;
-         }
-      }
-      throw new OseeStateException("no transaction record for " + branch + " found.");
-   }
-
-   private void export() throws OseeCoreException {
-      branch = BranchManager.getBranchByGuid("NBdJRXpKwHF0bAvVHSwA");
-      //      Collection<String> legacyIds = Arrays.asList();
-      //      List<Artifact> workflows =
-      //            ArtifactQuery.getArtifactListFromAttributeValues(AtsAttributeTypes.LegacyPCRId, legacyIds,
-      //                  CoreBranches.COMMON, legacyIds.size());
-      for (Artifact workflow : getWorkflows()) {
-         // if (workflow.getSoleAttributeValue(ATSAttributes.TEAM_DEFINITION_GUID_ATTRIBUTE.getStoreName()).equals(
-         //               "AAABIBFe5KAARwQiIYZIcA")) {
-         AtsBranchManager atsBranchMgr = ((TeamWorkFlowArtifact) workflow).getBranchMgr();
-         IProgressMonitor monitor = new NullProgressMonitor();
-         Collection<Change> changes = null;
-         if (atsBranchMgr.isCommittedBranchExists()) {
-            changes = ChangeManager.getChangesPerTransaction(pickTransaction(workflow), monitor);
-         } else {
-            Branch branch = atsBranchMgr.getWorkingBranch();
-            if (branch != null) {
-               changes = ChangeManager.getChangesPerBranch(branch, monitor);
-            }
-         }
-         if (changes != null) {
-            String folderName = workflow.getSoleAttributeValueAsString(AtsAttributeTypes.LegacyPCRId, null);
-            Operations.executeWorkAndCheckStatus(new WordChangeReportOperation(changes, true, folderName),
-                  new NullProgressMonitor(), 0);
-         }
-         //}
-      }
+      IOperation operation = new ExportChangesOperation(getWorkflows());
+      Operations.executeAsJob(operation, true);
    }
 
    @Override
@@ -109,6 +67,55 @@ public class ExportChangeReportsAction extends Action {
    }
 
    public void updateEnablement() {
-      setEnabled(getWorkflows().size() > 0);
+      setEnabled(!getWorkflows().isEmpty());
    }
+
+   private static final class ExportChangesOperation extends AbstractOperation {
+      private final Collection<TeamWorkFlowArtifact> workflows;
+
+      public ExportChangesOperation(Collection<TeamWorkFlowArtifact> workflows) {
+         super("Exporting Change Report(s)", AtsPlugin.PLUGIN_ID);
+         this.workflows = workflows;
+      }
+
+      private TransactionRecord pickTransaction(IArtifact workflow, IOseeBranch branch) throws OseeCoreException {
+         for (TransactionRecord transaction : TransactionManager.getCommittedArtifactTransactionIds(workflow)) {
+            if (transaction.getBranch().equals(branch)) {
+               return transaction;
+            }
+         }
+         throw new OseeStateException("no transaction record for " + branch + " found.");
+      }
+
+      @Override
+      protected void doWork(IProgressMonitor monitor) throws Exception {
+         Branch branch = BranchManager.getBranchByGuid("NBdJRXpKwHF0bAvVHSwA");
+         for (Artifact workflow : workflows) {
+            AtsBranchManager atsBranchMgr = ((TeamWorkFlowArtifact) workflow).getBranchMgr();
+
+            Collection<Change> changes = new ArrayList<Change>();
+            IOperation operation = null;
+            if (atsBranchMgr.isCommittedBranchExists()) {
+               operation = ChangeManager.comparedToPreviousTx(pickTransaction(workflow, branch), changes);
+            } else {
+               Branch workingBranch = atsBranchMgr.getWorkingBranch();
+               if (workingBranch != null) {
+                  operation = ChangeManager.comparedToParent(workingBranch, changes);
+               }
+            }
+            if (operation != null) {
+               doSubWork(operation, monitor, 0.50);
+            }
+            if (!changes.isEmpty()) {
+               String folderName = workflow.getSoleAttributeValueAsString(AtsAttributeTypes.LegacyPCRId, null);
+               IOperation subOp = new WordChangeReportOperation(changes, true, folderName);
+               doSubWork(subOp, monitor, 0.50);
+            } else {
+               monitor.worked(calculateWork(0.50));
+            }
+         }
+
+      }
+   }
+
 }

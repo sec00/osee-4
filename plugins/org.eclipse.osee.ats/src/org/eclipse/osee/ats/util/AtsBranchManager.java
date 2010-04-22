@@ -14,9 +14,7 @@ package org.eclipse.osee.ats.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -50,6 +48,7 @@ import org.eclipse.osee.framework.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.core.exception.OseeStateException;
 import org.eclipse.osee.framework.core.model.Branch;
 import org.eclipse.osee.framework.core.model.TransactionRecord;
+import org.eclipse.osee.framework.core.operation.IOperation;
 import org.eclipse.osee.framework.core.operation.Operations;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.framework.logging.OseeLevel;
@@ -79,7 +78,7 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * BranchManager contains methods necessary for ATS objects to interact with creation, view and commit of branches.
- *
+ * 
  * @author Donald G. Dunne
  */
 public class AtsBranchManager {
@@ -118,7 +117,7 @@ public class AtsBranchManager {
 
    /**
     * Return true if merge branch exists in DB (whether archived or not)
-    *
+    * 
     * @param destinationBranch
     * @return true
     * @throws OseeCoreException
@@ -295,7 +294,7 @@ public class AtsBranchManager {
 
    /**
     * Either return a single commit transaction or user must choose from a list of valid commit transactions
-    *
+    * 
     * @param title
     * @param showMergeManager
     * @return TransactionRecord
@@ -460,7 +459,7 @@ public class AtsBranchManager {
    /**
     * Return working branch associated with SMA; This data is cached across all workflows with the cache being updated
     * by local and remote events.
-    *
+    * 
     * @return Branch
     */
    public Branch getWorkingBranch() throws OseeCoreException {
@@ -471,7 +470,7 @@ public class AtsBranchManager {
     * Return working branch associated with SMA, even if it's been archived; This data is cached across all workflows
     * with the cache being updated by local and remote events. Filters out rebaseline branches (which are working
     * branches also).
-    *
+    * 
     * @param includeDeleted
     * @return Branch
     */
@@ -496,7 +495,7 @@ public class AtsBranchManager {
 
    /**
     * Returns true if there is a working branch that is not archived
-    *
+    * 
     * @return result
     * @throws OseeCoreException
     */
@@ -507,7 +506,7 @@ public class AtsBranchManager {
    /**
     * Returns true if there was ever a commit of a working branch regardless of whether the working branch is archived
     * or not.
-    *
+    * 
     * @return result
     * @throws OseeCoreException
     */
@@ -586,7 +585,7 @@ public class AtsBranchManager {
 
    /**
     * Return true if all commit destination branches are configured and have been committed to
-    *
+    * 
     * @return true
     * @throws OseeCoreException
     */
@@ -612,7 +611,7 @@ public class AtsBranchManager {
 
    /**
     * Perform error checks and popup confirmation dialogs associated with creating a working branch.
-    *
+    * 
     * @param pageId if specified, WorkPage gets callback to provide confirmation that branch can be created
     * @param popup if true, errors are popped up to user; otherwise sent silently in Results
     * @return Result return of status
@@ -853,25 +852,24 @@ public class AtsBranchManager {
    /**
     * Since change data for a committed branch is not going to change, cache it per run instance of OSEE
     */
-   private static final Map<TransactionRecord, ChangeData> changeDataCacheForCommittedBranch =
-         new HashMap<TransactionRecord, ChangeData>();
-
    public ChangeData getChangeDataFromEarliestTransactionId() throws OseeCoreException {
       return getChangeData(null);
    }
 
    /**
     * Return ChangeData represented by commit to commitConfigArt or earliest commit if commitConfigArt == null
-    *
+    * 
     * @param commitConfigArt that configures commit or null
     */
    public ChangeData getChangeData(ICommitConfigArtifact commitConfigArt) throws OseeCoreException {
       if (commitConfigArt != null && commitConfigArt.getParentBranch() == null) {
          throw new OseeArgumentException("Parent Branch not configured for " + commitConfigArt);
       }
-      ChangeData changeData = null;
+      Collection<Change> changes = new ArrayList<Change>();
+
+      IOperation operation = null;
       if (teamArt.getBranchMgr().isWorkingBranchInWork()) {
-         changeData = new ChangeData(ChangeManager.getChangesPerBranch(getWorkingBranch(), new NullProgressMonitor()));
+         operation = ChangeManager.comparedToParent(getWorkingBranch(), changes);
       } else if (teamArt.getBranchMgr().isCommittedBranchExists()) {
          TransactionRecord transactionId = null;
          if (commitConfigArt == null) {
@@ -883,16 +881,12 @@ public class AtsBranchManager {
                }
             }
          }
-         changeData = null;//shangeDataCacheForCommittedBranch.get(transactionId);
-         if (changeData == null) {
-            changeData =
-                  new ChangeData(ChangeManager.getChangesPerTransaction(transactionId, new NullProgressMonitor()));
-            changeDataCacheForCommittedBranch.put(transactionId, changeData);
-         }
-      } else {
-         changeData = new ChangeData(new ArrayList<Change>());
+         operation = ChangeManager.comparedToPreviousTx(transactionId, changes);
       }
-      return changeData;
+      if (operation != null) {
+         Operations.executeWorkAndCheckStatus(operation, new NullProgressMonitor(), 1.0);
+      }
+      return new ChangeData(changes);
    }
 
    public Boolean isWorkingBranchHaveChanges() throws OseeCoreException {

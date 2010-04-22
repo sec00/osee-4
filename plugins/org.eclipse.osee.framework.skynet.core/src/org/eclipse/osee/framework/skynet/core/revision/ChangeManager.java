@@ -17,26 +17,28 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.core.client.ClientSessionManager;
 import org.eclipse.osee.framework.core.data.IOseeBranch;
+import org.eclipse.osee.framework.core.data.TransactionDelta;
 import org.eclipse.osee.framework.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.core.model.Branch;
 import org.eclipse.osee.framework.core.model.TransactionRecord;
+import org.eclipse.osee.framework.core.operation.IOperation;
 import org.eclipse.osee.framework.database.core.ConnectionHandler;
 import org.eclipse.osee.framework.database.core.IOseeStatement;
 import org.eclipse.osee.framework.database.core.OseeSql;
 import org.eclipse.osee.framework.database.core.SQL3DataType;
 import org.eclipse.osee.framework.jdk.core.type.CompositeKeyHashMap;
 import org.eclipse.osee.framework.jdk.core.type.HashCollection;
-import org.eclipse.osee.framework.jdk.core.type.Pair;
 import org.eclipse.osee.framework.jdk.core.util.time.GlobalTime;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactLoader;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchManager;
+import org.eclipse.osee.framework.skynet.core.change.ArtifactDelta;
 import org.eclipse.osee.framework.skynet.core.change.Change;
 import org.eclipse.osee.framework.skynet.core.transaction.TransactionManager;
 
 /**
  * Public API class for access to change data from branches and transactionIds
- *
+ * 
  * @author Jeff C. Phillips
  * @author Donald G. Dunne
  */
@@ -47,20 +49,17 @@ public final class ChangeManager {
    private ChangeManager() {
    }
 
-   public static Collection<Pair<Artifact, Artifact>> getCompareArtifacts(Collection<Change> changes) {
-      Collection<Pair<Artifact, Artifact>> toReturn = new ArrayList<Pair<Artifact, Artifact>>(changes.size());
+   public static Collection<ArtifactDelta> getCompareArtifacts(Collection<Change> changes) {
+      Collection<ArtifactDelta> toReturn = new ArrayList<ArtifactDelta>(changes.size());
       for (Change change : changes) {
-         Artifact baseArtifact = change.getFromArtifact();
-         Artifact newerArtifact = change.getToArtifact();
-         toReturn.add(new Pair<Artifact, Artifact>(baseArtifact, newerArtifact));
-
+         toReturn.add(change.getDelta());
       }
       return toReturn;
    }
 
    /**
     * Acquires changes for a particular artifact
-    *
+    * 
     * @param artifact
     * @param monitor
     * @return changes
@@ -73,34 +72,43 @@ public final class ChangeManager {
    /**
     * Acquires artifact, relation and attribute changes from a source branch
     * since its creation.
-    *
+    * 
     * @param transactionId
     * @param monitor
     * @return changes
     * @throws OseeCoreException
     */
-   public static Collection<Change> getChangesPerTransaction(TransactionRecord transactionId, IProgressMonitor monitor) throws OseeCoreException {
-      return new ChangeDataLoader().getChanges(null, transactionId, monitor);
+   public static IOperation comparedToPreviousTx(TransactionRecord transactionId, Collection<Change> changes) throws OseeCoreException {
+      TransactionRecord startTx = TransactionManager.getPriorTransaction(transactionId);
+      TransactionRecord endTx = transactionId;
+
+      TransactionDelta txDelta = new TransactionDelta(startTx, endTx);
+      return new ChangeDataLoader(changes, txDelta);
    }
 
    /**
     * Acquires artifact, relation and attribute changes from a source branch
     * since its creation.
-    *
+    * 
     * @param sourceBranch
     * @param monitor
     * @return changes
     * @throws OseeCoreException
     */
-   public static Collection<Change> getChangesPerBranch(IOseeBranch sourceBranch, IProgressMonitor monitor) throws OseeCoreException {
-      return new ChangeDataLoader().getChanges(sourceBranch, null, monitor);
+   public static IOperation comparedToParent(IOseeBranch sourceBranch, Collection<Change> changes) throws OseeCoreException {
+      Branch branch = BranchManager.getBranch(sourceBranch);
+      TransactionRecord startTx = TransactionManager.getHeadTransaction(branch);
+      TransactionRecord endTx = TransactionManager.getHeadTransaction(branch.getParentBranch());
+
+      TransactionDelta txDelta = new TransactionDelta(startTx, endTx);
+      return new ChangeDataLoader(changes, txDelta);
    }
 
    /**
     * For the given list of artifacts determine which transactions (on that
     * artifact's branch) affected that artifact. The branch's baseline
     * transaction is excluded.
-    *
+    * 
     * @param artifacts
     * @return a map of artifact to collection of TransactionIds which affected
     *         the given artifact
@@ -153,7 +161,7 @@ public final class ChangeManager {
    /**
     * For the given list of artifacts determine which branches (in the branch
     * hierarchy for that artifact) affected that artifact.
-    *
+    * 
     * @param artifacts
     * @return a map of artifact to collection of branches which affected the
     *         given artifact
