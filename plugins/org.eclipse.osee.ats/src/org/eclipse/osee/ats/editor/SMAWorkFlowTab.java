@@ -28,30 +28,27 @@ import org.eclipse.osee.ats.actions.EmailActionAction;
 import org.eclipse.osee.ats.actions.FavoriteAction;
 import org.eclipse.osee.ats.actions.OpenInArtifactEditorAction;
 import org.eclipse.osee.ats.actions.OpenInAtsWorldAction;
-import org.eclipse.osee.ats.actions.OpenInSkyWalkerAction;
 import org.eclipse.osee.ats.actions.OpenParentAction;
 import org.eclipse.osee.ats.actions.OpenTeamDefinitionAction;
 import org.eclipse.osee.ats.actions.OpenVersionArtifactAction;
 import org.eclipse.osee.ats.actions.PrivilegedEditAction;
+import org.eclipse.osee.ats.actions.ReloadAction;
 import org.eclipse.osee.ats.actions.ResourceHistoryAction;
 import org.eclipse.osee.ats.actions.ShowChangeReportAction;
 import org.eclipse.osee.ats.actions.ShowMergeManagerAction;
-import org.eclipse.osee.ats.actions.SubscribedAction;
 import org.eclipse.osee.ats.artifact.ATSAttributes;
 import org.eclipse.osee.ats.artifact.GoalArtifact;
 import org.eclipse.osee.ats.artifact.NoteItem;
 import org.eclipse.osee.ats.artifact.StateMachineArtifact;
 import org.eclipse.osee.ats.artifact.TeamWorkFlowArtifact;
-import org.eclipse.osee.ats.editor.widget.ReviewInfoXWidget;
 import org.eclipse.osee.ats.internal.AtsPlugin;
 import org.eclipse.osee.ats.util.AtsUtil;
-import org.eclipse.osee.ats.util.PromptChangeUtil;
-import org.eclipse.osee.ats.workflow.ATSXWidgetOptionResolver;
 import org.eclipse.osee.ats.workflow.AtsWorkPage;
+import org.eclipse.osee.ats.workflow.item.AtsWorkDefinitions;
 import org.eclipse.osee.framework.core.exception.MultipleAttributesExist;
 import org.eclipse.osee.framework.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.core.exception.OseeStateException;
-import org.eclipse.osee.framework.jdk.core.util.AHTML;
+import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.framework.logging.OseeLevel;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.framework.plugin.core.IActionable;
@@ -66,8 +63,6 @@ import org.eclipse.osee.framework.ui.skynet.util.FormsUtil;
 import org.eclipse.osee.framework.ui.skynet.widgets.IArtifactWidget;
 import org.eclipse.osee.framework.ui.skynet.widgets.XDate;
 import org.eclipse.osee.framework.ui.skynet.widgets.XWidget;
-import org.eclipse.osee.framework.ui.skynet.widgets.workflow.WorkPage;
-import org.eclipse.osee.framework.ui.skynet.widgets.workflow.WorkPageDefinition;
 import org.eclipse.osee.framework.ui.swt.ALayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -85,8 +80,6 @@ import org.eclipse.ui.forms.IMessage;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.events.IHyperlinkListener;
-import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 /**
@@ -96,8 +89,6 @@ public class SMAWorkFlowTab extends FormPage implements IActionable {
    private final StateMachineArtifact sma;
    private final ArrayList<SMAWorkFlowSection> sections = new ArrayList<SMAWorkFlowSection>();
    private final XFormToolkit toolkit;
-   private static String ORIGINATOR = "Originator:";
-   private Label origLabel;
    private final List<AtsWorkPage> atsWorkPages = new ArrayList<AtsWorkPage>();
    private ScrolledForm scrolledForm;
    private final Integer HEADER_COMP_COLUMNS = 4;
@@ -166,14 +157,13 @@ public class SMAWorkFlowTab extends FormPage implements IActionable {
       atsBody.setLayoutData(new GridData(GridData.FILL_BOTH));
       atsBody.setLayout(new GridLayout(1, false));
 
-      createHeaderSection();
+      createHeaderSection(sma.getCurrentAtsWorkPage());
       createGoalSection();
       createPageSections();
       createHistorySection();
       createRelationsSection();
       createOperationsSection();
       createDetailsSection();
-      createDebugSection();
 
       atsBody.layout();
       atsBody.setFocus();
@@ -185,16 +175,6 @@ public class SMAWorkFlowTab extends FormPage implements IActionable {
       }
 
       managedForm.refresh();
-   }
-
-   private void createDebugSection() {
-      try {
-         if (AtsUtil.isAtsAdmin()) {
-            managedForm.addPart(new SMAWorkFlowDebugSection(atsBody, toolkit, SWT.NONE, sma));
-         }
-      } catch (Exception ex) {
-         OseeLog.log(AtsPlugin.class, OseeLevel.SEVERE, ex);
-      }
    }
 
    private void createDetailsSection() {
@@ -248,11 +228,8 @@ public class SMAWorkFlowTab extends FormPage implements IActionable {
    private void createPageSections() {
       try {
          // Only display current or past states
-         for (WorkPageDefinition workPageDefinition : sma.getWorkFlowDefinition().getPagesOrdered()) {
+         for (AtsWorkPage atsWorkPage : sma.getAtsWorkPages()) {
             try {
-               AtsWorkPage atsWorkPage =
-                     new AtsWorkPage(sma.getWorkFlowDefinition(), workPageDefinition, null,
-                           ATSXWidgetOptionResolver.getInstance());
                if (sma.isCurrentState(atsWorkPage.getName()) || sma.getStateMgr().isStateVisited(atsWorkPage.getName())) {
                   // Don't show completed or cancelled state if not currently those state
                   if (atsWorkPage.isCompletePage() && !sma.isCompleted()) continue;
@@ -272,7 +249,7 @@ public class SMAWorkFlowTab extends FormPage implements IActionable {
       }
    }
 
-   private void createHeaderSection() {
+   private void createHeaderSection(AtsWorkPage currentAtsWorkPage) {
       Composite headerComp = toolkit.createComposite(atsBody);
       GridData gd = new GridData(GridData.FILL_HORIZONTAL);
       gd.widthHint = 100;
@@ -283,7 +260,7 @@ public class SMAWorkFlowTab extends FormPage implements IActionable {
       // Display relations
       try {
          createCurrentStateAndTeamHeaders(headerComp, toolkit);
-         FormsUtil.createLabelText(toolkit, headerComp, "Assignee(s)", sma.getStateMgr().getAssigneesStr(150));
+         createTargetVersionAndAssigneeHeader(headerComp, currentAtsWorkPage, toolkit);
 
          createLatestHeader(headerComp, toolkit);
          if (sma.isTeamWorkflow()) {
@@ -303,6 +280,41 @@ public class SMAWorkFlowTab extends FormPage implements IActionable {
          }
       } catch (Exception ex) {
          OseeLog.log(AtsPlugin.class, Level.SEVERE, ex);
+      }
+   }
+
+   protected boolean isShowTargetedVersion() throws OseeCoreException {
+      return sma.isTargetedVersionable();
+   }
+
+   private void createTargetVersionAndAssigneeHeader(Composite parent, AtsWorkPage page, XFormToolkit toolkit) throws OseeCoreException {
+      boolean isShowTargetedVersion = isShowTargetedVersion();
+      boolean isCurrentNonCompleteCanceledState = page.isCurrentNonCompleteCancelledState(sma);
+      if (!isShowTargetedVersion && !isCurrentNonCompleteCanceledState) return;
+
+      Composite comp = toolkit.createContainer(parent, 6);
+      comp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      comp.setLayout(ALayout.getZeroMarginLayout(6, false));
+
+      // Targeted Version
+      if (isShowTargetedVersion) {
+         new SMATargetedVersionHeader(comp, SWT.NONE, sma, toolkit);
+         toolkit.createLabel(comp, "    ");
+      }
+
+      // Current Assignees
+      if (isCurrentNonCompleteCanceledState) {
+         boolean editable = (!sma.isCancelledOrCompleted() && !sma.isReadOnly() &&
+         // and access control writeable
+         sma.isAccessControlWrite()) && //
+
+         (SMAWorkFlowSection.isEditable(sma, page) || //
+         // page is define to allow anyone to edit
+         sma.getWorkPageDefinition().hasWorkRule(AtsWorkDefinitions.RuleWorkItemId.atsAllowAssigneeToAll.name()) ||
+         // team definition has allowed anyone to edit
+         sma.teamDefHasWorkRule(AtsWorkDefinitions.RuleWorkItemId.atsAllowAssigneeToAll.name()));
+
+         new SMAAssigneesHeader(comp, SWT.NONE, sma, toolkit, editable, sma.getEditor().isPriviledgedEditModeEnabled());
       }
    }
 
@@ -345,13 +357,12 @@ public class SMAWorkFlowTab extends FormPage implements IActionable {
       if (AtsUtil.isAtsAdmin()) {
          toolBarMgr.add(new OpenInArtifactEditorAction(sma.getEditor()));
       }
-      toolBarMgr.add(new OpenInSkyWalkerAction(sma));
       toolBarMgr.add(new OpenVersionArtifactAction(sma));
       toolBarMgr.add(new OpenTeamDefinitionAction(sma));
-      toolBarMgr.add(new SubscribedAction(sma.getEditor()));
       toolBarMgr.add(new CopyActionDetailsAction(sma));
       toolBarMgr.add(new PrivilegedEditAction(sma));
       toolBarMgr.add(new ResourceHistoryAction(sma));
+      toolBarMgr.add(new ReloadAction(sma));
 
       OseeUiActions.addButtonToEditorToolBar(sma.getEditor(), this, AtsPlugin.getInstance(),
             scrolledForm.getToolBarManager(), SMAEditor.EDITOR_ID, "ATS Editor");
@@ -418,33 +429,6 @@ public class SMAWorkFlowTab extends FormPage implements IActionable {
       return "Workflow Tab";
    }
 
-   public final static String normalColor = "#FFFFFF";
-   private final static String activeColor = "#EEEEEE";
-
-   public String getHtml() throws OseeCoreException {
-      StringBuffer htmlSb = new StringBuffer();
-      for (WorkPage wPage : atsWorkPages) {
-         AtsWorkPage page = (AtsWorkPage) wPage;
-         StringBuffer notesSb = new StringBuffer();
-         for (NoteItem note : sma.getNotes().getNoteItems()) {
-            if (note.getState().equals(page.getName())) {
-               notesSb.append(note.toHTML() + AHTML.newline());
-            }
-         }
-         if (sma.isCurrentState(page.getName()) || sma.getStateMgr().isStateVisited(page.getName()) && sma.isTeamWorkflow()) {
-            htmlSb.append(page.getHtml(sma.isCurrentState(page.getName()) ? activeColor : normalColor,
-                  notesSb.toString(), getStateHoursSpentHtml(page) + ReviewInfoXWidget.toHTML(
-                        (TeamWorkFlowArtifact) sma, page.getName())));
-            htmlSb.append(AHTML.newline());
-         }
-      }
-      return htmlSb.toString();
-   }
-
-   private String getStateHoursSpentHtml(WorkPage page) throws OseeCoreException {
-      return AHTML.getLabelValueStr("State Hours Spent", AtsUtil.doubleToI18nString(sma.getStateMgr().getHoursSpent(
-            page.getName())) + "<br>");
-   }
    private Control control = null;
 
    private void storeScrollLocation() throws OseeStateException {
@@ -503,11 +487,7 @@ public class SMAWorkFlowTab extends FormPage implements IActionable {
          OseeLog.log(AtsPlugin.class, OseeLevel.SEVERE, ex);
       }
 
-      try {
-         createOriginatorHeader(topLineComp, toolkit);
-      } catch (OseeCoreException ex) {
-         OseeLog.log(AtsPlugin.class, OseeLevel.SEVERE, ex);
-      }
+      new SMAOriginatorHeader(topLineComp, SWT.NONE, sma, toolkit);
 
       try {
          if (sma.isTeamWorkflow()) {
@@ -518,16 +498,16 @@ public class SMAWorkFlowTab extends FormPage implements IActionable {
       }
 
       try {
-         if (!(sma instanceof GoalArtifact)) {
-            FormsUtil.createLabelText(toolkit, topLineComp, "Action Id: ",
-                  sma.getParentActionArtifact() == null ? "??" : sma.getParentActionArtifact().getHumanReadableId());
-         }
-         if (sma.getParentSMA() != null) {
-            FormsUtil.createLabelText(toolkit, topLineComp, "Parent Workflow Id: ",
-                  sma.getParentSMA() == null ? "??" : sma.getParentSMA().getHumanReadableId());
-         }
-         FormsUtil.createLabelText(toolkit, topLineComp, sma.getArtifactSuperTypeName() + " Id: ",
+         FormsUtil.createLabelText(toolkit, topLineComp, sma.getArtifactSuperTypeName() + "Id: ",
                sma.getHumanReadableId());
+      } catch (OseeCoreException ex) {
+         OseeLog.log(AtsPlugin.class, OseeLevel.SEVERE, ex);
+      }
+
+      try {
+         if (Strings.isValid(sma.getPcrId())) {
+            FormsUtil.createLabelText(toolkit, topLineComp, " Id: ", sma.getPcrId());
+         }
       } catch (OseeCoreException ex) {
          OseeLog.log(AtsPlugin.class, OseeLevel.SEVERE, ex);
       }
@@ -564,56 +544,6 @@ public class SMAWorkFlowTab extends FormPage implements IActionable {
             FormsUtil.createLabelOrHyperlink(comp, toolkit, horizontalSpan, noteItem.toString());
          }
       }
-   }
-
-   private void createOriginatorHeader(Composite comp, XFormToolkit toolkit) throws OseeCoreException {
-      Composite topLineComp = new Composite(comp, SWT.NONE);
-      topLineComp.setLayoutData(new GridData());
-      topLineComp.setLayout(ALayout.getZeroMarginLayout(2, false));
-      toolkit.adapt(topLineComp);
-
-      if (!sma.isCancelled() && !sma.isCompleted()) {
-         Hyperlink link = toolkit.createHyperlink(topLineComp, ORIGINATOR, SWT.NONE);
-         link.addHyperlinkListener(new IHyperlinkListener() {
-
-            public void linkEntered(HyperlinkEvent e) {
-            }
-
-            public void linkExited(HyperlinkEvent e) {
-            }
-
-            public void linkActivated(HyperlinkEvent e) {
-               try {
-                  if (PromptChangeUtil.promptChangeOriginator(sma)) {
-                     updateOrigLabel();
-                     sma.getEditor().onDirtied();
-                  }
-               } catch (OseeCoreException ex) {
-                  OseeLog.log(AtsPlugin.class, OseeLevel.SEVERE_POPUP, ex);
-               }
-            }
-         });
-         if (sma.getOriginator() == null) {
-            Label errorLabel = toolkit.createLabel(topLineComp, "Error: No originator identified.");
-            errorLabel.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-         } else {
-            origLabel = toolkit.createLabel(topLineComp, sma.getOriginator().getName());
-            origLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-         }
-      } else {
-         if (sma.getOriginator() == null) {
-            Label errorLabel = toolkit.createLabel(topLineComp, "Error: No originator identified.");
-            errorLabel.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-         } else {
-            Label origLabel = toolkit.createLabel(topLineComp, ORIGINATOR + sma.getOriginator().getName());
-            origLabel.setLayoutData(new GridData());
-         }
-      }
-   }
-
-   public void updateOrigLabel() throws OseeCoreException {
-      origLabel.setText(sma.getOriginator().getName());
-      origLabel.getParent().layout();
    }
 
    public void refresh() throws OseeCoreException {
