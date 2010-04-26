@@ -232,7 +232,7 @@ public class CoverageUtil {
    }
 
    public static String getPercentString(int percent, int complete, int total, boolean showZero) {
-      if (!showZero && percent == 0) {
+      if (!showZero && percent == 0 && complete == 0) {
          return "0%";
       }
       return String.format("%d%% - %d / %d", percent, complete, total);
