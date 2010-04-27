@@ -20,7 +20,6 @@ import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
-import org.eclipse.osee.framework.skynet.core.change.ArtifactDelta;
 import org.eclipse.osee.framework.skynet.core.change.Change;
 import org.eclipse.osee.framework.skynet.core.change.ErrorChange;
 import org.eclipse.osee.framework.ui.skynet.ArtifactImageManager;
@@ -53,7 +52,6 @@ public class XChangeLabelProvider extends XViewerLabelProvider {
             return change.getName();
          }
 
-         ArtifactDelta delta = change.getDelta();
          if (change instanceof ErrorChange) {
             return "";
          } else if (cCol.equals(ChangeXViewerFactory.Change_Type)) {
@@ -69,12 +67,12 @@ public class XChangeLabelProvider extends XViewerLabelProvider {
          } else if (cCol.equals(ChangeXViewerFactory.Artifact_Type)) {
             return change.getArtifactType().getName();
          } else if (cCol.equals(ChangeXViewerFactory.Hrid)) {
-            return delta.getStartArtifact().getHumanReadableId();
+            return change.getChangeArtifact().getHumanReadableId();
          } else if (cCol.equals(ChangeXViewerFactory.lastModDate)) {
-            return XDate.getDateStr(delta.getEndArtifact().getLastModified(), XDate.MMDDYYHHMM);
+            return XDate.getDateStr(change.getChangeArtifact().getLastModified(), XDate.MMDDYYHHMM);
          } else if (cCol.equals(ChangeXViewerFactory.paraNumber)) {
             String paragraphNum = "";
-            Artifact artifact = delta.getStartArtifact();
+            Artifact artifact = change.getChangeArtifact();
             if (artifact.isAttributeTypeValid(CoreAttributeTypes.PARAGRAPH_NUMBER)) {
                paragraphNum = artifact.getSoleAttributeValue(CoreAttributeTypes.PARAGRAPH_NUMBER, "");
             }
