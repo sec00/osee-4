@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.eclipse.osee.framework.core.enums.ModificationType;
 import org.eclipse.osee.framework.core.exception.OseeCoreException;
+import org.eclipse.osee.framework.core.exception.OseeExceptions;
 import org.eclipse.osee.framework.core.util.Conditions;
 import org.eclipse.osee.framework.jdk.core.util.Collections;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -51,19 +52,19 @@ public class ChangeData {
    }
 
    public Collection<Change> getArtifactChangesByName(String name) throws OseeCoreException {
-      Collection<Change> changes = new HashSet<Change>();
+      Collection<Change> toReturn = new HashSet<Change>();
       try {
          for (Change change : changes) {
             if (change instanceof ArtifactChange) {
                if (change.getArtifactName().equals(name)) {
-                  changes.add(change);
+                  toReturn.add(change);
                }
             }
          }
-         return changes;
       } catch (Exception ex) {
-         throw new OseeCoreException(ex);
+         OseeExceptions.wrapAndThrow(ex);
       }
+      return toReturn;
    }
 
    /**

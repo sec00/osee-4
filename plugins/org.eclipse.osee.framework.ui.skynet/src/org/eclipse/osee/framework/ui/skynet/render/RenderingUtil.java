@@ -61,8 +61,8 @@ public final class RenderingUtil {
             artFile1 = null;
             artFile2 = delta.getStartArtifact();
          } else {
-            artFile2 = delta.getStartArtifact();
             artFile1 = delta.getEndArtifact();
+            artFile2 = delta.getStartArtifact();
          }
       } else {
          // Assumptions - when comparing data between transactions on the same branch, the end artifact will never be null;
@@ -70,9 +70,12 @@ public final class RenderingUtil {
          if (modType.isDeleted()) {
             artFile1 = delta.getStartArtifact();
             artFile2 = null;
+         } else if ((modType == ModificationType.INTRODUCED || modType == ModificationType.NEW) && delta.getStartArtifact() == null) {
+            artFile1 = null;
+            artFile2 = delta.getEndArtifact();
          } else {
-            artFile2 = delta.getStartArtifact();
             artFile1 = delta.getEndArtifact();
+            artFile2 = delta.getStartArtifact();
          }
       }
       return new Pair<Artifact, Artifact>(artFile1, artFile2);
