@@ -27,22 +27,20 @@ import org.eclipse.osee.framework.ui.skynet.FrameworkImage;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.widgets.XDate;
 import org.eclipse.osee.framework.ui.swt.ImageManager;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
 public class XChangeLabelProvider extends XViewerLabelProvider {
 
-   Font font = null;
-   private final ChangeXViewer changeXViewer;
-
    public XChangeLabelProvider(ChangeXViewer changeXViewer) {
       super(changeXViewer);
-      this.changeXViewer = changeXViewer;
    }
 
    @Override
    public String getColumnText(Object element, XViewerColumn cCol, int columnIndex) throws OseeCoreException {
       try {
+         if (element instanceof String && cCol.equals(ChangeXViewerFactory.Name)) {
+            return element.toString();
+         }
          if (!(element instanceof Change)) {
             return "";
          }
@@ -84,13 +82,6 @@ public class XChangeLabelProvider extends XViewerLabelProvider {
       return "unhandled column";
    }
 
-   public void dispose() {
-      if (font != null) {
-         font.dispose();
-      }
-      font = null;
-   }
-
    public boolean isLabelProperty(Object element, String property) {
       return false;
    }
@@ -99,10 +90,6 @@ public class XChangeLabelProvider extends XViewerLabelProvider {
    }
 
    public void removeListener(ILabelProviderListener listener) {
-   }
-
-   public ChangeXViewer getTreeViewer() {
-      return changeXViewer;
    }
 
    @Override
@@ -125,5 +112,9 @@ public class XChangeLabelProvider extends XViewerLabelProvider {
          OseeLog.log(SkynetGuiPlugin.class, Level.SEVERE, ex);
       }
       return null;
+   }
+
+   @Override
+   public void dispose() {
    }
 }
