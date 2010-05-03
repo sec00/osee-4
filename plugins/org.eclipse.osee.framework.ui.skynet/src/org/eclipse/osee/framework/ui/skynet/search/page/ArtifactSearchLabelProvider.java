@@ -117,7 +117,6 @@ public class ArtifactSearchLabelProvider extends LabelProvider implements IStyle
             coloredName.append(' ').append("[" + artifact.getBranch().getShortName() + "]",
                   StyledString.DECORATIONS_STYLER);
          }
-
          try {
             String selectedAttributes = decoration.getSelectedAttributeData(artifact);
             if (Strings.isValid(selectedAttributes)) {
@@ -125,6 +124,7 @@ public class ArtifactSearchLabelProvider extends LabelProvider implements IStyle
             }
          } catch (Exception ex) {
             OseeLog.log(SkynetGuiPlugin.class, Level.SEVERE, ex);
+            coloredName.append(' ').append(ex.getLocalizedMessage());
          }
       }
       return coloredName;
