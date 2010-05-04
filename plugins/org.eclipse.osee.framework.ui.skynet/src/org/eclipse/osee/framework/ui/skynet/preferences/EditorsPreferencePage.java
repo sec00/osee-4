@@ -35,13 +35,13 @@ public class EditorsPreferencePage extends PreferencePage implements IWorkbenchP
 
    @Override
    protected Control createContents(Composite parent) {
-
-      //Page Composite
-      Composite composite = createComposite(parent, 3);
+      Composite composite = new Composite(parent, SWT.NULL);
+      composite.setLayout(new GridLayout());
+      composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
       // TODO Temporary until editor opening can be configured by users
       previewOnDoubleClickForWordArtifacts = new Button(composite, SWT.CHECK);
-      previewOnDoubleClickForWordArtifacts.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, true));
+      previewOnDoubleClickForWordArtifacts.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
       previewOnDoubleClickForWordArtifacts.setText("Open MS Word preview on double-click of MS Word Artifact");
       try {
          previewOnDoubleClickForWordArtifacts.setSelection(StaticIdManager.hasValue(UserManager.getUser(),
@@ -51,7 +51,7 @@ public class EditorsPreferencePage extends PreferencePage implements IWorkbenchP
       }
 
       changeReportAsEditor = new Button(composite, SWT.CHECK);
-      changeReportAsEditor.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, true));
+      changeReportAsEditor.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
       changeReportAsEditor.setText("Open Change Reports in an Editor");
       try {
          boolean value = UserManager.getUser().getBooleanSetting("change.report.as.editor");
@@ -96,28 +96,4 @@ public class EditorsPreferencePage extends PreferencePage implements IWorkbenchP
       }
       return super.performOk();
    }
-
-   /**
-    * Creates composite control and sets the default layout data.
-    * 
-    * @param parent the parent of the new composite
-    * @param numColumns the number of columns for the new composite
-    * @return the newly-created composite
-    */
-   private Composite createComposite(Composite parent, int numColumns) {
-      Composite composite = new Composite(parent, SWT.NULL);
-
-      //GridLayout
-      GridLayout layout = new GridLayout();
-      layout.numColumns = numColumns;
-      composite.setLayout(layout);
-
-      //GridData
-      GridData data = new GridData();
-      data.verticalAlignment = GridData.FILL;
-      data.horizontalAlignment = GridData.FILL;
-      composite.setLayoutData(data);
-      return composite;
-   }
-
 }
