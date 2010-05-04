@@ -51,7 +51,7 @@
       <import plugin="org.eclipse.core.jobs"/>
       <import feature="org.eclipse.osee.core.runtime.feature" version="0.9.4.qualifier" match="greaterOrEqual"/>
       <import feature="org.eclipse.osee.core.feature" version="0.9.4.qualifier"/>
-      <import plugin="com.google.guice" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="com.google.inject" version="2.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
