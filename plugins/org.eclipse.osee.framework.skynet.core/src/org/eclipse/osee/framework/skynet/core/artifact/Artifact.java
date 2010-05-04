@@ -380,7 +380,7 @@ public class Artifact implements IArtifact, IAdaptable, Comparable<Artifact>, IA
     * @throws MultipleArtifactsExist if this artifact has more than one parent
     */
    public boolean hasParent() throws OseeCoreException {
-      int parentCount = getRelatedArtifactsCount(CoreRelationTypes.Default_Hierarchical__Parent);
+      int parentCount = getRelatedArtifactsUnSorted(CoreRelationTypes.Default_Hierarchical__Parent).size();
       if (parentCount > 1) {
          throw new MultipleArtifactsExist(humanReadableId + " has " + parentCount + " parents");
       }
