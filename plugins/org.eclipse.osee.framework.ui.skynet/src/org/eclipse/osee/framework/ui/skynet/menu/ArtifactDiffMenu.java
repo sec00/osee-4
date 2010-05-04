@@ -110,8 +110,8 @@ public final class ArtifactDiffMenu {
          if (selection.size() == 2) {
             Object[] selections = selection.toArray();
             Object selectionA = selections[0];
-            Object secondB = selections[1];
-            ArtifactDelta artifactDelta = asArtifactDelta(selectionA, secondB);
+            Object selectionB = selections[1];
+            ArtifactDelta artifactDelta = asArtifactDelta(selectionA, selectionB);
             if (artifactDelta != null) {
                RendererManager.diffInJob(artifactDelta);
             }
@@ -142,7 +142,7 @@ public final class ArtifactDiffMenu {
          TransactionRecord endTx = second.getChangeArtifact().getTransactionRecord();
          if (startTx.getId() > endTx.getId()) {
             startTx = second.getChangeArtifact().getTransactionRecord();
-            endTx =  first.getChangeArtifact().getTransactionRecord();
+            endTx = first.getChangeArtifact().getTransactionRecord();
          }
          return new TransactionDelta(startTx, endTx);
       }
