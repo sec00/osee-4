@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.osee.framework.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.logging.OseeLog;
+import org.eclipse.osee.framework.skynet.core.User;
 import org.eclipse.osee.framework.skynet.core.UserManager;
 import org.eclipse.osee.framework.skynet.core.artifact.StaticIdManager;
 import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
@@ -30,6 +31,7 @@ public class EditorsPreferencePage extends PreferencePage implements IWorkbenchP
 
    public static String PreviewOnDoubleClickForWordArtifacts = "PreviewOnDoubleClickForWordArtifacts";
    private Button previewOnDoubleClickForWordArtifacts;
+   private Button changeReportAsEditor;
 
    @Override
    protected Control createContents(Composite parent) {
@@ -44,6 +46,16 @@ public class EditorsPreferencePage extends PreferencePage implements IWorkbenchP
       try {
          previewOnDoubleClickForWordArtifacts.setSelection(StaticIdManager.hasValue(UserManager.getUser(),
                PreviewOnDoubleClickForWordArtifacts));
+      } catch (OseeCoreException ex) {
+         OseeLog.log(SkynetGuiPlugin.class, Level.SEVERE, ex);
+      }
+
+      changeReportAsEditor = new Button(composite, SWT.CHECK);
+      changeReportAsEditor.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, true));
+      changeReportAsEditor.setText("Open Change Reports in an Editor");
+      try {
+         boolean value = UserManager.getUser().getBooleanSetting("change.report.as.editor");
+         changeReportAsEditor.setSelection(value);
       } catch (OseeCoreException ex) {
          OseeLog.log(SkynetGuiPlugin.class, Level.SEVERE, ex);
       }
@@ -68,13 +80,17 @@ public class EditorsPreferencePage extends PreferencePage implements IWorkbenchP
    @Override
    public boolean performOk() {
       try {
+         User user = UserManager.getUser();
          if (previewOnDoubleClickForWordArtifacts.getSelection()) {
-            StaticIdManager.setSingletonAttributeValue(UserManager.getUser(), PreviewOnDoubleClickForWordArtifacts);
+            StaticIdManager.setSingletonAttributeValue(user, PreviewOnDoubleClickForWordArtifacts);
          } else {
-            UserManager.getUser().deleteAttribute(StaticIdManager.STATIC_ID_ATTRIBUTE,
-                  PreviewOnDoubleClickForWordArtifacts);
+            user.deleteAttribute(StaticIdManager.STATIC_ID_ATTRIBUTE, PreviewOnDoubleClickForWordArtifacts);
          }
-         UserManager.getUser().persist();
+
+         boolean result = changeReportAsEditor.getSelection();
+         user.setSetting("change.report.as.editor", String.valueOf(result));
+
+         user.persist();
       } catch (OseeCoreException ex) {
          OseeLog.log(SkynetGuiPlugin.class, Level.SEVERE, ex);
       }
