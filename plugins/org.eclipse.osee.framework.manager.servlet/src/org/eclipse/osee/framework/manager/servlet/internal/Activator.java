@@ -15,10 +15,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.osee.framework.branch.management.IBranchExchange;
 import org.eclipse.osee.framework.core.data.OseeServerContext;
 import org.eclipse.osee.framework.core.enums.OseeServiceTrackerId;
 import org.eclipse.osee.framework.core.exception.OseeCoreException;
+import org.eclipse.osee.framework.core.exception.OseeDataStoreException;
 import org.eclipse.osee.framework.core.server.IAuthenticationManager;
 import org.eclipse.osee.framework.core.server.ISessionManager;
 import org.eclipse.osee.framework.core.server.OseeHttpServiceTracker;
@@ -27,11 +29,14 @@ import org.eclipse.osee.framework.core.services.IDataTranslationService;
 import org.eclipse.osee.framework.core.services.IOseeBranchService;
 import org.eclipse.osee.framework.core.services.IOseeBranchServiceProvider;
 import org.eclipse.osee.framework.core.services.IOseeCachingService;
+import org.eclipse.osee.framework.core.services.IOseeCachingServiceProvider;
 import org.eclipse.osee.framework.core.services.IOseeDataTranslationProvider;
 import org.eclipse.osee.framework.core.services.IOseeModelFactoryService;
 import org.eclipse.osee.framework.core.services.IOseeModelFactoryServiceProvider;
 import org.eclipse.osee.framework.core.services.IOseeModelingService;
 import org.eclipse.osee.framework.core.services.IOseeModelingServiceProvider;
+import org.eclipse.osee.framework.database.IOseeDatabaseService;
+import org.eclipse.osee.framework.database.IOseeDatabaseServiceProvider;
 import org.eclipse.osee.framework.manager.servlet.ArtifactFileServlet;
 import org.eclipse.osee.framework.manager.servlet.AtsServlet;
 import org.eclipse.osee.framework.manager.servlet.BranchExchangeServlet;
@@ -46,6 +51,7 @@ import org.eclipse.osee.framework.manager.servlet.ServerLookupServlet;
 import org.eclipse.osee.framework.manager.servlet.SessionClientLoopbackServlet;
 import org.eclipse.osee.framework.manager.servlet.SessionManagementServlet;
 import org.eclipse.osee.framework.manager.servlet.SystemManagerServlet;
+import org.eclipse.osee.framework.manager.servlet.UnsubscribeServlet;
 import org.eclipse.osee.framework.resource.management.IResourceLocatorManager;
 import org.eclipse.osee.framework.resource.management.IResourceManager;
 import org.eclipse.osee.framework.search.engine.ISearchEngine;
@@ -57,7 +63,7 @@ import org.osgi.util.tracker.ServiceTracker;
 /**
  * @author Donald G. Dunne
  */
-public class Activator implements BundleActivator, IOseeModelFactoryServiceProvider, IOseeModelingServiceProvider, IOseeBranchServiceProvider, IOseeDataTranslationProvider {
+public class Activator implements BundleActivator, IOseeCachingServiceProvider, IOseeModelFactoryServiceProvider, IOseeModelingServiceProvider, IOseeBranchServiceProvider, IOseeDataTranslationProvider, IOseeDatabaseServiceProvider {
    public static final String PLUGIN_ID = "org.eclipse.osee.framework.manager.servlet";
 
    private static Activator instance;
@@ -85,6 +91,7 @@ public class Activator implements BundleActivator, IOseeModelFactoryServiceProvi
       createServiceTracker(context, IOseeModelingService.class, OseeServiceTrackerId.OSEE_MODELING_SERVICE);
       createServiceTracker(context, IOseeBranchService.class, OseeServiceTrackerId.OSEE_BRANCH_SERVICE);
       createServiceTracker(context, IDataTranslationService.class, OseeServiceTrackerId.TRANSLATION_SERVICE);
+      createServiceTracker(context, IOseeDatabaseService.class, OseeServiceTrackerId.OSEE_DATABASE_SERVICE);
 
       createHttpServiceTracker(context, new SystemManagerServlet(), OseeServerContext.MANAGER_CONTEXT);
       createHttpServiceTracker(context, new ResourceManagerServlet(), OseeServerContext.RESOURCE_CONTEXT);
@@ -99,8 +106,9 @@ public class Activator implements BundleActivator, IOseeModelFactoryServiceProvi
       createHttpServiceTracker(context, new SessionManagementServlet(), OseeServerContext.SESSION_CONTEXT);
       createHttpServiceTracker(context, new SessionClientLoopbackServlet(), OseeServerContext.CLIENT_LOOPBACK_CONTEXT);
       createHttpServiceTracker(context, new ClientInstallInfoServlet(), "osee/install/info");
-      createHttpServiceTracker(context, new OseeCacheServlet(this), OseeServerContext.CACHE_CONTEXT);
+      createHttpServiceTracker(context, new OseeCacheServlet(this, this), OseeServerContext.CACHE_CONTEXT);
       createHttpServiceTracker(context, new OseeModelServlet(this), OseeServerContext.OSEE_MODEL_CONTEXT);
+      createHttpServiceTracker(context, new UnsubscribeServlet(context, this, this), "osee/unsubscribe");
 
       createHttpServiceTracker(context, new AtsServlet(), "osee/ats");
    }
@@ -170,10 +178,6 @@ public class Activator implements BundleActivator, IOseeModelFactoryServiceProvi
       return getTracker(OseeServiceTrackerId.TRANSLATION_SERVICE, IDataTranslationService.class);
    }
 
-   public IOseeCachingService getOseeCache() {
-      return getTracker(OseeServiceTrackerId.OSEE_CACHING_SERVICE, IOseeCachingService.class);
-   }
-
    @Override
    public IOseeModelFactoryService getOseeFactoryService() throws OseeCoreException {
       return getTracker(OseeServiceTrackerId.OSEE_MODEL_FACTORY, IOseeModelFactoryService.class);
@@ -187,5 +191,15 @@ public class Activator implements BundleActivator, IOseeModelFactoryServiceProvi
    @Override
    public IOseeBranchService getBranchService() throws OseeCoreException {
       return getTracker(OseeServiceTrackerId.OSEE_BRANCH_SERVICE, IOseeBranchService.class);
+   }
+
+   @Override
+   public IOseeDatabaseService getOseeDatabaseService() throws OseeDataStoreException {
+      return getTracker(OseeServiceTrackerId.OSEE_DATABASE_SERVICE, IOseeDatabaseService.class);
+   }
+
+   @Override
+   public IOseeCachingService getOseeCachingService() throws OseeCoreException {
+      return getTracker(OseeServiceTrackerId.OSEE_CACHING_SERVICE, IOseeCachingService.class);
    }
 }

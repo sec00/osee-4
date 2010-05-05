@@ -1,0 +1,46 @@
+<html>
+<head>
+<title>OSEE Unsubscribe</title>
+<script type="text/javascript">
+	function getHTTPObject() {
+		if (typeof XMLHttpRequest != 'undefined') {
+			return new XMLHttpRequest();
+		}
+		try {
+			return new ActiveXObject("Msxml2.XMLHTTP");
+		} catch (e) {
+			try {
+				return new ActiveXObject("Microsoft.XMLHTTP");
+			} catch (e) {
+			}
+		}
+		if (window.createRequest) {
+		try {
+			return window.createRequest();
+		} catch (e) {
+		}
+	}
+		
+		return false;
+	}
+	
+	function unsubscribe(elementId, url, groupId, userId) {
+		document.getElementById(elementId).innerHTML = "<p><em>Sending unsubscribe request...</em></p>";
+		var xmlhttp = getHTTPObject();
+		xmlhttp.open("DELETE", url, false);
+		xmlhttp.setRequestHeader("Content-Type", "application/xml;charset=utf-8");
+
+		xmlhttp.send("<request><groupId>" + groupId + "</groupId><userId>"+userId+"</userId></request>");
+		
+		document.getElementById(elementId).innerHTML = "<p><em>Status: " +  xmlhttp.status  +" " + xmlhttp.responseText + "</em></p>";
+		var link = document.getElementById("unsubscribeLink");
+		link.parentNode.removeChild(link);
+	}
+</script>
+</head>
+
+<body>
+<a id="unsubscribeLink" href="javascript:unsubscribe('deleteStatus','%s','%s','%s');">Click here to confirm unsubscribe.</a>
+<p><span id="deleteStatus"></span></p>
+</body>
+</html>
