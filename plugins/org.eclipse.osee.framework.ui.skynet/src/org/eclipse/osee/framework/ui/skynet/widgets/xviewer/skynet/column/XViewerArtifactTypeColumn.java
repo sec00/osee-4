@@ -14,6 +14,7 @@ import org.eclipse.nebula.widgets.xviewer.XViewerColumn;
 import org.eclipse.nebula.widgets.xviewer.XViewerValueColumn;
 import org.eclipse.nebula.widgets.xviewer.util.XViewerException;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.change.Change;
 import org.eclipse.osee.framework.ui.skynet.ArtifactImageManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -52,6 +53,10 @@ public class XViewerArtifactTypeColumn extends XViewerValueColumn {
    public String getColumnText(Object element, XViewerColumn column, int columnIndex) throws XViewerException {
       if (element instanceof Artifact) {
          return ((Artifact) element).getArtifactTypeName();
+      } else if (element instanceof Change) {
+         return ((Change) element).getArtifactType().getName();
+      } else if (element instanceof String) {
+         return "";
       }
       return super.getColumnText(element, column, columnIndex);
    }
