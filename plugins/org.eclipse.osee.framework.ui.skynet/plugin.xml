@@ -1791,4 +1791,7 @@
             id="org.eclipse.osee.framework.ui.skynet.change.ChangeReportEditorInputFactory">
       </factory>
    </extension>
+   <extension point="org.eclipse.osee.framework.ui.skynet.BlamOperation">
+      <Operation className="org.eclipse.osee.framework.ui.skynet.blam.operation.EmailGroupsBlam"></Operation>
+   </extension>
 </plugin>
