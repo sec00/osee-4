@@ -228,15 +228,6 @@ public class SMAOperationsSection extends SectionPart {
    }
 
    @Override
-   public void refresh() {
-      super.refresh();
-      Display.getDefault().asyncExec(new Runnable() {
-         public void run() {
-         }
-      });
-   }
-
-   @Override
    public void dispose() {
       super.dispose();
    }
