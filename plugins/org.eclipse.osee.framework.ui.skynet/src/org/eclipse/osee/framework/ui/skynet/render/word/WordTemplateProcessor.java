@@ -401,7 +401,8 @@ public class WordTemplateProcessor {
 
          }
       }
-
+      wordMl.startParagraph();
+      wordMl.endParagraph();
       wordMl.setPageLayout(artifact);
    }
 
