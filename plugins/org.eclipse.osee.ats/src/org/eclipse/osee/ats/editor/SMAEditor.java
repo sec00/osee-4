@@ -14,7 +14,6 @@ package org.eclipse.osee.ats.editor;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -76,7 +75,6 @@ import org.eclipse.osee.framework.ui.skynet.SkynetGuiPlugin;
 import org.eclipse.osee.framework.ui.skynet.artifact.editor.AbstractArtifactEditor;
 import org.eclipse.osee.framework.ui.skynet.artifact.editor.ArtifactEditor;
 import org.eclipse.osee.framework.ui.skynet.notify.OseeNotificationManager;
-import org.eclipse.osee.framework.ui.skynet.widgets.XWidget;
 import org.eclipse.osee.framework.ui.swt.IDirtiableEditor;
 import org.eclipse.osee.framework.ui.swt.ImageManager;
 import org.eclipse.swt.SWT;
@@ -119,7 +117,6 @@ public class SMAEditor extends AbstractArtifactEditor implements ISelectedAtsArt
 
    @Override
    protected void addPages() {
-
       try {
          IEditorInput editorInput = getEditorInput();
          if (editorInput instanceof SMAEditorInput) {
@@ -412,10 +409,6 @@ public class SMAEditor extends AbstractArtifactEditor implements ISelectedAtsArt
 
    public static void editArtifact(final StateMachineArtifact sma) {
       if (sma == null) return;
-      editArtifact(sma, false);
-   }
-
-   public static void editArtifact(final StateMachineArtifact sma, boolean pend) {
       if (sma == null) return;
       if (sma.isDeleted()) {
          AWorkbench.popup("ERROR", "Artifact has been deleted");
@@ -432,7 +425,7 @@ public class SMAEditor extends AbstractArtifactEditor implements ISelectedAtsArt
                OseeLog.log(AtsPlugin.class, OseeLevel.SEVERE_POPUP, ex);
             }
          }
-      }, pend);
+      });
 
    }
 
@@ -698,10 +691,6 @@ public class SMAEditor extends AbstractArtifactEditor implements ISelectedAtsArt
 
    public TaskComposite getTaskComposite() {
       return taskTabXWidgetActionPage.getTaskComposite();
-   }
-
-   public List<XWidget> getXWidgetsFromState(String stateName, Class<?> clazz) {
-      return workFlowTab.getXWidgetsFromState(stateName, clazz);
    }
 
    @Override
