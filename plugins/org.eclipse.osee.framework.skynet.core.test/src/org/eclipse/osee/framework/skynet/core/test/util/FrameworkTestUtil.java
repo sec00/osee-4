@@ -59,7 +59,7 @@ public class FrameworkTestUtil {
       return softArt;
    }
 
-   public static Collection<Artifact> createSimpleArtifacts(String artifactTypeName, int numArts, String name, Branch branch) throws Exception {
+   public static Collection<Artifact> createSimpleArtifacts(String artifactTypeName, int numArts, String name, Branch branch) throws OseeCoreException {
       List<Artifact> arts = new ArrayList<Artifact>();
       for (int x = 1; x < numArts + 1; x++) {
          arts.add(createSimpleArtifact(artifactTypeName, name + " " + x, branch));
