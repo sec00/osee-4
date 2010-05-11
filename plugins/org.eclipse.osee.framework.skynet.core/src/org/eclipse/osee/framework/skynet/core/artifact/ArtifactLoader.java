@@ -187,8 +187,8 @@ public final class ArtifactLoader {
             insertIntoArtifactJoin(insertParameters);
             loadArtifactsFromQueryId(data, queryId, loadLevel, confirmer, insertParameters.size(), reload, historical,
                   allowDeleted);
-         } finally {
             loadedItems.addAll(data);
+         } finally {
             OseeLog.log(Activator.class, Level.FINE, String.format("Artifact Load Time [%s] for [%d] artifacts. ",
                   Lib.getElapseString(time), data.size()), new Exception("Artifact Load Time"));
             clearQuery(queryId);
