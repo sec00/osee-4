@@ -181,14 +181,22 @@ public final class ArtifactLoader {
 
    public static void loadArtifacts(Collection<Artifact> loadedItems, int queryId, ArtifactLoad loadLevel, ISearchConfirmer confirmer, List<Object[]> insertParameters, boolean reload, boolean historical, boolean allowDeleted) throws OseeCoreException {
       if (!insertParameters.isEmpty()) {
-         Collection<Artifact> data = new ArrayList<Artifact>();
+         Collection<Artifact> data;
+         if (loadedItems.isEmpty()) {
+            data = loadedItems;
+         } else {
+            // Use a new list if loaded items already contains data to prevent artifact overwrites during loading;
+            data = new ArrayList<Artifact>(insertParameters.size());
+         }
          long time = System.currentTimeMillis();
          try {
             insertIntoArtifactJoin(insertParameters);
             loadArtifactsFromQueryId(data, queryId, loadLevel, confirmer, insertParameters.size(), reload, historical,
                   allowDeleted);
-            loadedItems.addAll(data);
          } finally {
+            if (data != loadedItems) {
+               loadedItems.addAll(data);
+            }
             OseeLog.log(Activator.class, Level.FINE, String.format("Artifact Load Time [%s] for [%d] artifacts. ",
                   Lib.getElapseString(time), data.size()), new Exception("Artifact Load Time"));
             clearQuery(queryId);
