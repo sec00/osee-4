@@ -38,6 +38,7 @@ import org.eclipse.osee.framework.database.core.IOseeStatement;
 import org.eclipse.osee.framework.database.core.SQL3DataType;
 import org.eclipse.osee.framework.jdk.core.type.CompositeKeyHashMap;
 import org.eclipse.osee.framework.jdk.core.type.Pair;
+import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.jdk.core.util.time.GlobalTime;
 import org.eclipse.osee.framework.logging.OseeLevel;
 import org.eclipse.osee.framework.logging.OseeLog;
@@ -378,13 +379,17 @@ public class RelationManager {
          String sql = String.format(GET_DELETED_ARTIFACT, formatArgs);
 
          IOseeStatement chStmt = ConnectionHandler.getStatement();
-         chStmt.runPreparedQuery(sql, artifact.getBranch().getId(), relationType.getId(), artifact.getArtId());
+         try {
+            chStmt.runPreparedQuery(sql, artifact.getBranch().getId(), relationType.getId(), artifact.getArtId());
 
-         while (chStmt.next()) {
-            int artId = chStmt.getInt(formatArgs[0] + "_art_id");
-            int branchId = chStmt.getInt("branch_id");
-            ConnectionHandler.runPreparedUpdate(JOIN_TABLE_INSERT, queryId, GlobalTime.GreenwichMeanTimestamp(), artId,
-                  branchId, SQL3DataType.INTEGER);
+            while (chStmt.next()) {
+               int artId = chStmt.getInt(formatArgs[0] + "_art_id");
+               int branchId = chStmt.getInt("branch_id");
+               ConnectionHandler.runPreparedUpdate(JOIN_TABLE_INSERT, queryId, GlobalTime.GreenwichMeanTimestamp(),
+                     artId, branchId, SQL3DataType.INTEGER);
+            }
+         } finally {
+            Lib.close(chStmt);
          }
 
          List<Artifact> deletedArtifacts =
