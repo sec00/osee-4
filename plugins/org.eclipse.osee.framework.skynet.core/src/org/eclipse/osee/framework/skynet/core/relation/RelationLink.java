@@ -10,11 +10,11 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.skynet.core.relation;
 
-import java.util.List;
+import static org.eclipse.osee.framework.core.enums.RelationSide.SIDE_A;
+import static org.eclipse.osee.framework.core.enums.RelationSide.SIDE_B;
 import java.util.logging.Level;
 import org.eclipse.osee.framework.core.data.IRelationType;
 import org.eclipse.osee.framework.core.enums.ModificationType;
-import org.eclipse.osee.framework.core.enums.RelationOrderBaseTypes;
 import org.eclipse.osee.framework.core.enums.RelationSide;
 import org.eclipse.osee.framework.core.exception.ArtifactDoesNotExist;
 import org.eclipse.osee.framework.core.exception.OseeArgumentException;
@@ -28,8 +28,6 @@ import org.eclipse.osee.framework.skynet.core.artifact.ArtifactCache;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 import org.eclipse.osee.framework.skynet.core.event.OseeEventManager;
 import org.eclipse.osee.framework.skynet.core.internal.Activator;
-import org.eclipse.osee.framework.skynet.core.relation.order.RelationOrderData;
-import org.eclipse.osee.framework.skynet.core.relation.order.RelationOrderFactory;
 
 /**
  * @author Jeff C. Phillips
@@ -164,8 +162,22 @@ public class RelationLink {
       internalDelete(true, false);
    }
 
+   private void removeFromOrder() throws OseeCoreException {
+      RelationTypeSideSorter aSorter = RelationManager.createTypeSideSorter(getArtifactA(), relationType, SIDE_B);
+      RelationTypeSideSorter bSorter = RelationManager.createTypeSideSorter(getArtifactB(), relationType, SIDE_A);
+      aSorter.removeItem(null, getArtifactB());
+      bSorter.removeItem(null, getArtifactA());
+   }
+
    private void internalDelete(boolean reorderRelations, boolean setDirty) {
       if (!isDeleted()) {
+         if (reorderRelations) {
+            try {
+               removeFromOrder();
+            } catch (OseeCoreException e) {
+               OseeLog.log(Activator.class, Level.SEVERE, e.getMessage());
+            }
+         }
 
          markAsDeleted(setDirty);
 
