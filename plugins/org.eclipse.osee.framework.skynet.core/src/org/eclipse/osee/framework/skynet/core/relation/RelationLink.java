@@ -16,7 +16,6 @@ import java.util.logging.Level;
 import org.eclipse.osee.framework.core.data.IRelationType;
 import org.eclipse.osee.framework.core.enums.ModificationType;
 import org.eclipse.osee.framework.core.enums.RelationSide;
-import org.eclipse.osee.framework.core.exception.ArtifactDoesNotExist;
 import org.eclipse.osee.framework.core.exception.OseeArgumentException;
 import org.eclipse.osee.framework.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.core.exception.OseeStateException;
@@ -144,7 +143,7 @@ public class RelationLink {
       return dirty;
    }
 
-   public void delete(boolean reorderRelations) throws ArtifactDoesNotExist {
+   public void delete(boolean reorderRelations) {
       internalDelete(reorderRelations, true);
    }
 
@@ -158,7 +157,7 @@ public class RelationLink {
       }
    }
 
-   public void internalRemoteEventDelete() throws ArtifactDoesNotExist {
+   public void internalRemoteEventDelete() {
       internalDelete(true, false);
    }
 
@@ -174,8 +173,8 @@ public class RelationLink {
          if (reorderRelations) {
             try {
                removeFromOrder();
-            } catch (OseeCoreException e) {
-               OseeLog.log(Activator.class, Level.SEVERE, e.getMessage());
+            } catch (OseeCoreException ex) {
+               OseeLog.log(Activator.class, Level.SEVERE, ex);
             }
          }
 
@@ -220,7 +219,7 @@ public class RelationLink {
       return getArtifact(getOppositeSide(artifact));
    }
 
-   public Artifact getArtifactOnOtherSideIfLoaded(Artifact artifact) throws ArtifactDoesNotExist {
+   public Artifact getArtifactOnOtherSideIfLoaded(Artifact artifact) {
       return getArtifactIfLoaded(getOppositeSide(artifact));
    }
 
@@ -258,7 +257,7 @@ public class RelationLink {
       }
    }
 
-   public boolean isOfType(IRelationType oseeType) throws OseeCoreException {
+   public boolean isOfType(IRelationType oseeType) {
       return relationType.equals(oseeType);
    }
 
