@@ -42,6 +42,11 @@ public class UnsubscribeServlet extends OseeHttpServlet {
       this.cacheProvider = cacheProvider;
       this.bundleContext = bundleContext;
    }
+   
+   @Override
+   protected void checkAccessControl(HttpServletRequest request) {
+      //prevent OseeHttpServlet.checkAccessControl from performing its check
+   }
 
    @Override
    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
