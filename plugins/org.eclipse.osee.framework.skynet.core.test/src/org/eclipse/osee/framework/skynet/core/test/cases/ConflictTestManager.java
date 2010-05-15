@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.CoreRelationTypes;
 import org.eclipse.osee.framework.core.enums.RelationOrderBaseTypes;
 import org.eclipse.osee.framework.core.exception.BranchDoesNotExist;
@@ -40,17 +41,10 @@ import org.eclipse.osee.support.test.util.DemoSawBuilds;
  */
 public class ConflictTestManager {
    public static enum Type {
-      RELATION,
-      ARTIFACT,
-      ATTRIBUTE;
+      RELATION, ARTIFACT, ATTRIBUTE;
    };
    public static enum Modification {
-      CREATE,
-      DELETE,
-      CREATE_AND_MODIFY,
-      CREATE_AND_DELETE,
-      MODIFY,
-      MODIFY_AND_DELETE;
+      CREATE, DELETE, CREATE_AND_MODIFY, CREATE_AND_DELETE, MODIFY, MODIFY_AND_DELETE;
    };
 
    private static final boolean DEBUG = true;
@@ -409,7 +403,13 @@ public class ConflictTestManager {
          }
       }
       if (artNumber == -1) {
-         throw new Exception("Source Artifact " + sourceArtifactId + " could not be found in the list of artifatcs");
+         // The relation order attribute of the parent folder will have a RelationOrder
+         // conflict that is not relevant to this test. -- RS
+         if (conflict.getArtifactName().equals("System Requirements") && (conflict.getAttributeType().equals(CoreAttributeTypes.RELATION_ORDER))) {
+            return;
+         } else {
+            throw new Exception("Source Artifact " + sourceArtifactId + " could not be found in the list of artifatcs");
+         }
       }
       for (AttributeValue value : conflictDefs[artNumber].values) {
          if (value.attributeName.equals(attributeName)) {
