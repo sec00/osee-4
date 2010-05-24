@@ -17,13 +17,13 @@ import org.eclipse.osee.framework.core.enums.TxChange;
  * @author Ryan D. Brooks
  */
 public final class Address implements Comparable<Address> {
-   final int branchId;
-   final int itemId;
-   final int transactionId;
-   final long gammaId;
-   final ModificationType modType;
-   final TxChange txCurrent;
-   final boolean isBaseline;
+	public final int branchId;
+   public final int itemId;
+   public final int transactionId;
+   public final long gammaId;
+   public ModificationType modType;
+   public final TxChange txCurrent;
+   public final boolean isBaseline;
    TxChange correctedTxCurrent;
    boolean purge;
 

@@ -119,4 +119,13 @@ public enum ModificationType implements Serializable {
       }
       return ALL_STATES;
    }
+   
+   public boolean matches(ModificationType... modTypes) {
+      for (ModificationType modType : modTypes) {
+         if (modType == this) {
+            return true;
+         }
+      }
+      return false;
+   }
 }
