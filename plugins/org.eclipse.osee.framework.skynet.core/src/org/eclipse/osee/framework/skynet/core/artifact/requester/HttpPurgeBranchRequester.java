@@ -16,6 +16,7 @@ import org.eclipse.osee.framework.core.data.OseeServerContext;
 import org.eclipse.osee.framework.core.data.PurgeBranchRequest;
 import org.eclipse.osee.framework.core.enums.CoreTranslatorId;
 import org.eclipse.osee.framework.core.enums.Function;
+import org.eclipse.osee.framework.core.enums.StorageState;
 import org.eclipse.osee.framework.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.core.model.Branch;
 import org.eclipse.osee.framework.jdk.core.util.HttpProcessor.AcquireResult;
@@ -40,6 +41,7 @@ public class HttpPurgeBranchRequester {
                   requestData, null);
 
       if (response.wasSuccessful()) {
+    	  branch.setStorageState(StorageState.PURGED);
          BranchManager.decache(branch);
          OseeEventManager.kickBranchEvent(HttpPurgeBranchRequester.class, BranchEventType.Purged, branch.getId());
       }
