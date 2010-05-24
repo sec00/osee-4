@@ -215,7 +215,7 @@ public class ArtifactTypeManager {
 
    private static final String DELETE_VALID_ATTRIBUTE =
          "delete from osee_artifact_type_attributes where art_type_id = ?";
-   private static final String COUNT_ARTIFACT_OCCURRENCE = "select count(1) from (select DISTINCT(art_id) FROM osee_arts where art_type_id = ?) t1";
+   private static final String COUNT_ARTIFACT_OCCURRENCE = "select count(1) from (select DISTINCT(art_id) FROM osee_artifact where art_type_id = ?) t1";
    private static final String DELETE_ARIFACT_TYPE = "delete from osee_artifact_type where art_type_id = ?";
 
    public static void purgeArtifactType(final ArtifactType artifactType) throws OseeCoreException {

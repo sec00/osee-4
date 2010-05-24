@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.core.enums.ModificationType;
-import org.eclipse.osee.framework.core.enums.TxChange;
 import org.eclipse.osee.framework.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.core.exception.OseeDataStoreException;
 import org.eclipse.osee.framework.core.exception.OseeStateException;
@@ -51,7 +50,7 @@ public class ConsolidateArtifactVersionTxOperation extends AbstractDbTxOperation
          "UPDATE osee_branch ob SET ob.baseline_transaction_id = (SELECT otd.transaction_id FROM osee_tx_details otd WHERE otd.branch_id = ob.branch_id AND otd.tx_type = 1)";
 
    private static final String POPULATE_ARTS =
-         "insert into osee_arts(gamma_id, art_id, art_type_id, guid, human_readable_id) select gamma_id, art.art_id, art_type_id, guid, human_readable_id from osee_artifact art, osee_artifact_version arv where art.art_id = arv.art_id and not exists (select 1 from osee_arts arts where art.art_id = arts.art_id)";
+         "insert into osee_artifact(gamma_id, art_id, art_type_id, guid, human_readable_id) select gamma_id, art.art_id, art_type_id, guid, human_readable_id from osee_artifact art, osee_artifact_version arv where art.art_id = arv.art_id and not exists (select 1 from osee_artifact arts where art.art_id = arts.art_id)";
 
    private List<Long[]> deleteArtifactVersionData;
    private final List<Long> obsoleteGammas = new ArrayList<Long>();
@@ -127,7 +126,7 @@ public class ConsolidateArtifactVersionTxOperation extends AbstractDbTxOperation
 
    private void populateArts() throws OseeCoreException {
       int count = getDatabaseService().runPreparedUpdate(connection, POPULATE_ARTS);
-      reporter.report(String.format("inserted %d rows into osee_arts", count));
+      reporter.report(String.format("inserted %d rows into osee_artifact", count));
    }
 
    private void findObsoleteGammas() throws OseeCoreException {
@@ -172,7 +171,6 @@ public class ConsolidateArtifactVersionTxOperation extends AbstractDbTxOperation
             int branchId = chStmt.getInt("branch_id");
             long netGammaId = chStmt.getLong("net_gamma_id");
             ModificationType modType = ModificationType.getMod(chStmt.getInt("mod_type"));
-            TxChange.getChangeType(chStmt.getInt("tx_current"));
 
             if (isNextArtifactGroup(netGammaId, branchId)) {
                writeAddressingChanges(archived, false);

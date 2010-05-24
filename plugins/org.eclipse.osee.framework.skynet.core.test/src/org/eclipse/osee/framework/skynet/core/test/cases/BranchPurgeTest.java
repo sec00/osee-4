@@ -44,7 +44,7 @@ public class BranchPurgeTest {
    private final Map<String, Integer> postCreateBranchCount = new HashMap<String, Integer>();
    private final Map<String, Integer> postPurgeCount = new HashMap<String, Integer>();
    List<String> tables =
-      Arrays.asList("osee_attribute", "osee_arts", "osee_relation_link", "osee_tx_details", "osee_txs");
+      Arrays.asList("osee_attribute", "osee_artifact", "osee_relation_link", "osee_tx_details", "osee_txs");
 
    /**
     * @throws java.lang.Exception

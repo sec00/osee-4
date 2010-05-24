@@ -48,7 +48,7 @@ public class ArtifactPurgeTest {
    private Map<String, Integer> postPurgeCount;
 
    private static final List<String> tables =
-      Arrays.asList("osee_attribute", "osee_arts", "osee_relation_link", "osee_tx_details", "osee_txs");
+      Arrays.asList("osee_attribute", "osee_artifact", "osee_relation_link", "osee_tx_details", "osee_txs");
 
    @BeforeClass
    public static void testInitialize() throws Exception {
