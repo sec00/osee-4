@@ -12,6 +12,9 @@ package org.eclipse.osee.framework.branch.management.exchange.transform;
 
 import java.util.Set;
 import org.eclipse.osee.framework.core.enums.ModificationType;
+import org.eclipse.osee.framework.core.enums.TxChange;
+import org.eclipse.osee.framework.database.operation.Address;
+import org.eclipse.osee.framework.jdk.core.type.HashCollection;
 import org.eclipse.osee.framework.jdk.core.util.io.xml.AbstractSaxHandler;
 import org.xml.sax.Attributes;
 
@@ -19,27 +22,32 @@ import org.xml.sax.Attributes;
  * @author Ryan D. Brooks
  */
 public class V0_9_2TxsConsolidateParser extends AbstractSaxHandler {
-   private final Integer targetBranchId;
+   private final int targetBranchId;
+   private final String targetBranchIdStr;
    private final Set<Long> netGammaIds;
+   private final HashCollection<Long, Address> addressMap;
 
-   public V0_9_2TxsConsolidateParser(Integer targetBranchId, Set<Long> netGammaIds) {
+   public V0_9_2TxsConsolidateParser(Integer targetBranchId, Set<Long> netGammaIds, HashCollection<Long, Address> addressMap) {
       this.targetBranchId = targetBranchId;
+      this.targetBranchIdStr = targetBranchId.toString();
       this.netGammaIds = netGammaIds;
+      this.addressMap= addressMap;
    }
 
    @Override
    public void startElementFound(String uri, String localName, String qName, Attributes attributes) throws Exception {
       if (localName.equals("entry")) {
-         Integer currentBranchId = Integer.parseInt(attributes.getValue("branch_id"));
-         if (targetBranchId.equals(currentBranchId)) {
-            Long gammaId = Long.parseLong(attributes.getValue("gamma_id"));
+         if (targetBranchIdStr.equals(attributes.getValue("branch_id"))) {
+            long gammaId = Long.parseLong(attributes.getValue("gamma_id"));
             if (netGammaIds.contains(gammaId)) {
-
                int modType = Integer.parseInt(attributes.getValue("mod_type"));
                ModificationType modificationType = ModificationType.getMod(modType);
-               Integer transaction = Integer.parseInt(attributes.getValue("transaction_id"));
+               int transactionId = Integer.parseInt(attributes.getValue("transaction_id"));
+               TxChange txCurrent = TxChange.getChangeType(Integer.parseInt(attributes.getValue("tx_current")));
 
-               // Do Something Here;
+               Address address =
+                     new Address(false, targetBranchId, -1, transactionId, gammaId, modificationType, txCurrent);
+               addressMap.put(gammaId, address);
             }
          }
       }
@@ -48,5 +56,4 @@ public class V0_9_2TxsConsolidateParser extends AbstractSaxHandler {
    @Override
    public void endElementFound(String uri, String localName, String qName) throws Exception {
    }
-
 }
