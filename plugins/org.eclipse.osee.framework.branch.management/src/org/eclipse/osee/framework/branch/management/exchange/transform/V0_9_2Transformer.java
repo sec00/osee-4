@@ -130,11 +130,11 @@ public class V0_9_2Transformer implements IOseeExchangeVersionTransformer {
    private void writeAddresses(XMLStreamWriter writer, Collection<Address> addresses) throws XMLStreamException {
       for (Address address : addresses) {
          writer.writeStartElement("entry");
-         writer.writeAttribute("branch_id", String.valueOf(address.branchId));
-         writer.writeAttribute("gamma_id", String.valueOf(address.gammaId));
-         writer.writeAttribute("tx_current", String.valueOf(address.txCurrent));
-         writer.writeAttribute("mod_type", String.valueOf(address.modType));
-         writer.writeAttribute("transaction_id", String.valueOf(address.transactionId));
+         writer.writeAttribute("branch_id", String.valueOf(address.getBranchId()));
+         writer.writeAttribute("gamma_id", String.valueOf(address.getGammaId()));
+         writer.writeAttribute("tx_current", String.valueOf(address.getCorrectedTxCurrent()));
+         writer.writeAttribute("mod_type", String.valueOf(address.getModType()));
+         writer.writeAttribute("transaction_id", String.valueOf(address.getTransactionId()));
          writer.writeEndElement();
       }
    }
@@ -143,14 +143,14 @@ public class V0_9_2Transformer implements IOseeExchangeVersionTransformer {
       Iterator<Address> iterator = addresses.iterator();
 
       Address previousAddress = iterator.next();
-      if (previousAddress.modType == ModificationType.MODIFIED) {
-         previousAddress.modType = ModificationType.NEW;
+      if (previousAddress.getModType() == ModificationType.MODIFIED) {
+         previousAddress.setModType(ModificationType.NEW);
       }
 
       while (iterator.hasNext()) {
          Address address = iterator.next();
-         ModificationType[] nextValidStates = getNextPossibleStates(previousAddress.modType);
-         if (!address.modType.matches(nextValidStates)) {
+         ModificationType[] nextValidStates = getNextPossibleStates(previousAddress.getModType());
+         if (!address.getModType().matches(nextValidStates)) {
             iterator.remove();
          }
       }
