@@ -85,7 +85,7 @@ public class RelationLink {
          System.out.println("RelationLink.getOrCreate relationId == " + RELATION_ID_UNDER_TEST);
       }
 
-      if (relation == null || relation.modificationType != modificationType || relation.getId() != relationId) {
+      if (relation == null) {
          relation =
                new RelationLink(aArtifactId, bArtifactId, aBranch, bBranch, relationType, relationId, gammaId,
                      rationale, modificationType);
