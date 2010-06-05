@@ -1,15 +1,12 @@
 <project name="Generates OSEE Application Server Runtime Bundle" default="run">
 
 	<target name="setup">
-		<propertyregex property="targetSiteFile" input="${masterZip}" defaultvalue="${masterZip}" regexp="-Master-" replace="-TARGET-" casesensitive="false" override="true" />
-		<property name="tempAppServerFolder" value="${buildDirectory}/${targetSiteFile}_tmp" />
+		<propertyregex property="updateSiteFile" input="${masterZip}" defaultvalue="${masterZip}" regexp="-Master-" replace="-Update-" casesensitive="false" override="true" />
+		<property name="tempAppServerFolder" value="${buildDirectory}/${buildLabel}/${updateSiteFile}_tmp" />
 		<mkdir dir="${tempAppServerFolder}" />
 
-		<unzip src="${buildDirectory}/${targetSiteFile}" dest="${tempAppServerFolder}">
-			<patternset>
-				<excludesfile name="features/*" />
-				<excludesfile name="plugins/*source_*.jar" />
-			</patternset>
+		<unzip src="${buildDirectory}/${buildLabel}/${updateSiteFile}" dest="${tempAppServerFolder}">
+			<patternset includes="plugins/*" excludes="features/*,*.jar,*.xml,**/*source_*" />
 		</unzip>
 
 		<mkdir dir="${tempAppServerFolder}/configuration" />
@@ -27,12 +24,12 @@
 	</target>
 
 	<target name="generateConfig">
-		<generateConfigIni configFolder="${configFolder}" pluginsFolder="${pluginsFolder}" />
+		<generateConfigIni configPath="${configFolder}" pluginsPath="${pluginsFolder}" />
 	</target>
 
 	<target name="pack">
-		<propertyregex property="serverRuntimeFile" input="${targetSiteFile}" defaultvalue="server-runtime.zip" regexp="-TARGET-" replace="-osgi-runtime-" casesensitive="false" override="true" />
-		<zip destfile="${buildDirectory}/${serverRuntimeFile}">
+		<propertyregex property="serverRuntimeFile" input="${masterZip}" defaultvalue="server-runtime.zip" regexp="-Master-" replace="-osgi-runtime-" casesensitive="false" override="true" />
+		<zip destfile="${buildDirectory}/../${serverRuntimeFile}">
 			<fileset dir="${tempAppServerFolder}" />
 		</zip>
 	</target>
@@ -84,17 +81,17 @@
 	<!--   GENERATE CONFIG.INI                                           -->
 	<!-- *************************************************************** -->
 	<macrodef name="generateConfigIni">
-		<attribute name="configFolder" />
-		<attribute name="pluginsFolder" />
+		<attribute name="configPath" />
+		<attribute name="pluginsPath" />
 		<sequential>
-			<echo file="@{configFolder}/config.ini" append="false" message="osgi.bundles= \${line.separator}\${line.separator}" />
+			<echo file="@{configPath}/config.ini" append="false" message="osgi.bundles= \${line.separator}\${line.separator}" />
 
 			<pathconvert property="serverBundles" setonempty="false" pathsep=";">
 				<path>
-					<fileset dir="@{pluginsFolder}">
+					<fileset dir="@{pluginsPath}">
 						<exclude name="org.eclipse.osgi_*.jar" />
 						<exclude name="org.eclipse.equinox.launcher_*.jar" />
-						<exclude name="*source*.jar" />
+						<exclude name="*source_*.jar" />
 					</fileset>
 				</path>
 			</pathconvert>
@@ -107,15 +104,15 @@
 					<if>
 						<equals arg1="${isFirst}" arg2="true" />
 						<then>
-							<echo file="@{configFolder}/config.ini" message=", \${line.separator}" append="true" />
+							<echo file="@{configPath}/config.ini" message=", \${line.separator}" append="true" />
 							<var name="isFirst" value="false" />
 						</then>
 					</if>
-					<echo file="@{configFolder}/config.ini" message="${projectName}@start" append="true" />
+					<echo file="@{configPath}/config.ini" message="${projectName}@start" append="true" />
 					<var name="isFirst" value="true" />
 				</sequential>
 			</for>
-			<echo file="@{configFolder}/config.ini" append="true">
+			<echo file="@{configPath}/config.ini" append="true">
 osgi.noShutdown=true
 eclipse.ignoreApp=true
 equinox.ds.debug=true
@@ -139,7 +136,7 @@ osee.log.default=INFO
 			<echo file="@{filepath}" append="false">java \
 -Dorg.osgi.service.http.port=@{serverport} \
 -Dosee.db.connection.id=@{connection.id} \
-@{extraVMArgs} -jar @{launcher} -console
+@{extraVMArgs} -jar plugins/@{launcher} -console
 </echo>
 			<if>
 				<equals arg1="executable" arg2="true" />
