@@ -1542,9 +1542,7 @@ public class Artifact implements IArtifact, IAdaptable, Comparable<Artifact>, IA
       if (branch.equals(destinationBranch)) {
          return this;
       }
-      Artifact reflectedArtifact = reflectHelper(destinationBranch);
-      reflectedArtifact.setTransactionId(TransactionManager.getHeadTransaction(destinationBranch).getId());
-      return reflectedArtifact;
+      return reflectHelper(destinationBranch);
    }
 
    private Artifact reflectHelper(IOseeBranch branch) throws OseeCoreException {
