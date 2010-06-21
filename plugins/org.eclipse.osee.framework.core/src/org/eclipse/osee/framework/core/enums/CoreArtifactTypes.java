@@ -36,6 +36,8 @@ public class CoreArtifactTypes extends NamedIdentity implements IArtifactType {
    public static final CoreArtifactTypes RootArtifact = new CoreArtifactTypes("AAMFDhHDqlbzKcIxcsAA", "Root Artifact");
    public static final CoreArtifactTypes SoftwareRequirement =
          new CoreArtifactTypes("AAMFDiAwhRFXwIyapJAA", "Software Requirement");
+   public static final CoreArtifactTypes SystemRequirement =
+         new CoreArtifactTypes("AAMFDiSTcDGdUd9+tHAA", "System Requirement");
    public static final CoreArtifactTypes SoftwareRequirementDrawing =
          new CoreArtifactTypes("ABNClhgUfwj6A3EAArQA", "Software Requirement Drawing");
    public static final CoreArtifactTypes SoftwareRequirementFunction =

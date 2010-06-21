@@ -22,9 +22,9 @@ import org.eclipse.osee.ats.artifact.ATSAttributes;
 import org.eclipse.osee.ats.artifact.ActionArtifact;
 import org.eclipse.osee.ats.artifact.StateMachineArtifact;
 import org.eclipse.osee.ats.artifact.TeamWorkFlowArtifact;
+import org.eclipse.osee.ats.artifact.TeamWorkFlowArtifact.DefaultTeamState;
 import org.eclipse.osee.ats.artifact.TeamWorkflowManager;
 import org.eclipse.osee.ats.artifact.VersionArtifact;
-import org.eclipse.osee.ats.artifact.TeamWorkFlowArtifact.DefaultTeamState;
 import org.eclipse.osee.ats.config.demo.artifact.DemoCodeTeamWorkflowArtifact;
 import org.eclipse.osee.ats.config.demo.config.DemoDbActionData.CreateReview;
 import org.eclipse.osee.ats.config.demo.config.DemoDbUtil.SoftwareRequirementStrs;
@@ -33,14 +33,16 @@ import org.eclipse.osee.ats.config.demo.util.DemoTeams;
 import org.eclipse.osee.ats.config.demo.util.DemoTeams.Team;
 import org.eclipse.osee.ats.util.ActionManager;
 import org.eclipse.osee.ats.util.AtsArtifactTypes;
+import org.eclipse.osee.ats.util.AtsPriority.PriorityType;
 import org.eclipse.osee.ats.util.AtsRelationTypes;
 import org.eclipse.osee.ats.util.AtsUtil;
 import org.eclipse.osee.ats.util.FavoritesManager;
 import org.eclipse.osee.ats.util.SubscribeManager;
-import org.eclipse.osee.ats.util.AtsPriority.PriorityType;
+import org.eclipse.osee.framework.core.data.IArtifactType;
 import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.eclipse.osee.framework.core.data.SystemUser;
 import org.eclipse.osee.framework.core.enums.BranchType;
+import org.eclipse.osee.framework.core.enums.CoreArtifactTypes;
 import org.eclipse.osee.framework.core.enums.CoreRelationTypes;
 import org.eclipse.osee.framework.core.enums.IRelationEnumeration;
 import org.eclipse.osee.framework.core.exception.OseeArgumentException;
@@ -66,9 +68,9 @@ import org.eclipse.osee.framework.skynet.core.utility.DbUtil;
 import org.eclipse.osee.framework.skynet.core.utility.Requirements;
 import org.eclipse.osee.framework.ui.plugin.PluginUiImage;
 import org.eclipse.osee.framework.ui.plugin.util.Result;
+import org.eclipse.osee.framework.ui.plugin.xnavigate.XNavigateComposite.TableLoadOption;
 import org.eclipse.osee.framework.ui.plugin.xnavigate.XNavigateItem;
 import org.eclipse.osee.framework.ui.plugin.xnavigate.XNavigateItemAction;
-import org.eclipse.osee.framework.ui.plugin.xnavigate.XNavigateComposite.TableLoadOption;
 import org.eclipse.osee.framework.ui.skynet.Import.ArtifactImportOperationFactory;
 import org.eclipse.osee.framework.ui.skynet.util.ChangeType;
 import org.eclipse.osee.support.test.util.DemoCscis;
@@ -458,27 +460,28 @@ public class PopulateDemoActions extends XNavigateItemAction {
 
    private void demoDbImportReqsTx() throws OseeCoreException {
       try {
-         importRequirements(DemoSawBuilds.SAW_Bld_1, Requirements.SOFTWARE_REQUIREMENT + "s",
-               Requirements.SOFTWARE_REQUIREMENT, "support/SAW-SoftwareRequirements.xml");
-         importRequirements(DemoSawBuilds.SAW_Bld_1, Requirements.SYSTEM_REQUIREMENT + "s",
-               Requirements.SYSTEM_REQUIREMENT, "support/SAW-SystemRequirements.xml");
-         importRequirements(DemoSawBuilds.SAW_Bld_1, Requirements.SUBSYSTEM_REQUIREMENT + "s",
-               Requirements.SUBSYSTEM_REQUIREMENT, "support/SAW-SubsystemRequirements.xml");
+         importRequirements(DemoSawBuilds.SAW_Bld_1, CoreArtifactTypes.SoftwareRequirement.getName() + "s",
+               CoreArtifactTypes.SoftwareRequirement, "support/SAW-SoftwareRequirements.xml");
+         importRequirements(DemoSawBuilds.SAW_Bld_1, CoreArtifactTypes.SystemRequirement.getName() + "s",
+               CoreArtifactTypes.SystemRequirement, "support/SAW-SystemRequirements.xml");
+         importRequirements(DemoSawBuilds.SAW_Bld_1, CoreArtifactTypes.SubsystemRequirement.getName() + "s",
+               CoreArtifactTypes.SubsystemRequirement, "support/SAW-SubsystemRequirements.xml");
       } catch (Exception ex) {
          OseeLog.log(OseeAtsConfigDemoActivator.class, Level.SEVERE, ex);
       }
    }
 
-   private void importRequirements(IOseeBranch branch, String rootArtifactName, String requirementArtifactName, String filename) throws Exception {
+   private void importRequirements(IOseeBranch branch, String rootArtifactName, IArtifactType requirementType, String filename) throws Exception {
 
       OseeLog.log(OseeAtsConfigDemoActivator.class, Level.INFO,
-            "Importing \"" + rootArtifactName + "\" requirements on branch \"" + branch.getGuid() + "\"");
-      Artifact systemReq = ArtifactQuery.getArtifactFromTypeAndName("Folder", rootArtifactName, branch);
+
+      "Importing \"" + rootArtifactName + "\" requirements on branch \"" + branch.getGuid() + "\"");
+      Artifact systemReq = ArtifactQuery.getArtifactFromTypeAndName(CoreArtifactTypes.Folder, rootArtifactName, branch);
 
       File file = OseeAtsConfigDemoActivator.getInstance().getPluginFile(filename);
       IArtifactImportResolver artifactResolver =
-            new NewArtifactImportResolver(ArtifactTypeManager.getType(requirementArtifactName),
-                  ArtifactTypeManager.getType("Heading"));
+            new NewArtifactImportResolver(ArtifactTypeManager.getType(requirementType),
+                  ArtifactTypeManager.getType(CoreArtifactTypes.Heading));
       IArtifactExtractor extractor = new WordOutlineExtractor();
       extractor.setDelegate(new WordOutlineExtractorDelegate());
 
