@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.sql.Types;
+
 import org.eclipse.osee.framework.branch.management.exchange.ExchangeDb;
 import org.eclipse.osee.framework.branch.management.exchange.ExportImportXml;
 import org.eclipse.osee.framework.branch.management.exchange.handler.ExportItem;
@@ -57,8 +58,7 @@ public class RelationalExportItem extends AbstractDbExportItem {
          tempFolder.mkdirs();
       }
 
-      IResourceLocator locator =
-            Activator.getInstance().getResourceLocatorManager().getResourceLocator(uriTarget);
+      IResourceLocator locator = Activator.getInstance().getResourceLocatorManager().getResourceLocator(uriTarget);
       IResource resource = Activator.getInstance().getResourceManager().acquire(locator, new Options());
 
       File target = new File(tempFolder, locator.getRawPath());
@@ -125,8 +125,15 @@ public class RelationalExportItem extends AbstractDbExportItem {
             } else if (name.equals(ExportImportXml.RATIONALE)) {
                handleStringContent(rationaleBuffer, getWriteLocation(), chStmt.getString(name),
                      ExportImportXml.RATIONALE);
-            } else if (name.equals(ExportImportXml.ART_TYPE_ID) || name.equals(ExportImportXml.ATTR_TYPE_ID) || name.equals(ExportImportXml.REL_TYPE_ID)) {
-               ExportImportXml.addXmlAttribute(appendable, ExportImportXml.TYPE_GUID, chStmt.getString(name));
+            } else if (name.equals(ExportImportXml.ART_TYPE_ID)) {
+               String guid = chStmt.getString("ART_TYPE_GUID");
+               ExportImportXml.addXmlAttribute(appendable, ExportImportXml.TYPE_GUID, guid);
+            } else if (name.equals(ExportImportXml.ATTR_TYPE_ID)) {
+               String guid = chStmt.getString("ATTR_TYPE_GUID");
+               ExportImportXml.addXmlAttribute(appendable, ExportImportXml.TYPE_GUID, guid);
+            } else if (name.equals(ExportImportXml.REL_TYPE_ID)) {
+               String guid = chStmt.getString("REL_LINK_TYPE_GUID");
+               ExportImportXml.addXmlAttribute(appendable, ExportImportXml.TYPE_GUID, guid);
             } else {
                switch (chStmt.getColumnType(columnIndex)) {
                   case Types.TIMESTAMP:
