@@ -59,7 +59,7 @@ public class V0_9_2Transformer implements IOseeExchangeVersionTransformer {
    public String applyTransform(ExchangeDataProcessor processor) throws OseeCoreException {
       List<Integer> branchIds = convertBranchTable(processor);
 
-      repairPreviuosExport(processor);
+      repairPreviousExport(processor);
 
       Map<Long, Long> artifactGammaToNetGammaId = convertArtifactAndConflicts(processor);
       consolidateTxsAddressing(processor, ExportItem.OSEE_TXS_DATA, branchIds, artifactGammaToNetGammaId);
@@ -75,7 +75,7 @@ public class V0_9_2Transformer implements IOseeExchangeVersionTransformer {
       return getMaxVersion().toString();
    }
 
-   private void repairPreviuosExport(ExchangeDataProcessor processor) throws OseeCoreException {
+   private void repairPreviousExport(ExchangeDataProcessor processor) throws OseeCoreException {
       processor.transform(ExportItem.EXPORT_DB_SCHEMA, new DbSchemaRuleAddColumn("osee_txs",
             "<column id=\"branch_id\" type=\"INTEGER\" />\n"));
 
