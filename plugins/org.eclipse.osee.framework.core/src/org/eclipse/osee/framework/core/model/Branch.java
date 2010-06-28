@@ -146,6 +146,7 @@ public class Branch extends AbstractOseeType implements Comparable<Branch>, IAcc
       return getName();
    }
 
+   @Override
    public int compareTo(Branch other) {
       int result = -1;
       if (other != null && other.getName() != null && getName() != null) {
@@ -158,6 +159,7 @@ public class Branch extends AbstractOseeType implements Comparable<Branch>, IAcc
       return getFieldValue(BranchField.BRANCH_CHILDREN);
    }
 
+   @Override
    public Branch getAccessControlBranch() {
       return this;
    }
@@ -194,7 +196,7 @@ public class Branch extends AbstractOseeType implements Comparable<Branch>, IAcc
       return ancestors;
    }
 
-   @SuppressWarnings("unchecked")
+   @Override
    public Object getAdapter(Class adapter) {
       if (adapter == null) {
          throw new IllegalArgumentException("adapter can not be null");
