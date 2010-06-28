@@ -59,8 +59,6 @@ public class V0_9_2Transformer implements IOseeExchangeVersionTransformer {
    public String applyTransform(ExchangeDataProcessor processor) throws OseeCoreException {
       List<Integer> branchIds = convertBranchTable(processor);
 
-      repairPreviousExport(processor);
-
       Map<Long, Long> artifactGammaToNetGammaId = convertArtifactAndConflicts(processor);
       consolidateTxsAddressing(processor, ExportItem.OSEE_TXS_DATA, branchIds, artifactGammaToNetGammaId);
 
