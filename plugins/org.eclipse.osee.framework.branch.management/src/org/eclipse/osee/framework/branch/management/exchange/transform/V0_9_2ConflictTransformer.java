@@ -30,10 +30,12 @@ public class V0_9_2ConflictTransformer extends SaxTransformer {
    public void startElementFound(String uri, String localName, String qName, Attributes attributes) throws XMLStreamException {
       writer.writeStartElement(localName);
       for (int i = 0; i < attributes.getLength(); i++) {
-         String value = "not set";
+         String value = null;
          if (attributes.getLocalName(i).equals("source_gamma_id") || attributes.getLocalName(i).equals("dest_gamma_id")) {
             Long netGammaId = artifactGammaToNetGammaId.get(Long.valueOf(attributes.getValue(i)));
-            value = String.valueOf(netGammaId);
+            if (netGammaId != null) {
+               value = String.valueOf(netGammaId);
+            }
          }
          if (value == null) {
             value = attributes.getValue(i);
