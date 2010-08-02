@@ -62,7 +62,7 @@ public class OutfileDataCollector implements IDataListener {
 
    private void checkForNull(Object object) {
       if (object == null) {
-         throw new IllegalArgumentException(String.format("Argument was null [%s]", object.getClass().getName()));
+         throw new IllegalArgumentException("Argument was null.");
       }
    }
 }

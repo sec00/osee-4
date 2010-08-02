@@ -856,7 +856,7 @@ public class AbstractMessageToolService implements IRemoteMessageService {
          }
          if (client == null) {
             OseeLog.log(MessageSystemTestEnvironment.class,
-                  Level.INFO, String.format("client was null %s", msgName, client.toString()));
+                  Level.INFO, String.format("client was null %s", msgName));
          } else if (client.getIpAddress() == null) {
             OseeLog.log(MessageSystemTestEnvironment.class,
                   Level.INFO, String.format("client ip address is null %s to %s", msgName, client.toString()));
