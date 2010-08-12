@@ -14,7 +14,6 @@
       <complexType>
          <sequence>
             <element ref="ServiceHandler" minOccurs="1" maxOccurs="unbounded"/>
-            <element ref="RegisterBundle" minOccurs="0" maxOccurs="1"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
