@@ -47,10 +47,10 @@ public class ExchangeDb {
    private static final String[] BRANCH_ID_NEG_ONE_ALIASES = new String[] {"parent_branch_id"};
 
    private static final String[] BRANCH_ID_REG_ALIASES =
-         new String[] {"mapped_branch_id", "source_branch_id", "merge_branch_id", "dest_branch_id"};
+      new String[] {"mapped_branch_id", "source_branch_id", "merge_branch_id", "dest_branch_id"};
 
    private static final String[] ARTIFACT_ID_NEG_ONE_ALIASES =
-         new String[] {"commit_art_id", "associated_art_id", "author"};
+      new String[] {"commit_art_id", "associated_art_id", "author"};
 
    private static final String[] ARTIFACT_ID_REG_ALIASES = new String[] {"a_art_id", "b_art_id", "privilege_entity_id"};
 
@@ -89,40 +89,43 @@ public class ExchangeDb {
    }
 
    public static final String GET_MAX_TX =
-         "SELECT last_sequence FROM osee_sequence WHERE sequence_name = '" + IOseeSequence.TRANSACTION_ID_SEQ + "'";
+      "SELECT last_sequence FROM osee_sequence WHERE sequence_name = '" + IOseeSequence.TRANSACTION_ID_SEQ + "'";
 
    private static final String BRANCH_TABLE_QUERY =
-         "SELECT br1.* FROM osee_branch br1, osee_join_export_import jex1 WHERE br1.branch_id = jex1.id1 AND jex1.query_id=? ORDER BY br1.branch_id";
+      "SELECT br1.* FROM osee_branch br1, osee_join_export_import jex1 WHERE br1.branch_id = jex1.id1 AND jex1.query_id=? ORDER BY br1.branch_id";
 
    private static final String TX_DETAILS_TABLE_QUERY =
-         "SELECT txd1.TRANSACTION_ID, txd1.TIME, txd1.AUTHOR, txd1.OSEE_COMMENT, txd1.BRANCH_ID, txd1.COMMIT_ART_ID, txd1.TX_TYPE FROM osee_tx_details txd1, osee_join_export_import jex1 WHERE txd1.branch_id = jex1.id1 AND jex1.query_id=? %s ORDER BY txd1.transaction_id";
+      "SELECT txd1.TRANSACTION_ID, txd1.TIME, txd1.AUTHOR, txd1.OSEE_COMMENT, txd1.BRANCH_ID, txd1.COMMIT_ART_ID, txd1.TX_TYPE FROM osee_tx_details txd1, osee_join_export_import jex1 WHERE txd1.branch_id = jex1.id1 AND jex1.query_id=? %s ORDER BY txd1.transaction_id";
 
    private static final String TXS_TABLE_QUERY =
-         "SELECT txs1.GAMMA_ID, txs1.TRANSACTION_ID, txs1.TX_CURRENT, txs1.MOD_TYPE FROM osee_txs txs1, osee_tx_details txd1, osee_join_export_import jex1 WHERE txs1.transaction_id = txd1.transaction_id AND txd1.branch_id = jex1.id1 AND jex1.query_id=? %s";
+      "SELECT txs1.GAMMA_ID, txs1.TRANSACTION_ID, txs1.TX_CURRENT, txs1.MOD_TYPE FROM osee_txs txs1, osee_tx_details txd1, osee_join_export_import jex1 WHERE txs1.transaction_id = txd1.transaction_id AND txd1.branch_id = jex1.id1 AND jex1.query_id=? %s";
+
+   private static final String TXS_ARCHIVE_TABLE_QUERY =
+      "SELECT txs1.GAMMA_ID, txs1.TRANSACTION_ID, txs1.TX_CURRENT, txs1.MOD_TYPE FROM osee_txs_archived txs1, osee_tx_details txd1, osee_join_export_import jex1 WHERE txs1.transaction_id = txd1.transaction_id AND txd1.branch_id = jex1.id1 AND jex1.query_id=? %s";
 
    private static final String ARTIFACT_TABLE_QUERY =
-         "SELECT DISTINCT (art1.art_id), aty.art_type_guid, art1.GUID, art1.HUMAN_READABLE_ID, art1.ART_TYPE_ID FROM osee_artifact art1, osee_artifact_type aty, osee_artifact_version artv1, osee_txs txs1, osee_tx_details txd1, osee_join_export_import jex1 WHERE art1.art_id = artv1.art_id AND art1.art_type_id = aty.art_type_id AND artv1.gamma_id = txs1.gamma_id AND txs1.transaction_id = txd1.transaction_id AND txd1.branch_id = jex1.id1 AND jex1.query_id=? %s";
+      "SELECT DISTINCT (art1.art_id), aty.art_type_guid, art1.GUID, art1.HUMAN_READABLE_ID, art1.ART_TYPE_ID FROM osee_artifact art1, osee_artifact_type aty, osee_artifact_version artv1, osee_txs txs1, osee_tx_details txd1, osee_join_export_import jex1 WHERE art1.art_id = artv1.art_id AND art1.art_type_id = aty.art_type_id AND artv1.gamma_id = txs1.gamma_id AND txs1.transaction_id = txd1.transaction_id AND txd1.branch_id = jex1.id1 AND jex1.query_id=? %s";
 
    private static final String ARTIFACT_VERSION_QUERY =
-         "SELECT DISTINCT (artv1.GAMMA_ID), artv1.ART_ID FROM osee_artifact_version artv1, osee_txs txs1, osee_tx_details txd1, osee_join_export_import jex1 WHERE artv1.gamma_id = txs1.gamma_id AND txs1.transaction_id = txd1.transaction_id AND txd1.branch_id = jex1.id1 AND jex1.query_id=? %s";
+      "SELECT DISTINCT (artv1.GAMMA_ID), artv1.ART_ID FROM osee_artifact_version artv1, osee_txs txs1, osee_tx_details txd1, osee_join_export_import jex1 WHERE artv1.gamma_id = txs1.gamma_id AND txs1.transaction_id = txd1.transaction_id AND txd1.branch_id = jex1.id1 AND jex1.query_id=? %s";
 
    private static final String ATTRIBUTE_TABLE_QUERY =
-         "SELECT DISTINCT (attr1.GAMMA_ID), attr1.ATTR_ID, attr1.ART_ID, attr1.VALUE, attr1.ATTR_TYPE_ID, attr1.URI, aty.attr_type_guid FROM osee_attribute attr1, osee_attribute_type aty, osee_txs txs1, osee_tx_details txd1, osee_join_export_import jex1 WHERE attr1.attr_type_id = aty.attr_type_id AND attr1.gamma_id = txs1.gamma_id AND txs1.transaction_id = txd1.transaction_id AND txd1.branch_id = jex1.id1 AND jex1.query_id=? %s";
+      "SELECT DISTINCT (attr1.GAMMA_ID), attr1.ATTR_ID, attr1.ART_ID, attr1.VALUE, attr1.ATTR_TYPE_ID, attr1.URI, aty.attr_type_guid FROM osee_attribute attr1, osee_attribute_type aty, osee_txs txs1, osee_tx_details txd1, osee_join_export_import jex1 WHERE attr1.attr_type_id = aty.attr_type_id AND attr1.gamma_id = txs1.gamma_id AND txs1.transaction_id = txd1.transaction_id AND txd1.branch_id = jex1.id1 AND jex1.query_id=? %s";
 
    private static final String RELATION_LINK_TABLE_QUERY =
-         "SELECT DISTINCT (rel1.GAMMA_ID), rel1.REL_LINK_ID, rel1.B_ART_ID, rel1.A_ART_ID, rel1.RATIONALE, rel1.REL_LINK_TYPE_ID, ry.rel_link_type_guid FROM osee_relation_link rel1, osee_txs txs1, osee_tx_details txd1, osee_join_export_import jex1, osee_relation_link_type ry WHERE rel1.rel_link_type_id = ry.rel_link_type_id AND rel1.gamma_id = txs1.gamma_id AND txs1.transaction_id = txd1.transaction_id AND txd1.branch_id = jex1.id1 AND jex1.query_id=? %s";
+      "SELECT DISTINCT (rel1.GAMMA_ID), rel1.REL_LINK_ID, rel1.B_ART_ID, rel1.A_ART_ID, rel1.RATIONALE, rel1.REL_LINK_TYPE_ID, ry.rel_link_type_guid FROM osee_relation_link rel1, osee_txs txs1, osee_tx_details txd1, osee_join_export_import jex1, osee_relation_link_type ry WHERE rel1.rel_link_type_id = ry.rel_link_type_id AND rel1.gamma_id = txs1.gamma_id AND txs1.transaction_id = txd1.transaction_id AND txd1.branch_id = jex1.id1 AND jex1.query_id=? %s";
 
    private static final String MERGE_TABLE_QUERY =
-         "SELECT om1.* FROM osee_merge om1, osee_join_export_import jex1 WHERE om1.merge_branch_id = jex1.id1 AND jex1.query_id=? %s";
+      "SELECT om1.* FROM osee_merge om1, osee_join_export_import jex1 WHERE om1.merge_branch_id = jex1.id1 AND jex1.query_id=? %s";
 
    private static final String CONFLICT_TABLE_QUERY =
-         "SELECT oc1.* FROM osee_conflict oc1, osee_merge om1, osee_join_export_import jex1 WHERE oc1.merge_branch_id = om1.merge_branch_id AND om1.merge_branch_id = jex1.id1 AND jex1.query_id=? %s";
+      "SELECT oc1.* FROM osee_conflict oc1, osee_merge om1, osee_join_export_import jex1 WHERE oc1.merge_branch_id = om1.merge_branch_id AND om1.merge_branch_id = jex1.id1 AND jex1.query_id=? %s";
 
    private static final String ARTIFACT_ACL_QUERY =
-         "SELECT oaa1.* FROM osee_artifact_acl oaa1, osee_join_export_import jex1 WHERE oaa1.branch_id = jex1.id1 AND jex1.query_id=? ORDER BY oaa1.branch_id";
+      "SELECT oaa1.* FROM osee_artifact_acl oaa1, osee_join_export_import jex1 WHERE oaa1.branch_id = jex1.id1 AND jex1.query_id=? ORDER BY oaa1.branch_id";
 
    private static final String BRANCH_ACL_QUERY =
-         "SELECT oba1.* FROM osee_branch_acl oba1, osee_join_export_import jex1 WHERE oba1.branch_id = jex1.id1 AND jex1.query_id=? ORDER BY oba1.branch_id";
+      "SELECT oba1.* FROM osee_branch_acl oba1, osee_join_export_import jex1 WHERE oba1.branch_id = jex1.id1 AND jex1.query_id=? ORDER BY oba1.branch_id";
 
    static List<AbstractExportItem> createTaskList() {
       List<AbstractExportItem> items = new ArrayList<AbstractExportItem>();
@@ -131,6 +134,7 @@ public class ExchangeDb {
       items.add(new RelationalExportItem(ExportItem.OSEE_BRANCH_DATA, BRANCH_TABLE_QUERY));
       items.add(new RelationalExportItem(ExportItem.OSEE_TX_DETAILS_DATA, TX_DETAILS_TABLE_QUERY));
       items.add(new RelationalExportItem(ExportItem.OSEE_TXS_DATA, TXS_TABLE_QUERY));
+      items.add(new RelationalExportItem(ExportItem.OSEE_TXS_ARCHIVED_DATA, TXS_ARCHIVE_TABLE_QUERY));
       items.add(new RelationalExportItem(ExportItem.OSEE_ARTIFACT_DATA, ARTIFACT_TABLE_QUERY));
       items.add(new RelationalExportItem(ExportItem.OSEE_ARTIFACT_VERSION_DATA, ARTIFACT_VERSION_QUERY));
       items.add(new RelationalExportItem(ExportItem.OSEE_ATTRIBUTE_DATA, ATTRIBUTE_TABLE_QUERY));
@@ -146,10 +150,11 @@ public class ExchangeDb {
    static List<IndexCollector> createCheckList() {
       List<IndexCollector> items = new ArrayList<IndexCollector>();
       items.add(new IndexCollector("osee.txs.data", GAMMA_ID, GAMMA_ID_REG_ALIASES));
+      items.add(new IndexCollector("osee.txs.archived.data", GAMMA_ID, GAMMA_ID_REG_ALIASES));
       items.add(new IndexCollector("osee.tx.details.data", TRANSACTION_ID, TRANSACTION_ID_REG_ALIASES,
-            TRANSACTION_ID_NEG_ONE_ALIASES));
+         TRANSACTION_ID_NEG_ONE_ALIASES));
       items.add(new IndexCollector("osee.artifact.data", ARTIFACT_ID, ARTIFACT_ID_REG_ALIASES,
-            ARTIFACT_ID_NEG_ONE_ALIASES));
+         ARTIFACT_ID_NEG_ONE_ALIASES));
       items.add(new IndexCollector("osee.attribute.data", ATTRIBUTE_ID));
       items.add(new IndexCollector("osee.relation.link.data", RELATION_ID));
       items.add(new IndexCollector("osee.branch.data", BRANCH_ID, BRANCH_ID_REG_ALIASES, BRANCH_ID_NEG_ONE_ALIASES));
@@ -204,7 +209,7 @@ public class ExchangeDb {
             }
 
             return new Pair<String, Object[]>(String.format(originalQuery, optionString),
-                  dataArray.toArray(new Object[dataArray.size()]));
+               dataArray.toArray(new Object[dataArray.size()]));
          }
       }
       return new Pair<String, Object[]>(originalQuery, new Object[] {queryId});

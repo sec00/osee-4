@@ -19,6 +19,7 @@ public enum ExportItem implements IExportItem {
    OSEE_BRANCH_DATA("osee_branch"),
    OSEE_TX_DETAILS_DATA("osee_tx_details"),
    OSEE_TXS_DATA("osee_txs"),
+   OSEE_TXS_ARCHIVED_DATA("osee_txs_archived"),
    OSEE_ARTIFACT_DATA("osee_artifact"),
    OSEE_ARTIFACT_VERSION_DATA("osee_artifact_version"),
    OSEE_ATTRIBUTE_DATA("osee_attribute"),
@@ -27,7 +28,7 @@ public enum ExportItem implements IExportItem {
    OSEE_CONFLICT_DATA("osee_conflict"),
    OSEE_BRANCH_ACL_DATA("osee_branch_acl"),
    OSEE_ARTIFACT_ACL_DATA("osee_artifact_acl");
-
+ 
    private final String source;
 
    private ExportItem(String source) {
