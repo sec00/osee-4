@@ -114,14 +114,14 @@ public class HttpProcessor {
          result.setEncoding(method.getResponseCharSet());
          if (statusCode != HttpURLConnection.HTTP_CREATED) {
             String exceptionString = Lib.inputStreamToString(responseInputStream);
-            throw new Exception(exceptionString);
+            throw new IOException(exceptionString);
          } else {
             responseInputStream = method.getResponseBodyAsStream();
             response = Lib.inputStreamToString(responseInputStream);
          }
 
       } catch (Exception ex) {
-         throw new IOException(String.format("Error during POST [%s] - status code: [%s]", url, statusCode), ex);
+         wrapAndThrow(ex, url, statusCode);
       } finally {
          try {
             if (responseInputStream != null) {
@@ -134,6 +134,14 @@ public class HttpProcessor {
          }
       }
       return response;
+   }
+   
+   private static void wrapAndThrow(Exception ex, URL url, int statusCode) throws IOException {
+      if (ex instanceof IOException) {
+         throw (IOException) ex;
+      } else {
+         throw new IOException(String.format("Error during POST [%s] - status code: [%s]", url, statusCode), ex);
+      }
    }
 
    public static AcquireResult post(URL url, InputStream inputStream, String contentType, String encoding, OutputStream outputStream) throws IOException {
@@ -155,12 +163,10 @@ public class HttpProcessor {
          result.setEncoding(method.getResponseCharSet());
          if (statusCode != HttpStatus.SC_ACCEPTED) {
             String exceptionString = Lib.inputStreamToString(httpInputStream);
-            throw new Exception(exceptionString);
+            throw new IOException(exceptionString);
          } else {
             Lib.inputStreamToOutputStream(httpInputStream, outputStream);
          }
-      } catch (Exception ex) {
-         throw new IOException(String.format("Error during POST [%s] - status code: [%s] ", url, statusCode), ex);
       } finally {
          try {
             result.setCode(statusCode);
