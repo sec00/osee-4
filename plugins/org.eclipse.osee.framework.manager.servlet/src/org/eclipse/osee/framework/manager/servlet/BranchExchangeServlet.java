@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.eclipse.osee.framework.core.operation.ConsoleReporter;
 import org.eclipse.osee.framework.core.server.OseeHttpServlet;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.logging.OseeLog;
@@ -125,7 +126,7 @@ public class BranchExchangeServlet extends OseeHttpServlet {
             Activator.getInstance().getResourceLocatorManager().getResourceLocator(exchangeInfo.getPath());
 
       Activator.getInstance().getBranchExchange().importBranch(locator, exchangeInfo.getOptions(),
-            exchangeInfo.getSelectedBranchIds());
+            exchangeInfo.getSelectedBranchIds(), new ConsoleReporter());
 
       response.setStatus(HttpServletResponse.SC_ACCEPTED);
       response.setContentType("text/plain");

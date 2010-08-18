@@ -16,6 +16,7 @@ import org.eclipse.osee.framework.branch.management.IBranchExchange;
 import org.eclipse.osee.framework.branch.management.exchange.handler.StandardOseeDbExportDataProvider;
 import org.eclipse.osee.framework.branch.management.exchange.resource.ExchangeLocatorProvider;
 import org.eclipse.osee.framework.branch.management.exchange.transform.ExchangeDataProcessor;
+import org.eclipse.osee.framework.core.operation.OperationReporter;
 import org.eclipse.osee.framework.jdk.core.type.Pair;
 import org.eclipse.osee.framework.resource.management.IResourceLocator;
 import org.eclipse.osee.framework.resource.management.Options;
@@ -49,19 +50,10 @@ public class BranchExchange implements IBranchExchange {
    }
 
    @Override
-   public void importBranch(IResourceLocator exportDataLocator, Options options, int... branchIds) throws Exception {
+   public void importBranch(IResourceLocator exportDataLocator, Options options, List<Integer> branchIds, OperationReporter reporter) throws Exception {
       IOseeExchangeDataProvider exportDataProvider = createExportDataProvider(exportDataLocator);
-      ImportController importController = new ImportController(oseeServices, exportDataProvider, options, branchIds);
+      ImportController importController = new ImportController(oseeServices, exportDataProvider, options, reporter);
       importController.execute();
-   }
-
-   @Override
-   public void importBranch(IResourceLocator fileToImport, Options options, List<Integer> branchIds) throws Exception {
-      int[] branchIdsArray = new int[branchIds.size()];
-      for (int index = 0; index < branchIds.size(); index++) {
-         branchIdsArray[index] = branchIds.get(index);
-      }
-      importBranch(fileToImport, options, branchIdsArray);
    }
 
    @Override

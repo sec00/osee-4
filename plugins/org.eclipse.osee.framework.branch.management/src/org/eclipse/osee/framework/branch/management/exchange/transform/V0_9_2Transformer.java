@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.TreeSet;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.osee.framework.branch.management.TxCurrentsAndModTypesCommand;
 import org.eclipse.osee.framework.branch.management.exchange.ExchangeUtil;
 import org.eclipse.osee.framework.branch.management.exchange.handler.ExportItem;
 import org.eclipse.osee.framework.core.enums.ModificationType;
@@ -28,11 +30,12 @@ import org.eclipse.osee.framework.core.enums.TxChange;
 import org.eclipse.osee.framework.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.core.exception.OseeExceptions;
 import org.eclipse.osee.framework.core.exception.OseeStateException;
+import org.eclipse.osee.framework.core.operation.OperationReporter;
+import org.eclipse.osee.framework.core.operation.Operations;
 import org.eclipse.osee.framework.database.operation.Address;
 import org.eclipse.osee.framework.jdk.core.text.rules.ReplaceAll;
 import org.eclipse.osee.framework.jdk.core.type.HashCollection;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
-import org.eclipse.osee.framework.jdk.core.util.io.xml.SaxTransformer;
 import org.osgi.framework.Version;
 
 /**
@@ -42,11 +45,11 @@ public class V0_9_2Transformer implements IOseeExchangeVersionTransformer {
    private static final Version MAX_VERSION = new Version("0.9.2");
 
    private final Map<ModificationType, ModificationType[]> allowedStates =
-         new HashMap<ModificationType, ModificationType[]>();
+      new HashMap<ModificationType, ModificationType[]>();
 
    public V0_9_2Transformer() {
       ModificationType[] FROM_NEW_OR_INTRODUCED =
-            new ModificationType[] {ModificationType.DELETED, ModificationType.MERGED};
+         new ModificationType[] {ModificationType.DELETED, ModificationType.MERGED};
       ModificationType[] END_STATE = new ModificationType[0];
       allowedStates.put(ModificationType.NEW, FROM_NEW_OR_INTRODUCED);
       allowedStates.put(ModificationType.INTRODUCED, FROM_NEW_OR_INTRODUCED);
@@ -56,7 +59,7 @@ public class V0_9_2Transformer implements IOseeExchangeVersionTransformer {
    }
 
    @Override
-   public String applyTransform(ExchangeDataProcessor processor) throws OseeCoreException {
+   public String applyTransform(ExchangeDataProcessor processor, OperationReporter reporter) throws OseeCoreException {
       List<Integer> branchIds = convertBranchTable(processor);
 
       Map<Long, Long> artifactGammaToNetGammaId = convertArtifactAndConflicts(processor);
@@ -67,21 +70,10 @@ public class V0_9_2Transformer implements IOseeExchangeVersionTransformer {
       tableToColumns.put("osee_branch", "<column id=\"baseline_transaction_id\" type=\"INTEGER\" />\n");
       processor.transform(ExportItem.EXPORT_DB_SCHEMA, new DbSchemaRuleAddColumn(tableToColumns));
 
-      processor.transform(ExportItem.EXPORT_MANIFEST, new ReplaceAll(
-            "<entry id=\"osee.artifact.version.data.xml[^<]+", ""));
+      processor.transform(ExportItem.EXPORT_MANIFEST, new ReplaceAll("<entry id=\"osee.artifact.version.data.xml[^<]+",
+         ""));
       processor.deleteExportItem("osee.artifact.version.data.xml");
       return getMaxVersion().toString();
-   }
-
-   private void repairPreviousExport(ExchangeDataProcessor processor) throws OseeCoreException {
-      processor.transform(ExportItem.EXPORT_DB_SCHEMA, new DbSchemaRuleAddColumn("osee_txs",
-            "<column id=\"branch_id\" type=\"INTEGER\" />\n"));
-
-      V0_9_0TxDetailsHandler txdHandler = new V0_9_0TxDetailsHandler();
-      processor.parse(ExportItem.OSEE_TX_DETAILS_DATA, txdHandler);
-
-      SaxTransformer txsTransformer = new V0_9_0TxsTransformer(txdHandler.getBranchIdMap());
-      processor.transform(ExportItem.OSEE_TXS_DATA, txsTransformer);
    }
 
    @Override
@@ -90,7 +82,11 @@ public class V0_9_2Transformer implements IOseeExchangeVersionTransformer {
    }
 
    @Override
-   public void finalizeTransform(ExchangeDataProcessor processor) throws Exception {
+   public void finalizeTransform(ExchangeDataProcessor processor, OperationReporter reporter) throws Exception {
+      Operations.executeWorkAndCheckStatus(new TxCurrentsAndModTypesCommand(reporter, false),
+         new NullProgressMonitor(), 0);
+      Operations.executeWorkAndCheckStatus(new TxCurrentsAndModTypesCommand(reporter, true), new NullProgressMonitor(),
+         0);
    }
 
    private List<Integer> convertBranchTable(ExchangeDataProcessor processor) throws OseeCoreException {

@@ -38,6 +38,7 @@ import org.eclipse.osee.framework.core.exception.OseeCoreException;
 import org.eclipse.osee.framework.core.exception.OseeDataStoreException;
 import org.eclipse.osee.framework.core.exception.OseeExceptions;
 import org.eclipse.osee.framework.core.exception.OseeStateException;
+import org.eclipse.osee.framework.core.operation.OperationReporter;
 import org.eclipse.osee.framework.database.core.DbTransaction;
 import org.eclipse.osee.framework.database.core.IOseeStatement;
 import org.eclipse.osee.framework.database.core.OseeConnection;
@@ -63,9 +64,10 @@ public final class ImportController {
    private final OseeServices oseeServices;
    private final IOseeExchangeDataProvider exportDataProvider;
    private final Options options;
-   private final int[] branchesToImport;
+   private final int[] branchesToImport = null;
    private final Map<String, SavePoint> savePoints;
-
+   private final OperationReporter reporter;
+   
    private ExchangeTransformer exchangeTransformer;
    private ExchangeDataProcessor exchangeDataProcessor;
    private TranslationManager translator;
@@ -73,15 +75,12 @@ public final class ImportController {
    private MetaDataSaxHandler metadataHandler;
    private String currentSavePoint;
 
-   ImportController(OseeServices oseeServices, IOseeExchangeDataProvider exportDataProvider, Options options, int... branchesToImport) {
+   ImportController(OseeServices oseeServices, IOseeExchangeDataProvider exportDataProvider, Options options, OperationReporter reporter) {
       this.oseeServices = oseeServices;
       this.exportDataProvider = exportDataProvider;
       this.options = options;
-      this.branchesToImport = branchesToImport;
-      if (branchesToImport != null && branchesToImport.length > 0) {
-         throw new UnsupportedOperationException("selective branch import is not supported.");
-      }
       this.savePoints = new LinkedHashMap<String, SavePoint>();
+      this.reporter =reporter;
    }
 
    private void checkPreconditions() throws OseeCoreException {
@@ -97,7 +96,7 @@ public final class ImportController {
       IExchangeTransformProvider transformProvider = new ExchangeTransformProvider(oseeServices.getCachingService());
       exchangeTransformer = new ExchangeTransformer(transformProvider, exchangeDataProcessor);
 
-      exchangeTransformer.applyTransforms();
+      exchangeTransformer.applyTransforms(reporter);
 
       currentSavePoint = "manifest";
       manifestHandler = new ManifestSaxHandler();
@@ -155,7 +154,7 @@ public final class ImportController {
 
          importBranchesTx.updateBranchParentTransactionId();
 
-         exchangeTransformer.applyFinalTransforms();
+         exchangeTransformer.applyFinalTransforms(reporter);
 
          currentSavePoint = "stop";
          addSavePoint(currentSavePoint);
