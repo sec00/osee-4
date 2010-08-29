@@ -48,12 +48,6 @@ class OteJmsServiceConnector implements ServiceNotification, OseeMessagingStatus
    private final ExportClassLoader exportClassLoader;
    private final OseeMessagingListener myOteServiceRequestHandler;
 
-   /**
-    * @param remoteServiceLookup
-    * @param messageService
-    * @param connectionService
-    * @param exportClassLoader
-    */
    OteJmsServiceConnector(RemoteServiceLookup remoteServiceLookup, MessageService messageService, IConnectionService connectionService, ExportClassLoader exportClassLoader) {
       this.remoteServiceLookup = remoteServiceLookup;
       this.messageService = messageService;
@@ -144,7 +138,7 @@ class OteJmsServiceConnector implements ServiceNotification, OseeMessagingStatus
             ByteArrayInputStream bais = new ByteArrayInputStream((byte[]) message);
             ObjectInputStream ois = new ObjectInputStream(bais);
             Object msg = ois.readObject();
-            String messageId = msg.toString();
+            msg.toString();
             Object obj = ois.readObject();
             IHostTestEnvironment hostEnv = (IHostTestEnvironment) obj;
             String id = hostEnv.getProperties().getProperty("id").toString();

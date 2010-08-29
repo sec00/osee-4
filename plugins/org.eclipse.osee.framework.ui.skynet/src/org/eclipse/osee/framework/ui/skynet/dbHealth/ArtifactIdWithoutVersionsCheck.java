@@ -38,9 +38,6 @@ public class ArtifactIdWithoutVersionsCheck extends DatabaseHealthOperation {
    private static final String GET_INVALID_ACL_ART_IDS =
       "select item.art_id as artId from osee_artifact_acl item where NOT EXISTS (select oav.art_id from osee_artifact oav where oav.art_id = item.art_id)";
 
-   /**
-    * @param operationName
-    */
    public ArtifactIdWithoutVersionsCheck() {
       super("Artifact Id Without osee_artifact Table Entry");
    }
@@ -88,7 +85,9 @@ public class ArtifactIdWithoutVersionsCheck extends DatabaseHealthOperation {
       appendToDetails(AHTML.beginMultiColumnTable(100, 1));
       appendToDetails(AHTML.addHeaderRowMultiColumnTable(new String[] {"TABLE", "REFERENCED_BY", "TOTAL INVALIDS"}));
       for (ItemEntry entry : itemsToDelete) {
-         appendToDetails(AHTML.addRowMultiColumnTable(new String[] {entry.table, entry.invalidField,
+         appendToDetails(AHTML.addRowMultiColumnTable(new String[] {
+            entry.table,
+            entry.invalidField,
             String.valueOf(entry.invalids.size())}));
       }
       appendToDetails(AHTML.endMultiColumnTable());

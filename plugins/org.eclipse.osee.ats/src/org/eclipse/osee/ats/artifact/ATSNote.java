@@ -132,8 +132,7 @@ public class ATSNote {
             element.setAttribute("msg", item.getMsg());
             rootElement.appendChild(element);
          }
-         getArtifact().setSoleAttributeValue(AtsAttributeTypes.StateNotes,
-            Jaxp.getDocumentXml(doc));
+         getArtifact().setSoleAttributeValue(AtsAttributeTypes.StateNotes, Jaxp.getDocumentXml(doc));
       } catch (Exception ex) {
          OseeLog.log(AtsPlugin.class, OseeLevel.SEVERE_POPUP, "Can't create ats note document", ex);
       }
@@ -143,7 +142,6 @@ public class ATSNote {
     * Display Note Table; If state == null, only display non-state notes Otherwise, show only notes associated with
     * state
     * 
-    * @param state
     */
    public String getTable(String state) {
       ArrayList<NoteItem> showNotes = new ArrayList<NoteItem>();

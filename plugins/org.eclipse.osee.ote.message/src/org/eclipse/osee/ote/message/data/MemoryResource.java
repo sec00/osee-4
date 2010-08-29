@@ -133,7 +133,7 @@ public class MemoryResource {
          v <<= 8;
          v |= data[endByte] & 0xFF;
       }
-      return (v >>> 7 - lsb % 8);
+      return v >>> 7 - lsb % 8;
    }
 
    public final long getLong(int offset, int msb, int lsb) {
@@ -393,17 +393,12 @@ public class MemoryResource {
       _dataHasChanged = true;
    }
 
-   /**
-    * @param src
-    */
    public void copyData(ByteBuffer src) {
       copyData(0, src, src.remaining());
    }
 
    /**
     * @param destOffset offset in this memory resource in which the copy will begin
-    * @param src
-    * @param length
     */
    public void copyData(int destOffset, ByteBuffer src, int length) throws MessageSystemException {
       if (length + destOffset > byteArray.get().length) {

@@ -53,7 +53,6 @@ public class Xml {
    /**
     * TODO Optimize algorithm
     * 
-    * @param text
     * @return Returns a string with entity reference characters unescaped.
     */
    public static StringBuilder unescape(String text) {
@@ -96,7 +95,6 @@ public class Xml {
    /**
     * TODO Optimize algorithm
     * 
-    * @param text
     * @return Returns a string with entity reference characters escaped.
     */
    public static CharSequence escape(CharSequence text) {
@@ -404,15 +402,19 @@ public class Xml {
 
    public static final Element makeTable(Element parentDivElement, String caption, String[][] columnDescriptors) {
       Element newTableElement =
-         appendNewElementWithTextAndAttributes(parentDivElement, "table", null, new String[][] { {"border", "1"},
-            {"cellpadding", "3"}, {"cellspacing", "0"}, {"width", "100%"}});
+         appendNewElementWithTextAndAttributes(parentDivElement, "table", null, new String[][] {
+            {"border", "1"},
+            {"cellpadding", "3"},
+            {"cellspacing", "0"},
+            {"width", "100%"}});
       appendNewElementWithText(newTableElement, "caption", caption);
       Element columnGroupElement =
          appendNewElementWithTextAndAttributes(newTableElement, "colgroup", null, new String[][] {{"align", "left"}});
       String[] columnNames = new String[columnDescriptors.length];
       for (int i = 0; i < columnDescriptors.length; i++) {
          columnNames[i] = columnDescriptors[i][0];
-         appendNewElementWithTextAndAttributes(columnGroupElement, "col", null, new String[][] {{"width",
+         appendNewElementWithTextAndAttributes(columnGroupElement, "col", null, new String[][] {{
+            "width",
             columnDescriptors[i][1]}});//width,33
       }
       Element headingTableRowElement = appendNewElementWithText(newTableElement, "tr", null);

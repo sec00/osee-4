@@ -14,24 +14,18 @@ import java.io.Serializable;
 
 @SuppressWarnings("unchecked")
 /**
- * This key is used by the model manager to search for a model already instanciated for this environment. 
+ * This key is used by the model manager to search for a model already instanciated for this environment.
  * Each of the getter functions MUST return a unique identifier for the specific model they represent ( or null if
  * that particular type isn't available).
  * @author Andrew M. Finkbeiner
- * @param <M> 
+ * @param <M>
  */
 public class ModelKey<M extends IModel> implements Serializable, Comparable {
-   /**
-    * 
-    */
    private static final long serialVersionUID = 4735332847721441142L;
    private String className;
    private String name;
    private Class<M> modelClass;
 
-   /**
-    * @param className
-    */
    public ModelKey(String className) {
       this(className, null, null);
    }
@@ -40,27 +34,14 @@ public class ModelKey<M extends IModel> implements Serializable, Comparable {
       this(key.className, key.name, null);
    }
 
-   /**
-    * @param className
-    * @param name
-    */
    public ModelKey(Class<M> clazz) {
       this(clazz.getCanonicalName(), null, clazz);
    }
 
-   /**
-    * @param className
-    * @param name
-    */
    public ModelKey(Class<M> clazz, String name) {
       this(clazz.getCanonicalName(), name, clazz);
    }
 
-   /**
-    * @param className
-    * @param name
-    * @param modelClass
-    */
    public ModelKey(String className, String name, Class<M> modelClass) {
       this.className = className;
       this.name = name;

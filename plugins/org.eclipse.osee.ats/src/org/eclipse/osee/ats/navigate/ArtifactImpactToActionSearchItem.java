@@ -49,9 +49,6 @@ public class ArtifactImpactToActionSearchItem extends XNavigateItemAction {
 
    private static String TITLE = "Search Artifact Impact to Action";
 
-   /**
-    * @param parent
-    */
    public ArtifactImpactToActionSearchItem(XNavigateItem parent) {
       super(parent, TITLE, FrameworkImage.FLASHLIGHT);
    }
@@ -139,8 +136,11 @@ public class ArtifactImpactToActionSearchItem extends XNavigateItemAction {
                for (Branch branch : branches) {
                   Artifact assocArt = BranchManager.getAssociatedArtifact(branch);
                   if (assocArt != null && !assocArt.equals(UserManager.getUser(SystemUser.OseeSystem))) {
-                     rd.addRaw(AHTML.addRowMultiColumnTable(new String[] {assocArt.getArtifactTypeName(), "Working",
-                        XResultData.getHyperlink(assocArt), assocArt.getName()}));
+                     rd.addRaw(AHTML.addRowMultiColumnTable(new String[] {
+                        assocArt.getArtifactTypeName(),
+                        "Working",
+                        XResultData.getHyperlink(assocArt),
+                        assocArt.getName()}));
                   } else {
                      rd.addRaw(AHTML.addRowMultiColumnTable(new String[] {"Branch", "", branch.getName()}));
                   }
@@ -162,8 +162,11 @@ public class ArtifactImpactToActionSearchItem extends XNavigateItemAction {
                      Artifact assocArt =
                         ArtifactQuery.getArtifactFromId(transactionId.getCommit(), BranchManager.getCommonBranch());
                      if (assocArt instanceof TeamWorkFlowArtifact) {
-                        rd.addRaw(AHTML.addRowMultiColumnTable(new String[] {assocArt.getArtifactTypeName(),
-                           "Committed", assocArt.getHumanReadableId(), assocArt.getName()}));
+                        rd.addRaw(AHTML.addRowMultiColumnTable(new String[] {
+                           assocArt.getArtifactTypeName(),
+                           "Committed",
+                           assocArt.getHumanReadableId(),
+                           assocArt.getName()}));
                         committedChanges = true;
                      }
                   }

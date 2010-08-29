@@ -19,9 +19,6 @@ import javax.print.attribute.EnumSyntax;
 public abstract class EnumBase extends EnumSyntax {
    //TODO We need to possibly refactor getEnum and rework the structure of the enums???
 
-   /**
-    * 
-    */
    private static final long serialVersionUID = -5380925813499901084L;
 
    @Override
@@ -45,7 +42,7 @@ public abstract class EnumBase extends EnumSyntax {
 
       throw new IllegalArgumentException("Not a valid enumeration name: " + str);
       // TODO - We might want to come back and make this more efficient later!!!
-      // This was a binary search, but was changed because it was forcing the tables to have to be 
+      // This was a binary search, but was changed because it was forcing the tables to have to be
       // in the correct binary search order to work.
 
    }

@@ -336,8 +336,7 @@ public class OseeEmail extends MimeMessage {
     */
    private static Session getSession() throws OseeCoreException {
       Properties props = System.getProperties();
-      props.put(
-         emailType,
+      props.put(emailType,
          OseeSystemArtifacts.getGlobalPreferenceArtifact().getSoleAttributeValue(CoreAttributeTypes.DefaultMailServer));
 
       return Session.getDefaultInstance(props, null);
@@ -346,8 +345,6 @@ public class OseeEmail extends MimeMessage {
    /**
     * Adds an attachment to an email
     * 
-    * @param source
-    * @param attachmentName
     * @throws MessagingException
     */
    public void addAttachment(DataSource source, String attachmentName) throws MessagingException {

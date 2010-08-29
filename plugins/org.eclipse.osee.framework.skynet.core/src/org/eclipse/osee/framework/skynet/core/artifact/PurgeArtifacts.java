@@ -58,9 +58,6 @@ public class PurgeArtifacts extends DbTransaction {
 
    private final Collection<? extends Artifact> artifactsToPurge;
 
-   /**
-    * @param artifactsToPurge
-    */
    public PurgeArtifacts(Collection<? extends Artifact> artifactsToPurge) {
       this.artifactsToPurge = artifactsToPurge;
    }
@@ -78,7 +75,11 @@ public class PurgeArtifacts extends DbTransaction {
       try {
          for (Artifact art : artifactsToPurge) {
             for (Branch branch : art.getBranch().getChildBranches(true)) {
-               batchParameters.add(new Object[] {queryId, insertTime, art.getArtId(), branch.getId(),
+               batchParameters.add(new Object[] {
+                  queryId,
+                  insertTime,
+                  art.getArtId(),
+                  branch.getId(),
                   SQL3DataType.INTEGER});
             }
          }
@@ -114,7 +115,11 @@ public class PurgeArtifacts extends DbTransaction {
 
          // insert into the artifact_join_table
          for (Artifact art : artifactsToPurge) {
-            batchParameters.add(new Object[] {queryId, insertTime, art.getArtId(), art.getBranch().getId(),
+            batchParameters.add(new Object[] {
+               queryId,
+               insertTime,
+               art.getArtId(),
+               art.getBranch().getId(),
                SQL3DataType.INTEGER});
          }
          ArtifactLoader.insertIntoArtifactJoin(connection, batchParameters);

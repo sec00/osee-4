@@ -116,7 +116,6 @@ public class TestLogger extends Logger implements ITestLogger {
     * Records a severe message in the log.
     * 
     * @param source The object requesting the logging (Usually "this" is passed in).
-    * @param thrown
     */
    @Override
    public void severe(Object source, Throwable thrown) {
@@ -152,10 +151,6 @@ public class TestLogger extends Logger implements ITestLogger {
     * Record a trace event. Such as when a function starts or stops.
     * 
     * @param source The object requesting the logging (Usually "this" is passed in).
-    * @param objectName
-    * @param methodName
-    * @param methodArguments
-    * @param startFlag
     */
    public void trace(ITestEnvironmentAccessor source, String objectName, String methodName, MethodFormatter methodArguments) {
       log(new TraceRecord(source, objectName, methodName, methodArguments));
@@ -198,7 +193,7 @@ public class TestLogger extends Logger implements ITestLogger {
 
    //   /**
    //    * Log the beginning of a method with a the MethodFormatter formatted argument object.
-   //    * 
+   //    *
    //    * @param source The object requesting the logging (Usually "this" is passed in).
    //    * @param methodFormat Reference to the MethodFormatter formatted argument list.
    //    */
@@ -232,7 +227,7 @@ public class TestLogger extends Logger implements ITestLogger {
    //   /**
    //    * Log the start of a method with the object variable name and a formatted string with the
    //    * arguments.
-   //    * 
+   //    *
    //    * @param source The object requesting the logging (Usually "this" is passed in).
    //    * @param objectName The class variable name.
    //    * @param arguments The arguments in a formatted string.

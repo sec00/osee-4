@@ -92,7 +92,6 @@ public class ChangeSet {
    /**
     * Make sure this writer is buffered if source is only a CharSequence
     * 
-    * @param writer
     * @throws IOException
     */
    public void applyChanges(Writer writer) throws IOException {
@@ -149,7 +148,6 @@ public class ChangeSet {
    /**
     * @param srcStartIndex inclusive start index
     * @param srcEndIndex inclusive end index
-    * @param newChar
     */
    public void replace(int srcStartIndex, int srcEndIndex, String newChar) {
       replace(srcStartIndex, srcEndIndex, newChar.toCharArray());
@@ -188,7 +186,7 @@ public class ChangeSet {
 
    private void addNormalized(CharacterChanger previous, CharacterChanger changer, CharacterChanger next) {
       // assumptions: if next is non-null, changer.srcEndIndex < next.srcStartIndex
-      //            previous.srcEndIndex <= changer.srcEndIndex 
+      //            previous.srcEndIndex <= changer.srcEndIndex
       //					the current set of changes have no overlaps (i.e. is already normalized)
 
       // if these changes are adjacent deletes, just combine them
@@ -250,8 +248,6 @@ public class ChangeSet {
    /**
     * This function calls reset(source) on your matcher and will replace all matched items in the ChangesSet source.
     * 
-    * @param matcher
-    * @param replacement
     */
    public void replaceAll(Matcher matcher, String replacement) {
       matcher.reset(source);

@@ -62,7 +62,9 @@ public abstract class SkynetDragAndDrop {
    }
 
    private void setupDragSupport() {
-      source.setTransfer(new Transfer[] {HTMLTransfer.getInstance(), ArtifactTransfer.getInstance(),
+      source.setTransfer(new Transfer[] {
+         HTMLTransfer.getInstance(),
+         ArtifactTransfer.getInstance(),
          TextTransfer.getInstance()});
       source.addDragListener(new DragSourceListener() {
 
@@ -94,7 +96,9 @@ public abstract class SkynetDragAndDrop {
    }
 
    private void setupDropSupport() {
-      target.setTransfer(new Transfer[] {FileTransfer.getInstance(), TextTransfer.getInstance(),
+      target.setTransfer(new Transfer[] {
+         FileTransfer.getInstance(),
+         TextTransfer.getInstance(),
          ArtifactTransfer.getInstance()});
       target.addDropListener(new DropTargetAdapter() {
 
@@ -192,7 +196,6 @@ public abstract class SkynetDragAndDrop {
     * override this method and its cousins rather than performDrop in order to have the drop data preprocessed and
     * passed in the desired form
     * 
-    * @param text
     */
    public void performTextDrop(String text) {
       // provided for subclass implementation
@@ -202,7 +205,6 @@ public abstract class SkynetDragAndDrop {
     * override this method and its cousins rather than performDrop in order to have the drop data preprocessed and
     * passed in the desired form
     * 
-    * @param dropArtifacts
     */
    public void performArtifactDrop(Artifact[] dropArtifacts) {
       // provided for subclass implementation
@@ -212,7 +214,6 @@ public abstract class SkynetDragAndDrop {
     * override this method and its cousins rather than performDrop in order to have the drop data preprocessed and
     * passed in the desired form
     * 
-    * @param fileNames
     */
    public void performFileDrop(String[] fileNames) {
       // provided for subclass implementation

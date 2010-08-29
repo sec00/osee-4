@@ -75,9 +75,6 @@ public class ResultsEditorExample extends XNavigateItemAction {
    private final static List<Double> chartValueStrsGoal = Arrays.asList(177.0, 174.0, 167.0, 161.0, 167.0, 167.0,
       163.0, 165.0, 171.0, 179.0, 177.0, 175.0, 173.0, 171.0, 169.0, 167.0, 165.0);
 
-   /**
-    * @param parent
-    */
    public ResultsEditorExample(XNavigateItem parent) {
       super(parent, TITLE, PluginUiImage.ADMIN);
    }
@@ -87,8 +84,10 @@ public class ResultsEditorExample extends XNavigateItemAction {
       StringBuilder sb = new StringBuilder();
       sb.append(AHTML.heading(3, TITLE));
       sb.append(AHTML.beginMultiColumnTable(100, 1));
-      sb.append(AHTML.addHeaderRowMultiColumnTable(new String[] {Columns.Date.name(),
-         Columns.Priority_123_Open_Bugs.name(), Columns.Goal.name()}));
+      sb.append(AHTML.addHeaderRowMultiColumnTable(new String[] {
+         Columns.Date.name(),
+         Columns.Priority_123_Open_Bugs.name(),
+         Columns.Goal.name()}));
       for (int x = 0; x < chartDateStrs.size(); x++) {
          sb.append(AHTML.addRowMultiColumnTable(chartDateStrs.get(x), "" + chartValueStrs.get(x),
             "" + chartValueStrsGoal.get(x)));
@@ -198,8 +197,10 @@ public class ResultsEditorExample extends XNavigateItemAction {
          public List<IResultsEditorTab> getResultsEditorTabs() {
             List<IResultsXViewerRow> rows = new ArrayList<IResultsXViewerRow>();
             for (int x = 0; x < chartDateStrs.size(); x++) {
-               rows.add(new ResultsXViewerRow(new String[] {chartDateStrs.get(x),
-                  String.valueOf(chartValueStrs.get(x)), String.valueOf(chartValueStrsGoal.get(x))}));
+               rows.add(new ResultsXViewerRow(new String[] {
+                  chartDateStrs.get(x),
+                  String.valueOf(chartValueStrs.get(x)),
+                  String.valueOf(chartValueStrsGoal.get(x))}));
             }
             List<XViewerColumn> columns =
                Arrays.asList(new XViewerColumn(Columns.Date.name(), Columns.Date.name(), 80, SWT.LEFT, true,

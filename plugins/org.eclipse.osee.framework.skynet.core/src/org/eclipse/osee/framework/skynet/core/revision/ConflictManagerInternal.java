@@ -178,11 +178,6 @@ public class ConflictManagerInternal {
    }
 
    /**
-    * @param sourceBranch
-    * @param destinationBranch
-    * @param baselineTransaction
-    * @param conflictBuilders
-    * @param artIdSet
     * @throws OseeCoreException
     */
 
@@ -237,10 +232,6 @@ public class ConflictManagerInternal {
    }
 
    /**
-    * @param sourceBranch
-    * @param destinationBranch
-    * @param baselineTransaction
-    * @param conflicts
     * @throws OseeCoreException
     */
    private static void loadAttributeConflictsNew(Branch sourceBranch, Branch destinationBranch, TransactionRecord baselineTransaction, Collection<ConflictBuilder> conflictBuilders, Set<Integer> artIdSet, IProgressMonitor monitor, TransactionRecord transactionId) throws OseeCoreException {
@@ -331,7 +322,11 @@ public class ConflictManagerInternal {
 
             List<Object[]> insertParameters = new LinkedList<Object[]>();
             for (Conflict conflict : conflicts) {
-               insertParameters.add(new Object[] {queryId, insertTime, conflict.getObjectId(), branchId,
+               insertParameters.add(new Object[] {
+                  queryId,
+                  insertTime,
+                  conflict.getObjectId(),
+                  branchId,
                   SQL3DataType.INTEGER});
             }
             ArtifactLoader.insertIntoArtifactJoin(insertParameters);

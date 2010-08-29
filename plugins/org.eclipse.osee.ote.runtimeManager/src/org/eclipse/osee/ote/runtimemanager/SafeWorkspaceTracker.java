@@ -57,11 +57,6 @@ public class SafeWorkspaceTracker extends ServiceTracker implements OteBundleLoc
    private SafeWorkspaceAccess service;
    private final BundleContext context;
 
-   /**
-    * @param context
-    * @param filter
-    * @param customizer
-    */
    public SafeWorkspaceTracker(BundleContext context) {
       super(context, SafeWorkspaceAccess.class.getName(), null);
       this.context = context;
@@ -82,19 +77,12 @@ public class SafeWorkspaceTracker extends ServiceTracker implements OteBundleLoc
       return super.addingService(reference);
    }
 
-   /**
- * 
- */
    private void slowLoadingJars() {
       Jobs.runInJob(new LocateWorkspaceBundles("Locating Workspace Bundles", RuntimeManager.BUNDLE_ID), false);
 
    }
 
    private class LocateWorkspaceBundles extends AbstractOperation {
-      /**
-       * @param operationName
-       * @param pluginId
-       */
       public LocateWorkspaceBundles(String operationName, String pluginId) {
          super(operationName, pluginId);
       }
@@ -223,7 +211,6 @@ public class SafeWorkspaceTracker extends ServiceTracker implements OteBundleLoc
    }
 
    /**
-    * @param url
     * @return
     * @throws IOException
     */
@@ -252,12 +239,12 @@ public class SafeWorkspaceTracker extends ServiceTracker implements OteBundleLoc
 
       Set<URL> sysNewBundles = systemLibListener.consumeNewBundles();
       Set<URL> sysChangedBundles = systemLibListener.consumeChangedBundles();
-      //		Set<URL> sysRemovedBundles = 
+      //		Set<URL> sysRemovedBundles =
       systemLibListener.consumeRemovedBundles();
 
       Set<URL> userNewBundles = userLibListener.consumeNewBundles();
       Set<URL> userChangedBundles = userLibListener.consumeChangedBundles();
-      //		Set<URL> userRemovedBundles = 
+      //		Set<URL> userRemovedBundles =
       userLibListener.consumeRemovedBundles();
 
       Collection<URL> sysNewModLibs = new ArrayList<URL>(sysNewBundles.size() + sysChangedBundles.size());
@@ -277,7 +264,7 @@ public class SafeWorkspaceTracker extends ServiceTracker implements OteBundleLoc
       // modifiedLibs.add(info);
       // }
       // }
-      //      
+      //
       // return modifiedLibs;
    }
 }

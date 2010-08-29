@@ -63,8 +63,6 @@ public final class ChangeManager {
    /**
     * Acquires changes for a particular artifact
     * 
-    * @param artifact
-    * @param monitor
     * @return changes
     * @throws OseeCoreException
     */
@@ -75,8 +73,6 @@ public final class ChangeManager {
    /**
     * Acquires artifact, relation and attribute changes from a source branch since its creation.
     * 
-    * @param transactionId
-    * @param monitor
     * @return changes
     * @throws OseeCoreException
     */
@@ -91,8 +87,6 @@ public final class ChangeManager {
    /**
     * Acquires artifact, relation and attribute changes from a source branch since its creation.
     * 
-    * @param sourceBranch
-    * @param monitor
     * @return changes
     * @throws OseeCoreException
     */
@@ -116,7 +110,6 @@ public final class ChangeManager {
     * For the given list of artifacts determine which transactions (on that artifact's branch) affected that artifact.
     * The branch's baseline transaction is excluded.
     * 
-    * @param artifacts
     * @return a map of artifact to collection of TransactionIds which affected the given artifact
     * @throws OseeCoreException
     */
@@ -137,7 +130,11 @@ public final class ChangeManager {
          while (branch.hasParentBranch()) {
             transactionNumber = branch.getSourceTransaction().getId();
             branch = branch.getParentBranch();
-            insertParameters.add(new Object[] {queryId, insertTime, artifact.getArtId(), branch.getId(),
+            insertParameters.add(new Object[] {
+               queryId,
+               insertTime,
+               artifact.getArtId(),
+               branch.getId(),
                transactionNumber});
          }
       }
@@ -168,7 +165,6 @@ public final class ChangeManager {
     * For the given list of artifacts determine which branches (in the branch hierarchy for that artifact) affected that
     * artifact.
     * 
-    * @param artifacts
     * @return a map of artifact to collection of branches which affected the given artifact
     * @throws OseeCoreException
     */
@@ -184,7 +180,11 @@ public final class ChangeManager {
          // hierarchy
          for (Branch workingBranch : BranchManager.getBranches(BranchArchivedState.UNARCHIVED, BranchType.WORKING)) {
             if (artifact.getBranch().equals(workingBranch.getParentBranch())) {
-               insertParameters.add(new Object[] {queryId, insertTime, artifact.getArtId(), workingBranch.getId(),
+               insertParameters.add(new Object[] {
+                  queryId,
+                  insertTime,
+                  artifact.getArtId(),
+                  workingBranch.getId(),
                   SQL3DataType.INTEGER});
             }
          }
