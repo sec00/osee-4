@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ATS Reports Test Fragment
+Bundle-SymbolicName: org.eclipse.osee.ats.reports.test;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: org.eclipse.osee.ats.reports
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Eclipse Open System Engineering Environment
+Import-Package: org.eclipse.osee.ats.api.data,
+ org.eclipse.osee.framework.core.data,
+ org.eclipse.osee.framework.core.enums,
+ org.eclipse.osee.framework.core.model.type,
+ org.eclipse.osee.framework.skynet.core.artifact,
+ org.eclipse.osee.framework.skynet.core.artifact.search,
+ org.eclipse.osee.framework.ui.skynet.blam,
+ org.eclipse.osee.framework.ui.skynet.widgets.util,
+ org.eclipse.ui.forms.widgets,
+ org.junit;version="4.10.0"
