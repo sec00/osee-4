@@ -1,0 +1,148 @@
+
+userDefinition "Joe Smith" GetOrCreate {
+	userId "Joe Smith"
+}
+
+userDefinition "Kay Jones" GetOrCreate {
+	userId "Kay Jones"
+}
+
+teamDefinition "Teams" GetOrCreate {
+	guid "AAABER+35b4A8O7WHrXTiA"
+	children {
+		teamDefinition "AtsBranchConfig" GetOrCreate {
+			guid "AGZs2EW4tWRkIv3OqfAA"
+		   children {
+		
+		      teamDefinition "AtsBranchConfig Software" {
+		      	guid "AGZs2EW0tWRkIv3OqfAA"
+		         lead named "Smith, Joe"
+		         member named "Smith, Joe"
+		         workDefinition "WorkDef_Team_AtsBranchConfigExample"
+		      }
+		      teamDefinition "AtsBranchConfig Requirements" {
+		      	guid "AGZs2EU1d3db9M57WJQA"
+		         lead named "Smith, Joe"
+		         member named "Smith, Joe"
+		         workDefinition "WorkDef_Team_AtsBranchConfigExample"
+		      }
+		   }
+		}
+   }
+}
+
+
+actionableItem "Actionable Items" GetOrCreate {
+	guid "AAABER+37QEA8O7WSQaqJQ"
+	actionable False
+	children {
+      actionableItem "AtsBranchConfig" GetOrCreate {
+   	guid "ATujHGY1XBYDqS69o7gA"
+      children {
+         actionableItem "AtsBranchConfig Software" {
+         	guid "ATujHGZtIyQY9FsY3LQA"
+         	team "AtsBranchConfig Software"
+         }
+         actionableItem "AtsBranchConfig Test" {
+         	guid "ATujHGafr1VA3ARazkQA"
+         	team "AtsBranchConfig Software"
+         }
+         actionableItem "AtsBranchConfig Requirements" {
+         	guid "ATujHGbSOyXT3RIHWSQA"
+         	team "AtsBranchConfig Requirements"
+            }
+         }
+      }
+   }
+}
+
+workDefinition "WorkDef_AtsBranchConfig" {
+	id "WorkDef_AtsBranchConfig"
+   startState "Analyze" 
+
+   widgetDefinition "Need By" {
+      attributeName "ats.Need By"
+      xWidgetName "XDateDam"
+      option HORIZONTAL_LABEL
+   }
+
+   widgetDefinition "Estimated Hours" {
+      attributeName "ats.Estimated Hours"
+      xWidgetName "XFloatDam"
+      option REQUIRED_FOR_TRANSITION
+   }
+
+   widgetDefinition "Title" {
+      attributeName "Name"
+      xWidgetName "XTextDam"
+      option REQUIRED_FOR_TRANSITION
+   }
+
+   widgetDefinition "Description" {
+      attributeName "ats.Description"
+      xWidgetName "XTextDam"
+      option FILL_VERTICALLY
+      option REQUIRED_FOR_TRANSITION
+   }
+
+   widgetDefinition "Resolution" {
+      attributeName "ats.Resolution"
+      xWidgetName "XTextDam"
+      option FILL_VERTICALLY
+   }
+
+   widgetDefinition "Proposed Resolution" {
+      attributeName "ats.Proposed Resolution"
+      xWidgetName "XTextDam"
+      option FILL_VERTICALLY
+   }
+
+   state "Analyze" {
+      type Working
+      ordinal 1
+      to "Cancelled"
+      to "Implement" AsDefault
+      rule RequireStateHourSpentPrompt
+      layout {
+         widget "Title"
+         widget "Description"
+         widget "Proposed Resolution"
+         composite {
+            numColumns 6
+            attributeWidget "ats.Change Type"
+            attributeWidget "ats.Priority"
+            attributeWidget "ats.Need By"
+         }
+          attributeWidget "ats.Estimated Hours"
+      }
+   }
+
+   state "Implement" { 
+      type Working
+      ordinal 2
+      to "Cancelled"
+      to "Completed" AsDefault
+      to "Analyze" OverrideAttributeValidation
+      rule RequireStateHourSpentPrompt
+      layout {
+         attributeWidget "ats.Work Package"
+         attributeWidget "ats.Estimated Completion Date"
+         widget "Resolution"
+      }
+   }
+
+   state "Completed" {
+      type Completed
+      ordinal 3
+      to "Implement" OverrideAttributeValidation
+      rule AddDecisionValidateBlockingReview
+   }
+
+   state "Cancelled" {
+      type Cancelled
+      ordinal 4
+      to "Analyze" OverrideAttributeValidation
+      to "Implement" OverrideAttributeValidation
+   }
+}
+

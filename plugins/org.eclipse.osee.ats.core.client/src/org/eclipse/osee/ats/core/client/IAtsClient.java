@@ -34,6 +34,8 @@ import org.eclipse.osee.ats.core.config.IActionableItemFactory;
 import org.eclipse.osee.ats.core.config.IAtsConfigProvider;
 import org.eclipse.osee.ats.core.config.ITeamDefinitionFactory;
 import org.eclipse.osee.ats.core.config.IVersionFactory;
+import org.eclipse.osee.framework.core.data.IArtifactToken;
+import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.OseeStateException;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -54,6 +56,9 @@ public interface IAtsClient extends IAttributeResolverProvider, IAtsReviewServic
     */
    @Override
    Artifact getArtifact(IAtsObject atsObject) throws OseeCoreException;
+
+   @Override
+   Artifact getArtifact(IArtifactToken artifactToken, IOseeBranch branch);
 
    AbstractWorkflowArtifact getWorkflowArtifact(IAtsObject atsObject) throws OseeCoreException;
 
@@ -91,4 +96,5 @@ public interface IAtsClient extends IAttributeResolverProvider, IAtsReviewServic
 
    @Override
    IAtsReviewService getReviewService() throws OseeCoreException;
+
 }

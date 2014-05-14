@@ -30,6 +30,7 @@ import org.eclipse.osee.ats.api.data.AtsArtifactTypes;
 import org.eclipse.osee.ats.api.team.IAtsTeamDefinition;
 import org.eclipse.osee.ats.api.user.IAtsUser;
 import org.eclipse.osee.ats.config.AtsConfig2ExampleNavigateItem;
+import org.eclipse.osee.ats.config.AtsNewBranchConfigNavigateItem;
 import org.eclipse.osee.ats.config.ValidateAtsConfiguration;
 import org.eclipse.osee.ats.config.editor.AtsConfigResultsEditorNavigateItem;
 import org.eclipse.osee.ats.core.client.util.AtsUtilClient;
@@ -218,6 +219,7 @@ public final class AtsNavigateViewItems implements XNavigateViewItems, IXNavigat
          new CreateActionUsingAllActionableItems(adminItems);
 
          new AtsConfig2ExampleNavigateItem(adminItems);
+         new AtsNewBranchConfigNavigateItem(adminItems);
          new DoesNotWorkItemAts(adminItems);
          new XNavigateItemAction(adminItems, new OpenChangeReportByTransactionIdAction(), FrameworkImage.BRANCH_CHANGE);
          new XNavigateItemAction(adminItems, new PurgeTransactionAction(), FrameworkImage.PURGE);

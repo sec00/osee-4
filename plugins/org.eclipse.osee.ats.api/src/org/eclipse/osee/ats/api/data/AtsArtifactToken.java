@@ -41,6 +41,8 @@ public final class AtsArtifactToken {
       CoreArtifactTypes.UserGroup);
    public static IArtifactToken AtsTempAdmin = TokenFactory.createArtifactToken("AAABHaItoVsAG7ZAAMyhQw",
       "AtsTempAdmin", CoreArtifactTypes.UserGroup);
+   public static IArtifactToken AtsBranchConfig = TokenFactory.createArtifactToken("AFX1AeBHWiDWPTDaqRwA",
+      "AtsBranchConfig", AtsArtifactTypes.WorkDefinition);
 
    private AtsArtifactToken() {
       // Constants

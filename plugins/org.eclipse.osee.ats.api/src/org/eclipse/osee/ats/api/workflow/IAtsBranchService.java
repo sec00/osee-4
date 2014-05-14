@@ -36,4 +36,6 @@ public interface IAtsBranchService {
    boolean isBranchValid(ICommitConfigItem configArt);
 
    IOseeBranch getBranchInherited(IAtsVersion version);
+
+   IOseeBranch getBranch(Long uuidL);
 }

@@ -128,7 +128,7 @@ public final class AtsWorkDefinitionSheetProviders {
       trans.addArtifact(stateNameArt);
    }
 
-   private static Artifact createStateNameArtifact(Set<String> stateNames, Artifact folder, IAtsChangeSet changes) throws OseeCoreException {
+   public static Artifact createStateNameArtifact(Set<String> stateNames, Artifact folder, IAtsChangeSet changes) throws OseeCoreException {
       Artifact stateNameArt =
          ArtifactTypeManager.addArtifact(org.eclipse.osee.ats.api.data.AtsArtifactToken.WorkDef_State_Names,
             AtsUtilCore.getAtsBranch());

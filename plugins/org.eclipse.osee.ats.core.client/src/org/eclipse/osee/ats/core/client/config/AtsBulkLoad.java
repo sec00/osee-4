@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.ats.api.data.AtsRelationTypes;
+import org.eclipse.osee.ats.core.AtsCore;
 import org.eclipse.osee.ats.core.client.action.ActionArtifact;
 import org.eclipse.osee.ats.core.client.internal.Activator;
 import org.eclipse.osee.ats.core.client.internal.AtsClientService;
@@ -38,8 +39,19 @@ import org.eclipse.osee.framework.ui.skynet.util.DbConnectionUtility;
 public class AtsBulkLoad {
 
    private static AtomicBoolean atsTypeDataLoadedStarted = new AtomicBoolean(false);
+   private static String userContextUuid;
 
    public static List<IOperation> getConfigLoadingOperations() {
+      userContextUuid =
+         AtsCore.getContextService().getUserContextUuid(
+            AtsClientService.get().getUserAdmin().getCurrentUser().getUserId());
+      Long uuid = null;
+      try {
+         uuid = Long.valueOf(userContextUuid);
+         //         AtsUtilCore.setBranch(uuid);
+      } catch (Exception ex) {
+         // do nothing
+      }
       List<IOperation> ops = new ArrayList<IOperation>();
       if (atsTypeDataLoadedStarted.compareAndSet(false, true) && DbConnectionUtility.isVersionSupported()) {
          IOperation op = new AbstractOperation("Re-load ATS Config", Activator.PLUGIN_ID) {

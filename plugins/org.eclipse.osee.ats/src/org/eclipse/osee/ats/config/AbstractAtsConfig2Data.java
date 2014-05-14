@@ -12,6 +12,7 @@ package org.eclipse.osee.ats.config;
 
 import java.util.Collection;
 import org.eclipse.osee.ats.api.util.IAtsChangeSet;
+import org.eclipse.osee.ats.core.client.util.AtsChangeSet;
 import org.eclipse.osee.ats.core.workdef.WorkDefinitionSheet;
 import org.eclipse.osee.framework.core.util.XResultData;
 
@@ -48,5 +49,9 @@ public abstract class AbstractAtsConfig2Data {
    }
 
    public abstract void performPostConfig(IAtsChangeSet changes, AbstractAtsConfig2Data data);
+
+   public void performPreConfig(AtsChangeSet changes, AbstractAtsConfig2Data data) {
+      // for extension
+   }
 
 }

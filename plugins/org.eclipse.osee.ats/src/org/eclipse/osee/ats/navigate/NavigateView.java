@@ -22,8 +22,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osee.ats.actions.MyFavoritesAction;
 import org.eclipse.osee.ats.actions.MyWorldAction;
@@ -32,8 +34,12 @@ import org.eclipse.osee.ats.actions.NewGoal;
 import org.eclipse.osee.ats.actions.OpenChangeReportByIdAction;
 import org.eclipse.osee.ats.actions.OpenWorkflowByIdAction;
 import org.eclipse.osee.ats.actions.OpenWorldByIdAction;
+import org.eclipse.osee.ats.context.AtsContextLoadListener;
+import org.eclipse.osee.ats.context.AtsContextUi;
+import org.eclipse.osee.ats.core.AtsCore;
 import org.eclipse.osee.ats.core.client.config.AtsBulkLoad;
 import org.eclipse.osee.ats.core.client.util.AtsUtilClient;
+import org.eclipse.osee.ats.core.util.AtsUtilCore;
 import org.eclipse.osee.ats.help.ui.AtsHelpContext;
 import org.eclipse.osee.ats.internal.Activator;
 import org.eclipse.osee.ats.internal.AtsClientService;
@@ -41,7 +47,9 @@ import org.eclipse.osee.ats.search.AtsQuickSearchComposite;
 import org.eclipse.osee.framework.core.client.ClientSessionManager;
 import org.eclipse.osee.framework.core.operation.OperationBuilder;
 import org.eclipse.osee.framework.core.operation.Operations;
+import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.framework.logging.OseeLog;
+import org.eclipse.osee.framework.skynet.core.artifact.BranchManager;
 import org.eclipse.osee.framework.ui.plugin.util.HelpUtil;
 import org.eclipse.osee.framework.ui.plugin.xnavigate.IXNavigateEventListener;
 import org.eclipse.osee.framework.ui.plugin.xnavigate.XNavigateEventManager;
@@ -84,6 +92,7 @@ public class NavigateView extends ViewPart implements IXNavigateEventListener {
    private String savedFilterStr;
    private AtsNavigateComposite xNavComp;
    private Composite parent;
+   private Label contextLabel;
    private LoadingComposite loadingComposite;
 
    @Override
@@ -193,10 +202,44 @@ public class NavigateView extends ViewPart implements IXNavigateEventListener {
                }
                userLabel.setText(str);
                userLabel.setToolTipText(str);
+
+               boolean changed = updateContextName();
+               if (changed) {
+                  parent.getParent().layout(true);
+                  parent.layout(true);
+               }
             }
          };
          Operations.scheduleJob(job, false, Job.SHORT, null);
       }
+   }
+
+   /**
+    * @return true if label updated or deleted
+    */
+   private boolean updateContextName() {
+      String contextName = null;
+      if (!AtsUtilCore.isArtifactConfig()) {
+         contextName = BranchManager.getBranch(AtsUtilCore.getAtsBranch()).getName();
+      }
+      //         AtsCore.getContextService().getContextName(
+      //            AtsCore.getContextService().getUserContextUuid(
+      //               AtsClientService.get().getUserAdmin().getCurrentUser().getUserId()));
+      boolean labelAddOrDeleted = false;
+      if (Strings.isValid(contextName)) {
+         if (contextLabel == null) {
+            contextLabel = new Label(xNavComp, SWT.None);
+            contextLabel.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false));
+            labelAddOrDeleted = true;
+         }
+         contextLabel.setText(contextName);
+      } else {
+         if (contextLabel != null) {
+            contextLabel.dispose();
+            labelAddOrDeleted = true;
+         }
+      }
+      return labelAddOrDeleted;
    }
 
    @Override
@@ -252,14 +295,28 @@ public class NavigateView extends ViewPart implements IXNavigateEventListener {
       toolbarManager.add(new OpenWorldByIdAction());
       toolbarManager.add(new OpenWorkflowByIdAction());
       toolbarManager.add(new NewAction());
-      getViewSite().getActionBars().updateActionBars();
+      toolbarManager.update(true);
 
       IActionBars bars = getViewSite().getActionBars();
       IMenuManager mm = bars.getMenuManager();
+      mm.removeAll();
       mm.add(new NewAction());
       mm.add(new NewGoal());
 
-      toolbarManager.update(true);
+      MenuManager subMenu = new MenuManager("ATS Context", null);
+      subMenu.setRemoveAllWhenShown(true);
+      subMenu.addMenuListener(new IMenuListener() {
+
+         @Override
+         public void menuAboutToShow(IMenuManager manager) {
+            manager.removeAll();
+            AtsContextUi contextUi = new AtsContextUi(AtsCore.getContextService(), new AtsContextLoadListener());
+            contextUi.createContextAction(manager);
+         }
+      });
+      mm.add(subMenu);
+
+      getViewSite().getActionBars().updateActionBars();
    }
 
    public static NavigateView getNavigateView() {

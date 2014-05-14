@@ -15,6 +15,7 @@ import org.eclipse.osee.ats.api.IAtsWorkItem;
 import org.eclipse.osee.ats.api.workflow.IAttribute;
 import org.eclipse.osee.ats.core.util.ArtifactIdWrapper;
 import org.eclipse.osee.ats.core.util.AttributeIdWrapper;
+import org.eclipse.osee.framework.core.data.IArtifactToken;
 import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.eclipse.osee.framework.core.enums.CoreBranches;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
@@ -59,6 +60,10 @@ public class AtsUtilServer {
 
    public static ArtifactReadable getArtifactByGuid(OrcsApi orcsApi, String guid) throws OseeCoreException {
       return orcsApi.getQueryFactory(null).fromBranch(AtsUtilServer.getAtsBranch()).andGuid(guid).getResults().getExactlyOne();
+   }
+
+   public static ArtifactReadable getArtifact(OrcsApi orcsApi, IOseeBranch branch, IArtifactToken artifactToken) {
+      return orcsApi.getQueryFactory(null).fromBranch(branch).andGuid(artifactToken.getGuid()).getResults().getExactlyOne();
    }
 
 }

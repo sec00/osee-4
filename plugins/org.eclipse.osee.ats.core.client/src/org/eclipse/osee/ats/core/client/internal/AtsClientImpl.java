@@ -69,13 +69,16 @@ import org.eclipse.osee.ats.core.config.IVersionFactory;
 import org.eclipse.osee.ats.core.util.CacheProvider;
 import org.eclipse.osee.ats.core.workdef.AtsWorkDefinitionAdminImpl;
 import org.eclipse.osee.ats.core.workdef.AtsWorkDefinitionCache;
+import org.eclipse.osee.framework.core.data.IArtifactToken;
 import org.eclipse.osee.framework.core.data.IArtifactType;
+import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.eclipse.osee.framework.core.exception.ArtifactDoesNotExist;
 import org.eclipse.osee.framework.core.util.XResultData;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.OseeStateException;
 import org.eclipse.osee.framework.jdk.core.util.Conditions;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 
 /**
  * @author Donald G. Dunne
@@ -427,5 +430,10 @@ public class AtsClientImpl implements IAtsClient {
    @Override
    public IAttributeResolver getAttributeResolver() {
       return attributeResolverService;
+   }
+
+   @Override
+   public Artifact getArtifact(IArtifactToken artifactToken, IOseeBranch branch) {
+      return ArtifactQuery.getArtifactFromToken(artifactToken, branch);
    }
 }

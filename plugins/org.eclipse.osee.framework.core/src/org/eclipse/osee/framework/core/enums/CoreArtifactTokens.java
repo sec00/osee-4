@@ -20,6 +20,7 @@ public final class CoreArtifactTokens {
    public static IArtifactToken GroupRoot = TokenFactory.createArtifactToken("AExdLMeOTGhhPY4CyvQA", "Root Artifact", CoreArtifactTypes.UniversalGroup);
    public static IArtifactToken Everyone = TokenFactory.createArtifactToken("AAABEbn4DKoAaR82FZsL3A", "Everyone", CoreArtifactTypes.UserGroup);
    public static IArtifactToken OseeAdmin = TokenFactory.createArtifactToken("AAABHaItmnUAG6ZAYlFKag", "OseeAdmin", CoreArtifactTypes.UserGroup);
+   public static final IArtifactToken GlobalPreferences =  TokenFactory.createArtifactToken("AAABE8T1j3AA8O7WNsu89A", "Global Preferences", CoreArtifactTypes.GlobalPreferences);;
    // @formatter:on
 
    private CoreArtifactTokens() {

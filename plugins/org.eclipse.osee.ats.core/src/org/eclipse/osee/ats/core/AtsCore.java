@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.ats.core;
 
+import org.eclipse.osee.ats.api.context.IAtsContextService;
 import org.eclipse.osee.ats.api.notify.IAtsNotificationService;
 import org.eclipse.osee.ats.api.notify.IAtsNotificationServiceProvider;
 import org.eclipse.osee.ats.api.review.IAtsReviewService;
@@ -27,6 +28,7 @@ import org.eclipse.osee.ats.api.workflow.state.IAtsWorkStateFactory;
 import org.eclipse.osee.ats.core.column.IAtsColumnUtilities;
 import org.eclipse.osee.ats.core.config.IAtsConfig;
 import org.eclipse.osee.ats.core.config.IAtsConfigProvider;
+import org.eclipse.osee.ats.core.context.AtsContextService;
 import org.eclipse.osee.ats.core.internal.AtsEarnedValueService;
 import org.eclipse.osee.ats.core.internal.column.ev.AtsColumnUtilities;
 import org.eclipse.osee.ats.core.internal.log.AtsLogFactory;
@@ -55,6 +57,7 @@ public class AtsCore {
    private static IAtsReviewServiceProvider reviewServiceProvider;
    private static AtsWorkStateFactory workStateFactory;
    private static IAtsConfigProvider atsConfigProvider;
+   private static IAtsContextService atsContextService;
 
    public void setAtsConfigProvider(IAtsConfigProvider atsConfigProvider) {
       AtsCore.atsConfigProvider = atsConfigProvider;
@@ -129,6 +132,14 @@ public class AtsCore {
    public static IAtsUserService getUserService() throws OseeStateException {
       checkStarted();
       return userService;
+   }
+
+   public static IAtsContextService getContextService() throws OseeStateException {
+      checkStarted();
+      if (atsContextService == null) {
+         atsContextService = new AtsContextService(getAttrResolver());
+      }
+      return atsContextService;
    }
 
    public static IAtsColumnUtilities getColumnUtilities() {

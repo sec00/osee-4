@@ -66,6 +66,10 @@ public class AtsDatabaseConfig implements IDbInitializationTask {
 
    public static void createAtsFolders() throws OseeCoreException {
       IOseeBranch atsBranch = AtsUtilCore.getAtsBranch();
+      createAtsFolders(atsBranch);
+   }
+
+   public static void createAtsFolders(IOseeBranch atsBranch) throws OseeCoreException {
       SkynetTransaction transaction = TransactionManager.createTransaction(atsBranch, "Create ATS Folders");
 
       Artifact headingArt = OseeSystemArtifacts.getOrCreateArtifact(AtsArtifactToken.HeadingFolder, atsBranch);

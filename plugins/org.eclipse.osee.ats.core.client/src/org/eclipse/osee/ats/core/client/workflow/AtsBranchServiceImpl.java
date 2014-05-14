@@ -89,4 +89,9 @@ public class AtsBranchServiceImpl extends AbstractAtsBranchService {
       return branch;
    }
 
+   @Override
+   public IOseeBranch getBranch(Long uuidL) {
+      return BranchManager.getBranch(uuidL);
+   }
+
 }

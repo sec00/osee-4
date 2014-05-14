@@ -11,8 +11,12 @@
 package org.eclipse.osee.ats.core.client.internal.user;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.eclipse.osee.ats.api.user.IAtsUser;
 import org.eclipse.osee.ats.core.client.IAtsUserAdmin;
 import org.eclipse.osee.ats.core.users.AtsCoreUsers;
@@ -29,10 +33,14 @@ import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
  */
 public class AtsUserAdminImpl implements IAtsUserAdmin {
 
+   private final Map<String, IAtsUser> userIdCache = new HashMap<String, IAtsUser>();
+
    @Override
    public Collection<IAtsUser> getUsers() throws OseeCoreException {
-      List<User> users = UserManager.getUsers();
-      return getAtsUsers(users);
+      List<User> userArts = UserManager.getUsers();
+      Set<IAtsUser> users = new HashSet<IAtsUser>();
+      users.addAll(getAtsUsers(userArts));
+      return users;
    }
 
    @Override
@@ -43,6 +51,12 @@ public class AtsUserAdminImpl implements IAtsUserAdmin {
          if (atsUser == null) {
             User user = UserManager.getUserByUserId(userId);
             atsUser = new AtsUser(user);
+         }
+         for (IAtsUser aUser : userIdCache.values()) {
+            if (aUser.getUserId().equals(UserManager.getUser().getUserId())) {
+               atsUser = aUser;
+               break;
+            }
          }
       }
       return atsUser;
@@ -62,17 +76,39 @@ public class AtsUserAdminImpl implements IAtsUserAdmin {
 
    @Override
    public IAtsUser getCurrentUser() throws OseeCoreException {
-      return getUserById(getCurrentOseeUser().getUserId());
+      IAtsUser user = getUserById(getCurrentOseeUser().getUserId());
+      if (user == null) {
+         for (IAtsUser aUser : userIdCache.values()) {
+            if (aUser.getUserId().equals(UserManager.getUser().getUserId())) {
+               user = aUser;
+               break;
+            }
+         }
+      }
+      return user;
    }
 
    @Override
    public IAtsUser getUserByName(String name) throws OseeCoreException {
-      return getUserFromOseeUser(UserManager.getUserByName(name));
+      IAtsUser user = getUserFromOseeUser(UserManager.getUserByName(name));
+      if (user == null) {
+         for (IAtsUser aUser : userIdCache.values()) {
+            if (aUser.getName().equals(name)) {
+               user = aUser;
+               break;
+            }
+         }
+      }
+      return user;
    }
 
    @Override
    public IAtsUser getUserFromToken(IUserToken token) throws OseeCoreException {
-      return getUserById(token.getUserId());
+      IAtsUser user = getUserById(token.getUserId());
+      if (user == null) {
+         user = userIdCache.get(token.getUserId());
+      }
+      return user;
    }
 
    @Override
@@ -134,12 +170,25 @@ public class AtsUserAdminImpl implements IAtsUserAdmin {
             results.add(userByUserId);
          }
       }
+      results.addAll(userIdCache.values());
       return results;
    }
 
    @Override
    public User getOseeUserById(String userId) throws OseeCoreException {
       return UserManager.getUserByUserId(userId);
+   }
+
+   @Override
+   public IAtsUser createUser(String userId, String name, String email, boolean active, boolean admin) {
+      return new AtsUserByValues(userId, name, email, active, admin);
+   }
+
+   @Override
+   public void cache(IAtsUser user) {
+      if (user.getStoreObject() == null) {
+         userIdCache.put(user.getUserId(), user);
+      }
    }
 
 }

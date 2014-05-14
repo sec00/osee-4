@@ -13,7 +13,9 @@ package org.eclipse.osee.ats.core.util;
 import org.eclipse.osee.ats.api.IAtsWorkItem;
 import org.eclipse.osee.ats.api.workflow.IAttribute;
 import org.eclipse.osee.framework.core.data.IOseeBranch;
+import org.eclipse.osee.framework.core.data.TokenFactory;
 import org.eclipse.osee.framework.core.enums.CoreBranches;
+import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.orcs.data.ArtifactId;
 import org.eclipse.osee.orcs.data.AttributeId;
 
@@ -23,9 +25,28 @@ import org.eclipse.osee.orcs.data.AttributeId;
 public class AtsUtilCore {
 
    public final static double DEFAULT_HOURS_PER_WORK_DAY = 8;
+   private static IOseeBranch branch = null;
 
    public static IOseeBranch getAtsBranch() {
-      return CoreBranches.COMMON;
+      if (branch == null) {
+         String branchGuid = System.getProperty("AtsBranch");
+         if (Strings.isValid(branchGuid)) {
+            branch = TokenFactory.createBranch(branchGuid, "ATSBranch - fromConfig");
+         }
+         if (branch == null) {
+            branch = CoreBranches.COMMON;
+         }
+      }
+      System.err.println("ATS Branch " + branch);
+      return branch;
+   }
+
+   public static void setBranch(String guid) {
+      setBranch(TokenFactory.createBranch(guid, "Set Branch"));
+   }
+
+   public static void setBranch(IOseeBranch branch) {
+      AtsUtilCore.branch = branch;
    }
 
    public static boolean isInTest() {
@@ -55,4 +76,17 @@ public class AtsUtilCore {
    public static AttributeId toAttributeId(IAttribute<?> attr) {
       return new AttributeIdWrapper(attr);
    }
+
+   /**
+    * @return true if ATS Config is stored as separeate artifacts. false if it comes from ATS xtext.
+    */
+   public static boolean isArtifactConfig() {
+      boolean artifactConfig = true;
+      String atsBranchGuid = System.getProperty("AtsBranch");
+      if (!CoreBranches.COMMON.getGuid().equals(atsBranchGuid)) {
+         artifactConfig = false;
+      }
+      return artifactConfig;
+   }
+
 }

@@ -22,7 +22,9 @@ import org.eclipse.osee.ats.api.workflow.IAttribute;
 import org.eclipse.osee.ats.core.client.internal.Activator;
 import org.eclipse.osee.ats.core.client.internal.AtsClientService;
 import org.eclipse.osee.ats.core.client.internal.workdef.AttributeWrapper;
+import org.eclipse.osee.framework.core.data.IArtifactToken;
 import org.eclipse.osee.framework.core.data.IAttributeType;
+import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.eclipse.osee.framework.core.model.type.AttributeType;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
@@ -207,4 +209,25 @@ public class AtsAttributeResolverServiceImpl implements IAttributeResolver {
          attributeById.delete();
       }
    }
+
+   @SuppressWarnings({"unchecked", "deprecation"})
+   @Override
+   public <T> Collection<IAttribute<T>> getAttributes(IOseeBranch branch, IArtifactToken artifact, IAttributeType attributeType) {
+      List<IAttribute<T>> attrs = new ArrayList<IAttribute<T>>();
+      for (Attribute<Object> attr : AtsClientService.get().getArtifact(artifact, branch).getAttributes(attributeType)) {
+         attrs.add(new AttributeWrapper<T>((Attribute<T>) attr));
+      }
+      return attrs;
+   }
+
+   @Override
+   public void addAttribute(IOseeBranch branch, IArtifactToken artifact, IAttributeType attributeType, String value) {
+      AtsClientService.get().getArtifact(artifact, branch).addAttribute(attributeType, value);
+   }
+
+   @Override
+   public List<String> getAttributesToStringList(IOseeBranch branch, IArtifactToken artifactToken, IAttributeType attributeType) {
+      return AtsClientService.get().getArtifact(artifactToken, branch).getAttributesToStringList(attributeType);
+   }
+
 }

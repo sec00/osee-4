@@ -12,13 +12,16 @@ package org.eclipse.osee.ats.impl.internal.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.eclipse.osee.ats.api.IAtsObject;
 import org.eclipse.osee.ats.api.IAtsWorkItem;
 import org.eclipse.osee.ats.api.util.IAtsChangeSet;
 import org.eclipse.osee.ats.api.workdef.IAtsWidgetDefinition;
 import org.eclipse.osee.ats.api.workdef.IAttributeResolver;
 import org.eclipse.osee.ats.api.workflow.IAttribute;
+import org.eclipse.osee.framework.core.data.IArtifactToken;
 import org.eclipse.osee.framework.core.data.IAttributeType;
+import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.OseeStateException;
 import org.eclipse.osee.framework.jdk.core.util.Conditions;
@@ -46,6 +49,10 @@ public class AtsAttributeResolverServiceImpl implements IAttributeResolver {
 
    private ArtifactReadable getArtifact(IAtsObject atsObject) {
       return AtsUtilServer.getArtifact(orcsApi, atsObject);
+   }
+
+   public ArtifactReadable getArtifact(IOseeBranch branch, IArtifactToken artifactToken) {
+      return AtsUtilServer.getArtifact(orcsApi, branch, artifactToken);
    }
 
    public void start() throws OseeCoreException {
@@ -197,6 +204,28 @@ public class AtsAttributeResolverServiceImpl implements IAttributeResolver {
       // Sets on Server need to be through transaction
       throw new OseeStateException(
          "Invalid: Must use deleteSoleAttribute(IAtsWorkItem workItem, IAttributeType attributeType, IAtsChangeSet changes)");
+   }
+
+   @SuppressWarnings("unchecked")
+   @Override
+   public <T> Collection<IAttribute<T>> getAttributes(IOseeBranch branch, IArtifactToken artifact, IAttributeType attributeType) {
+      Collection<IAttribute<T>> attrs = new ArrayList<IAttribute<T>>();
+      for (AttributeReadable<Object> attr : getArtifact(branch, artifact).getAttributes(attributeType)) {
+         attrs.add(new AttributeWrapper<T>((AttributeReadable<T>) attr));
+      }
+      return attrs;
+   }
+
+   @Override
+   public void addAttribute(IOseeBranch branch, IArtifactToken artifact, IAttributeType attributeType, String value) {
+      // Sets on Server need to be through transaction
+      throw new OseeStateException(
+         "Invalid: Must use addAttribute(IAtsWorkItem workItem, IAttributeType attributeType, IAtsChangeSet changes)");
+   }
+
+   @Override
+   public List<String> getAttributesToStringList(IOseeBranch branch, IArtifactToken artifact, IAttributeType attributeType) {
+      return getArtifact(branch, artifact).getAttributeValues(attributeType);
    }
 
 }

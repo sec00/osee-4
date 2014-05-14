@@ -11,10 +11,13 @@
 package org.eclipse.osee.ats.api.workdef;
 
 import java.util.Collection;
+import java.util.List;
 import org.eclipse.osee.ats.api.IAtsWorkItem;
 import org.eclipse.osee.ats.api.util.IAtsChangeSet;
 import org.eclipse.osee.ats.api.workflow.IAttribute;
+import org.eclipse.osee.framework.core.data.IArtifactToken;
 import org.eclipse.osee.framework.core.data.IAttributeType;
+import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 
 /**
@@ -67,5 +70,11 @@ public interface IAttributeResolver {
    <T> void deleteAttribute(IAtsWorkItem workItem, IAttribute<T> attr, IAtsChangeSet changes) throws OseeCoreException;
 
    IAttributeType getAttributeType(String atrributeName);
+
+   <T> Collection<IAttribute<T>> getAttributes(IOseeBranch branch, IArtifactToken artifact, IAttributeType attributeType);
+
+   void addAttribute(IOseeBranch branch, IArtifactToken artifact, IAttributeType attributeType, String value);
+
+   List<String> getAttributesToStringList(IOseeBranch branch, IArtifactToken artifact, IAttributeType staticid);
 
 }

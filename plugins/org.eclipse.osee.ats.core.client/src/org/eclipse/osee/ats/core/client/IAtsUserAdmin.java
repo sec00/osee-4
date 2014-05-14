@@ -45,4 +45,8 @@ public interface IAtsUserAdmin {
 
    Collection<IAtsUser> getAtsUsers(Collection<User> users) throws OseeCoreException;
 
+   IAtsUser createUser(String userId, String name, String email, boolean active, boolean admin);
+
+   void cache(IAtsUser user);
+
 }
