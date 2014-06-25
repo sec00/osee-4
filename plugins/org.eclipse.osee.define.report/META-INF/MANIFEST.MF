@@ -20,6 +20,7 @@ Import-Package: com.google.common.base;version="[11.0.0,15.0.0)",
  org.eclipse.osee.orcs,
  org.eclipse.osee.orcs.data,
  org.eclipse.osee.orcs.search,
+ org.eclipse.osee.orcs.transaction,
  org.eclipse.osee.template.engine
 Bundle-Vendor: Eclipse Open System Engineering Environment
 Export-Package: org.eclipse.osee.define.report
