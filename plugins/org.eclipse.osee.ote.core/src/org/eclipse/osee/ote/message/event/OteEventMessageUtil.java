@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.eclipse.osee.ote.core.ServiceUtility;
+import org.eclipse.osee.ote.endpoint.OteUdpEndpointSender;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
@@ -60,6 +61,14 @@ public class OteEventMessageUtil {
       data.put(BYTE_KEY, message.getData());
       Event newevent = new Event(message.getHeader().TOPIC.getValue(), data);
       eventAdmin.postEvent(newevent);
+   }
+   
+   public static void sendEvent(OteEventMessage message, OteUdpEndpointSender sender) throws InterruptedException {
+      sender.send(message);
+   }
+   
+   public static void postEvent(OteEventMessage message, OteUdpEndpointSender sender) throws InterruptedException {
+      sender.send(message);
    }
 
    public static UUID getUUID(OteEventMessage msg) {

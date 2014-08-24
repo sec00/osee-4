@@ -1,4 +1,4 @@
-package org.eclipse.osee.ote.remote.messages;
+package org.eclipse.osee.ote.message.event;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

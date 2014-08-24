@@ -54,11 +54,17 @@ public class SerializedClassMessage<T> extends OteEventMessage {
 		getDefaultMessageData().setNewBackingBuffer(newData);
 	}
 	
-	public T getObject() throws IOException, ClassNotFoundException{
+	@SuppressWarnings("unchecked")
+   public T getObject() throws IOException, ClassNotFoundException{
 		int offset = OBJECT.getByteOffset() + getHeaderSize();
 		ByteArrayInputStream bis = new ByteArrayInputStream(getData(), offset, getData().length - offset);
 		MyObjectInputStream ois = new MyObjectInputStream(bis);
-		return (T)ois.readObject();
+		try{
+		   Object obj = ois.readObject();
+		   return (T)obj;
+		} finally {
+		   ois.close();
+		}
 	}
 	
 }  

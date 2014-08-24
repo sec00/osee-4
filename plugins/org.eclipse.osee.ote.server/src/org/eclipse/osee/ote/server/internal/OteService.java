@@ -37,6 +37,7 @@ import org.eclipse.osee.ote.core.environment.TestEnvironmentConfig;
 import org.eclipse.osee.ote.core.environment.interfaces.IHostTestEnvironment;
 import org.eclipse.osee.ote.core.environment.interfaces.IRuntimeLibraryManager;
 import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironment;
+import org.eclipse.osee.ote.endpoint.OteUdpEndpoint;
 import org.eclipse.osee.ote.message.MessageSystemTestEnvironment;
 import org.eclipse.osee.ote.server.PropertyParamter;
 
@@ -52,7 +53,7 @@ public class OteService implements IHostTestEnvironment, IService {
    private OTESessionManager oteSessions;
    
    
-   public OteService(IRuntimeLibraryManager runtimeLibraryManager, EnvironmentCreationParameter environmentCreation, OTESessionManager oteSessions, PropertyParamter parameterObject, EnhancedProperties properties) {
+   public OteService(IRuntimeLibraryManager runtimeLibraryManager, EnvironmentCreationParameter environmentCreation, OTESessionManager oteSessions, PropertyParamter parameterObject, EnhancedProperties properties, OteUdpEndpoint receiver) {
       this.runtimeLibraryManager = runtimeLibraryManager;
       this.environmentCreation = environmentCreation;
       this.oteSessions = oteSessions;
@@ -79,6 +80,7 @@ public class OteService implements IHostTestEnvironment, IService {
          } else {
             enhancedProperties.setProperty("appServerURI", String.format("http://%s:%s", InetAddress.getLocalHost().getHostAddress(), Integer.parseInt(System.getProperty("org.osgi.service.http.port"))));
          }
+         enhancedProperties.setProperty("oteUdpEndpoint", String.format("tcp://%s:%d", receiver.getLocalEndpoint().getAddress().getHostAddress(), receiver.getLocalEndpoint().getPort()));
       } catch (Exception e) {
          OseeLog.log(OteService.class, Level.SEVERE, "Failed to set the appServerURI", e);
       }

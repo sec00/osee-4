@@ -1,7 +1,7 @@
 /*
  * PLACE_YOUR_DISTRIBUTION_STATEMENT_RIGHT_HERE
  */
-package org.eclipse.osee.ote.remote.messages;
+package org.eclipse.osee.ote.message.event;
 
 import org.eclipse.osee.ote.message.elements.IEnumValue;
 

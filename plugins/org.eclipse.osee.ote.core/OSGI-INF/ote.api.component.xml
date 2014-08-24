@@ -10,4 +10,5 @@
    <reference bind="bindTestEnvironmentInterface" cardinality="0..1" interface="org.eclipse.osee.ote.core.environment.TestEnvironmentInterface" name="TestEnvironmentInterface" policy="dynamic" unbind="unbindTestEnvironmentInterface"/>
    <reference bind="bindIModelManager" cardinality="0..1" interface="org.eclipse.osee.ote.core.model.IModelManager" name="IModelManager" policy="dynamic" unbind="unbindIModelManager"/>
    <reference bind="bindIRemoteMessageService" cardinality="0..1" interface="org.eclipse.osee.ote.message.interfaces.IRemoteMessageService" name="IRemoteMessageService" policy="dynamic" unbind="unbindIRemoteMessageService"/>
+   <reference bind="bindIHostTestEnvironment" cardinality="0..1" interface="org.eclipse.osee.ote.core.environment.interfaces.IHostTestEnvironment" name="IHostTestEnvironment" policy="dynamic" unbind="unbindIHostTestEnvironment"/>
 </scr:component>

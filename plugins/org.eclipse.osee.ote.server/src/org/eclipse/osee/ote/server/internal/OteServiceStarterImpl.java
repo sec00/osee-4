@@ -53,6 +53,7 @@ import org.eclipse.osee.ote.core.OteBaseMessages;
 import org.eclipse.osee.ote.core.environment.interfaces.IHostTestEnvironment;
 import org.eclipse.osee.ote.core.environment.interfaces.IRuntimeLibraryManager;
 import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironmentServiceConfig;
+import org.eclipse.osee.ote.endpoint.OteUdpEndpoint;
 import org.eclipse.osee.ote.master.rest.client.OTEMasterServer;
 import org.eclipse.osee.ote.master.rest.client.OTEMasterServerResult;
 import org.eclipse.osee.ote.master.rest.model.OTEServer;
@@ -87,6 +88,7 @@ public class OteServiceStarterImpl implements OteServiceStarter, ServiceInfoPopu
    private URI masterURI;
    private NodeInfo nodeInfo;
    private int brokerPort = 0;
+   private OteUdpEndpoint receiver;
    
    public OteServiceStarterImpl() {
       listenForHostRequest = new ListenForHostRequest();
@@ -151,6 +153,14 @@ public class OteServiceStarterImpl implements OteServiceStarter, ServiceInfoPopu
       this.packageAdmin = null;
    }
 	
+	public void bindOteUdpEndpoint(OteUdpEndpoint receiver){
+	   this.receiver = receiver;
+	}
+	
+	public void unbindOteUdpEndpoint(OteUdpEndpoint receiver){
+	   this.receiver = receiver;
+	}
+	
 	@Override
 	public IHostTestEnvironment start(IServiceConnector serviceSideConnector, ITestEnvironmentServiceConfig config, PropertyParamter propertyParameter, String environmentFactoryClass) throws Exception {
 		return start(serviceSideConnector, config, propertyParameter, null, environmentFactoryClass);
@@ -211,7 +221,7 @@ public class OteServiceStarterImpl implements OteServiceStarter, ServiceInfoPopu
 
 		service =
 				new OteService(runtimeLibraryManager, environmentCreationParameter, oteSessions, propertyParameter,
-						serviceSideConnector.getProperties());
+						serviceSideConnector.getProperties(), receiver);
 
 		serviceSideConnector.init(service);
 
@@ -255,11 +265,12 @@ public class OteServiceStarterImpl implements OteServiceStarter, ServiceInfoPopu
 	   server.setStartTime(new Date().toString());
 	   server.setOwner(System.getProperty("user.name"));
 	   server.setUUID(uuid);
-	   if(System.getProperty("org.osgi.service.http.port") == null){
-	      server.setOteRestServer(String.format("http://%s:%s", InetAddress.getLocalHost().getHostAddress(), 80));
-	   } else {
-	      server.setOteRestServer(String.format("http://%s:%s", InetAddress.getLocalHost().getHostAddress(), Integer.parseInt(System.getProperty("org.osgi.service.http.port"))));
-	   }
+	   server.setOteRestServer(String.format("tcp://%s:%d", receiver.getLocalEndpoint().getAddress().getHostAddress(), receiver.getLocalEndpoint().getPort()));
+//	   if(System.getProperty("org.osgi.service.http.port") == null){
+//	      server.setOteRestServer(String.format("http://%s:%s", InetAddress.getLocalHost().getHostAddress(), 80));
+//	   } else {
+//	      server.setOteRestServer(String.format("http://%s:%s", InetAddress.getLocalHost().getHostAddress(), Integer.parseInt(System.getProperty("org.osgi.service.http.port"))));
+//	   }
 	   server.setOteActivemqServer(nodeInfo.getUri().toString());
 	   return server;
 	}
@@ -281,7 +292,7 @@ public class OteServiceStarterImpl implements OteServiceStarter, ServiceInfoPopu
 
 	@Override
 	public void stop() {
-	   if(messageService != null && nodeInfo != null){
+	   if(messageService != null && nodeInfo != null && service != null){
 	      try {
             messageService.get(nodeInfo).send(OteBaseMessages.OteHostShutdown, service.getServiceID().toString());
          } catch (OseeCoreException e) {
@@ -323,8 +334,11 @@ public class OteServiceStarterImpl implements OteServiceStarter, ServiceInfoPopu
 		      try {
                removeServer.get(1000, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
+               e.printStackTrace();
             } catch (ExecutionException e) {
+               e.printStackTrace();
             } catch (TimeoutException e) {
+               e.printStackTrace();
             }
 		   }
 		}

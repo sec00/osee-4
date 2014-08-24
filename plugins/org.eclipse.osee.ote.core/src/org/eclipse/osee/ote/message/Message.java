@@ -80,6 +80,7 @@ public abstract class Message<S extends ITestEnvironmentMessageSystemAccessor, T
    private boolean regularUnscheduleCalled = false;
    private boolean isTurnedOff = false;
 
+   @SuppressWarnings("rawtypes")
    private IMessageRequestor messageRequestor = null;
    private static final double doubleTolerance = 0.000001;
    private final Set<DataType> memTypeActive = new HashSet<DataType>();
@@ -1140,6 +1141,7 @@ public abstract class Message<S extends ITestEnvironmentMessageSystemAccessor, T
    /**
     * @param defaultMessageData the defaultMessageData to set
     */
+   @SuppressWarnings("unchecked")
    protected void setDefaultMessageData(T defaultMessageData) {
       checkState();
       this.defaultMessageData = defaultMessageData;
@@ -1227,10 +1229,12 @@ public abstract class Message<S extends ITestEnvironmentMessageSystemAccessor, T
    public void switchElementAssociation(Collection<U> messages) {
    }
 
+   @SuppressWarnings("rawtypes")
    public Map<? extends DataType, Class<? extends Message>[]> getAssociatedMessages() {
       return new HashMap<DataType, Class<? extends Message>[]>();
    }
 
+   @SuppressWarnings({ "rawtypes", "unchecked" })
    public void postCreateMessageSetup(IMessageManager messageManager, MessageData data) throws Exception {
       Map<? extends DataType, Class<? extends Message>[]> o = getAssociatedMessages();
       messageRequestor = messageManager.createMessageRequestor(getName());
