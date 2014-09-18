@@ -37,15 +37,15 @@ public class RunTests implements ITestServerCommand, Serializable {
    private volatile boolean cancelAll = false;
    private volatile boolean isRunning = false;
    private final UUID sessionKey;
-   private final String guid;
+   private final String commandId;
    private TestEnvironment environment;
    private final Configuration configuration;
 
-   public RunTests(String guid, UUID uuid, Configuration configuration, IPropertyStore global, List<IPropertyStore> scripts) {
+   public RunTests(String commandId, UUID sessionKey, Configuration configuration, IPropertyStore global, List<IPropertyStore> scripts) {
       this.global = global;
       this.scripts = scripts;
-      this.sessionKey = uuid;
-      this.guid = guid;
+      this.sessionKey = sessionKey;
+      this.commandId = commandId;
       this.configuration = configuration;
    }
 
@@ -205,7 +205,7 @@ public class RunTests implements ITestServerCommand, Serializable {
 
    @Override
    public String getGUID() {
-      return guid;
+      return commandId;
    }
 
    @Override

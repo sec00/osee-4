@@ -28,17 +28,18 @@ public class EventToEndpoint  implements EventHandler {
    public void handleEvent(Event arg0) {
       OteEventMessage oteEventMessage = OteEventMessageUtil.getOteEventMessage(arg0);
       if(oteEventMessage != null && oteEventMessage.getHeader().TTL.getValue().intValue() == 0){
+         oteEventMessage.getHeader().ADDRESS.setAddress(endpoint.getLocalEndpoint().getAddress());
+         oteEventMessage.getHeader().ADDRESS.setPort(endpoint.getLocalEndpoint().getPort());
          CopyOnWriteNoIteratorList<OteUdpEndpointSender> broadcastSenders = endpoint.getBroadcastSenders();
          OteUdpEndpointSender[] oteUdpEndpointSenders = broadcastSenders.get();
          for(int i = 0; i < oteUdpEndpointSenders.length; i++){
             try{
-            oteUdpEndpointSenders[i].send(oteEventMessage);
+               oteUdpEndpointSenders[i].send(oteEventMessage);
             } catch (OTEException ex){
                OseeLog.log(getClass(), Level.SEVERE, ex);
             }
          }
       }
-      
    }
 
 }

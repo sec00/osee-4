@@ -2,9 +2,11 @@ package org.eclipse.osee.ote.master.rest.client.internal;
 
 import java.net.URI;
 import java.util.concurrent.Callable;
+
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
+
 import org.eclipse.osee.jaxrs.client.JaxRsClient;
 import org.eclipse.osee.ote.master.rest.client.OTEMasterServerResult;
 import org.eclipse.osee.ote.master.rest.model.OTEServer;
@@ -28,10 +30,12 @@ public class AddServer implements Callable<OTEMasterServerResult> {
 
       OTEMasterServerResult result = new OTEMasterServerResult();
       try {
+//         URI targetUri = new URI(String.format("%s/%s/%s", uri.toString(), OTEMasterServerImpl.CONTEXT_NAME, OTEMasterServerImpl.CONTEXT_SERVERS));
          webClientProvider.target(targetUri).request(MediaType.APPLICATION_XML).post(Entity.xml(server));
       } catch (Throwable th) {
          result.setSuccess(false);
          result.setThrowable(th);
+//         th.printStackTrace();
       }
       return result;
    }

@@ -28,6 +28,8 @@ public class OteEventMessageUtil {
 	
 	public final static String BYTE_KEY = "oteeventbytes";
 	
+	public final static String BYTE_KEY_2 = "bytes";
+	
 	private static EventAdmin eventAdmin;
 	
 	private static EventAdmin getEventAdmin(){
@@ -102,6 +104,11 @@ public class OteEventMessageUtil {
       Object obj = event.getProperty(BYTE_KEY);
       if (obj != null && obj instanceof byte[]) {
          return new OteEventMessage((byte[]) obj);
+      } else {
+         obj = event.getProperty(BYTE_KEY_2);
+         if(obj != null && obj instanceof byte[]){
+            return new OteEventMessage((byte[]) obj);
+         }
       }
       return null;
    }
@@ -111,6 +118,10 @@ public class OteEventMessageUtil {
       if (obj != null && obj instanceof byte[]) {
          return (byte[]) obj;
       } else {
+         obj = event.getProperty(BYTE_KEY_2);
+         if (obj != null && obj instanceof byte[]) {
+            return (byte[]) obj;
+         }
          return null;
       }
    }

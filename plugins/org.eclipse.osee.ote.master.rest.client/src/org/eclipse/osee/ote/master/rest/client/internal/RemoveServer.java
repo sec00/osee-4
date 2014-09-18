@@ -32,11 +32,8 @@ public class RemoveServer implements Callable<OTEMasterServerResult> {
       } catch (Throwable th) {
          result.setSuccess(false);
          result.setThrowable(th);
-         th.printStackTrace();
       }
       return result;
    }
-   
-  
 
 }

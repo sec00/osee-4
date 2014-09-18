@@ -20,7 +20,7 @@ public class ConnectorContribution implements IConnectorContributor {
 
    @Override
    public void init() throws Exception {
-      Activator.getDefault().startJini();
+//      Activator.getDefault().startJini();
    }
 
 }

@@ -46,7 +46,6 @@ import org.eclipse.osee.ote.core.GCHelper;
 import org.eclipse.osee.ote.core.OseeTestThread;
 import org.eclipse.osee.ote.core.OteProperties;
 import org.eclipse.osee.ote.core.TestScript;
-import org.eclipse.osee.ote.core.cmd.Command;
 import org.eclipse.osee.ote.core.environment.interfaces.IAssociatedObjectListener;
 import org.eclipse.osee.ote.core.environment.interfaces.ICancelTimer;
 import org.eclipse.osee.ote.core.environment.interfaces.IEnvironmentFactory;
@@ -148,10 +147,6 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
       return getServiceTracker(MessagingGateway.class.getName(), new OteEnvironmentTrackerCustomizer(context,
             oteServerSideEndpointRecieve, oteServerSideEndpointSender,
             OteServerSideEndpointSender.OTE_SERVER_SIDE_SEND_PROTOCOL));
-   }
-
-   public void sendCommand(Command command) {
-      Activator.getInstance().getCommandDistributer().distribute(command);
    }
 
    public void sendMessageToServer(Message message) {

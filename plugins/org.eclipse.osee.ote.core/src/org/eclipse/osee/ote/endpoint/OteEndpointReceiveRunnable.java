@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.DatagramChannel;
@@ -85,18 +86,19 @@ public class OteEndpointReceiveRunnable implements Runnable {
    }
 
    private void processBuffer(ByteBuffer buffer) {
-      if(debugOutput){
-         System.out.printf("[%s] Received OteEndpoint packet: size[%d]\t", new Date(), buffer.remaining());
-      }
       if((buffer.getShort(0) & 0xFFFF) == OteEventMessageHeader.MARKER_VALUE){
          byte[] data = new byte[buffer.remaining()];
          buffer.get(data);
          OteEventMessage msg = new OteEventMessage((byte[])data);
          msg.getHeader().TTL.setNoLog(1);
          if(debugOutput){
-            System.out.printf(" topicSend [%s]\n", msg.getHeader().TOPIC.getValue());
+            try {
+               System.out.printf("[%s] received: [%s] from [%s:%d]\n", new Date(), msg.getHeader().TOPIC.getValue(), msg.getHeader().ADDRESS.getAddress().getHostAddress(), msg.getHeader().ADDRESS.getPort());
+            } catch (UnknownHostException e) {
+               e.printStackTrace();
+            }
          }
-         OteEventMessageUtil.sendEvent(msg);
+         OteEventMessageUtil.postEvent(msg);
       }
    }
 

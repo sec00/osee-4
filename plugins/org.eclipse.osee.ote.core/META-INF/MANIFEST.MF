@@ -5,6 +5,7 @@ Bundle-SymbolicName: org.eclipse.osee.ote.core;singleton:=true
 Bundle-Version: 0.19.0.qualifier
 Bundle-Vendor: Eclipse Open System Engineering Environment
 Export-Package: org.eclipse.osee.ote,
+ org.eclipse.osee.ote.classserver,
  org.eclipse.osee.ote.core,
  org.eclipse.osee.ote.core.annotations,
  org.eclipse.osee.ote.core.cmd,

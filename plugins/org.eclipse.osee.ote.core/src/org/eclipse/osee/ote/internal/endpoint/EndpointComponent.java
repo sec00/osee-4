@@ -16,12 +16,17 @@ public class EndpointComponent implements OteUdpEndpoint {
    private OteUdpEndpointReceiverImpl receiver;
    private HashMap<InetSocketAddress, OteUdpEndpointSender> senders = new HashMap<InetSocketAddress, OteUdpEndpointSender>();
    private CopyOnWriteNoIteratorList<OteUdpEndpointSender> broadcast = new CopyOnWriteNoIteratorList<OteUdpEndpointSender>(OteUdpEndpointSender.class);
-   private boolean debug = false;
-
+   private boolean debug = true;
+   
    public void start(){
       int port;
       try {
-         port = PortUtil.getInstance().getValidPort();
+         String strPort = System.getProperty("ote.endpoint.port", Integer.toString(PortUtil.getInstance().getValidPort()));
+         try{
+            port = Integer.parseInt(strPort);
+         } catch (Throwable th){
+            port = PortUtil.getInstance().getValidPort();
+         }
          receiver = new OteUdpEndpointReceiverImpl(new InetSocketAddress(InetAddress.getLocalHost(), port));
          receiver.setDebugOutput(debug);
          receiver.start();

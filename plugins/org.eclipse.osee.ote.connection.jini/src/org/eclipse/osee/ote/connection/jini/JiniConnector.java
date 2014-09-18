@@ -17,16 +17,17 @@ import java.rmi.server.ExportException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+
 import net.jini.core.entry.Entry;
 import net.jini.export.Exporter;
 import net.jini.jeri.BasicILFactory;
 import net.jini.jeri.BasicJeriExporter;
 import net.jini.jeri.tcp.TcpServerEndpoint;
+
 import org.eclipse.osee.connection.service.IServiceConnector;
 import org.eclipse.osee.connection.service.IServicePropertyChangeListener;
 import org.eclipse.osee.framework.jdk.core.util.EnhancedProperties;
 import org.eclipse.osee.framework.jdk.core.util.Network;
-import org.eclipse.osee.framework.jini.service.core.PropertyEntry;
 
 /**
  * @author Ken J. Aguilar
@@ -100,8 +101,8 @@ public abstract class JiniConnector implements IServiceConnector {
 
    protected static void buildPropertiesFromEntries(Entry[] entries, EnhancedProperties properties) {
       for (Entry entry : entries) {
-         if (entry instanceof PropertyEntry) {
-            ((PropertyEntry) entry).fillProps(properties.asMap());
+//         if (entry instanceof PropertyEntry) {
+//            ((PropertyEntry) entry).fillProps(properties.asMap());
             // } else if (entry instanceof ServiceInfo) {
             // ServiceInfo si = (ServiceInfo) entry;
             // properties.setProperty("name", si.name);
@@ -127,7 +128,7 @@ public abstract class JiniConnector implements IServiceConnector {
             // } else if (entry instanceof TestEntry) {
             // System.out.println("test entry data = "
             // + ((TestEntry) entry).getData());
-         }
+//         }
       }
    }
 
@@ -137,15 +138,15 @@ public abstract class JiniConnector implements IServiceConnector {
       // group.group =
       // OseeProperties.getInstance().getOseeJiniServiceGroups();
       // entries.add(group);
-      // // entries.add(new StaticStationInfo((String) properties
+      // // entries.add(new StaticStationInfo((String) propertie
       // // .getProperty("station"), "", (String) properties
       // // .getProperty("type"), "", "", new Date()));
       // entries.add(new ServiceInfo((String) properties.getProperty("name"),
       // "", "", "", "", ""));
       // // entries.add(new TestEntry("this is test data"));
-      PropertyEntry entry = new PropertyEntry(properties.asMap());
-      assert entry.getProperty("date", null) != null;
-      entries.add(entry);
+//      PropertyEntry entry = new PropertyEntry(properties.asMap());
+//      assert entry.getProperty("date", null) != null;
+//      entries.add(entry);
       return entries.toArray(new Entry[entries.size()]);
    }
 

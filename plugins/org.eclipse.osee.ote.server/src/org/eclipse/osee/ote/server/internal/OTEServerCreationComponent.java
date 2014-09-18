@@ -36,6 +36,7 @@ public class OTEServerCreationComponent {
    }
    
    public void start() {
+      
       final String oteServerFactoryClass = System.getProperty("osee.ote.server.factory.class");
       if (oteServerFactoryClass != null) {
          try{
