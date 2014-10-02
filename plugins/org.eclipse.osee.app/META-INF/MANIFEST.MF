@@ -4,16 +4,21 @@ Bundle-Name: OSEE Server Application Support  (Incubation)
 Bundle-SymbolicName: org.eclipse.osee.app
 Bundle-Version: 0.22.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: javax.ws.rs;version="2.0.0",
- javax.ws.rs.core;version="2.0.0",
+Service-Component: OSGI-INF/*.xml
+Import-Package: javax.ws.rs,
+ javax.ws.rs.core,
+ org.eclipse.osee.framework.core.data,
  org.eclipse.osee.framework.core.enums,
  org.eclipse.osee.framework.core.server,
  org.eclipse.osee.framework.jdk.core.type,
+ org.eclipse.osee.framework.jdk.core.util,
  org.eclipse.osee.logger,
  org.eclipse.osee.orcs,
  org.eclipse.osee.orcs.data,
  org.eclipse.osee.orcs.search,
- org.eclipse.osee.template.engine
+ org.eclipse.osee.orcs.transaction,
+ org.eclipse.osee.template.engine,
+ org.json
 Bundle-Vendor: Eclipse Open System Engineering Environment
 Export-Package: org.eclipse.osee.app
 Bundle-ActivationPolicy: lazy

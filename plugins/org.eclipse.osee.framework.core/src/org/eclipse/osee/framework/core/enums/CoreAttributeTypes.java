@@ -63,6 +63,7 @@ public final class CoreAttributeTypes {
    public static final IAttributeType Name = TokenFactory.createAttributeType(0x1000000000000070L, "Name");
    public static final IAttributeType NativeContent = TokenFactory.createAttributeType(0x1000000000000079L, "Native Content");
    public static final IAttributeType Notes = TokenFactory.createAttributeType(0x100000000000006DL, "Notes");
+   public static final IAttributeType OseeAppDefinition = TokenFactory.createAttributeType(0x1000000000000194L, "Osee App Definition");
    public static final IAttributeType PageType = TokenFactory.createAttributeType(0x1000000000000073L, "Page Type");
    public static final IAttributeType ParagraphNumber = TokenFactory.createAttributeType(0x100000000000007DL, "Paragraph Number");
    public static final IAttributeType Partition = TokenFactory.createAttributeType(0x1000000000000087L, "Partition");

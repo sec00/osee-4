@@ -1,0 +1,31 @@
+{
+  "author": "Ryan D. Brooks",
+  "title": "System Safety Report",
+  "subtitle": "DO-178",
+	"parameters":[
+		{ "name": "teamDef",
+		  "label": "Team Definition(s)",
+        "type": "list",
+        "options": "start from branch ATS find artifacts where art-type = {Team Definition} collect art-id as value, attribute{Name} as text",
+        "multiple": "true",
+        "value": 128394523409856,
+        "description": "select a team definition"
+      },
+		{ "name": "Branch",
+        "type": "branch"
+      },
+		{ "name": "Code Root",
+        "type": "text",
+        "description": ""
+      },
+		{ "name": "Version(s)",
+        "type": "list",
+        "options": "start from branch ATS find artifacts where art-type = {Version} and relation{TeamDefinitionToVersion}.side-A-id = teamDef",
+        "multiple": "true",
+        "parameter dependency": "teamDef",
+        "description": "select a version"
+      }
+    ],
+   "actions": [{"url": "osee/ats/openActions/{teamDef}", "name": "Start", "method": "GET"},  {"url": "osee/ats/validateSomething", "name": "validate",  "method": "GET"}],
+   "description": "<ul><li>Selected Branch - provide the Branch to obtain the System Safety Report for</li><li>Code Root Directory - if specified, provides:<ul><li> a file listing the directories to search </li><li> a directory to recurse into looking for files</li></ul></li><li>Start Button - generates the report</li></ul>"
+}

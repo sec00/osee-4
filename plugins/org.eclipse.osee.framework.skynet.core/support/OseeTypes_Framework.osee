@@ -10,6 +10,11 @@ artifactType "Access Control Model" extends "General Data" {
 	uuid 0x0000000000000002
 }
 
+artifactType "OSEE App" extends "Artifact" {
+	uuid 0x0000000000000059
+	attribute "Osee App Definition"
+}
+
 artifactType "Global Preferences" extends "Artifact" {
 	uuid 0x0000000000000003
 	attribute "Dictionary"
@@ -392,6 +397,15 @@ attributeType "Description" extends StringAttribute {
 	mediaType "text/plain"
 }
 
+attributeType "Osee App Definition" extends StringAttribute {
+	uuid 0x1000000000000194
+	dataProvider DefaultAttributeDataProvider
+	min 0
+	max 1
+	description "Json that defines the parameters, action(s), and metadata of an OSEE Single Page App"
+	mediaType "application/json"
+}
+
 oseeEnumType "enum.doc.page.type" {
 	uuid 0x3000000000000179
 	entry "Portrait"
@@ -555,7 +569,6 @@ abstract artifactType "Abstract Access Controlled" extends "Artifact" {
 	attribute "Access Context Id"
 }
 
-
 artifactType "MS Word Whole Document" extends "MS Word" {
 	uuid 0x0000000000000012
 	attribute "Whole Word Content"
@@ -625,7 +638,6 @@ artifactType "Requirement" extends "Artifact" {
 	attribute "Subsystem"
 	attribute "Technical Performance Parameter"
 	attribute "PublishInline"
-	
 }
 
 attributeType "Test Frequency" extends EnumeratedAttribute {
@@ -653,7 +665,8 @@ attributeType "Data Rights Classification" extends EnumeratedAttribute {
 	max 1
 	taggerId DefaultAttributeTaggerProvider
 	enumType "enum.data.rights.classification"
-	description "Restricted Rights:  Rights are retained by the company\n\nRestricted Rights Mixed:  contains some Restricted Rights that need separation of content with other rights\n\nOther:  does not contain content with Restricted Rights\n\nUnspecified: not yet specified"
+	description
+	"Restricted Rights:  Rights are retained by the company\n\nRestricted Rights Mixed:  contains some Restricted Rights that need separation of content with other rights\n\nOther:  does not contain content with Restricted Rights\n\nUnspecified: not yet specified"
 	defaultValue "Unspecified"
 	mediaType "text/plain"
 }
@@ -1165,7 +1178,6 @@ attributeType "Development Assurance Level" extends EnumeratedAttribute {
 	mediaType "text/plain"
 }
 
-
 attributeType "Severity Category" extends StringAttribute {
 	uuid 0x0B473ECCDBFF0E6D
 	dataProvider DefaultAttributeDataProvider
@@ -1539,27 +1551,27 @@ relationType "Supporting Info" {
 }
 
 relationType "Supporting Requirement" {
-    uuid 0x200000000000017C
-    sideAName "higher-level requirement"
-    sideAArtifactType "Requirement"
-    sideBName "lower-level requirement"
-    sideBArtifactType "Requirement"
-    defaultOrderType Unordered
-    multiplicity MANY_TO_MANY
+	uuid 0x200000000000017C
+	sideAName "higher-level requirement"
+	sideAArtifactType "Requirement"
+	sideBName "lower-level requirement"
+	sideBArtifactType "Requirement"
+	defaultOrderType Unordered
+	multiplicity MANY_TO_MANY
 }
 
-artifactType "Heading - MS Word" extends "Abstract Heading", "MS Word Template" {
+artifactType "Heading - MS Word" extends "Abstract Heading" , "MS Word Template" {
 	uuid 0x0000000000000038
 }
 
-artifactType "Heading - HTML" extends "Abstract Heading", "HTML Artifact" {  
- 	uuid 0x0000000000000324   
-}  
-    
-abstract artifactType "Abstract Heading" extends "Artifact" {   
-	uuid 0x0000000000000325   
-}  
-   
+artifactType "Heading - HTML" extends "Abstract Heading" , "HTML Artifact" {
+	uuid 0x0000000000000324
+}
+
+abstract artifactType "Abstract Heading" extends "Artifact" {
+	uuid 0x0000000000000325
+}
+
 artifactType "Component" extends "Artifact" {
 	uuid 0x0000000000000039
 	attribute "Developmental"
