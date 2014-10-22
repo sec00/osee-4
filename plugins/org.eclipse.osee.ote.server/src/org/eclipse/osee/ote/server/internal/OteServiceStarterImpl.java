@@ -68,7 +68,7 @@ import org.osgi.service.packageadmin.PackageAdmin;
  * @author Andrew M. Finkbeiner
  */
 public class OteServiceStarterImpl implements OteServiceStarter, ServiceInfoPopulator, OseeMessagingStatusCallback {
-
+   
 	private PackageAdmin packageAdmin;
 	private IRuntimeLibraryManager runtimeLibraryManager;
 	private IConnectionService connectionService;

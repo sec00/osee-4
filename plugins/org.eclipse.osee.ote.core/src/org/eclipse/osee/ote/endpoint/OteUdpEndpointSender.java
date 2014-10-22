@@ -40,7 +40,7 @@ public class OteUdpEndpointSender {
    }
    
    public void start(){
-      Thread th = new Thread(new OteEndpointSendRunnable(toSend, buffers));
+      Thread th = new Thread(new OteEndpointSendRunnable(toSend, buffers, debug));
       th.setName(String.format("OTE Endpoint Sender[%s]", address.toString()));
       th.setDaemon(true);
       th.start();

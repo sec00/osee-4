@@ -20,9 +20,12 @@ public class OteEndpointSendRunnable implements Runnable {
    private ArrayBlockingQueue<AddressBuffer> toSend;
    private ObjectPool<AddressBuffer> buffers;
 
-   public OteEndpointSendRunnable(ArrayBlockingQueue<AddressBuffer> toSend, ObjectPool<AddressBuffer> buffers) {
+   private boolean debug = false;
+
+   public OteEndpointSendRunnable(ArrayBlockingQueue<AddressBuffer> toSend, ObjectPool<AddressBuffer> buffers, boolean debug) {
       this.toSend = toSend;
       this.buffers = buffers;
+      this.debug = debug;
    }
 
    @Override
@@ -55,18 +58,26 @@ public class OteEndpointSendRunnable implements Runnable {
                   threadChannel.send(data.getBuffer(), data.getAddress());
                }
             } catch (ClosedByInterruptException ex){
-               OseeLog.log(getClass(), Level.SEVERE, "Error trying to send data", ex);
+               if(debug){
+                  OseeLog.log(getClass(), Level.SEVERE, "Error trying to send data", ex);
+               }
                threadChannel = openAndInitializeDatagramChannel();
             } catch (AsynchronousCloseException ex){
-               OseeLog.log(getClass(), Level.SEVERE, "Error trying to send data", ex);
+               if(debug){
+                  OseeLog.log(getClass(), Level.SEVERE, "Error trying to send data", ex);
+               }
                closeChannel(threadChannel);
                threadChannel = openAndInitializeDatagramChannel();
             } catch (ClosedChannelException ex){
-               OseeLog.log(getClass(), Level.SEVERE, "Error trying to send data", ex);
+               if(debug){
+                  OseeLog.log(getClass(), Level.SEVERE, "Error trying to send data", ex);
+               }
                closeChannel(threadChannel);
                threadChannel = openAndInitializeDatagramChannel();
             } catch (IOException ex){
-               OseeLog.log(getClass(), Level.SEVERE, "Error trying to send data", ex);
+               if(debug){
+                  OseeLog.log(getClass(), Level.SEVERE, "Error trying to send data", ex);
+               }
             } finally {
                int size = dataToSend.size();
                for (int i = 0; i < size; i++) {
@@ -75,7 +86,9 @@ public class OteEndpointSendRunnable implements Runnable {
             }
          } 
       } catch (IOException ex){
-         OseeLog.log(getClass(), Level.SEVERE, "Error opening DatagramChannel.  Ending OteEndpointSendRunnable unexpectedly.", ex);
+         if(debug){
+            OseeLog.log(getClass(), Level.SEVERE, "Error opening DatagramChannel.  Ending OteEndpointSendRunnable unexpectedly.", ex);
+         }
       } finally{
          closeChannel(threadChannel);
       }
@@ -88,7 +101,9 @@ public class OteEndpointSendRunnable implements Runnable {
             channel.close();
          }
       } catch (IOException e) {
-         OseeLog.log(getClass(), Level.SEVERE, "Error trying to close channel", e);
+         if(debug){
+            OseeLog.log(getClass(), Level.SEVERE, "Error trying to close channel", e);
+         }
       } 
    }
 

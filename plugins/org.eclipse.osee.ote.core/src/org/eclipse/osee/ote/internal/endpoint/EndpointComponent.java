@@ -28,8 +28,8 @@ public class EndpointComponent implements OteUdpEndpoint {
             port = PortUtil.getInstance().getValidPort();
          }
          receiver = new OteUdpEndpointReceiverImpl(new InetSocketAddress(InetAddress.getLocalHost(), port));
-         receiver.setDebugOutput(debug);
          receiver.start();
+         setDebugOutput(true);
       } catch (IOException e) {
          e.printStackTrace();
       }
@@ -48,6 +48,14 @@ public class EndpointComponent implements OteUdpEndpoint {
    
    @Override
    public void setDebugOutput(boolean debug) {
+      String ioRedirect = System.getProperty("ote.io.redirect");
+      if(ioRedirect != null){
+         if(Boolean.parseBoolean(ioRedirect)){
+            this.debug = false;
+            System.out.println("Unable to enable Endpoint debug because -Dote.io.redirect is enabled.");
+            return;
+         }
+      }
       this.debug = debug;
       receiver.setDebugOutput(debug);
       for(OteUdpEndpointSender sender: senders.values()){

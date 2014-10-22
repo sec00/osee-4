@@ -57,19 +57,21 @@ public class OteEndpointReceiveRunnable implements Runnable {
                   processBuffer(buffer);
                }
             } catch (BindException ex) {
-               OseeLog.log(logger, Level.FINEST, ex);
+               if(debugOutput){
+                  OseeLog.log(logger, Level.FINEST, ex);
+               }
                channel.close();
                Thread.sleep(1000);
             }
          }
       }catch (InterruptedIOException ex) {
          Thread.interrupted();
-         if (run) {
+         if (run && debugOutput) {
             OseeLog.log(logger, Level.WARNING, "Unexpected interruption", ex);
          }
       } catch (ClosedByInterruptException ie) {
          Thread.interrupted();
-         if (run) {
+         if (run && debugOutput) {
             OseeLog.log(logger, Level.WARNING, "Unexpected interruption", ie);
          }
       } catch (Throwable t) {
@@ -80,7 +82,9 @@ public class OteEndpointReceiveRunnable implements Runnable {
                channel.close();
             }
          } catch (IOException ex) {
-            ex.printStackTrace();
+            if(debugOutput){
+               ex.printStackTrace();
+            }
          }
       }
    }
@@ -93,7 +97,7 @@ public class OteEndpointReceiveRunnable implements Runnable {
          msg.getHeader().TTL.setNoLog(1);
          if(debugOutput){
             try {
-               System.out.printf("[%s] received: [%s] from [%s:%d]\n", new Date(), msg.getHeader().TOPIC.getValue(), msg.getHeader().ADDRESS.getAddress().getHostAddress(), msg.getHeader().ADDRESS.getPort());
+               System.out.printf("[%s] received: [%s][%d] from [%s:%d]\n", new Date(), msg.getHeader().TOPIC.getValue(), msg.getData().length, msg.getHeader().ADDRESS.getAddress().getHostAddress(), msg.getHeader().ADDRESS.getPort());
             } catch (UnknownHostException e) {
                e.printStackTrace();
             }
