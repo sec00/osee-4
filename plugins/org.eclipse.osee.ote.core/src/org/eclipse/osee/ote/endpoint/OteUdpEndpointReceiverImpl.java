@@ -30,5 +30,13 @@ public class OteUdpEndpointReceiverImpl {
    public InetSocketAddress getEndpoint(){
       return oteEndpointReceiveRunnable.getAddress();
    }
+
+   public void addDataProcessor(EndpointDataProcessor processor) {
+      oteEndpointReceiveRunnable.addDataProcessor(processor);  
+   }
+
+   public void removeDataProcessor(EndpointDataProcessor processor) {
+      oteEndpointReceiveRunnable.removeDataProcessor(processor);
+   }
    
 }

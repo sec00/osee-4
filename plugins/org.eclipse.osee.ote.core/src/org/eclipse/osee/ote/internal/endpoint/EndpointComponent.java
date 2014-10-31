@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import org.eclipse.osee.framework.jdk.core.util.network.PortUtil;
 import org.eclipse.osee.ote.core.CopyOnWriteNoIteratorList;
+import org.eclipse.osee.ote.endpoint.EndpointDataProcessor;
 import org.eclipse.osee.ote.endpoint.OteUdpEndpoint;
 import org.eclipse.osee.ote.endpoint.OteUdpEndpointReceiverImpl;
 import org.eclipse.osee.ote.endpoint.OteUdpEndpointSender;
@@ -16,9 +17,9 @@ public class EndpointComponent implements OteUdpEndpoint {
    private OteUdpEndpointReceiverImpl receiver;
    private HashMap<InetSocketAddress, OteUdpEndpointSender> senders = new HashMap<InetSocketAddress, OteUdpEndpointSender>();
    private CopyOnWriteNoIteratorList<OteUdpEndpointSender> broadcast = new CopyOnWriteNoIteratorList<OteUdpEndpointSender>(OteUdpEndpointSender.class);
-   private boolean debug = true;
+   private boolean debug = false;
    
-   public void start(){
+   public EndpointComponent(){
       int port;
       try {
          String strPort = System.getProperty("ote.endpoint.port", Integer.toString(PortUtil.getInstance().getValidPort()));
@@ -28,11 +29,14 @@ public class EndpointComponent implements OteUdpEndpoint {
             port = PortUtil.getInstance().getValidPort();
          }
          receiver = new OteUdpEndpointReceiverImpl(new InetSocketAddress(InetAddress.getLocalHost(), port));
-         receiver.start();
-         setDebugOutput(true);
       } catch (IOException e) {
          e.printStackTrace();
       }
+   }
+   
+   public void start(){
+      receiver.start();
+      setDebugOutput(false);
    }
    
    public synchronized void stop(){
@@ -93,6 +97,16 @@ public class EndpointComponent implements OteUdpEndpoint {
    @Override
    public CopyOnWriteNoIteratorList<OteUdpEndpointSender> getBroadcastSenders() {
       return broadcast;
+   }
+
+   @Override
+   public void addDataProcessor(EndpointDataProcessor processor) {
+      receiver.addDataProcessor(processor);
+   }
+
+   @Override
+   public void removeDataProcessor(EndpointDataProcessor processor) {
+      receiver.removeDataProcessor(processor);      
    }
 
 }

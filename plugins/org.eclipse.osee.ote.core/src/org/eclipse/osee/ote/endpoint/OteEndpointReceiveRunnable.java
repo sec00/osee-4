@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.DatagramChannel;
 import java.util.Date;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 import org.eclipse.osee.framework.logging.OseeLog;
@@ -27,6 +28,8 @@ public class OteEndpointReceiveRunnable implements Runnable {
    private volatile boolean debugOutput = false;
    private Class<OteEndpointReceiveRunnable> logger = OteEndpointReceiveRunnable.class;
    private InetSocketAddress address;
+   
+   private CopyOnWriteArrayList<EndpointDataProcessor> dataProcessors = new CopyOnWriteArrayList<EndpointDataProcessor>();
 
    public OteEndpointReceiveRunnable(InetSocketAddress address){
       this.address = address;
@@ -90,7 +93,8 @@ public class OteEndpointReceiveRunnable implements Runnable {
    }
 
    private void processBuffer(ByteBuffer buffer) {
-      if((buffer.getShort(0) & 0xFFFF) == OteEventMessageHeader.MARKER_VALUE){
+      int typeId = buffer.getShort(0) & 0xFFFF;
+      if(typeId == OteEventMessageHeader.MARKER_VALUE){
          byte[] data = new byte[buffer.remaining()];
          buffer.get(data);
          OteEventMessage msg = new OteEventMessage((byte[])data);
@@ -103,6 +107,16 @@ public class OteEndpointReceiveRunnable implements Runnable {
             }
          }
          OteEventMessageUtil.postEvent(msg);
+      } else {
+         for(EndpointDataProcessor processor: dataProcessors){
+            if(processor.getTypeId() == typeId){
+               try{
+                  processor.processBuffer(buffer);
+               } catch (Throwable th){
+                  th.printStackTrace();
+               }
+            }
+         }
       }
    }
 
@@ -112,6 +126,14 @@ public class OteEndpointReceiveRunnable implements Runnable {
 
    public InetSocketAddress getAddress() {
       return address;
+   }
+
+   public void addDataProcessor(EndpointDataProcessor processor) {
+      dataProcessors.add(processor);
+   }
+
+   public void removeDataProcessor(EndpointDataProcessor processor) {
+      dataProcessors.remove(processor);
    }
 
 }

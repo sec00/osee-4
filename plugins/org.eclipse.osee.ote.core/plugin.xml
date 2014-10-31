@@ -20,10 +20,10 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="org.eclipse.osee.ote.core.server"
-            name="ote.server">
+            name="OteServerStandalone">
          <property
                name="appName"
-               value="ote.server">
+               value="OteServerStandalone">
          </property>
       </product>
    </extension>

@@ -12,4 +12,6 @@ public interface OteUdpEndpoint {
    public void addBroadcast(OteUdpEndpointSender sender);
    public void removeBroadcast(OteUdpEndpointSender sender);
    public CopyOnWriteNoIteratorList<OteUdpEndpointSender> getBroadcastSenders();
+   public void addDataProcessor(EndpointDataProcessor processor);
+   public void removeDataProcessor(EndpointDataProcessor processor);
 }

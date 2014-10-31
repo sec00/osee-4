@@ -245,7 +245,7 @@ public class OteServiceStarterImpl implements OteServiceStarter, ServiceInfoPopu
 			      OseeLog.log(getClass(), Level.SEVERE, th);
 			   }
 			} else {
-				OseeLog.log(getClass(), Level.SEVERE, "'ote.master.uri' was not set.  You must use direct connect from the client.");
+				OseeLog.log(getClass(), Level.WARNING, "'ote.master.uri' was not set.  You must use direct connect from the client.");
 			}
 			
 		} else {

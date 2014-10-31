@@ -68,7 +68,9 @@ public class Activator implements BundleActivator {
 
    @Override
    public void stop(BundleContext context) throws Exception {
-      out.flush();      
+      if(out != null){
+         out.flush();    
+      }
    }
    
    public void addListener(SystemOutputListener listener){
