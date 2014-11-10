@@ -1,0 +1,72 @@
+[
+{"type": "11", "atttributes": { "1152921504606847088": "Aircraft Survivability Equipment"}, "children": [
+{"type": "87", "atttributes": { "1152921504606847088": "Missile Warning System"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Radar Jammer"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Laser Warning Receiver"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Radar Warning Receiver"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Aircraft Gateway Processor"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Countermeasure Dispensing System"}}]},
+{"type": "11", "atttributes": { "1152921504606847088": "Aircraft Systems Management"}, "children": [
+{"type": "87", "atttributes": { "1152921504606847088": "Auxiliary Power Unit"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Power Control"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Fuel"}}]},
+{"type": "11", "atttributes": { "1152921504606847088": "Cognitive Decision Aiding"}},
+{"type": "11", "atttributes": { "1152921504606847088": "Data Correlation"}},
+{"type": "11", "atttributes": { "1152921504606847088": "Communications"}, "children": [
+{"type": "87", "atttributes": { "1152921504606847088": "ARC201D"}},
+{"type": "87", "atttributes": { "1152921504606847088": "ARC231"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Communications Interface System"}},
+{"type": "87", "atttributes": { "1152921504606847088": "APX-118 Transponder"}},
+{"type": "87", "atttributes": { "1152921504606847088": "SATCOM"}}]},
+{"type": "11", "atttributes": { "1152921504606847088": "Controls and Displays"}, "children": [
+{"type": "87", "atttributes": { "1152921504606847088": "MPD"}},
+{"type": "87", "atttributes": { "1152921504606847088": "UFD "}},
+{"type": "87", "atttributes": { "1152921504606847088": "LMP "}},
+{"type": "87", "atttributes": { "1152921504606847088": "KU"}},
+{"type": "87", "atttributes": { "1152921504606847088": "AAG"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Cockpit Controls"}},
+{"type": "87", "atttributes": { "1152921504606847088": "DVR"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Rendering"}}]},
+{"type": "11", "atttributes": { "1152921504606847088": "Data Management"}, "children": [
+{"type": "87", "atttributes": { "1152921504606847088": "Solid State Recording Device (SSRD)"}},
+{"type": "87", "atttributes": { "1152921504606847088": "MDR"}},
+{"type": "87", "atttributes": { "1152921504606847088": "MSPU"}},
+{"type": "87", "atttributes": { "1152921504606847088": "WCAEF"}}]},
+{"type": "11", "atttributes": { "1152921504606847088": "Flight Controls"}, "children": [
+{"type": "87", "atttributes": { "1152921504606847088": "FMC"}}]},
+{"type": "11", "atttributes": { "1152921504606847088": "Mission Systems Management"}, "children": [
+{"type": "87", "atttributes": { "1152921504606847088": "Architecture"}},
+{"type": "87", "atttributes": { "1152921504606847088": "MUX"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Mission Processor (MP)"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Aircraft Interface Unit (AIU)"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Ethernet Routing Device"}}]},
+{"type": "11", "atttributes": { "1152921504606847088": "Navigation"}, "children": [
+{"type": "87", "atttributes": { "1152921504606847088": "EGI+MMR"}},
+{"type": "87", "atttributes": { "1152921504606847088": "SFDS"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Radar Altimeter"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Dopplar"}},
+{"type": "87", "atttributes": { "1152921504606847088": "HIADC"}},
+{"type": "87", "atttributes": { "1152921504606847088": "ADF"}}]},
+{"type": "11", "atttributes": { "1152921504606847088": "Network Centric Operations"}, "children": [
+{"type": "87", "atttributes": { "1152921504606847088": "IDM"}},
+{"type": "87", "atttributes": { "1152921504606847088": "BFT"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Link16"}}]},
+{"type": "11", "atttributes": { "1152921504606847088": "Sights"}, "children": [
+{"type": "87", "atttributes": { "1152921504606847088": "M-TADS"}},
+{"type": "87", "atttributes": { "1152921504606847088": "FCR"}},
+{"type": "87", "atttributes": { "1152921504606847088": "M-PNVS"}},
+{"type": "87", "atttributes": { "1152921504606847088": "IHADSS-21"}},
+{"type": "87", "atttributes": { "1152921504606847088": "TEDAC"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Laser Electronic Unit"}}]},
+{"type": "11", "atttributes": { "1152921504606847088": "Unmanned Systems Management"}, "children": [
+{"type": "87", "atttributes": { "1152921504606847088": "UTA"}},
+{"type": "87", "atttributes": { "1152921504606847088": "UAV"}},
+{"type": "87", "atttributes": { "1152921504606847088": "UR"}}]},
+{"type": "11", "atttributes": { "1152921504606847088": "Weapons / Armament"}, "children": [
+{"type": "87", "atttributes": { "1152921504606847088": "Gun "}},
+{"type": "87", "atttributes": { "1152921504606847088": "Pylon Interface Unit"}},
+{"type": "87", "atttributes": { "1152921504606847088": "HELLFIRE "}},
+{"type": "87", "atttributes": { "1152921504606847088": "Rocket Launcher"}},
+{"type": "87", "atttributes": { "1152921504606847088": "Laser Pointer"}},
+{"type": "87", "atttributes": { "1152921504606847088": "TESS"}}]}
+]

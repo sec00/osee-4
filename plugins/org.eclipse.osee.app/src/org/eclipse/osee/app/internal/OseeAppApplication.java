@@ -38,6 +38,7 @@ public class OseeAppApplication extends Application {
       OseeTemplateTokens.register(registry);
 
       singletons.add(new OseeSinglePageAppResource(registry, orcsApi));
+      singletons.add(new ImportArtifactsResource(registry, orcsApi));
    }
 
    public void stop() {
