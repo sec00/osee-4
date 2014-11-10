@@ -127,6 +127,9 @@ public class RoughArtifact {
    }
 
    private boolean isEnumeration(String typeName) throws OseeCoreException {
+      if (1 == 1) {
+         return false;
+      }
       boolean result = false;
       AttributeType type = AttributeTypeManager.getType(typeName);
       result = type.isEnumerated();

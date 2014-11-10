@@ -94,6 +94,10 @@ public class RoughToRealArtifactOperation extends AbstractOperation {
          return realArtifact;
       }
 
+      if (roughArtifact.getName().equals("wcafeExport")) {
+         return null;
+      }
+
       realArtifact = artifactResolver.resolve(roughArtifact, transaction.getBranch(), realParent, destinationArtifact);
       unmatchedArtifacts.remove(realArtifact);
 
