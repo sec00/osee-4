@@ -11,6 +11,7 @@ import org.eclipse.osee.ote.endpoint.EndpointDataProcessor;
 import org.eclipse.osee.ote.endpoint.OteUdpEndpoint;
 import org.eclipse.osee.ote.endpoint.OteUdpEndpointReceiverImpl;
 import org.eclipse.osee.ote.endpoint.OteUdpEndpointSender;
+import org.eclipse.osee.ote.properties.OtePropertiesCore;
 
 public class EndpointComponent implements OteUdpEndpoint {
    
@@ -52,7 +53,7 @@ public class EndpointComponent implements OteUdpEndpoint {
    
    @Override
    public void setDebugOutput(boolean debug) {
-      String ioRedirect = System.getProperty("ote.io.redirect");
+      String ioRedirect = OtePropertiesCore.ioRedirect.getValue();
       if(ioRedirect != null){
          if(Boolean.parseBoolean(ioRedirect)){
             this.debug = false;

@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 
 import org.eclipse.osee.ote.io.SystemOutputListener;
+import org.eclipse.osee.ote.properties.OtePropertiesCore;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -21,10 +22,6 @@ import org.osgi.framework.BundleContext;
 public class Activator implements BundleActivator {
 
    private static final String SYSTEM_OUT_FILE = "systemout.txt";
-   private static final String LINE_SEPARATOR = "line.separator";
-   private static final String USER_DIR = "user.dir";
-   private static final String OTE_IO_REDIRECT_FILE = "ote.io.redirect.file";
-   private static final String OTE_IO_REDIRECT = "ote.io.redirect";
 
    private static Activator instance;
    
@@ -45,18 +42,18 @@ public class Activator implements BundleActivator {
       oldErr = System.err;
       oldOut = System.out;
       oldIn = System.in;
-      String ioRedirect = System.getProperty(OTE_IO_REDIRECT);
+      String ioRedirect = OtePropertiesCore.ioRedirect.getValue();
       if(ioRedirect != null){
          if(Boolean.parseBoolean(ioRedirect)){
-            String ioRedirectFile = System.getProperty(OTE_IO_REDIRECT_FILE);
+            String ioRedirectFile = OtePropertiesCore.ioRedirectFile.getValue();
             if(ioRedirectFile != null){
                if(Boolean.parseBoolean(ioRedirectFile)){
-                  String workingDirectory = System.getProperty(USER_DIR);
+                  String workingDirectory = OtePropertiesCore.ioRedirectFile.getValue();
                   outputStream = new BufferedOutputStream(new FileOutputStream(new File(workingDirectory, SYSTEM_OUT_FILE)));
                }
             }
             out = new SpecializedOut(new SpecializedOutputStream(outputStream == null ? oldOut : outputStream));
-            newline = System.getProperty(LINE_SEPARATOR);
+            newline = OtePropertiesCore.lineSeparator.getValue();
             in = new SpecializedInputStream(oldIn);
             System.setIn(in);
             System.setOut(out);

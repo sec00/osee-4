@@ -41,6 +41,7 @@ import org.eclipse.osee.ote.core.environment.interfaces.IRuntimeLibraryManager;
 import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironment;
 import org.eclipse.osee.ote.endpoint.OteUdpEndpoint;
 import org.eclipse.osee.ote.message.MessageSystemTestEnvironment;
+import org.eclipse.osee.ote.properties.OtePropertiesCore;
 import org.eclipse.osee.ote.server.PropertyParamter;
 
 public class OteService implements IHostTestEnvironment {
@@ -74,12 +75,12 @@ public class OteService implements IHostTestEnvironment {
       enhancedProperties.setProperty(HostServerProperties.comment.name(), parameterObject.getComment());
       enhancedProperties.setProperty(HostServerProperties.date.name(), new Date().toString());
       enhancedProperties.setProperty(HostServerProperties.group.name(), "OSEE Test Environment");
-      enhancedProperties.setProperty(HostServerProperties.owner.name(), System.getProperty("user.name"));
+      enhancedProperties.setProperty(HostServerProperties.owner.name(), OtePropertiesCore.userName.getValue());
       enhancedProperties.setProperty(HostServerProperties.id.name(), serviceID.toString());
       enhancedProperties.setProperty(HostServerProperties.activeMq.name(), environmentCreation.getBroker().getUri().toString());
       try {
          String format = String.format("tcp://%s:%d", receiver.getLocalEndpoint().getAddress().getHostAddress(), receiver.getLocalEndpoint().getPort());
-         if(System.getProperty("org.osgi.service.http.port") == null){
+         if(OtePropertiesCore.httpPort.getValue() == null){
             enhancedProperties.setProperty(HostServerProperties.appServerURI.name(), format);
          } else {
             enhancedProperties.setProperty(HostServerProperties.appServerURI.name(), format);
@@ -89,9 +90,9 @@ public class OteService implements IHostTestEnvironment {
          OseeLog.log(OteService.class, Level.SEVERE, "Failed to set the appServerURI", e);
       }
       
-      String workingDirectory = System.getProperty(HostServerProperties.serverLaunchWorkingDir.name());
-      if(workingDirectory != null){
-         File dir = new File(workingDirectory);
+      String ioRedirectPath = OtePropertiesCore.ioRedirectPath.getValue();
+      if(ioRedirectPath != null){
+         File dir = new File(ioRedirectPath);
          if(dir.exists() && dir.isDirectory()){
             try{
                Properties serverProperties = new Properties();

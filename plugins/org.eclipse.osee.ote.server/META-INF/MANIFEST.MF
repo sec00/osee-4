@@ -37,6 +37,7 @@ Import-Package: org.apache.felix.service.command;status=provisional;version="0.8
  org.eclipse.osee.ote.message,
  org.eclipse.osee.ote.message.instrumentation,
  org.eclipse.osee.ote.message.interfaces,
+ org.eclipse.osee.ote.properties,
  org.osgi.framework,
  org.osgi.service.packageadmin,
  org.osgi.util.tracker

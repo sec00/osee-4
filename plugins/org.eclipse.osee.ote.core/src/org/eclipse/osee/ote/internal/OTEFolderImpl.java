@@ -11,13 +11,14 @@ import java.util.logging.Level;
 
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.OTEServerFolder;
+import org.eclipse.osee.ote.properties.OtePropertiesCore;
 
 public class OTEFolderImpl implements OTEServerFolder{
    
    private static int DAYS;
    
    static {
-      String strDays = System.getProperty("ote.batchfolder.days");
+      String strDays = OtePropertiesCore.batchFolderDays.getValue();
       if(strDays!=null){
          try{
          DAYS = Integer.parseInt(strDays);
@@ -35,7 +36,7 @@ public class OTEFolderImpl implements OTEServerFolder{
    private static final String RUNLIST_FILE = ".runlist";
    private static final String RESULTS_FILE = ".result";
    
-   private static File OTESERVER = new File(System.getProperty("user.home") + File.separator + "OTESERVER");
+   private static File OTESERVER = new File(OtePropertiesCore.userHome.getValue() + File.separator + "OTESERVER");
    private static File BATCHES = new File(OTESERVER, "batches");
    private static File JARCACHE = new File(OTESERVER, "runtimeCache");
    private static SimpleDateFormat format = new SimpleDateFormat("yyyy_MM_dd___kk_mm_ss");

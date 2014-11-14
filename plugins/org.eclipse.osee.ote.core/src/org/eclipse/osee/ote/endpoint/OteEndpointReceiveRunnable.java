@@ -41,7 +41,7 @@ public class OteEndpointReceiveRunnable implements Runnable {
    
    @Override
    public void run() {
-      ByteBuffer buffer = ByteBuffer.allocateDirect(DATA_SIZE);
+      ByteBuffer buffer = ByteBuffer.allocate(DATA_SIZE);
       DatagramChannel channel = null;
       try{
          while(run){

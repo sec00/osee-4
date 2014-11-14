@@ -58,6 +58,7 @@ import org.eclipse.osee.ote.endpoint.OteUdpEndpoint;
 import org.eclipse.osee.ote.master.rest.client.OTEMasterServer;
 import org.eclipse.osee.ote.master.rest.client.OTEMasterServerResult;
 import org.eclipse.osee.ote.master.rest.model.OTEServer;
+import org.eclipse.osee.ote.properties.OtePropertiesCore;
 import org.eclipse.osee.ote.server.OteServiceStarter;
 import org.eclipse.osee.ote.server.PropertyParamter;
 import org.eclipse.osee.ote.server.TestEnvironmentFactory;
@@ -234,7 +235,7 @@ public class OteServiceStarterImpl implements OteServiceStarter, ServiceInfoPopu
 			connectionService.addConnector(serviceSideConnector);
 		}
 		if (!propertyParameter.isLocalConnector()) {
-			String masterURIStr = System.getProperty("ote.master.uri");
+			String masterURIStr = OtePropertiesCore.masterURI.getValue();
 			if(masterURIStr != null){
 			   try{
 			      masterURI = new URI(masterURIStr);
@@ -265,7 +266,7 @@ public class OteServiceStarterImpl implements OteServiceStarter, ServiceInfoPopu
 	   server.setType(propertyParameter.getType());
 	   server.setComment(propertyParameter.getComment());
 	   server.setStartTime(new Date().toString());
-	   server.setOwner(System.getProperty("user.name"));
+	   server.setOwner(OtePropertiesCore.userName.getValue());
 	   server.setUUID(uuid);
 	   server.setOteRestServer(String.format("tcp://%s:%d", receiver.getLocalEndpoint().getAddress().getHostAddress(), receiver.getLocalEndpoint().getPort()));
 	   server.setOteActivemqServer(nodeInfo.getUri().toString());
@@ -273,7 +274,7 @@ public class OteServiceStarterImpl implements OteServiceStarter, ServiceInfoPopu
 	}
 
 	private int getServerPort() throws IOException {
-		String portFromLaunch = System.getProperty("ote.server.broker.uri.port");
+		String portFromLaunch = OtePropertiesCore.brokerUriPort.getValue();
 		int port = 0;
 		if (portFromLaunch != null) {
 			try {
