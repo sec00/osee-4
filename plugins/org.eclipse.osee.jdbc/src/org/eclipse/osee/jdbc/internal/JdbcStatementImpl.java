@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import org.eclipse.osee.jdbc.JdbcConstants;
+import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.jdbc.JdbcDbType;
 import org.eclipse.osee.jdbc.JdbcException;
 import org.eclipse.osee.jdbc.JdbcStatement;
@@ -457,4 +458,18 @@ public final class JdbcStatementImpl implements JdbcStatement {
          throw newJdbcException(ex);
       }
    }
+
+   /**
+    * @return the current row number where the first row's number is 1
+    * @throws OseeCoreException
+    */
+   @Override
+   public int getRowNumber() throws JdbcException {
+      try {
+         return rSet.getRow();
+      } catch (SQLException ex) {
+         throw newJdbcException(ex);
+      }
+   }
+
 }

@@ -88,6 +88,8 @@ public interface JdbcStatement extends Closeable {
     */
    int getRowCount();
 
+   int getRowNumber();
+
    boolean isNullable(int columnIndex);
 
    double getCallableDouble(int columnIndex);
