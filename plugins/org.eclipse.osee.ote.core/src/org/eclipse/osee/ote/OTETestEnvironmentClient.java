@@ -326,11 +326,11 @@ public class OTETestEnvironmentClient {
       
    }
    
-   public EnhancedProperties getProperties() {
+   public EnhancedProperties getProperties(long timeout) {
       SerializedEnhancedProperties props = new SerializedEnhancedProperties();
       RequestHostEnvironmentProperties req = new RequestHostEnvironmentProperties();
       OteEndpointSendEventMessage sendit = new OteEndpointSendEventMessage(service, destinationAddress);
-      props = sendit.synchSendAndResponse(props, req, 1000);
+      props = sendit.synchSendAndResponse(props, req, timeout);
       EnhancedProperties returnVal = null;
       try {
          if(props != null){
