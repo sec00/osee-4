@@ -13,13 +13,15 @@ public enum OtePropertiesCore implements OteProperties {
    masterURI("ote.master.uri"),
    noStacktraceFilter("org.eclipse.osee.ote.core.noStacktraceFilter"),
    outfilesLocation("osee.ote.outfiles"),
+   pingTimeout("ote.client.pingTimeout"),
    serverFactoryClass("osee.ote.server.factory.class"),
    serverKeepalive("osee.ote.server.keepAlive"),
    serverTitle("osee.ote.server.title"),
    userHome("user.home"),
    userName("user.name"),
    useLookup("osee.ote.use.lookup");
-
+   
+   
    private String key;
    
    OtePropertiesCore(String key){
@@ -44,5 +46,15 @@ public enum OtePropertiesCore implements OteProperties {
    @Override
    public String getValue(String defaultValue) {
       return System.getProperty(key, defaultValue);
+   }
+
+   public long getLongValue(long defaultValue) {
+      long value = defaultValue;
+      String valueStr = System.getProperty(key);
+      try{
+         value = Long.parseLong(valueStr);
+      } catch (Throwable th){
+      }
+      return value;
    }
 }

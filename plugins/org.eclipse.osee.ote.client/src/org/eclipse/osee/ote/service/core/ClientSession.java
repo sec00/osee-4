@@ -175,6 +175,7 @@ public class ClientSession extends AbstractRemoteSession {
             Thread.currentThread().setContextClassLoader(ExportClassLoader.getInstance());
             ConnectionRequestResult result = testHost.requestEnvironment(exportedSession, id, config);
             if (result.getStatus().getStatus()) {
+               connector.setConnected(true);
                return new TestHostConnection(connector, testHost, result.getEnvironment(), result.getSessionKey());
             } else {
                OseeLog.log(Activator.class, OseeLevel.SEVERE_POPUP, "Error Connecting to the OTE Test Server.",
@@ -193,6 +194,7 @@ public class ClientSession extends AbstractRemoteSession {
       // intentionally package-private
       if (lock.tryLock(TIMEOUT, TimeUnit.MINUTES)) {
          try {
+            connection.getServiceConnector().setConnected(false);
             connection.endConnection();
             return;
          } finally {

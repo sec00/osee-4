@@ -38,6 +38,7 @@ public abstract class JiniConnector implements IServiceConnector {
    private final EnhancedProperties properties;
    private final HashSet<IServicePropertyChangeListener> propertyChangeListeners =
       new HashSet<IServicePropertyChangeListener>();
+   private boolean connected = false;
 
    private static final class ExportInfo {
       private final Exporter exporter;
@@ -186,5 +187,13 @@ public abstract class JiniConnector implements IServiceConnector {
             listener.propertyChanged(this, key, properties.getProperty(key));
          }
       }
+   }
+   
+   public void setConnected(boolean connected){
+      this.connected = connected;
+   }
+   
+   public boolean isConnected() {
+      return this.connected;
    }
 }
