@@ -48,8 +48,12 @@ public class Activator implements BundleActivator {
             String ioRedirectFile = OtePropertiesCore.ioRedirectFile.getValue();
             if(ioRedirectFile != null){
                if(Boolean.parseBoolean(ioRedirectFile)){
-                  String workingDirectory = OtePropertiesCore.ioRedirectFile.getValue();
-                  outputStream = new BufferedOutputStream(new FileOutputStream(new File(workingDirectory, SYSTEM_OUT_FILE)));
+                  String workingDirectory = OtePropertiesCore.ioRedirectPath.getValue();
+                  System.out.println(workingDirectory);
+                  File wd = new File(workingDirectory);
+                  if(wd.exists() && wd.isDirectory()){
+                     outputStream = new BufferedOutputStream(new FileOutputStream(new File(workingDirectory, SYSTEM_OUT_FILE)));
+                  }
                }
             }
             out = new SpecializedOut(new SpecializedOutputStream(outputStream == null ? oldOut : outputStream));

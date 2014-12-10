@@ -15,7 +15,7 @@ import org.eclipse.osee.ote.remote.messages.ConsoleOutputMessage;
 
 public class OTESystemOutputHandler implements SystemOutputListener {
 
-   private ByteBuffer buffer = ByteBuffer.allocate(64000);
+   private ByteBuffer buffer = ByteBuffer.allocate(4096);
    private OteUdpEndpoint endpoint;
    private ConsoleOutputMessage outputMessage;
    private ScheduledExecutorService newSingleThreadScheduledExecutor;
@@ -47,7 +47,7 @@ public class OTESystemOutputHandler implements SystemOutputListener {
 
    @Override
    public synchronized void flush() throws IOException {
-      
+      send();
    }
    
    public synchronized void send(){

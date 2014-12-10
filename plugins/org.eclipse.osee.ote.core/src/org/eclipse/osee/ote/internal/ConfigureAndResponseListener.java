@@ -37,6 +37,7 @@ public class ConfigureAndResponseListener implements EventHandler {
          ConfigurationAndResponse config = serialized.getObject();
          
          OteUdpEndpointSender oteEndpointSender = endpoint.getOteEndpointSender(serialized.getHeader().getSourceInetSocketAddress());
+         endpoint.addBroadcast(oteEndpointSender);
          try{
             String id = (String) oteApi.getIHostTestEnvironment().getProperties().getProperty("id");
             /*

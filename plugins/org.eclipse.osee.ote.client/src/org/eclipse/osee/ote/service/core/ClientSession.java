@@ -174,7 +174,7 @@ public class ClientSession extends AbstractRemoteSession {
             UUID id = UUID.randomUUID();
             Thread.currentThread().setContextClassLoader(ExportClassLoader.getInstance());
             ConnectionRequestResult result = testHost.requestEnvironment(exportedSession, id, config);
-            if (result.getStatus().getStatus()) {
+            if (result != null && result.getStatus().getStatus()) {
                connector.setConnected(true);
                return new TestHostConnection(connector, testHost, result.getEnvironment(), result.getSessionKey());
             } else {

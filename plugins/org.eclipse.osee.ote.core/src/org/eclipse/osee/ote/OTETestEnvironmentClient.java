@@ -40,6 +40,7 @@ import org.eclipse.osee.ote.message.event.OteEventMessageUtil;
 import org.eclipse.osee.ote.message.event.send.OteEndpointSendEventMessage;
 import org.eclipse.osee.ote.message.event.send.OteEventMessageFuture;
 import org.eclipse.osee.ote.message.event.send.OteSendEventMessage;
+import org.eclipse.osee.ote.properties.OtePropertiesCore;
 import org.eclipse.osee.ote.remote.messages.BooleanResponse;
 import org.eclipse.osee.ote.remote.messages.ConfigurationAndResponse;
 import org.eclipse.osee.ote.remote.messages.DisconnectRemoteTestEnvironment;
@@ -134,6 +135,7 @@ public class OTETestEnvironmentClient {
             ser.getHeader().RESPONSE_TOPIC.setValue(SerializedOTEJobStatus.EVENT);
 
             OteEndpointSendEventMessage sendit = new OteEndpointSendEventMessage(service, destinationAddress);
+            service.addBroadcast(service.getOteEndpointSender(destinationAddress));//so we can communicate via console before connect
             WaitForCompletion completion = new WaitForCompletion(monitor);
             final OteEventMessageFuture<SerializedConfigurationAndResponse, SerializedOTEJobStatus> asynchSendAndResponse = sendit.asynchSendAndMultipleResponse(SerializedOTEJobStatus.class, ser, completion,  1000 * 60 * 10);
             Thread th = new Thread(new Runnable(){
@@ -350,8 +352,10 @@ public class OTETestEnvironmentClient {
          SerializedRequestRemoteTestEnvironment req = new SerializedRequestRemoteTestEnvironment(new RequestRemoteTestEnvironment(session, id, config));
          SerializedConnectionRequestResult result = new SerializedConnectionRequestResult();
          OteEndpointSendEventMessage sendit = new OteEndpointSendEventMessage(service, destinationAddress);
-         result = sendit.synchSendAndResponse(result, req, 1000 * 120);
-         return result.getObject();
+         result = sendit.synchSendAndResponse(result, req, OtePropertiesCore.serverConnectionTimeout.getLongValue(1000 * 10));
+         if(result != null){
+            return result.getObject();
+         }
       } catch (IOException e) {
          e.printStackTrace();
       } catch (ClassNotFoundException e) {

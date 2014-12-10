@@ -14,6 +14,7 @@ public enum OtePropertiesCore implements OteProperties {
    noStacktraceFilter("org.eclipse.osee.ote.core.noStacktraceFilter"),
    outfilesLocation("osee.ote.outfiles"),
    pingTimeout("ote.client.pingTimeout"),
+   serverConnectionTimeout("ote.server.connection.timeout"),
    serverFactoryClass("osee.ote.server.factory.class"),
    serverKeepalive("osee.ote.server.keepAlive"),
    serverTitle("osee.ote.server.title"),
