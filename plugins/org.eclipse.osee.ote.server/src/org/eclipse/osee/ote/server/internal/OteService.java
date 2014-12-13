@@ -35,11 +35,13 @@ import org.eclipse.osee.ote.core.IUserSession;
 import org.eclipse.osee.ote.core.OSEEPerson1_4;
 import org.eclipse.osee.ote.core.OTESessionManager;
 import org.eclipse.osee.ote.core.ReturnStatus;
+import org.eclipse.osee.ote.core.ServiceUtility;
 import org.eclipse.osee.ote.core.environment.TestEnvironmentConfig;
 import org.eclipse.osee.ote.core.environment.interfaces.IHostTestEnvironment;
 import org.eclipse.osee.ote.core.environment.interfaces.IRuntimeLibraryManager;
 import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironment;
 import org.eclipse.osee.ote.endpoint.OteUdpEndpoint;
+import org.eclipse.osee.ote.io.OTEServerFolder;
 import org.eclipse.osee.ote.message.MessageSystemTestEnvironment;
 import org.eclipse.osee.ote.properties.OtePropertiesCore;
 import org.eclipse.osee.ote.server.PropertyParamter;
@@ -90,14 +92,17 @@ public class OteService implements IHostTestEnvironment {
          OseeLog.log(OteService.class, Level.SEVERE, "Failed to set the appServerURI", e);
       }
       
-      String ioRedirectPath = OtePropertiesCore.ioRedirectPath.getValue();
-      if(ioRedirectPath != null){
-         File dir = new File(ioRedirectPath);
+      OTEServerFolder service = ServiceUtility.getService(OTEServerFolder.class);
+      if(service != null){
+         File dir = service.getCurrentServerFolder();
          if(dir.exists() && dir.isDirectory()){
             try{
                Properties serverProperties = new Properties();
                serverProperties.putAll(enhancedProperties.asMap());
-               serverProperties.store(new FileOutputStream(new File(dir, "server.properties")), "");;
+               serverProperties.store(new FileOutputStream(new File(dir, "server.properties")), "");
+               File running = new File(dir, ".running");
+               running.createNewFile();
+               running.deleteOnExit();
             } catch (Throwable th){
                th.printStackTrace();
             }

@@ -33,6 +33,7 @@ import org.eclipse.osee.ote.core.environment.TestEnvironmentConfig;
 import org.eclipse.osee.ote.core.framework.command.ICommandHandle;
 import org.eclipse.osee.ote.core.framework.command.ITestCommandResult;
 import org.eclipse.osee.ote.core.framework.command.RunTests;
+import org.eclipse.osee.ote.endpoint.OteEndpointUtil;
 import org.eclipse.osee.ote.endpoint.OteUdpEndpoint;
 import org.eclipse.osee.ote.filetransfer.TcpFileTransfer;
 import org.eclipse.osee.ote.filetransfer.TcpFileTransferHandle;
@@ -68,6 +69,10 @@ public class OTETestEnvironmentClient {
    private OteUdpEndpoint service;
    private InetSocketAddress destinationAddress;
    private ExecutorService pool;
+   
+   public static OTETestEnvironmentClient getInstance(String endpoint){
+      return new OTETestEnvironmentClient(ServiceUtility.getService(OteUdpEndpoint.class), OteEndpointUtil.getAddress(endpoint));
+   }
    
    public OTETestEnvironmentClient(OteUdpEndpoint service, InetSocketAddress destinationAddress) {
       this.service = service;

@@ -17,7 +17,6 @@ import org.eclipse.osee.framework.logging.IHealthStatus;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.Configuration;
 import org.eclipse.osee.ote.OTEApi;
-import org.eclipse.osee.ote.OTEServerFolder;
 import org.eclipse.osee.ote.core.ServiceUtility;
 import org.eclipse.osee.ote.core.environment.TestEnvironment;
 import org.eclipse.osee.ote.core.environment.status.CommandEndedStatusEnum;
@@ -25,6 +24,7 @@ import org.eclipse.osee.ote.core.environment.status.OTEStatusBoard;
 import org.eclipse.osee.ote.core.framework.IMethodResult;
 import org.eclipse.osee.ote.core.framework.ReturnCode;
 import org.eclipse.osee.ote.core.framework.saxparse.ProcessOutfileOverview;
+import org.eclipse.osee.ote.io.OTEServerFolder;
 import org.eclipse.osee.ote.message.IMessageTestContext;
 
 public class RunTests implements ITestServerCommand, Serializable {
