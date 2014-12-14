@@ -51,7 +51,6 @@ public class OTEFolderImpl implements OTEServerFolder{
       currentServerFolder = getNewServerFolder();
       String serverIOPath = OtePropertiesCore.ioRedirectPath.getValue(currentServerFolder.getAbsolutePath());
       currentServerFolder = new File(serverIOPath);
-      currentServerFolder.mkdirs();
    }
    
    /**

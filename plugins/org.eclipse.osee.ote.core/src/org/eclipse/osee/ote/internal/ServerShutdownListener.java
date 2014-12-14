@@ -24,7 +24,7 @@ public class ServerShutdownListener implements EventHandler {
 
    @Override
    public void handleEvent(Event arg0) {
-      if(oteApi.getTestEnvironment() == null){
+      if(oteApi.getIHostTestEnvironment() == null){
          return;
       }
       TestEnvironmentServerShutdown serverShutdown = new TestEnvironmentServerShutdown(OteEventMessageUtil.getBytes(arg0));

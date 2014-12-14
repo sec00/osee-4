@@ -95,6 +95,7 @@ public class OteService implements IHostTestEnvironment {
       OTEServerFolder service = ServiceUtility.getService(OTEServerFolder.class);
       if(service != null){
          File dir = service.getCurrentServerFolder();
+         dir.mkdirs();
          if(dir.exists() && dir.isDirectory()){
             try{
                Properties serverProperties = new Properties();

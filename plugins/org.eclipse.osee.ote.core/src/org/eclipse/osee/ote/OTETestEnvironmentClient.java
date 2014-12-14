@@ -91,7 +91,8 @@ public class OTETestEnvironmentClient {
    public void shutdownServer(String serverId){
       TestEnvironmentServerShutdown shutdown = new TestEnvironmentServerShutdown();
       shutdown.SERVER_ID.setValue(serverId);
-      OteEventMessageUtil.postEvent(shutdown);
+      OteEndpointSendEventMessage sendit = new OteEndpointSendEventMessage(service, destinationAddress);
+      sendit.asynchSend(shutdown);
    }
    
    public boolean getServerFile(File localFile, File serverFile) throws IOException, ExecutionException, InterruptedException{

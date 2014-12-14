@@ -36,11 +36,11 @@ public class SystemOutputImpl implements SystemOutput {
             String ioRedirectFile = OtePropertiesCore.ioRedirectFile.getValue();
             if(ioRedirectFile != null){
                if(Boolean.parseBoolean(ioRedirectFile)){
-                  String workingDirectory = serverFolder.getCurrentServerFolder().getAbsolutePath();
-                  File wd = new File(workingDirectory);
+                  File wd = serverFolder.getCurrentServerFolder();
+                  wd.mkdirs();
                   if(wd.exists() && wd.isDirectory()){
                      try {
-                        outputStream = new BufferedOutputStream(new FileOutputStream(new File(workingDirectory, SYSTEM_OUT_FILE)));
+                        outputStream = new BufferedOutputStream(new FileOutputStream(new File(wd, SYSTEM_OUT_FILE)));
                      } catch (FileNotFoundException e) {
                      }
                   }
