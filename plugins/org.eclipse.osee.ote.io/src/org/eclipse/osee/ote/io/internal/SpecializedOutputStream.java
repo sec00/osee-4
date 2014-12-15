@@ -8,11 +8,9 @@ import org.eclipse.osee.ote.io.SystemOutputListener;
 
 public class SpecializedOutputStream extends OutputStream {
 
-   private OutputStream outputStream;
    private CopyOnWriteArrayList<SystemOutputListener> listeners;
 
-   public SpecializedOutputStream(OutputStream outputStream) {
-      this.outputStream = outputStream;
+   public SpecializedOutputStream() {
       this.listeners = new CopyOnWriteArrayList<SystemOutputListener>();
    }
 
@@ -31,7 +29,6 @@ public class SpecializedOutputStream extends OutputStream {
 
    @Override
    public void close() throws IOException {
-      outputStream.close();
       for(SystemOutputListener listner:listeners){
          listner.close();
       }
@@ -39,7 +36,6 @@ public class SpecializedOutputStream extends OutputStream {
 
    @Override
    public void flush() throws IOException {
-      outputStream.flush();
       for(SystemOutputListener listner:listeners){
          listner.flush();
       }
@@ -47,7 +43,6 @@ public class SpecializedOutputStream extends OutputStream {
 
    @Override
    public void write(byte[] b, int off, int len) throws IOException {
-      outputStream.write(b, off, len);
       for(SystemOutputListener listner:listeners){
          listner.write(b, off, len);
       }
@@ -55,7 +50,6 @@ public class SpecializedOutputStream extends OutputStream {
 
    @Override
    public void write(byte[] b) throws IOException {
-      outputStream.write(b);
       for(SystemOutputListener listner:listeners){
          listner.write(b);
       }

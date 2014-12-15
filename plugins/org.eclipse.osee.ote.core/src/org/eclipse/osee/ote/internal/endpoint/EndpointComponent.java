@@ -23,7 +23,7 @@ public class EndpointComponent implements OteUdpEndpoint {
    public EndpointComponent(){
       int port;
       try {
-         String strPort = System.getProperty("ote.endpoint.port", Integer.toString(PortUtil.getInstance().getValidPort()));
+         String strPort = OtePropertiesCore.endpointPort.getValue(Integer.toString(PortUtil.getInstance().getValidPort()));
          try{
             port = Integer.parseInt(strPort);
          } catch (Throwable th){
@@ -87,7 +87,21 @@ public class EndpointComponent implements OteUdpEndpoint {
 
    @Override
    public void addBroadcast(OteUdpEndpointSender sender) {
-      broadcast.add(sender);
+      if(!isAlreadyInBroadcastList(sender)){
+         broadcast.add(sender);
+      }
+   }
+
+   private boolean isAlreadyInBroadcastList(OteUdpEndpointSender sender) {
+      OteUdpEndpointSender[] oteUdpEndpointSenders = broadcast.get();
+      for(int i = 0; i < oteUdpEndpointSenders.length; i++) {
+         if(oteUdpEndpointSenders[i].getAddress().getPort() == sender.getAddress().getPort()){
+            if(oteUdpEndpointSenders[i].getAddress().getAddress().equals(sender.getAddress().getAddress())){
+               return true;
+            }
+         }
+      }
+      return false;
    }
 
    @Override

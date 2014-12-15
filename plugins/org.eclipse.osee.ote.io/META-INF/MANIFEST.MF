@@ -11,3 +11,4 @@ Export-Package: org.eclipse.osee.ote.io
 Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/*.xml
 Bundle-Vendor: Eclipse Open System Engineering Environment
+Bundle-Activator: org.eclipse.osee.ote.io.internal.EarlyIORedirect

@@ -4,6 +4,7 @@ public enum OtePropertiesCore implements OteProperties {
 
    batchFolderDays("ote.batchfolder.days"),
    brokerUriPort("ote.server.broker.uri.port"),
+   endpointPort("ote.endpoint.port"),
    httpPort("org.osgi.service.http.port"),
    ioRedirectFile("ote.io.redirect.file"),
    ioRedirect("ote.io.redirect"),
@@ -18,15 +19,40 @@ public enum OtePropertiesCore implements OteProperties {
    serverFactoryClass("osee.ote.server.factory.class"),
    serverKeepalive("osee.ote.server.keepAlive"),
    serverTitle("osee.ote.server.title"),
+   timeDebug("ote.time.debug", false),
+   timeDebugTimeout("ote.time.debug.timeout", 250000),
    userHome("user.home"),
    userName("user.name"),
    useLookup("osee.ote.use.lookup");
-   
-   
+      
    private String key;
+   private long defaultLong;
+   private boolean defaultBoolean;
+   private String defaultString;
+   
+   private final boolean defaultValueSet;
    
    OtePropertiesCore(String key){
       this.key = key;
+      this.defaultValueSet = false;
+   }
+   
+   OtePropertiesCore(String key, long defaultLong){
+      this.key = key;
+      this.defaultLong = defaultLong;
+      this.defaultValueSet = true;
+   }
+   
+   OtePropertiesCore(String key, boolean defaultBoolean){
+      this.key = key;
+      this.defaultBoolean = defaultBoolean;
+      this.defaultValueSet = true;
+   }
+   
+   OtePropertiesCore(String key, String defaultString){
+      this.key = key;
+      this.defaultString = defaultString;
+      this.defaultValueSet = true;
    }
    
    @Override
@@ -55,6 +81,46 @@ public enum OtePropertiesCore implements OteProperties {
       try{
          value = Long.parseLong(valueStr);
       } catch (Throwable th){
+      }
+      return value;
+   }
+
+   public long getLongValue() {
+      if(!defaultValueSet){
+         throw new IllegalStateException("No default value set.");
+      }
+      long value = defaultLong;
+      String valueStr = System.getProperty(key);
+      try{
+         value = Long.parseLong(valueStr);
+      } catch (Throwable th){
+      }
+      return value;
+   }
+   
+   public boolean getBooleanValue(boolean defaultValue) {
+      boolean value = defaultValue;
+      String valueStr = System.getProperty(key);
+      if(valueStr != null){
+         try{
+            value = Boolean.parseBoolean(valueStr);
+         } catch (Throwable th){
+         }
+      }
+      return value;
+   }
+   
+   public boolean getBooleanValue() {
+      if(!defaultValueSet){
+         throw new IllegalStateException("No default value set.");
+      }
+      boolean value = defaultBoolean;
+      String valueStr = System.getProperty(key);
+      if(valueStr != null){
+         try{
+            value = Boolean.parseBoolean(valueStr);
+         } catch (Throwable th){
+         }
       }
       return value;
    }

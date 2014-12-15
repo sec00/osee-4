@@ -227,7 +227,7 @@ public class OTEFolderImpl implements OTEServerFolder{
          folder.mkdirs();
          fos = new FileOutputStream(new File(folder, DELETE_MARKER));
       } catch (FileNotFoundException e) {
-         e.printStackTrace();
+         OseeLog.log(getClass(), Level.SEVERE, e);
       } finally {
          if(fos != null){
             try {
