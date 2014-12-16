@@ -1,13 +1,8 @@
 package org.eclipse.osee.ote.io.internal;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import org.eclipse.osee.ote.io.OTEServerFolder;
 import org.eclipse.osee.ote.io.SystemOutputListener;
 import org.eclipse.osee.ote.properties.OtePropertiesCore;
 import org.osgi.framework.BundleActivator;
@@ -25,7 +20,6 @@ public class EarlyIORedirect implements BundleActivator {
    private PrintStream oldOut;
    private InputStream oldIn;
    private SpecializedOut out;
-   private BufferedOutputStream outputStream;
    private SpecializedInputStream in;
    private String newline;
    

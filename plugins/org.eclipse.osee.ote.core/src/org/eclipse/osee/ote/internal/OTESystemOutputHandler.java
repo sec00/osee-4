@@ -68,18 +68,20 @@ public class OTESystemOutputHandler implements SystemOutputListener {
 
    @Override
    public synchronized void write(byte[] b, int off, int len) throws IOException {
-      if(buffer.remaining() <= len){
-         flush();
+      while(len > 0){
+         if(buffer.position() > 0 && buffer.remaining() <= len){
+            flush();
+         }
+         int length = (buffer.remaining() < len) ? buffer.remaining() : len;
+         len = len - length;
+         buffer.put(b, off, length);   
+         off += length;
       }
-      buffer.put(b, off, len);
    }
 
    @Override
    public synchronized void write(byte[] b) throws IOException {
-      if(buffer.remaining() <= b.length){
-         flush();
-      }
-      buffer.put(b);
+      write(b, 0, b.length);
    }
 
 }
