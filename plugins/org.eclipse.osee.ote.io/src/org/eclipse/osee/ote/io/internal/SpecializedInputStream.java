@@ -25,10 +25,15 @@ public class SpecializedInputStream extends InputStream {
          public void run() {
             InputStreamReader isr=new InputStreamReader(monitorIn);
             BufferedReader br=new BufferedReader(isr);
-            while(true){
+            boolean validSystemIn = true;
+            while(validSystemIn){
                try{
                   String line = br.readLine();
-                  add(line);                  
+                  if(line != null){
+                     add(line); 
+                  } else {
+                     validSystemIn = false;
+                  }
                } catch (Throwable th){
                   
                }

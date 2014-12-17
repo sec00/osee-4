@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.rmi.server.ExportException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -93,6 +94,21 @@ public class RunTests implements ITestServerCommand, Serializable {
       }   
       
       for (IPropertyStore store : scripts) {
+         Set<String> arrayKeySet = global.arrayKeySet();
+         for(String key:arrayKeySet){
+            String[] array = global.getArray(key);
+            if(array != null ){
+               store.put(key, array);
+            }
+         }
+         Set<String> keySet = global.keySet();
+         for(String key:keySet){
+            String val = global.get(key);
+            if(val != null ){
+               store.put(key, val);
+            }
+         }
+                 
          if (cancelAll) {
             statusBoard.onTestComplete(store.get(RunTestsKeys.testClass.name()),
                store.get(RunTestsKeys.serverOutfilePath.name()),

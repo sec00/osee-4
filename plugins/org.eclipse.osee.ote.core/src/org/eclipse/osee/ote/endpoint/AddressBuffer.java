@@ -9,7 +9,7 @@ public class AddressBuffer {
    private InetSocketAddress address;
    
    public AddressBuffer(){
-      buffer = ByteBuffer.allocate(64000);
+      buffer = ByteBuffer.allocate(131072);
    }
    
    public ByteBuffer getBuffer(){
