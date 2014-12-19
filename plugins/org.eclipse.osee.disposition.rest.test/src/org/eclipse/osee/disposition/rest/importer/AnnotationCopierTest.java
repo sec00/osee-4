@@ -20,7 +20,7 @@ import org.eclipse.osee.disposition.model.DispoStrings;
 import org.eclipse.osee.disposition.rest.internal.DispoConnector;
 import org.eclipse.osee.disposition.rest.internal.importer.AnnotationCopier;
 import org.eclipse.osee.disposition.rest.internal.report.OperationReport;
-import org.eclipse.osee.disposition.rest.util.DispoUtil;
+import org.eclipse.osee.disposition.util.DispoUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

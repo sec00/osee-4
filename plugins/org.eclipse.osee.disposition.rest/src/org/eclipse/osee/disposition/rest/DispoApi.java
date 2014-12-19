@@ -32,7 +32,7 @@ public interface DispoApi {
    // Queries
    ResultSet<IOseeBranch> getDispoPrograms();
 
-   List<DispoSet> getDispoSets(DispoProgram program);
+   List<DispoSet> getDispoSets(DispoProgram program, String type);
 
    DispoSet getDispoSetById(DispoProgram program, String dispoSetId);
 

@@ -34,7 +34,7 @@ public interface DispoQuery {
 
    boolean isUniqueItemName(DispoProgram program, String setId, String name);
 
-   List<DispoSet> findDispoSets(DispoProgram program);
+   List<DispoSet> findDispoSets(DispoProgram program, String type);
 
    DispoSet findDispoSetsById(DispoProgram program, String id);
 

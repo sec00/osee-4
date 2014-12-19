@@ -11,8 +11,8 @@
 package org.eclipse.osee.disposition.rest.util;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.osee.disposition.model.Discrepancy;
 import org.eclipse.osee.disposition.model.DispoAnnotationData;
 import org.eclipse.osee.disposition.model.DispoItem;
@@ -51,19 +51,11 @@ public final class DispoUtil {
          DispoStrings.Exception_Handling_Resolution);
    }
 
-   public static JSONObject getById(JSONArray list, String id) {
-      try {
-         for (int i = 0; i < list.length(); i++) {
-            JSONObject object;
-            object = list.getJSONObject(i);
-            if (object.has("id")) {
-               if (object.getString("id").equals(id)) {
-                  return object;
-               }
-            }
+   public static DispoAnnotationData getById(List<DispoAnnotationData> list, String id) {
+      for (DispoAnnotationData annotation : list) {
+         if (annotation.getId().equals(id)) {
+            return annotation;
          }
-      } catch (JSONException ex) {
-         throw new OseeCoreException(ex);
       }
 
       return null;
@@ -145,7 +137,10 @@ public final class DispoUtil {
       dispoItemData.setElapsedTime(dispoItemArt.getElapsedTime());
       dispoItemData.setItemNotes(dispoItemArt.getItemNotes());
       if (isIncludeDiscrepancies) {
-         dispoItemData.setDiscrepanciesList(dispoItemArt.getDiscrepanciesList());
+         Map<String, Discrepancy> discrepanciesList = dispoItemArt.getDiscrepanciesList();
+         dispoItemData.setDiscrepanciesList(discrepanciesList);
+         dispoItemData.setDiscrepanciesAsRanges(discrepanciesToString(discrepanciesList));
+         dispoItemData.setFailureCount(discrepanciesList.size());
       }
       if (isIncludeAnnotations) {
          dispoItemData.setAnnotationsList(dispoItemArt.getAnnotationsList());
@@ -153,22 +148,15 @@ public final class DispoUtil {
       return dispoItemData;
    }
 
-   @SuppressWarnings("unchecked")
-   public static String discrepanciesToString(JSONObject discrepanciesList) {
+   public static String discrepanciesToString(Map<String, Discrepancy> discrepanciesList) {
       List<Integer> discrepanciesPoints = new ArrayList<Integer>();
-      Iterator<String> iterator = discrepanciesList.keys();
-      while (iterator.hasNext()) {
-         try {
-            JSONObject jObject = discrepanciesList.getJSONObject(iterator.next());
-            int location = jObject.getInt("location");
-            discrepanciesPoints.add(location);
-         } catch (JSONException ex) {
-            throw new OseeCoreException(ex);
-         }
+      for (String key : discrepanciesList.keySet()) {
+         Discrepancy disrepancy = discrepanciesList.get(key);
+         int location = disrepancy.getLocation();
+         discrepanciesPoints.add(location);
       }
 
       return LocationRangesCompressor.compress(discrepanciesPoints);
-
    }
 
    public static DispoItemData jsonObjToDispoItem(JSONObject jsonObject) {
@@ -180,8 +168,8 @@ public final class DispoUtil {
          if (jsonObject.has("guid")) {
             dispoItem.setGuid(jsonObject.getString("guid"));
          }
-         if (jsonObject.has("itemStatus")) {
-            dispoItem.setStatus(jsonObject.getString("itemStatus"));
+         if (jsonObject.has("status")) {
+            dispoItem.setStatus(jsonObject.getString("status"));
          }
          if (jsonObject.has("totalPoints")) {
             dispoItem.setTotalPoints(jsonObject.getString("totalPoints"));
@@ -189,17 +177,11 @@ public final class DispoUtil {
          if (jsonObject.has("needsRerun")) {
             dispoItem.setNeedsRerun(jsonObject.getBoolean("needsRerun"));
          }
-         if (jsonObject.has("itemVersion")) {
-            dispoItem.setVersion(jsonObject.getString("itemVersion"));
+         if (jsonObject.has("version")) {
+            dispoItem.setVersion(jsonObject.getString("version"));
          }
          if (jsonObject.has("assignee")) {
             dispoItem.setAssignee(jsonObject.getString("assignee"));
-         }
-         if (jsonObject.has("discrepanciesList")) {
-            dispoItem.setDiscrepanciesList(jsonObject.getJSONObject("discrepanciesList"));
-         }
-         if (jsonObject.has("annotationsList")) {
-            dispoItem.setAnnotationsList(jsonObject.getJSONArray("annotationsList"));
          }
          if (jsonObject.has("category")) {
             dispoItem.setCategory(jsonObject.getString("category"));
@@ -253,7 +235,7 @@ public final class DispoUtil {
       JSONObject jsonObject = new JSONObject();
       try {
          jsonObject.put("discrepanciesAsRanges", discrepanciesToString(dispoItem.getDiscrepanciesList()));
-         jsonObject.put("failureCount", dispoItem.getDiscrepanciesList().length());
+         jsonObject.put("failureCount", dispoItem.getDiscrepanciesList().size());
          jsonObject.put("name", dispoItem.getName());
          jsonObject.put("status", dispoItem.getStatus());
          jsonObject.put("totalPoints", dispoItem.getTotalPoints());
@@ -314,7 +296,12 @@ public final class DispoUtil {
             dispoAnnotation.setLocationRefs(object.getString("locationRefs"));
          }
          if (object.has("idsOfCoveredDiscrepancies")) {
-            dispoAnnotation.setIdsOfCoveredDiscrepancies(object.getJSONArray("idsOfCoveredDiscrepancies"));
+            List<String> idsOfCoveredDiscrepanciesList = new ArrayList<String>();
+            JSONArray jArray = object.getJSONArray("idsOfCoveredDiscrepancies");
+            for (int i = 0; i < jArray.length(); i++) {
+               idsOfCoveredDiscrepanciesList.add(jArray.getString(i));
+            }
+            dispoAnnotation.setIdsOfCoveredDiscrepancies(idsOfCoveredDiscrepanciesList);
          }
          if (object.has("isValid")) {
             dispoAnnotation.setIsConnected(object.getBoolean("isValid"));
@@ -341,6 +328,35 @@ public final class DispoUtil {
          throw new OseeCoreException(ex);
       }
       return dispoAnnotation;
+   }
+
+   public static JSONObject disrepanciesMapToJson(Map<String, Discrepancy> discrepancies) {
+      JSONObject jObject = null;
+      try {
+         jObject = new JSONObject();
+         for (String key : discrepancies.keySet()) {
+            jObject.put(key, DispoUtil.discrepancyToJsonObj(discrepancies.get(key)));
+         }
+
+      } catch (JSONException ex) {
+         throw new OseeCoreException(ex);
+      }
+      return jObject;
+
+   }
+
+   public static JSONArray annotationsListToJson(List<DispoAnnotationData> annotations) {
+      JSONArray jArray = null;
+      try {
+         jArray = new JSONArray();
+         for (DispoAnnotationData annotation : annotations) {
+            jArray.put(annotation.getIndex(), DispoUtil.annotationToJsonObj(annotation));
+         }
+
+      } catch (JSONException ex) {
+         throw new OseeCoreException(ex);
+      }
+      return jArray;
    }
 
    public static Discrepancy jsonObjToDiscrepancy(JSONObject object) throws JSONException {

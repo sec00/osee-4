@@ -15,18 +15,19 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
 import org.eclipse.osee.disposition.model.DispoAnnotationData;
+import java.util.Map;
+import org.eclipse.osee.disposition.model.Discrepancy;
 import org.eclipse.osee.disposition.model.DispoItem;
 import org.eclipse.osee.disposition.model.DispoProgram;
 import org.eclipse.osee.disposition.model.DispoSet;
 import org.eclipse.osee.disposition.rest.DispoApi;
 import org.eclipse.osee.disposition.rest.internal.DispoConnector;
-import org.eclipse.osee.disposition.rest.internal.LocationRangesCompressor;
-import org.eclipse.osee.disposition.rest.util.DispoUtil;
+import org.eclipse.osee.disposition.util.DispoUtil;
+import org.eclipse.osee.disposition.util.LocationRangesCompressor;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.util.io.xml.ExcelXmlWriter;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * @author Angel Avila
@@ -56,13 +57,13 @@ public class ExportSet {
             String[] row = new String[columns];
             int index = 0;
 
-            JSONObject discrepanciesList = item.getDiscrepanciesList();
+            Map<String, Discrepancy> discrepanciesList = item.getDiscrepanciesList();
 
             row[index++] = String.valueOf(item.getName());
             row[index++] = String.valueOf(item.getCategory());
             row[index++] = String.valueOf(item.getStatus());
             row[index++] = String.valueOf(item.getTotalPoints());
-            row[index++] = String.valueOf(item.getDiscrepanciesList().length());
+            row[index++] = String.valueOf(item.getDiscrepanciesList().size());
             row[index++] = String.valueOf(DispoUtil.discrepanciesToString(discrepanciesList));
             row[index++] = String.valueOf(allUncoveredDiscprepancies.size());
             row[index++] = String.valueOf(LocationRangesCompressor.compress(allUncoveredDiscprepancies));

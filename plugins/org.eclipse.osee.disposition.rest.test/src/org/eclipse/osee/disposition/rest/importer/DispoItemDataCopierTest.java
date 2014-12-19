@@ -26,7 +26,7 @@ import org.eclipse.osee.disposition.rest.internal.DispoConnector;
 import org.eclipse.osee.disposition.rest.internal.importer.DiscrepancyParser;
 import org.eclipse.osee.disposition.rest.internal.importer.DispoItemDataCopier;
 import org.eclipse.osee.disposition.rest.internal.report.OperationReport;
-import org.eclipse.osee.disposition.rest.util.DispoUtil;
+import org.eclipse.osee.disposition.util.DispoUtil;
 import org.eclipse.osee.framework.jdk.core.util.GUID;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.orcs.db.mock.OsgiService;

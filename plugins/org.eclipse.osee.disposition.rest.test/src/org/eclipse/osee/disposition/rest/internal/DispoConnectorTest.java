@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.osee.disposition.rest.internal;
 
-import static org.eclipse.osee.disposition.rest.util.DispoUtil.annotationToJsonObj;
-import static org.eclipse.osee.disposition.rest.util.DispoUtil.discrepancyToJsonObj;
+import static org.eclipse.osee.disposition.util.DispoUtil.annotationToJsonObj;
+import static org.eclipse.osee.disposition.util.DispoUtil.discrepancyToJsonObj;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;

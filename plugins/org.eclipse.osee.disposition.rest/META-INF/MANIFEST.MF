@@ -13,6 +13,7 @@ Import-Package:
  javax.ws.rs.core,
  javax.ws.rs.ext,
  org.eclipse.osee.disposition.model,
+ org.eclipse.osee.disposition.util,
  org.eclipse.osee.executor.admin,
  org.eclipse.osee.framework.core.data,
  org.eclipse.osee.framework.core.enums,

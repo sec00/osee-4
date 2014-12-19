@@ -118,7 +118,7 @@ public class DispoSetResource {
    @GET
    @Produces(MediaType.APPLICATION_JSON)
    public Iterable<DispoSet> getAllDispoSets(@QueryParam("type") String type) {
-      List<DispoSet> allDispoSets = dispoApi.getDispoSets(program);
+      List<DispoSet> allDispoSets = dispoApi.getDispoSets(program, type);
       return allDispoSets;
    }
 

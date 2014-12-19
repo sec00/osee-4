@@ -20,14 +20,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import org.eclipse.osee.disposition.model.DispoItem;
 import org.eclipse.osee.disposition.model.DispoItemData;
 import org.eclipse.osee.disposition.model.DispoMessages;
 import org.eclipse.osee.disposition.model.DispoProgram;
 import org.eclipse.osee.disposition.rest.DispoApi;
 import org.eclipse.osee.disposition.rest.util.DispoUtil;
-import org.json.JSONArray;
 
 /**
  * @author Angel Avila
@@ -45,15 +43,9 @@ public class DispoItemResource {
 
    @GET
    @Produces(MediaType.APPLICATION_JSON)
-   public Response getAllDispoItems() throws Exception {
-      List<DispoItem> dispoItems = dispoApi.getDispoItems(program, setId);
-      JSONArray jarray = new JSONArray();
-      for (DispoItem dispoItem : dispoItems) {
-         jarray.put(DispoUtil.dispoItemToJsonObj(dispoItem));
-      }
-
-      ResponseBuilder builder = Response.ok(jarray.toString());
-      return builder.build();
+   public Iterable<DispoItem> getAllDispoItems() {
+      List<DispoItem> allDispoItems = dispoApi.getDispoItems(program, setId);
+      return allDispoItems;
    }
 
    /**

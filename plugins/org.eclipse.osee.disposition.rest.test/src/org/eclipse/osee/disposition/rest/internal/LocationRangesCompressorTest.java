@@ -12,6 +12,7 @@ package org.eclipse.osee.disposition.rest.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.osee.disposition.util.LocationRangesCompressor;
 import org.junit.Assert;
 import org.junit.Test;
 

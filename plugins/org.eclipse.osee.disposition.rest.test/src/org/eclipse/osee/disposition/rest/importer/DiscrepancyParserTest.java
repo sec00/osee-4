@@ -18,7 +18,7 @@ import java.util.Iterator;
 import org.eclipse.osee.disposition.model.Discrepancy;
 import org.eclipse.osee.disposition.model.DispoItemData;
 import org.eclipse.osee.disposition.rest.internal.importer.DiscrepancyParser;
-import org.eclipse.osee.disposition.rest.util.DispoUtil;
+import org.eclipse.osee.disposition.util.DispoUtil;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.json.JSONObject;
 import org.junit.Assert;

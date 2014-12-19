@@ -11,10 +11,11 @@
 
 package org.eclipse.osee.disposition.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.eclipse.osee.framework.jdk.core.type.Identifiable;
 import org.eclipse.osee.framework.jdk.core.type.Identity;
-import org.json.JSONArray;
 
 /**
  * @author Angel Avila
@@ -29,7 +30,7 @@ public class DispoAnnotationData implements Identifiable<String> {
    private String customerNotes;
    private String locationRefs;
    private boolean isConnected;
-   private JSONArray idsOfCoveredDiscrepancies;
+   private List<String> idsOfCoveredDiscrepancies;
    private String resolution;
    private boolean isResolutionValid;
    private String resolutionType;
@@ -69,7 +70,7 @@ public class DispoAnnotationData implements Identifiable<String> {
       return locationRefs;
    }
 
-   public JSONArray getIdsOfCoveredDiscrepancies() {
+   public List<String> getIdsOfCoveredDiscrepancies() {
       return idsOfCoveredDiscrepancies;
    }
 
@@ -117,7 +118,7 @@ public class DispoAnnotationData implements Identifiable<String> {
       this.isConnected = isConnected;
    }
 
-   public void setIdsOfCoveredDiscrepancies(JSONArray idsOfCoveredDiscrepancies) {
+   public void setIdsOfCoveredDiscrepancies(List<String> idsOfCoveredDiscrepancies) {
       this.idsOfCoveredDiscrepancies = idsOfCoveredDiscrepancies;
    }
 
@@ -147,7 +148,7 @@ public class DispoAnnotationData implements Identifiable<String> {
 
    public void disconnect() {
       this.isConnected = false;
-      this.idsOfCoveredDiscrepancies = new JSONArray();
+      this.idsOfCoveredDiscrepancies = new ArrayList<String>();
    }
 
    @Override

@@ -5,6 +5,7 @@ Bundle-SymbolicName: org.eclipse.osee.disposition.rest.model
 Bundle-Version: 0.21.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: Eclipse Open System Engineering Environment
-Export-Package: org.eclipse.osee.disposition.model
+Export-Package: org.eclipse.osee.disposition.model,
+ org.eclipse.osee.disposition.util
 Import-Package: org.eclipse.osee.framework.jdk.core.type,
  org.json

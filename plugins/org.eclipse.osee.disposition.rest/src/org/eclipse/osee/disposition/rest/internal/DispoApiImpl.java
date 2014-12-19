@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.eclipse.osee.disposition.model.Discrepancy;
 import org.eclipse.osee.disposition.model.DispoAnnotationData;
 import org.eclipse.osee.disposition.model.DispoItem;
 import org.eclipse.osee.disposition.model.DispoItemData;
@@ -43,9 +44,7 @@ import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.ResultSet;
 import org.eclipse.osee.logger.Log;
 import org.eclipse.osee.orcs.data.ArtifactReadable;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * @author Angel Avila
@@ -125,18 +124,16 @@ public class DispoApiImpl implements DispoApi {
       DispoItem dispoItem = getQuery().findDispoItemById(program, itemId);
       if (dispoItem != null && dispoItem.getAssignee().equalsIgnoreCase(userName)) {
          try {
-            JSONArray annotationsList = dispoItem.getAnnotationsList();
+            List<DispoAnnotationData> annotationsList = dispoItem.getAnnotationsList();
             dataFactory.initAnnotation(annotationToCreate);
             idOfNewAnnotation = dataFactory.getNewId();
             annotationToCreate.setId(idOfNewAnnotation);
-            int indexOfAnnotation = annotationsList.length();
+            int indexOfAnnotation = annotationsList.size();
             annotationToCreate.setIndex(indexOfAnnotation);
 
-            JSONObject discrepanciesList = dispoItem.getDiscrepanciesList();
-
+            Map<String, Discrepancy> discrepanciesList = dispoItem.getDiscrepanciesList();
             dispoConnector.connectAnnotation(annotationToCreate, discrepanciesList);
-
-            annotationsList.put(indexOfAnnotation, DispoUtil.annotationToJsonObj(annotationToCreate));
+            annotationsList.add(indexOfAnnotation, annotationToCreate);
 
             DispoItem updatedItem;
             updatedItem = dataFactory.createUpdatedItem(annotationsList, discrepanciesList);
@@ -204,47 +201,42 @@ public class DispoApiImpl implements DispoApi {
       boolean wasUpdated = false;
       DispoItem dispoItem = getQuery().findDispoItemById(program, itemId);
       if (dispoItem != null && dispoItem.getAssignee().equalsIgnoreCase(userName)) {
-         JSONArray annotationsList = dispoItem.getAnnotationsList();
-         JSONObject discrepanciesList = dispoItem.getDiscrepanciesList();
-         try {
-            DispoAnnotationData origAnnotation =
-               DispoUtil.jsonObjToDispoAnnotationData(DispoUtil.getById(annotationsList, annotationId));
-            int indexOfAnnotation = origAnnotation.getIndex();
+         List<DispoAnnotationData> annotationsList = dispoItem.getAnnotationsList();
+         Map<String, Discrepancy> discrepanciesList = dispoItem.getDiscrepanciesList();
+         DispoAnnotationData origAnnotation = DispoUtil.getById(annotationsList, annotationId);
+         int indexOfAnnotation = origAnnotation.getIndex();
 
-            boolean needToReconnect = false;
-            // now if the new Annotation modified the location Reference or resolution then disconnect the annotation and try to match it to discrepancies again
-            String newLocationRefs = newAnnotation.getLocationRefs();
-            String newResolution = newAnnotation.getResolution();
-            String newResolutionType = newAnnotation.getResolutionType();
+         boolean needToReconnect = false;
+         // now if the new Annotation modified the location Reference or resolution then disconnect the annotation and try to match it to discrepancies again
+         String newLocationRefs = newAnnotation.getLocationRefs();
+         String newResolution = newAnnotation.getResolution();
+         String newResolutionType = newAnnotation.getResolutionType();
 
-            if (!origAnnotation.getResolutionType().equals(newResolutionType) || !origAnnotation.getResolution().equals(
-               newResolution)) {
-               newAnnotation.setIsResolutionValid(validateResolution(newAnnotation));
-               needToReconnect = true;
-            }
-            if (!origAnnotation.getLocationRefs().equals(newLocationRefs)) {
-               needToReconnect = true;
-            }
-
-            if (needToReconnect == true) {
-               newAnnotation.disconnect();
-               dispoConnector.connectAnnotation(newAnnotation, discrepanciesList);
-            }
-
-            JSONObject annotationAsJsonObject = DispoUtil.annotationToJsonObj(newAnnotation);
-            annotationsList.put(indexOfAnnotation, annotationAsJsonObject);
-
-            ArtifactReadable author = getQuery().findUser();
-            DispoItemData modifiedDispoItem = DispoUtil.itemArtToItemData(getDispoItemById(program, itemId), true);
-
-            modifiedDispoItem.setAnnotationsList(annotationsList);
-            modifiedDispoItem.setStatus(dispoConnector.getItemStatus(modifiedDispoItem));
-            getWriter().updateDispoItem(author, program, dispoItem.getGuid(), modifiedDispoItem);
-
-            wasUpdated = true;
-         } catch (JSONException ex) {
-            throw new OseeCoreException(ex);
+         if (!origAnnotation.getResolutionType().equals(newResolutionType) || !origAnnotation.getResolution().equals(
+            newResolution)) {
+            newAnnotation.setIsResolutionValid(validateResolution(newAnnotation));
+            needToReconnect = true;
          }
+         if (!origAnnotation.getLocationRefs().equals(newLocationRefs)) {
+            needToReconnect = true;
+         }
+
+         if (needToReconnect == true) {
+            newAnnotation.disconnect();
+            dispoConnector.connectAnnotation(newAnnotation, discrepanciesList);
+         }
+
+         //            JSONObject annotationAsJsonObject = DispoUtil.annotationToJsonObj(newAnnotation);
+         annotationsList.add(indexOfAnnotation, newAnnotation);
+
+         ArtifactReadable author = getQuery().findUser();
+         DispoItemData modifiedDispoItem = DispoUtil.itemArtToItemData(getDispoItemById(program, itemId), true);
+
+         modifiedDispoItem.setAnnotationsList(annotationsList);
+         modifiedDispoItem.setStatus(dispoConnector.getItemStatus(modifiedDispoItem));
+         getWriter().updateDispoItem(author, program, dispoItem.getGuid(), modifiedDispoItem);
+
+         wasUpdated = true;
       }
       return wasUpdated;
    }
@@ -254,15 +246,15 @@ public class DispoApiImpl implements DispoApi {
       boolean wasUpdated = false;
       DispoItem dispoItem = getQuery().findDispoItemById(program, itemId);
       if (dispoItem != null && dispoItem.getAssignee().equalsIgnoreCase(userName)) {
-         JSONArray annotationsList = dispoItem.getAnnotationsList();
-         JSONObject discrepanciesList = dispoItem.getDiscrepanciesList();
+         List<DispoAnnotationData> annotationsList = dispoItem.getAnnotationsList();
+         Map<String, Discrepancy> discrepanciesList = dispoItem.getDiscrepanciesList();
          try {
-            DispoAnnotationData annotationToRemove =
-               DispoUtil.jsonObjToDispoAnnotationData(DispoUtil.getById(annotationsList, annotationId));
+            DispoAnnotationData annotationToRemove = DispoUtil.getById(annotationsList, annotationId);
             annotationToRemove.disconnect();
 
             // collapse list so there are no gaps
-            JSONArray newAnnotationsList = collapseList(annotationsList, annotationToRemove.getIndex());
+            List<DispoAnnotationData> newAnnotationsList =
+               removeAnnotationFromList(annotationsList, annotationToRemove.getIndex());
 
             DispoItem updatedItem = dataFactory.createUpdatedItem(newAnnotationsList, discrepanciesList);
 
@@ -282,8 +274,8 @@ public class DispoApiImpl implements DispoApi {
    }
 
    @Override
-   public List<DispoSet> getDispoSets(DispoProgram program) throws OseeCoreException {
-      return getQuery().findDispoSets(program);
+   public List<DispoSet> getDispoSets(DispoProgram program, String type) throws OseeCoreException {
+      return getQuery().findDispoSets(program, type);
    }
 
    @Override
@@ -308,32 +300,15 @@ public class DispoApiImpl implements DispoApi {
 
    @Override
    public List<DispoAnnotationData> getDispoAnnotations(DispoProgram program, String itemId) {
-      List<DispoAnnotationData> toReturn = new ArrayList<DispoAnnotationData>();
       DispoItem dispoItem = getQuery().findDispoItemById(program, itemId);
-      JSONArray annotationsList = dispoItem.getAnnotationsList();
-      try {
-         for (int i = 0; i < annotationsList.length(); i++) {
-            toReturn.add(DispoUtil.jsonObjToDispoAnnotationData(annotationsList.getJSONObject(i)));
-         }
-      } catch (JSONException ex) {
-         throw new OseeCoreException(ex);
-      }
-      return toReturn;
+      return dispoItem.getAnnotationsList();
    }
 
    @Override
    public DispoAnnotationData getDispoAnnotationById(DispoProgram program, String itemId, String annotationId) {
-      DispoAnnotationData toReturn = new DispoAnnotationData();
       DispoItem dispoItem = getQuery().findDispoItemById(program, itemId);
-      JSONArray annotationsList = dispoItem.getAnnotationsList();
-      JSONObject annotationInList = DispoUtil.getById(annotationsList, annotationId);
-      if (annotationInList != null) {
-         toReturn = DispoUtil.jsonObjToDispoAnnotationData(annotationInList);
-
-      } else {
-         toReturn = null;
-      }
-      return toReturn;
+      List<DispoAnnotationData> annotationsList = dispoItem.getAnnotationsList();
+      return DispoUtil.getById(annotationsList, annotationId);
    }
 
    @Override
@@ -445,18 +420,16 @@ public class DispoApiImpl implements DispoApi {
       return operationNote;
    }
 
-   private JSONArray collapseList(JSONArray oldList, int indexRemoved) throws JSONException {
-      // JSONArray's remove(index) leaves a gap so this method was created to get around that
-      // If the implementation is changed and remove(index) collapses the list, then this method can be removed
-      JSONArray newList = new JSONArray();
-      for (int i = 0; i < indexRemoved; i++) {
-         newList.put(i, oldList.getJSONObject(i));
-      }
-      for (int i = indexRemoved + 1; i < oldList.length(); i++) {
-         JSONObject annotationObject = oldList.getJSONObject(i);
-         DispoAnnotationData annotation = DispoUtil.jsonObjToDispoAnnotationData(annotationObject);
-         annotation.setIndex(annotation.getIndex() - 1);
-         newList.put(annotation.getIndex(), DispoUtil.annotationToJsonObj(annotation));
+   private List<DispoAnnotationData> removeAnnotationFromList(List<DispoAnnotationData> oldList, int indexRemoved) {
+      List<DispoAnnotationData> newList = new ArrayList<DispoAnnotationData>();
+      oldList.remove(indexRemoved);
+
+      // Re assign index to Annotations still left in list
+      int newIndex = 0;
+      for (DispoAnnotationData annotation : oldList) {
+         annotation.setIndex(newIndex);
+         newList.add(newIndex, annotation);
+         newIndex++;
       }
       return newList;
    }

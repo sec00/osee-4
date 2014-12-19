@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.osee.disposition.model.Discrepancy;
 import org.eclipse.osee.disposition.model.DispoAnnotationData;
 import org.eclipse.osee.disposition.model.DispoItem;
@@ -36,8 +37,8 @@ public class DispoItemDataCopier {
    public static void copyOldItemData(DispoItem sourceItem, DispoItemData destItem, OperationReport report) throws JSONException {
       StringBuilder message = new StringBuilder();
 
-      JSONObject destItemDiscrepancies = destItem.getDiscrepanciesList();
-      JSONArray sourceAnnotations = sourceItem.getAnnotationsList();
+      Map<String, Discrepancy> destItemDiscrepancies = destItem.getDiscrepanciesList();
+      List<DispoAnnotationData> sourceAnnotations = sourceItem.getAnnotationsList();
       Boolean needsReview = false;
       HashMap<String, Integer> idsToUpdate =
          matchupOldDiscrepancies(sourceItem.getDiscrepanciesList(), destItemDiscrepancies, sourceAnnotations, message,
