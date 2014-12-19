@@ -253,7 +253,7 @@ public class OrcsStorageImpl implements Storage {
 
       String name = newData.getName();
       String importPath = newData.getImportPath();
-      JSONArray notesList = newData.getNotesList();
+      JSONArray notesList = new JSONArray(newData.getNotesList());
 
       TransactionBuilder tx = getTxFactory().createTransaction(program.getUuid(), author, "Delete Dispo Set");
       if (name != null && !name.equals(origSetAs.getName())) {

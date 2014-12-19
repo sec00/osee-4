@@ -11,8 +11,8 @@
 
 package org.eclipse.osee.disposition.model;
 
+import java.util.List;
 import org.eclipse.osee.framework.jdk.core.type.Identifiable;
-import org.json.JSONArray;
 
 /**
  * @author Angel Avila
@@ -22,7 +22,7 @@ public interface DispoSet extends Identifiable<String> {
 
    String getImportPath();
 
-   JSONArray getNotesList();
+   List<Note> getNotesList();
 
    String getImportState();
 

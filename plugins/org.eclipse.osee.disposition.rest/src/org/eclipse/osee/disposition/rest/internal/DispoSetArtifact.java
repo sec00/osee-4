@@ -10,8 +10,12 @@
  *******************************************************************************/
 package org.eclipse.osee.disposition.rest.internal;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.osee.disposition.model.DispoSet;
+import org.eclipse.osee.disposition.model.Note;
 import org.eclipse.osee.disposition.rest.DispoConstants;
+import org.eclipse.osee.disposition.rest.util.DispoUtil;
 import org.eclipse.osee.framework.jdk.core.type.BaseIdentity;
 import org.eclipse.osee.framework.jdk.core.type.Named;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
@@ -42,10 +46,15 @@ public class DispoSetArtifact extends BaseIdentity<String> implements DispoSet, 
    }
 
    @Override
-   public JSONArray getNotesList() {
+   public List<Note> getNotesList() {
+      List<Note> toReturn = new ArrayList<Note>();
       String notesJson = artifact.getSoleAttributeAsString(DispoConstants.DispoNotesJson, "[]");
       try {
-         return new JSONArray(notesJson);
+         JSONArray jArray = new JSONArray(notesJson);
+         for (int i = 0; i < jArray.length(); i++) {
+            toReturn.add(DispoUtil.jsonObjToNote(jArray.getJSONObject(i)));
+         }
+         return toReturn;
       } catch (JSONException ex) {
          throw new OseeCoreException("Could not parse Notes Json", ex);
       }

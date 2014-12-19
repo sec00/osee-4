@@ -33,9 +33,7 @@ import org.eclipse.osee.disposition.model.DispoSetDescriptorData;
 import org.eclipse.osee.disposition.rest.DispoApi;
 import org.eclipse.osee.disposition.rest.util.DispoUtil;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * @author Angel Avila
@@ -119,27 +117,9 @@ public class DispoSetResource {
     */
    @GET
    @Produces(MediaType.APPLICATION_JSON)
-   public Response getAllDispoSets(@QueryParam("type") String type) throws JSONException {
+   public Iterable<DispoSet> getAllDispoSets(@QueryParam("type") String type) {
       List<DispoSet> allDispoSets = dispoApi.getDispoSets(program);
-      JSONArray jarray = new JSONArray();
-
-      for (DispoSet set : allDispoSets) {
-         JSONObject jobject = new JSONObject();
-         if (set.getDispoType().equalsIgnoreCase(type)) {
-            jobject.put("guid", set.getGuid());
-            jobject.put("name", set.getName());
-            jobject.put("importPath", set.getImportPath());
-            jobject.put("notesList", set.getNotesList());
-            jarray.put(jobject);
-         }
-      }
-      Status status;
-      if (allDispoSets.isEmpty()) {
-         status = Status.NOT_FOUND;
-      } else {
-         status = Status.OK;
-      }
-      return Response.status(status).entity(jarray.toString()).build();
+      return allDispoSets;
    }
 
    /**

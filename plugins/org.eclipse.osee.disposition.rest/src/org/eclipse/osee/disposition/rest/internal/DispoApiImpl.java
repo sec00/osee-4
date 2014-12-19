@@ -155,12 +155,6 @@ public class DispoApiImpl implements DispoApi {
       String reportUrl = "";
 
       if (dispSetToEdit != null) {
-         if (newSet.getNotesList() != null) {
-            JSONArray mergedNotesList =
-               dataFactory.mergeJsonArrays(dispSetToEdit.getNotesList(), newSet.getNotesList());
-            newSet.setNotesList(mergedNotesList);
-         }
-
          if (newSet.getOperation() != null) {
             reportUrl = runOperation(program, dispSetToEdit, newSet);
          }
@@ -401,9 +395,9 @@ public class DispoApiImpl implements DispoApi {
       }
 
       // Create the Note to document the Operation
-      JSONArray oldNotes = setToEdit.getNotesList();
-      JSONArray newNotes = dataFactory.mergeJsonArrays(oldNotes, generateOperationNotes(operation));
-      newSet.setNotesList(newNotes);
+      List<Note> notesList = setToEdit.getNotesList();
+      notesList.add(generateOperationNotes(operation));
+      newSet.setNotesList(notesList);
 
       // Generate report
       String reportUrl = generateReportArt(program, author, report, operation);
@@ -442,14 +436,13 @@ public class DispoApiImpl implements DispoApi {
       return toReturn;
    }
 
-   private JSONArray generateOperationNotes(String operation) {
+   private Note generateOperationNotes(String operation) {
       Note operationNote = new Note();
       Date date = new Date();
       operationNote.setDateString(date.toString());
       operationNote.setType("SYSTEM");
       operationNote.setContent(operation);
-      JSONObject operationNoteAsJson = new JSONObject(operationNote);
-      return new JSONArray(Collections.singleton(operationNoteAsJson));
+      return operationNote;
    }
 
    private JSONArray collapseList(JSONArray oldList, int indexRemoved) throws JSONException {

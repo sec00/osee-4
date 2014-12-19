@@ -22,6 +22,7 @@ import org.eclipse.osee.disposition.model.DispoSetData;
 import org.eclipse.osee.disposition.model.DispoStrings;
 import org.eclipse.osee.disposition.model.LocationRange;
 import org.eclipse.osee.disposition.model.Note;
+import org.eclipse.osee.disposition.rest.internal.DispoSetArtifact;
 import org.eclipse.osee.disposition.rest.internal.LocationRangesCompressor;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.json.JSONArray;
@@ -96,6 +97,20 @@ public final class DispoUtil {
    }
 
    public static DispoSetData setArtToSetData(DispoSet dispoSet) {
+      DispoSetData dispoSetData = new DispoSetData();
+      if (dispoSet != null) {
+         dispoSetData.setName(dispoSet.getName());
+         dispoSetData.setImportPath(dispoSet.getImportPath());
+         dispoSetData.setNotesList(dispoSet.getNotesList());
+         dispoSetData.setGuid(dispoSet.getGuid());
+         dispoSetData.setDispoType(dispoSet.getDispoType());
+      } else {
+         dispoSetData = null;
+      }
+      return dispoSetData;
+   }
+
+   public static DispoSetData setArtToJson(DispoSetArtifact dispoSet) {
       DispoSetData dispoSetData = new DispoSetData();
       if (dispoSet != null) {
          dispoSetData.setName(dispoSet.getName());
@@ -221,7 +236,12 @@ public final class DispoUtil {
             dispoSet.setOperation(jsonObject.getString("operation"));
          }
          if (jsonObject.has("notesList")) {
-            dispoSet.setNotesList(jsonObject.getJSONArray("notesList"));
+            JSONArray jArray = jsonObject.getJSONArray("notesList");
+            List<Note> notesList = new ArrayList<Note>();
+            for (int i = 0; i < jArray.length(); i++) {
+               notesList.add(jsonObjToNote(jArray.getJSONObject(i)));
+            }
+            dispoSet.setNotesList(notesList);
          }
       } catch (JSONException ex) {
          throw new OseeCoreException("Error deserializing a Dispositionable Item.", ex);
@@ -260,7 +280,7 @@ public final class DispoUtil {
       return toReturn;
    }
 
-   public static JSONObject dispoSetToJsonObj(DispoSetData dispoSet) {
+   public static JSONObject dispoSetToJsonObj(DispoSet dispoSet) {
       JSONObject jsonObject = new JSONObject(dispoSet, true);
       try {
          jsonObject.put("notesList", dispoSet.getNotesList());

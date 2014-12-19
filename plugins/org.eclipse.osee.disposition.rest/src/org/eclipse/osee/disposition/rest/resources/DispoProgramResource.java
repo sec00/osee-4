@@ -15,15 +15,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import org.eclipse.osee.disposition.rest.DispoApi;
 import org.eclipse.osee.disposition.rest.util.DispoFactory;
 import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.eclipse.osee.framework.jdk.core.type.ResultSet;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * @author Angel Avila
@@ -49,24 +45,9 @@ public class DispoProgramResource {
     */
    @GET
    @Produces(MediaType.APPLICATION_JSON)
-   public Response getAllPrograms() throws JSONException {
+   public Iterable<IOseeBranch> getAllPrograms() {
       ResultSet<IOseeBranch> allPrograms = dispoApi.getDispoPrograms();
-      JSONArray jarray = new JSONArray();
-
-      for (IOseeBranch branch : allPrograms) {
-         JSONObject jobject = new JSONObject();
-         String uuid = String.valueOf(branch.getUuid());
-         jobject.put("value", uuid);
-         jobject.put("text", branch.getName());
-         jarray.put(jobject);
-      }
-      Status status;
-      if (allPrograms.isEmpty()) {
-         status = Status.NOT_FOUND;
-      } else {
-         status = Status.OK;
-      }
-      return Response.status(status).entity(jarray.toString()).build();
+      return allPrograms;
    }
 
    @Path("{programId}/set")

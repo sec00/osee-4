@@ -11,9 +11,9 @@
 
 package org.eclipse.osee.disposition.model;
 
+import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.eclipse.osee.framework.jdk.core.type.Identity;
-import org.json.JSONArray;
 
 /**
  * @author Angel Avila
@@ -24,7 +24,7 @@ public class DispoSetData extends DispoSetDescriptorData implements DispoSet {
 
    private String guid;
    private String operation;
-   private JSONArray notesList;
+   private List<Note> notesList;
    private String importState;
    private String operationStatus;
 
@@ -53,7 +53,7 @@ public class DispoSetData extends DispoSetDescriptorData implements DispoSet {
       this.operation = operation;
    }
 
-   public void setNotesList(JSONArray notesList) {
+   public void setNotesList(List<Note> notesList) {
       this.notesList = notesList;
    }
 
@@ -62,7 +62,7 @@ public class DispoSetData extends DispoSetDescriptorData implements DispoSet {
    }
 
    @Override
-   public JSONArray getNotesList() {
+   public List<Note> getNotesList() {
       return notesList;
    }
 
