@@ -8,7 +8,7 @@
  * Contributors:
  *     Boeing - initial API and implementation
  *******************************************************************************/
-package org.eclipse.osee.orcs.db.internal.callable;
+package org.eclipse.osee.orcs.db.internal.health;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +24,14 @@ import org.eclipse.osee.jdbc.JdbcConstants;
 import org.eclipse.osee.jdbc.JdbcStatement;
 import org.eclipse.osee.logger.Log;
 import org.eclipse.osee.orcs.OrcsSession;
+import org.eclipse.osee.orcs.db.internal.callable.AbstractDatastoreTxCallable;
 import org.eclipse.osee.orcs.db.internal.sql.join.ExportImportJoinQuery;
 import org.eclipse.osee.orcs.db.internal.sql.join.SqlJoinFactory;
 
 /**
  * @author Ryan D. Brooks
  */
-public class ConsolidateRelationsDatabaseTxCallable extends AbstractDatastoreTxCallable<Object> {
+public class ConsolidateRelations extends AbstractDatastoreTxCallable<Object> {
    private static final String SELECT_RELATIONS =
       "select * from osee_relation_link order by rel_link_type_id, a_art_id, b_art_id, gamma_id";
 
@@ -65,14 +66,14 @@ public class ConsolidateRelationsDatabaseTxCallable extends AbstractDatastoreTxC
    private final SqlJoinFactory joinFactory;
    private final Console console;
 
-   long previousNetGammaId;
-   long previousObsoleteGammaId;
-   int previousTransactionId;
-   long previousBranchId;
-   ModificationType netModType;
-   TxChange netTxCurrent;
+   private long previousNetGammaId;
+   private long previousObsoleteGammaId;
+   private int previousTransactionId;
+   private long previousBranchId;
+   private ModificationType netModType;
+   private TxChange netTxCurrent;
 
-   public ConsolidateRelationsDatabaseTxCallable(Log logger, OrcsSession session, JdbcClient jdbcClient, SqlJoinFactory joinFactory, Console console) {
+   public ConsolidateRelations(Log logger, OrcsSession session, JdbcClient jdbcClient, SqlJoinFactory joinFactory, Console console) {
       super(logger, session, jdbcClient);
       this.joinFactory = joinFactory;
       this.console = console;
