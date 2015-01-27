@@ -13,6 +13,7 @@ package org.eclipse.osee.define.report.internal;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.GET;
+import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -91,6 +92,37 @@ public final class DataRightsSwReqAndCodeResource {
    public String getApplet() {
       OseeAppletPage pageUtil = new OseeAppletPage(queryFactory.branchQuery());
       return pageUtil.realizeApplet(resourceRegistry, "dataRightsReport.html", getClass());
+   }
+
+   @Path("cleandupattr")
+   @GET
+   @Produces(MediaType.TEXT_HTML)
+   public String deleteDuplicate(@MatrixParam("branch") long branch, @MatrixParam("type") long attrType, @MatrixParam("artids") long[] artIds) {
+      IAttributeType type = TokenFactory.createAttributeType(attrType, String.valueOf(attrType));
+      ResultSet<ArtifactReadable> arts = queryFactory.fromBranch(branch).andUuid(artIds).getResults();
+      TransactionBuilder txBuilder = createTxBuilder("Delete duplicate attribute values", branch);
+
+      int count = 0;
+      for (ArtifactReadable art : arts) {
+         List<Object> values = art.getAttributeValues(type);
+         if (allValuesEqual(values)) {
+            txBuilder.setAttributesFromValues(art, type, values.get(0));
+            count++;
+         }
+      }
+      txBuilder.commit();
+      return "done: " + count;
+   }
+
+   private <T> boolean allValuesEqual(List<T> values) {
+      T previous = null;
+      for (T value : values) {
+         if (previous != null && !previous.equals(value)) {
+            return false;
+         }
+         previous = value;
+      }
+      return true;
    }
 
    private static final IArtifactType WCAFE = TokenFactory.createArtifactType(0x0000BA000000001FL, "WCAFE");
