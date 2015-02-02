@@ -15,9 +15,7 @@ import java.util.List;
 import org.eclipse.osee.disposition.model.DispoAnnotationData;
 import org.eclipse.osee.disposition.model.DispoItem;
 import org.eclipse.osee.disposition.model.DispoItemData;
-import org.eclipse.osee.disposition.util.DispoUtil;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
-import org.json.JSONArray;
 import org.json.JSONException;
 
 /**
@@ -28,10 +26,10 @@ public class DispoSetDataCleaner {
    public static List<DispoItem> cleanUpPcrTypes(List<DispoItem> items) {
       List<DispoItem> toModify = new ArrayList<DispoItem>();
       for (DispoItem item : items) {
-         JSONArray annotationsList = item.getAnnotationsList();
+         List<DispoAnnotationData> annotationsList = item.getAnnotationsList();
          if (checkForBadReqType(annotationsList)) {
             try {
-               JSONArray modifiedAnnotations = cleanAnnotationsList(annotationsList);
+               List<DispoAnnotationData> modifiedAnnotations = cleanAnnotationsList(annotationsList);
                DispoItemData modifiedItem = new DispoItemData();
                modifiedItem.setAnnotationsList(modifiedAnnotations);
                modifiedItem.setGuid(item.getGuid());
@@ -47,23 +45,22 @@ public class DispoSetDataCleaner {
       return toModify;
    }
 
-   private static boolean checkForBadReqType(JSONArray annotations) {
-      if (containsBadWord(annotations.toString())) {
+   private static boolean checkForBadReqType(List<DispoAnnotationData> annotationsList) {
+      if (containsBadWord(annotationsList.toString())) {
          return true;
       } else {
          return false;
       }
    }
 
-   private static JSONArray cleanAnnotationsList(JSONArray annotations) throws JSONException {
-      for (int i = 0; i < annotations.length(); i++) {
-         DispoAnnotationData annotation = DispoUtil.jsonObjToDispoAnnotationData(annotations.getJSONObject(i));
+   private static List<DispoAnnotationData> cleanAnnotationsList(List<DispoAnnotationData> annotationsList) throws JSONException {
+      for (DispoAnnotationData annotation : annotationsList) {
          if (containsBadWord(annotation.getResolutionType())) {
             annotation.setResolutionType("Requirement");
          }
-         annotations.put(annotation.getIndex(), DispoUtil.annotationToJsonObj(annotation));
+         annotationsList.add(annotation.getIndex(), annotation);
       }
-      return annotations;
+      return annotationsList;
    }
 
    private static boolean containsBadWord(String toCheck) {

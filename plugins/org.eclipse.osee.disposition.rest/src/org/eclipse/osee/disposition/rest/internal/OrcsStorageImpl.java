@@ -209,7 +209,7 @@ public class OrcsStorageImpl implements Storage {
       List<DispoItem> toReturn = new ArrayList<DispoItem>();
       for (ArtifactReadable art : results) {
          DispoItemArtifact dispoItemArtifact = new DispoItemArtifact(art);
-         toReturn.add(DispoUtil.itemArtToItemData(dispoItemArtifact, true));
+         toReturn.add(dispoItemArtifact);
       }
       return toReturn;
    }

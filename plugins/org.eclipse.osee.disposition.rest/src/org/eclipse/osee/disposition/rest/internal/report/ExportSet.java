@@ -14,20 +14,21 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
-import org.eclipse.osee.disposition.model.DispoAnnotationData;
 import java.util.Map;
 import org.eclipse.osee.disposition.model.Discrepancy;
+import org.eclipse.osee.disposition.model.DispoAnnotationData;
 import org.eclipse.osee.disposition.model.DispoItem;
 import org.eclipse.osee.disposition.model.DispoProgram;
 import org.eclipse.osee.disposition.model.DispoSet;
 import org.eclipse.osee.disposition.rest.DispoApi;
 import org.eclipse.osee.disposition.rest.internal.DispoConnector;
-import org.eclipse.osee.disposition.util.DispoUtil;
-import org.eclipse.osee.disposition.util.LocationRangesCompressor;
+import org.eclipse.osee.disposition.rest.internal.LocationRangesCompressor;
+import org.eclipse.osee.disposition.rest.util.DispoUtil;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.util.io.xml.ExcelXmlWriter;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * @author Angel Avila

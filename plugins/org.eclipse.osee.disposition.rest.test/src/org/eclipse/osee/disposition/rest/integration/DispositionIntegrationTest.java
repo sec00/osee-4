@@ -84,7 +84,7 @@ public class DispositionIntegrationTest {
 
       DispoProgram program = dispoApi.getDispoFactory().createProgram(DispositionTestUtil.SAW_Bld_1_FOR_DISPO);
 
-      List<DispoSet> dispoSets = dispoApi.getDispoSets(program);
+      List<DispoSet> dispoSets = dispoApi.getDispoSets(program, "code_coverage");
       DispoSet devSet = dispoSets.get(0);
       String devSetId = devSet.getGuid();
 

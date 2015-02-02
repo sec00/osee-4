@@ -123,25 +123,21 @@ public class DispoApiImpl implements DispoApi {
       String idOfNewAnnotation = "";
       DispoItem dispoItem = getQuery().findDispoItemById(program, itemId);
       if (dispoItem != null && dispoItem.getAssignee().equalsIgnoreCase(userName)) {
-         try {
-            List<DispoAnnotationData> annotationsList = dispoItem.getAnnotationsList();
-            dataFactory.initAnnotation(annotationToCreate);
-            idOfNewAnnotation = dataFactory.getNewId();
-            annotationToCreate.setId(idOfNewAnnotation);
-            int indexOfAnnotation = annotationsList.size();
-            annotationToCreate.setIndex(indexOfAnnotation);
+         List<DispoAnnotationData> annotationsList = dispoItem.getAnnotationsList();
+         dataFactory.initAnnotation(annotationToCreate);
+         idOfNewAnnotation = dataFactory.getNewId();
+         annotationToCreate.setId(idOfNewAnnotation);
+         int indexOfAnnotation = annotationsList.size();
+         annotationToCreate.setIndex(indexOfAnnotation);
 
-            Map<String, Discrepancy> discrepanciesList = dispoItem.getDiscrepanciesList();
-            dispoConnector.connectAnnotation(annotationToCreate, discrepanciesList);
-            annotationsList.add(indexOfAnnotation, annotationToCreate);
+         Map<String, Discrepancy> discrepanciesList = dispoItem.getDiscrepanciesList();
+         dispoConnector.connectAnnotation(annotationToCreate, discrepanciesList);
+         annotationsList.add(indexOfAnnotation, annotationToCreate);
 
-            DispoItem updatedItem;
-            updatedItem = dataFactory.createUpdatedItem(annotationsList, discrepanciesList);
-            ArtifactReadable author = getQuery().findUser();
-            getWriter().updateDispoItem(author, program, dispoItem.getGuid(), updatedItem);
-         } catch (JSONException ex) {
-            throw new OseeCoreException(ex);
-         }
+         DispoItem updatedItem;
+         updatedItem = dataFactory.createUpdatedItem(annotationsList, discrepanciesList);
+         ArtifactReadable author = getQuery().findUser();
+         getWriter().updateDispoItem(author, program, dispoItem.getGuid(), updatedItem);
       }
       return idOfNewAnnotation;
    }
@@ -248,22 +244,18 @@ public class DispoApiImpl implements DispoApi {
       if (dispoItem != null && dispoItem.getAssignee().equalsIgnoreCase(userName)) {
          List<DispoAnnotationData> annotationsList = dispoItem.getAnnotationsList();
          Map<String, Discrepancy> discrepanciesList = dispoItem.getDiscrepanciesList();
-         try {
-            DispoAnnotationData annotationToRemove = DispoUtil.getById(annotationsList, annotationId);
-            annotationToRemove.disconnect();
+         DispoAnnotationData annotationToRemove = DispoUtil.getById(annotationsList, annotationId);
+         annotationToRemove.disconnect();
 
-            // collapse list so there are no gaps
-            List<DispoAnnotationData> newAnnotationsList =
-               removeAnnotationFromList(annotationsList, annotationToRemove.getIndex());
+         // collapse list so there are no gaps
+         List<DispoAnnotationData> newAnnotationsList =
+            removeAnnotationFromList(annotationsList, annotationToRemove.getIndex());
 
-            DispoItem updatedItem = dataFactory.createUpdatedItem(newAnnotationsList, discrepanciesList);
+         DispoItem updatedItem = dataFactory.createUpdatedItem(newAnnotationsList, discrepanciesList);
 
-            ArtifactReadable author = getQuery().findUser();
-            getWriter().updateDispoItem(author, program, dispoItem.getGuid(), updatedItem);
-            wasUpdated = true;
-         } catch (JSONException ex) {
-            throw new OseeCoreException(ex);
-         }
+         ArtifactReadable author = getQuery().findUser();
+         getWriter().updateDispoItem(author, program, dispoItem.getGuid(), updatedItem);
+         wasUpdated = true;
       }
       return wasUpdated;
    }

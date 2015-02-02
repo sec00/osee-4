@@ -25,7 +25,7 @@ import org.eclipse.osee.disposition.model.DispoSet;
 import org.eclipse.osee.disposition.rest.DispoApi;
 import org.eclipse.osee.disposition.rest.internal.DispoConnector;
 import org.eclipse.osee.disposition.rest.internal.report.STRSReport;
-import org.eclipse.osee.disposition.util.DispoUtil;
+import org.eclipse.osee.disposition.rest.util.DispoUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

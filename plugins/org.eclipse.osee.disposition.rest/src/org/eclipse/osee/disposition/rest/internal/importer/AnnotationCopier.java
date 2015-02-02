@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,11 +24,8 @@ import org.eclipse.osee.disposition.model.DispoItemData;
 import org.eclipse.osee.disposition.model.DispoStrings;
 import org.eclipse.osee.disposition.rest.internal.DispoConnector;
 import org.eclipse.osee.disposition.rest.internal.report.OperationReport;
-import org.eclipse.osee.disposition.util.DispoUtil;
+import org.eclipse.osee.disposition.rest.util.DispoUtil;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * @author Angel Avila
@@ -42,7 +38,7 @@ public class AnnotationCopier {
       this.connector = connector;
    }
 
-   public List<DispoItem> copyEntireSet(List<DispoItemData> destinationItems, Collection<DispoItem> sourceItems, boolean isCopySet, OperationReport report) throws JSONException {
+   public List<DispoItem> copyEntireSet(List<DispoItemData> destinationItems, Collection<DispoItem> sourceItems, boolean isCopySet, OperationReport report) {
       List<DispoItem> modifiedItems = new ArrayList<DispoItem>();
 
       HashMap<String, DispoItemData> nameToDestItems = createNameToItemList(destinationItems);
@@ -50,7 +46,7 @@ public class AnnotationCopier {
          DispoItemData destItem = nameToDestItems.get(sourceItem.getName());
 
          if (destItem != null) {
-            JSONArray annotationsList = destItem.getAnnotationsList();
+            List<DispoAnnotationData> annotationsList = destItem.getAnnotationsList();
             /**
              * If item is PASS don't bother copying over Annotations from Source Item, all annotations are Default
              * Annotations and already created in the Import
@@ -65,10 +61,9 @@ public class AnnotationCopier {
                   }
                   modifiedItems.add(newItem);
 
-                  report.addMessageForItem(destItem.getName(), "$$$$Had %s Dispositions$$$$\n",
-                     annotationsList.length());
+                  report.addMessageForItem(destItem.getName(), "$$$$Had %s Dispositions$$$$\n", annotationsList.size());
                   report.addMessageForItem(destItem.getName(), "$$$$Now has %s Dispositions$$$$",
-                     newItem.getAnnotationsList().length());
+                     newItem.getAnnotationsList().size());
                }
             } else if (!Strings.isValid(destItem.getGuid()) && !sourceItem.getStatus().equals(DispoStrings.Item_Pass)) {
                destItem.setGuid(sourceItem.getGuid());
@@ -80,7 +75,7 @@ public class AnnotationCopier {
       return modifiedItems;
    }
 
-   private DispoItemData createNewItemWithCopiedAnnotations(DispoItemData destItem, DispoItem sourceItem, boolean isCopySet, OperationReport report) throws JSONException {
+   private DispoItemData createNewItemWithCopiedAnnotations(DispoItemData destItem, DispoItem sourceItem, boolean isCopySet, OperationReport report) {
       DispoItemData toReturn;
       boolean isSameDiscrepancies = matchAllDiscrepancies(destItem, sourceItem);
       if (isSameDiscrepancies) {
@@ -94,22 +89,20 @@ public class AnnotationCopier {
       return toReturn;
    }
 
-   private DispoItemData buildNewItem(DispoItemData destItem, DispoItem sourceItem, boolean isSkipDestDefaultAnnotations, OperationReport report) throws JSONException {
+   private DispoItemData buildNewItem(DispoItemData destItem, DispoItem sourceItem, boolean isSkipDestDefaultAnnotations, OperationReport report) {
       boolean isChangesMade = false;
       DispoItemData newItem = new DispoItemData();
       newItem.setDiscrepanciesList(destItem.getDiscrepanciesList());
-      JSONArray newList = new JSONArray(destItem.getAnnotationsList().toString());
+      List<DispoAnnotationData> newList = new ArrayList<DispoAnnotationData>();
+      newList.addAll(destItem.getAnnotationsList());
       newItem.setAnnotationsList(newList);
 
-      JSONArray newAnnotations = newItem.getAnnotationsList();
-      JSONArray sourceAnnotations = sourceItem.getAnnotationsList();
+      List<DispoAnnotationData> newAnnotations = newItem.getAnnotationsList();
+      List<DispoAnnotationData> sourceAnnotations = sourceItem.getAnnotationsList();
 
       Set<String> destDefaultAnntationLocations = getDefaultAnnotations(newItem);
 
-      for (int i = 0; i < sourceAnnotations.length(); i++) {
-         JSONObject annotationJson = sourceAnnotations.getJSONObject(i);
-         DispoAnnotationData sourceAnnotation = DispoUtil.jsonObjToDispoAnnotationData(annotationJson);
-
+      for (DispoAnnotationData sourceAnnotation : sourceAnnotations) {
          String sourceLocation = sourceAnnotation.getLocationRefs();
 
          if (DispoUtil.isDefaultAnntoation(sourceAnnotation)) {
@@ -159,9 +152,9 @@ public class AnnotationCopier {
             connector.connectAnnotation(newAnnotation, newItem.getDiscrepanciesList());
             isChangesMade = true;
             // Both the source and destination are dispositionable so copy the annotation
-            int nextIndex = newAnnotations.length();
+            int nextIndex = newAnnotations.size();
             newAnnotation.setIndex(nextIndex);
-            newAnnotations.put(nextIndex, DispoUtil.annotationToJsonObj(newAnnotation));
+            newAnnotations.add(nextIndex, newAnnotation);
          }
       }
 
@@ -175,15 +168,13 @@ public class AnnotationCopier {
       return newItem;
    }
 
-   private Set<String> getDefaultAnnotations(DispoItemData item) throws JSONException {
+   private Set<String> getDefaultAnnotations(DispoItemData item) {
       Set<String> defaultAnnotationLocations = new HashSet<String>();
-      JSONArray annotations = item.getAnnotationsList();
+      List<DispoAnnotationData> annotations = item.getAnnotationsList();
       if (annotations == null) {
-         annotations = new JSONArray();
+         annotations = new ArrayList<DispoAnnotationData>();
       }
-      for (int i = 0; i < annotations.length(); i++) {
-         JSONObject annotationJson = annotations.getJSONObject(i);
-         DispoAnnotationData annotation = DispoUtil.jsonObjToDispoAnnotationData(annotationJson);
+      for (DispoAnnotationData annotation : annotations) {
          if (DispoUtil.isDefaultAnntoation(annotation)) {
             defaultAnnotationLocations.add(annotation.getLocationRefs());
          }
@@ -200,17 +191,13 @@ public class AnnotationCopier {
       return nameToItem;
    }
 
-   private boolean matchAllDiscrepancies(DispoItemData destItem, DispoItem sourceItem) throws JSONException {
+   private boolean matchAllDiscrepancies(DispoItemData destItem, DispoItem sourceItem) {
       Map<Integer, String> destLocationToText = generateLocationToTextMap(destItem);
       boolean toReturn = true;
 
-      JSONObject sourceDiscrepancies = sourceItem.getDiscrepanciesList();
-      @SuppressWarnings("unchecked")
-      Iterator<String> iterator = sourceDiscrepancies.keys();
-      while (iterator.hasNext()) {
-         String key = iterator.next();
-         JSONObject discrepancyAsJson = sourceDiscrepancies.getJSONObject(key);
-         Discrepancy sourceDiscrepancy = DispoUtil.jsonObjToDiscrepancy(discrepancyAsJson);
+      Map<String, Discrepancy> sourceDiscrepancies = sourceItem.getDiscrepanciesList();
+      for (String key : sourceDiscrepancies.keySet()) {
+         Discrepancy sourceDiscrepancy = sourceDiscrepancies.get(key);
 
          int sourceLocation = sourceDiscrepancy.getLocation();
          String destDicrepancyText = destLocationToText.get(sourceLocation);
@@ -229,15 +216,11 @@ public class AnnotationCopier {
       return toReturn;
    }
 
-   private Map<Integer, String> generateLocationToTextMap(DispoItem item) throws JSONException {
+   private Map<Integer, String> generateLocationToTextMap(DispoItem item) {
       Map<Integer, String> locationToText = new HashMap<Integer, String>();
-      JSONObject discrepancies = item.getDiscrepanciesList();
-      @SuppressWarnings("unchecked")
-      Iterator<String> iterator = discrepancies.keys();
-      while (iterator.hasNext()) {
-         String key = iterator.next();
-         JSONObject discrepancyAsJson = discrepancies.getJSONObject(key);
-         Discrepancy discrepancy = DispoUtil.jsonObjToDiscrepancy(discrepancyAsJson);
+      Map<String, Discrepancy> discrepancies = item.getDiscrepanciesList();
+      for (String key : discrepancies.keySet()) {
+         Discrepancy discrepancy = discrepancies.get(key);
          locationToText.put(discrepancy.getLocation(), discrepancy.getText());
       }
 

@@ -20,7 +20,7 @@ import org.eclipse.osee.disposition.model.DispoItem;
 import org.eclipse.osee.disposition.rest.internal.DispoDataFactory;
 import org.eclipse.osee.disposition.rest.internal.importer.TmzImporter;
 import org.eclipse.osee.disposition.rest.internal.report.OperationReport;
-import org.eclipse.osee.disposition.util.DispoUtil;
+import org.eclipse.osee.disposition.rest.util.DispoUtil;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.json.JSONException;
 import org.json.JSONObject;
