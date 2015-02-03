@@ -120,8 +120,8 @@ public class DispoSetResourceTest {
    public void testGetAll() throws JSONException {
       // No Sets
       List<DispoSet> emptyResultSet = new ArrayList<DispoSet>();
-      when(dispositionApi.getDispoSets(program)).thenReturn(emptyResultSet);
-      Response noSetsResponse = resource.getAllDispoSets("testScript");
+      when(dispositionApi.getDispoSets(program, "testScript")).thenReturn(emptyResultSet);
+      Iterable<DispoSet> noSetsResponse = resource.getAllDispoSets("testScript");
       String messageActual = (String) noSetsResponse.getEntity();
       assertEquals(Response.Status.NOT_FOUND.getStatusCode(), noSetsResponse.getStatus());
       assertEquals("[]", messageActual);

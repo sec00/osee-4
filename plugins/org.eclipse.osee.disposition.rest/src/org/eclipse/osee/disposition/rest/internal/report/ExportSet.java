@@ -26,9 +26,6 @@ import org.eclipse.osee.disposition.rest.internal.LocationRangesCompressor;
 import org.eclipse.osee.disposition.rest.util.DispoUtil;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.util.io.xml.ExcelXmlWriter;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * @author Angel Avila
@@ -87,12 +84,10 @@ public class ExportSet {
 
    }
 
-   private static String prettifyAnnotations(JSONArray annotations) throws JSONException {
+   private static String prettifyAnnotations(List<DispoAnnotationData> annotations) {
       StringBuilder sb = new StringBuilder();
 
-      for (int i = 0; i < annotations.length(); i++) {
-         JSONObject annotationJson = annotations.getJSONObject(i);
-         DispoAnnotationData annotation = DispoUtil.jsonObjToDispoAnnotationData(annotationJson);
+      for (DispoAnnotationData annotation : annotations) {
          sb.append(annotation.getLocationRefs());
          sb.append(":");
          sb.append(annotation.getResolution());

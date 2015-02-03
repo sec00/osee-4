@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +34,6 @@ import org.eclipse.osee.disposition.rest.internal.DispoConnector;
 import org.eclipse.osee.disposition.rest.internal.DispoDataFactory;
 import org.eclipse.osee.disposition.rest.internal.importer.AnnotationCopier;
 import org.eclipse.osee.disposition.rest.internal.report.OperationReport;
-import org.eclipse.osee.disposition.rest.util.DispoUtil;
 import org.eclipse.osee.framework.core.util.Result;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.Pair;
@@ -51,9 +49,6 @@ import org.eclipse.osee.vcast.model.VCastInstrumentedFile;
 import org.eclipse.osee.vcast.model.VCastResult;
 import org.eclipse.osee.vcast.model.VCastSourceFileJoin;
 import org.eclipse.osee.vcast.model.VCastStatementCoverage;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * @author Angel Avila
@@ -94,34 +89,27 @@ public class LisFileParser implements DispoImporterApi {
          try {
             processResult(result, report);
          } catch (Exception ex) {
-            //
+            report.addOtherMessage(ex.toString());
          }
       }
 
-      try {
-         processExceptionHandled(report);
-      } catch (JSONException ex) {
-         //
-      }
+      processExceptionHandled(report);
 
       Collection<DispoItemData> values = datIdToItem.values();
 
       for (DispoItemData item : values) {
          dataFactory.initDispoItem(item);
-         item.setTotalPoints(String.valueOf(item.getAnnotationsList().length() + item.getDiscrepanciesList().length()));
+         item.setTotalPoints(String.valueOf(item.getAnnotationsList().size() + item.getDiscrepanciesList().size()));
       }
 
       // This is a reimport so we'll need to copy all the annotations
       if (!exisitingItems.isEmpty()) {
          AnnotationCopier copier = new AnnotationCopier(dispoConnector);
-         try {
-            List<DispoItemData> itemsFromImport = new ArrayList<DispoItemData>();
-            itemsFromImport.addAll(values);
+         List<DispoItemData> itemsFromImport = new ArrayList<DispoItemData>();
+         itemsFromImport.addAll(values);
 
-            toReturn = copier.copyEntireSet(itemsFromImport, exisitingItems.values(), false, report);
-         } catch (JSONException ex) {
-            //
-         }
+         toReturn = copier.copyEntireSet(itemsFromImport, exisitingItems.values(), false, report);
+         //
       } else {
          toReturn = new ArrayList<DispoItem>();
          toReturn.addAll(values);
@@ -129,7 +117,7 @@ public class LisFileParser implements DispoImporterApi {
       return toReturn;
    }
 
-   private void processExceptionHandled(OperationReport report) throws JSONException {
+   private void processExceptionHandled(OperationReport report) {
       for (String datId : datIdsCoveredByException) {
          Matcher matcher = Pattern.compile("\\d*:\\d*:").matcher(datId);
          matcher.find();
@@ -197,7 +185,7 @@ public class LisFileParser implements DispoImporterApi {
    private void processFunction(String lisFileName, VCastLisFileParser lisFileParser, int fileNum, VCastDataStore dataStore, VCastInstrumentedFile instrumentedFile, VCastFunction function, OperationReport report) {
       int functionNum = function.getFindex();
       DispoItemData newItem = new DispoItemData();
-      newItem.setAnnotationsList(new JSONArray());
+      newItem.setAnnotationsList(new ArrayList<DispoAnnotationData>());
       newItem.setName(lisFileName + "." + function.getName());
 
       String datId = generateDatId(fileNum, functionNum);
@@ -213,18 +201,18 @@ public class LisFileParser implements DispoImporterApi {
             instrumentedFile.getId(), function.getId(), ex.getMessage());
       }
 
-      Map<String, JSONObject> discrepancies = new HashMap<String, JSONObject>();
+      Map<String, Discrepancy> discrepancies = new HashMap<String, Discrepancy>();
 
       for (VCastStatementCoverage statementCoverageItem : statementCoverageItems) {
          processStatement(lisFileName, lisFileParser, fileNum, functionNum, function, statementCoverageItem,
             discrepancies, report);
       }
 
-      newItem.setDiscrepanciesList(new JSONObject(discrepancies));
+      newItem.setDiscrepanciesList(discrepancies);
       // add discrepancies to item
    }
 
-   private void processStatement(String lisFileName, VCastLisFileParser lisFileParser, int fileNum, int functionNum, VCastFunction function, VCastStatementCoverage statementCoverageItem, Map<String, JSONObject> discrepancies, OperationReport report) {
+   private void processStatement(String lisFileName, VCastLisFileParser lisFileParser, int fileNum, int functionNum, VCastFunction function, VCastStatementCoverage statementCoverageItem, Map<String, Discrepancy> discrepancies, OperationReport report) {
       // Create discrepancy for every line, annotate with test usnit or exception handled
       Integer functionNumber = function.getFindex();
       Integer lineNumber = statementCoverageItem.getLine();
@@ -243,7 +231,7 @@ public class LisFileParser implements DispoImporterApi {
          newDiscrepancy.setLocation(lineNumber);
          String id = String.valueOf(Lib.generateUuid());
          newDiscrepancy.setId(id);
-         discrepancies.put(id, new JSONObject(newDiscrepancy));
+         discrepancies.put(id, newDiscrepancy);
 
          // Is covered by exception handling, pass as parameter from DispoApiImpl
          if (lineData.getSecond()) {
@@ -305,13 +293,9 @@ public class LisFileParser implements DispoImporterApi {
       }
    }
 
-   private void removeDisrepancy(String location, JSONObject discrepancies) throws JSONException {
-      @SuppressWarnings("unchecked")
-      Iterator<String> iterator = discrepancies.keys();
-      while (iterator.hasNext()) {
-         String key = iterator.next();
-         JSONObject discrepancyAsJson = discrepancies.getJSONObject(key);
-         Discrepancy discrepancy = DispoUtil.jsonObjToDiscrepancy(discrepancyAsJson);
+   private void removeDisrepancy(String location, Map<String, Discrepancy> discrepancies) {
+      for (String key : discrepancies.keySet()) {
+         Discrepancy discrepancy = discrepancies.get(key);
          if (String.valueOf(discrepancy.getLocation()).equals(location)) {
             discrepancies.remove(key);
             break;
@@ -320,7 +304,7 @@ public class LisFileParser implements DispoImporterApi {
 
    }
 
-   private void addAnnotationForForCoveredLine(DispoItemData item, String location, String resolutionType, String coveringFile) throws JSONException {
+   private void addAnnotationForForCoveredLine(DispoItemData item, String location, String resolutionType, String coveringFile) {
       DispoAnnotationData newAnnotation = new DispoAnnotationData();
       dataFactory.initAnnotation(newAnnotation);
       String idOfNewAnnotation = dataFactory.getNewId();
@@ -333,10 +317,10 @@ public class LisFileParser implements DispoImporterApi {
       newAnnotation.setIsResolutionValid(true);
       dispoConnector.connectAnnotation(newAnnotation, item.getDiscrepanciesList());
 
-      JSONArray annotationsList = item.getAnnotationsList();
-      int newIndex = annotationsList.length();
+      List<DispoAnnotationData> annotationsList = item.getAnnotationsList();
+      int newIndex = annotationsList.size();
       newAnnotation.setIndex(newIndex);
-      annotationsList.put(newIndex, DispoUtil.annotationToJsonObj(newAnnotation));
+      annotationsList.add(newIndex, newAnnotation);
    }
 
    private Collection<VCastResult> getResultFiles(VCastDataStore dataStore) {

@@ -13,41 +13,46 @@ package org.eclipse.osee.disposition.rest.messages;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
-import org.eclipse.osee.disposition.model.DispoItemData;
-import org.json.JSONException;
+import org.eclipse.osee.disposition.model.DispoItem;
+import org.eclipse.osee.disposition.rest.util.DispoUtil;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
  * @author Angel Avila
  */
-public class DispoItemMessageWriter implements MessageBodyWriter<DispoItemData> {
+public class DispoItemMessageWriter implements MessageBodyWriter<List<DispoItem>> {
 
    @Override
    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-      return type == DispoItemData.class;
+      if (genericType instanceof ParameterizedType) {
+         return ((ParameterizedType) genericType).getActualTypeArguments()[0] == DispoItem.class;
+      } else {
+         return false;
+      }
    }
 
    @Override
-   public long getSize(DispoItemData dispoItem, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+   public long getSize(List<DispoItem> dispoItems, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
       return -1;
    }
 
    @Override
-   public void writeTo(DispoItemData dispoItem, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
-      JSONObject jsonObject = new JSONObject(dispoItem);
-      try {
-         jsonObject.put("annotationsList", dispoItem.getAnnotationsList());
-         jsonObject.put("discrepanciesList", dispoItem.getDiscrepanciesList());
-      } catch (JSONException ex) {
-         throw new IOException("Could not get Lists from Disposition Item", ex);
+   public void writeTo(List<DispoItem> dispoItems, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+      JSONArray jArray = new JSONArray();
+      for (DispoItem item : dispoItems) {
+         JSONObject jObject = DispoUtil.dispoItemToJsonObj(item);
+         jArray.put(jObject);
       }
-      String jsonString = jsonObject.toString();
+      String jsonString = jArray.toString();
       entityStream.write(jsonString.getBytes(Charset.forName("UTF-8")));
    }
 }

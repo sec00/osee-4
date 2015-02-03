@@ -31,9 +31,7 @@ import org.eclipse.osee.disposition.model.DispoSet;
 import org.eclipse.osee.disposition.model.DispoSetData;
 import org.eclipse.osee.disposition.model.DispoSetDescriptorData;
 import org.eclipse.osee.disposition.rest.DispoApi;
-import org.eclipse.osee.disposition.rest.util.DispoUtil;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
-import org.json.JSONArray;
 import org.json.JSONException;
 
 /**
@@ -74,7 +72,7 @@ public class DispoSetResource {
             String createdSetId = dispoApi.createDispoSet(program, descriptor).getGuid();
             DispoSet createdSet = dispoApi.getDispoSetById(program, createdSetId);
             status = Status.CREATED;
-            response = Response.status(status).entity(DispoUtil.setArtToSetData(createdSet)).build();
+            response = Response.status(status).entity(createdSet).build();
          } else {
             status = Status.CONFLICT;
             response = Response.status(status).entity(DispoMessages.Set_ConflictingNames).build();
@@ -103,7 +101,7 @@ public class DispoSetResource {
       if (result == null) {
          response = Response.status(Response.Status.NOT_FOUND).entity(DispoMessages.Set_NotFound).build();
       } else {
-         response = Response.status(Response.Status.OK).entity(DispoUtil.setArtToSetData(result)).build();
+         response = Response.status(Response.Status.OK).entity(result).build();
       }
       return response;
    }
@@ -185,20 +183,9 @@ public class DispoSetResource {
    @Path("{setId}/search")
    @GET
    @Produces(MediaType.APPLICATION_JSON)
-   public Response getDispoItemsByAnnotationText(@PathParam("setId") String setId, @QueryParam("value") String value) {
-      Response response;
+   public Iterable<DispoItem> getDispoItemsByAnnotationText(@PathParam("setId") String setId, @QueryParam("value") String value) {
       Collection<DispoItem> foundItems = dispoApi.getDispoItemByAnnotationText(program, setId, value);
-      if (foundItems.isEmpty()) {
-         response = Response.status(Response.Status.NOT_FOUND).entity(DispoMessages.Item_NotFound).build();
-      } else {
-         JSONArray jArray = new JSONArray();
-         for (DispoItem item : foundItems) {
-            jArray.put(DispoUtil.dispoItemToJsonObj(item));
-         }
-
-         response = Response.status(Response.Status.OK).entity(jArray.toString()).build();
-      }
-      return response;
+      return foundItems;
    }
 
 }

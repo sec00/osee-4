@@ -44,7 +44,6 @@ import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.ResultSet;
 import org.eclipse.osee.logger.Log;
 import org.eclipse.osee.orcs.data.ArtifactReadable;
-import org.json.JSONException;
 
 /**
  * @author Angel Avila
@@ -445,11 +444,7 @@ public class DispoApiImpl implements DispoApi {
       }
       List<DispoItem> toEdit = Collections.emptyList();
       OperationReport report = new OperationReport();
-      try {
-         toEdit = copier.copyEntireSet(destinationItems, getDispoItems(program, source.getGuid()), true, report);
-      } catch (JSONException ex) {
-         report.addOtherMessage(ex.getMessage());
-      }
+      toEdit = copier.copyEntireSet(destinationItems, getDispoItems(program, source.getGuid()), true, report);
       if (!toEdit.isEmpty()) {
          editDispoItems(program, toEdit, false);
       }

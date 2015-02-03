@@ -17,7 +17,9 @@ import org.eclipse.osee.disposition.model.Discrepancy;
 import org.eclipse.osee.disposition.model.DispoAnnotationData;
 import org.eclipse.osee.disposition.model.DispoItem;
 import org.eclipse.osee.disposition.model.DispoItemData;
+import org.eclipse.osee.disposition.model.DispoSetData;
 import org.eclipse.osee.disposition.model.DispoStrings;
+import org.eclipse.osee.disposition.model.Note;
 import org.eclipse.osee.disposition.rest.internal.LocationRangesCompressor;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.json.JSONArray;
@@ -153,103 +155,106 @@ public final class DispoUtil {
    }
 
    //
-   //   public static DispoItemData jsonObjToDispoItem(JSONObject jsonObject) {
-   //      DispoItemData dispoItem = new DispoItemData();
-   //      try {
-   //         if (jsonObject.has("name")) {
-   //            dispoItem.setName(jsonObject.getString("name"));
-   //         }
-   //         if (jsonObject.has("guid")) {
-   //            dispoItem.setGuid(jsonObject.getString("guid"));
-   //         }
-   //         if (jsonObject.has("status")) {
-   //            dispoItem.setStatus(jsonObject.getString("status"));
-   //         }
-   //         if (jsonObject.has("totalPoints")) {
-   //            dispoItem.setTotalPoints(jsonObject.getString("totalPoints"));
-   //         }
-   //         if (jsonObject.has("needsRerun")) {
-   //            dispoItem.setNeedsRerun(jsonObject.getBoolean("needsRerun"));
-   //         }
-   //         if (jsonObject.has("version")) {
-   //            dispoItem.setVersion(jsonObject.getString("version"));
-   //         }
-   //         if (jsonObject.has("assignee")) {
-   //            dispoItem.setAssignee(jsonObject.getString("assignee"));
-   //         }
-   //         if (jsonObject.has("category")) {
-   //            dispoItem.setCategory(jsonObject.getString("category"));
-   //         }
-   //         if (jsonObject.has("machine")) {
-   //            dispoItem.setMachine(jsonObject.getString("machine"));
-   //         }
-   //         if (jsonObject.has("elapsedTime")) {
-   //            dispoItem.setElapsedTime(jsonObject.getString("elapsedTime"));
-   //         }
-   //         if (jsonObject.has("aborted")) {
-   //            dispoItem.setAborted(jsonObject.getBoolean("aborted"));
-   //         }
-   //         if (jsonObject.has("itemNotes")) {
-   //            dispoItem.setItemNotes(jsonObject.getString("itemNotes"));
-   //         }
-   //      } catch (JSONException ex) {
-   //         throw new OseeCoreException("Error deserializing a Dispositionable Item.", ex);
-   //      }
+   public static DispoItemData jsonObjToDispoItem(JSONObject jsonObject) {
+      DispoItemData dispoItem = new DispoItemData();
+      try {
+         if (jsonObject.has("name")) {
+            dispoItem.setName(jsonObject.getString("name"));
+         }
+         if (jsonObject.has("guid")) {
+            dispoItem.setGuid(jsonObject.getString("guid"));
+         }
+         if (jsonObject.has("status")) {
+            dispoItem.setStatus(jsonObject.getString("status"));
+         }
+         if (jsonObject.has("totalPoints")) {
+            dispoItem.setTotalPoints(jsonObject.getString("totalPoints"));
+         }
+         if (jsonObject.has("needsRerun")) {
+            dispoItem.setNeedsRerun(jsonObject.getBoolean("needsRerun"));
+         }
+         if (jsonObject.has("version")) {
+            dispoItem.setVersion(jsonObject.getString("version"));
+         }
+         if (jsonObject.has("assignee")) {
+            dispoItem.setAssignee(jsonObject.getString("assignee"));
+         }
+         if (jsonObject.has("category")) {
+            dispoItem.setCategory(jsonObject.getString("category"));
+         }
+         if (jsonObject.has("machine")) {
+            dispoItem.setMachine(jsonObject.getString("machine"));
+         }
+         if (jsonObject.has("elapsedTime")) {
+            dispoItem.setElapsedTime(jsonObject.getString("elapsedTime"));
+         }
+         if (jsonObject.has("aborted")) {
+            dispoItem.setAborted(jsonObject.getBoolean("aborted"));
+         }
+         if (jsonObject.has("itemNotes")) {
+            dispoItem.setItemNotes(jsonObject.getString("itemNotes"));
+         }
+      } catch (JSONException ex) {
+         throw new OseeCoreException("Error deserializing a Dispositionable Item.", ex);
+      }
+
+      return dispoItem;
+   }
+
    //
-   //      return dispoItem;
-   //   }
+   public static DispoSetData jsonObjToDispoSet(JSONObject jsonObject) {
+      DispoSetData dispoSet = new DispoSetData();
+      try {
+         if (jsonObject.has("importPath")) {
+            dispoSet.setImportPath(jsonObject.getString("importPath"));
+         }
+         if (jsonObject.has("name")) {
+            dispoSet.setName(jsonObject.getString("name"));
+         }
+         if (jsonObject.has("operation")) {
+            dispoSet.setOperation(jsonObject.getString("operation"));
+         }
+         if (jsonObject.has("notesList")) {
+            JSONArray jArray = jsonObject.getJSONArray("notesList");
+            List<Note> notesList = new ArrayList<Note>();
+            for (int i = 0; i < jArray.length(); i++) {
+               notesList.add(jsonObjToNote(jArray.getJSONObject(i)));
+            }
+            dispoSet.setNotesList(notesList);
+         }
+      } catch (JSONException ex) {
+         throw new OseeCoreException("Error deserializing a Dispositionable Item.", ex);
+      }
+      return dispoSet;
+   }
+
    //
-   //   public static DispoSetData jsonObjToDispoSet(JSONObject jsonObject) {
-   //      DispoSetData dispoSet = new DispoSetData();
-   //      try {
-   //         if (jsonObject.has("importPath")) {
-   //            dispoSet.setImportPath(jsonObject.getString("importPath"));
-   //         }
-   //         if (jsonObject.has("name")) {
-   //            dispoSet.setName(jsonObject.getString("name"));
-   //         }
-   //         if (jsonObject.has("operation")) {
-   //            dispoSet.setOperation(jsonObject.getString("operation"));
-   //         }
-   //         if (jsonObject.has("notesList")) {
-   //            JSONArray jArray = jsonObject.getJSONArray("notesList");
-   //            List<Note> notesList = new ArrayList<Note>();
-   //            for (int i = 0; i < jArray.length(); i++) {
-   //               notesList.add(jsonObjToNote(jArray.getJSONObject(i)));
-   //            }
-   //            dispoSet.setNotesList(notesList);
-   //         }
-   //      } catch (JSONException ex) {
-   //         throw new OseeCoreException("Error deserializing a Dispositionable Item.", ex);
-   //      }
-   //      return dispoSet;
-   //   }
-   //
-   //   public static JSONObject dispoItemToJsonObj(DispoItem dispoItem) {
-   //      JSONObject jsonObject = new JSONObject();
-   //      try {
-   //         jsonObject.put("discrepanciesAsRanges", discrepanciesToString(dispoItem.getDiscrepanciesList()));
-   //         jsonObject.put("failureCount", dispoItem.getDiscrepanciesList().size());
-   //         jsonObject.put("name", dispoItem.getName());
-   //         jsonObject.put("status", dispoItem.getStatus());
-   //         jsonObject.put("totalPoints", dispoItem.getTotalPoints());
-   //         jsonObject.put("assignee", dispoItem.getAssignee());
-   //         jsonObject.put("needsRerun", dispoItem.getNeedsRerun());
-   //         jsonObject.put("guid", dispoItem.getGuid());
-   //         jsonObject.put("category", dispoItem.getCategory());
-   //         jsonObject.put("machine", dispoItem.getMachine());
-   //         jsonObject.put("elapsedTime", dispoItem.getElapsedTime());
-   //         jsonObject.put("aborted", dispoItem.getAborted());
-   //         jsonObject.put("lastUpdated", dispoItem.getLastUpdate());
-   //         jsonObject.put("creationDate", dispoItem.getCreationDate());
-   //         jsonObject.put("itemNotes", dispoItem.getItemNotes());
-   //         jsonObject.put("version", dispoItem.getVersion());
-   //      } catch (JSONException ex) {
-   //         throw new OseeCoreException("Error deserializing a Dispositionable Item.", ex);
-   //      }
-   //
-   //      return jsonObject;
-   //   }
+   public static JSONObject dispoItemToJsonObj(DispoItem dispoItem) {
+      JSONObject jsonObject = new JSONObject();
+      try {
+         jsonObject.put("discrepanciesAsRanges", discrepanciesToString(dispoItem.getDiscrepanciesList()));
+         jsonObject.put("failureCount", dispoItem.getDiscrepanciesList().size());
+         jsonObject.put("name", dispoItem.getName());
+         jsonObject.put("status", dispoItem.getStatus());
+         jsonObject.put("totalPoints", dispoItem.getTotalPoints());
+         jsonObject.put("assignee", dispoItem.getAssignee());
+         jsonObject.put("needsRerun", dispoItem.getNeedsRerun());
+         jsonObject.put("guid", dispoItem.getGuid());
+         jsonObject.put("category", dispoItem.getCategory());
+         jsonObject.put("machine", dispoItem.getMachine());
+         jsonObject.put("elapsedTime", dispoItem.getElapsedTime());
+         jsonObject.put("aborted", dispoItem.getAborted());
+         jsonObject.put("lastUpdated", dispoItem.getLastUpdate());
+         jsonObject.put("creationDate", dispoItem.getCreationDate());
+         jsonObject.put("itemNotes", dispoItem.getItemNotes());
+         jsonObject.put("version", dispoItem.getVersion());
+      } catch (JSONException ex) {
+         throw new OseeCoreException("Error deserializing a Dispositionable Item.", ex);
+      }
+
+      return jsonObject;
+   }
+
    //
    public static JSONObject discrepancyToJsonObj(Discrepancy discrepancy) {
       JSONObject toReturn = new JSONObject(discrepancy);
@@ -366,19 +371,18 @@ public final class DispoUtil {
       return discrepancy;
    }
 
-   //      public static LocationRange jsonObjToLocationRagne(JSONObject object) throws JSONException {
-   //         LocationRange range = new LocationRange();
-   //         range.setStart(object.getInt("start"));
-   //         range.setEnd(object.getInt("end"));
-   //         return range;
-   //      }
-   //
-   //      public static Note jsonObjToNote(JSONObject object) throws JSONException {
-   //         Note note = new Note();
-   //         note.setContent(object.getString("content"));
-   //         note.setDateString(object.getString("dateString"));
-   //         note.setType(object.getString("type"));
-   //         return note;
-   //      }
-   //   }
+   //         public static LocationRange jsonObjToLocationRagne(JSONObject object) throws JSONException {
+   //            LocationRange range = new LocationRange();
+   //            range.setStart(object.getInt("start"));
+   //            range.setEnd(object.getInt("end"));
+   //            return range;
+   //         }
+
+   public static Note jsonObjToNote(JSONObject object) throws JSONException {
+      Note note = new Note();
+      note.setContent(object.getString("content"));
+      note.setDateString(object.getString("dateString"));
+      note.setType(object.getString("type"));
+      return note;
+   }
 }

@@ -26,9 +26,29 @@
     	  {
     		   "service.pid": "org.eclipse.osee.http.jetty.internal.osgi.JettyHttpService",
     		   "jetty.server.context.session.inactive.interval": 3600,
-    		   "jetty.server.session.manager.factory": "JDBC",
+    		   "jetty.server.session.manager.factory": "IN_MEMORY",
     		   "jetty.jdbc.cluster.name" : "OSEE",
     		   "jetty.jdbc.save.interval.secs" : 30
-    	  }
+    	  }, 
+    	  {
+            "service.pid": "org.eclipse.osee.jaxrs.server.internal.security.oauth2.provider.OAuth2ServerProvider",
+            "jaxrs.oauth2.provider.enabled" : true,
+            "jaxrs.oauth2.provider.secret.key":"T0W3wQ1mMqmgdSxklHxYqg"
+        },
+        {
+            "service.pid": "org.eclipse.osee.authentication.admin.internal.AuthenticationAdminImpl",
+            "authentication.scheme.allowed": "LDAP",
+            "authentication.scheme.allowed.default": "LDAP"
+        },
+        {
+            "service.pid": "org.eclipse.osee.authentication.ldap.internal.LdapAuthenticationProvider",
+            "ldap.server.address": "ldap://msa-support.msc.az.boeing.com",
+            "ldap.credential.source": "SYSTEM",
+            "ldap.account.search.base": "DC=msc,DC=az,DC=boeing,DC=com",
+            "ldap.account.search.pattern": "(&(objectClass=person)(uid=${username}))",
+            "ldap.account.display.name": "cn",
+            "ldap.account.email.address": "mail",
+            "ldap.group.search.base": "DC=msc,DC=az,DC=boeing,DC=com"
+        }
     ]
 }

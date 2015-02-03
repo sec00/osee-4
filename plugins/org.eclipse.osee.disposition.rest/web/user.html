@@ -12,7 +12,6 @@
                 </div>   
                 <div class="span3">
                   ATS Version:
-                  <select class="form-control" ng-show="programs" ng-model="programSelection" ng-disabled="isSearchView" ng-change="updateProgram()" ng-options="obj.value as obj.text for obj in programs"></select>
                   <select class="form-control" ng-show="programs" ng-model="programSelection" ng-change="updateProgram()" ng-options="program.guid as program.name for program in programs"></select>
                </div>
                 <div class="span3">
