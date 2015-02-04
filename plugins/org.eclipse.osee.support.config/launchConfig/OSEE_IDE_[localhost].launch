@@ -3,6 +3,7 @@
 <setAttribute key="additional_plugins">
 <setEntry value="com.google.guava:12.0.0.v201212092141:default:true"/>
 <setEntry value="org.eclipse.ui.views.log:1.0.400.v20130515-2009:default:true"/>
+<setEntry value="org.objectweb.asm:3.3.1.v201105211655:default:true"/>
 </setAttribute>
 <booleanAttribute key="append.args" value="true"/>
 <booleanAttribute key="askclear" value="true"/>
