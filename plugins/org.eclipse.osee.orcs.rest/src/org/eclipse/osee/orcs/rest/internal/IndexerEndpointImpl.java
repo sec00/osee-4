@@ -110,4 +110,9 @@ public class IndexerEndpointImpl implements IndexerEndpoint {
       return asResponse(modified);
    }
 
+   @Override
+   public Response indexTxs(String txsUuids) {
+      return null;
+   }
+
 }

@@ -44,4 +44,7 @@ public interface IndexerEndpoint {
    @Path("queue/{query-id}")
    Response deleteIndexQueueItem(@PathParam("query-id") int queryId);
 
+   @PUT
+   @Path("txs/{txs-uuids}")
+   Response indexTxs(@PathParam("txs-uuids") String txsUuids);
 }

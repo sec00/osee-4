@@ -16,6 +16,7 @@ import javax.script.ScriptEngine;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import org.eclipse.osee.framework.resource.management.IResourceManager;
+import org.eclipse.osee.activity.api.ActivityLog;
 import org.eclipse.osee.orcs.OrcsApi;
 
 /**
@@ -29,6 +30,7 @@ public class OrcsApplication extends Application {
    private final Set<Object> resources = new HashSet<Object>();
    private final Set<Class<?>> classes = new HashSet<Class<?>>();
    private static OrcsApi orcsApi;
+   private ActivityLog activityLog;
 
    private IResourceManager resourceManager;
 
@@ -50,6 +52,7 @@ public class OrcsApplication extends Application {
 
       classes.add(BranchesResource.class);
       resources.add(new IdeClientEndpointImpl());
+      resources.add(new IndexerResource(orcsApi, activityLog));
 
       resources.add(new BranchEndpointImpl(orcsApi, resourceManager));
       resources.add(new TransactionEndpointImpl(orcsApi));
@@ -75,4 +78,7 @@ public class OrcsApplication extends Application {
       return resources;
    }
 
+   public void setActivityLog(ActivityLog activityLog) {
+      this.activityLog = activityLog;
+   }
 }
