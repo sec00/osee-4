@@ -129,7 +129,7 @@ public class ArtifactQuerySqlContextFactoryImplTest {
    private QueryData queryData;
 
    @Before
-   public void setUp() throws OseeCoreException {
+   public void setUp() {
       MockitoAnnotations.initMocks(this);
 
       String sessionId = GUID.create();
@@ -154,12 +154,12 @@ public class ArtifactQuerySqlContextFactoryImplTest {
             assertEquals(QUICK_SEARCH_VALUE, value);
 
             TagCollector collector = (TagCollector) args[1];
-            collector.addTag(WORD_1, CODED_WORD_1);
-            collector.addTag(WORD_2, CODED_WORD_2);
-            collector.addTag(WORD_3, CODED_WORD_3);
+            collector.addTag(-1L, WORD_1, CODED_WORD_1);
+            collector.addTag(-1L, WORD_2, CODED_WORD_2);
+            collector.addTag(-1L, WORD_3, CODED_WORD_3);
             return null;
          }
-      }).when(tagProcessor).collectFromString(eq(QUICK_SEARCH_VALUE), any(TagCollector.class));
+      }).when(tagProcessor).collectFromString(-1L, eq(QUICK_SEARCH_VALUE), any(TagCollector.class));
 
       when(joinFactory.createIdJoinQuery()).thenAnswer(new Answer<IdJoinQuery>() {
 

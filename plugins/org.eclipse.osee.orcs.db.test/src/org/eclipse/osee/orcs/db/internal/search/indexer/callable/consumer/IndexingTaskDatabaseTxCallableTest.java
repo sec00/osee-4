@@ -17,7 +17,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
-import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.jdbc.JdbcClient;
 import org.eclipse.osee.jdbc.JdbcConnection;
 import org.eclipse.osee.logger.Log;
@@ -62,9 +61,13 @@ public class IndexingTaskDatabaseTxCallableTest {
       initMocks(this);
       IndexedResourceLoader loader = new IndexedResourceLoader() {
          @Override
-         public void loadSource(OrcsDataHandler<IndexedResource> handler, int tagQueueQueryId) throws OseeCoreException {
+         public void loadSource(OrcsDataHandler<IndexedResource> handler, int tagQueueQueryId) {
             handler.onData(resource1);
             handler.onData(resource2);
+         }
+
+         @Override
+         public void cleanupSource(JdbcConnection connection, int tagQueueQueryId) {
          }
       };
       txCallable =
@@ -96,7 +99,7 @@ public class IndexingTaskDatabaseTxCallableTest {
 
       verify(logger, times(1)).error("Field has invalid tagger[%s] provider and cannot be tagged - [Gamma: %s]", null,
          2L);
-      verify(tagger, times(1)).tagIt(Matchers.eq(resource1), Matchers.any(TagCollector.class));
+      verify(tagger, times(1)).tagIt(-1L, Matchers.eq(resource1), Matchers.any(TagCollector.class));
    }
 
 }

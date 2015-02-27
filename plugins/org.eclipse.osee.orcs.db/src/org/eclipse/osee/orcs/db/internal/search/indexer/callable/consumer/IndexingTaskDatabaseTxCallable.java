@@ -86,21 +86,22 @@ public final class IndexingTaskDatabaseTxCallable extends AbstractDatastoreTxCal
    }
 
    @Override
-   protected Long handleTxWork(JdbcConnection connection) throws OseeCoreException {
+   protected Long handleTxWork(JdbcConnection connection) {
       getLogger().debug("Tagging: [%s]", getTagQueueQueryId());
+
       long totalTags = -1;
       try {
          Collection<IndexedResource> sources = new LinkedHashSet<IndexedResource>();
          OrcsDataHandler<IndexedResource> handler = createCollector(sources);
          loader.loadSource(handler, getTagQueueQueryId());
-
          if (!sources.isEmpty()) {
             try {
                deleteTags(connection, sources);
                totalTags = createTags(connection, sources);
-               removeIndexingTaskFromQueue(connection);
             } catch (Exception ex) {
                throw new OseeCoreException(ex, "Unable to store tags - tagQueueQueryId [%d]", getTagQueueQueryId());
+            } finally {
+               loader.cleanupSource(connection, getTagQueueQueryId());
             }
          } else {
             getLogger().warn("Empty gamma query id: %s", getTagQueueQueryId());
@@ -111,12 +112,12 @@ public final class IndexingTaskDatabaseTxCallable extends AbstractDatastoreTxCal
       return totalTags;
    }
 
-   private String getTaggerIdByTypeUuid(long typeUuid) throws OseeCoreException {
+   private String getTaggerIdByTypeUuid(long typeUuid) {
       IAttributeType type = attributeTypes.getByUuid(typeUuid);
       return attributeTypes.getTaggerId(type);
    }
 
-   private long createTags(JdbcConnection connection, Collection<IndexedResource> sources) throws OseeCoreException {
+   private long createTags(JdbcConnection connection, Collection<IndexedResource> sources) {
       SearchTagCollector tagCollector = new SearchTagCollector();
 
       Set<Long> processed = new HashSet<Long>();
@@ -132,12 +133,11 @@ public final class IndexingTaskDatabaseTxCallable extends AbstractDatastoreTxCal
             try {
                long typeUuid = source.getTypeUuid();
                String taggerId = getTaggerIdByTypeUuid(typeUuid);
-               if (taggingEngine.hasTagger(taggerId)) {
-                  Tagger tagger = taggingEngine.getTagger(taggerId);
-                  tagger.tagIt(source, tagCollector);
-                  if (isStorageAllowed(toStore)) {
-                     getLogger().debug("Stored a - [%s] - connectionId[%s] - [%s]", getTagQueueQueryId(), connection,
-                        toStore);
+
+               Tagger tagger = taggingEngine.getTagger(taggerId);
+               if (tagger != null) {
+                  tagger.tagIt(gamma, source, tagCollector);
+                  if (!isCacheAll && isStorageAllowed(toStore)) {
                      storeTags(connection, toStore);
                   }
                } else {
@@ -147,15 +147,14 @@ public final class IndexingTaskDatabaseTxCallable extends AbstractDatastoreTxCal
             } catch (Exception ex) {
                getLogger().error(ex, "Unable to tag - [%s]", gamma);
             } finally {
-               long endItemTime = System.currentTimeMillis() - startItemTime;
-               notifyOnIndexItemComplete(gamma, tags.size(), endItemTime);
+               notifyOnIndexItemComplete(gamma, tags.size(), startItemTime);
             }
          }
       }
 
       if (!toStore.isEmpty()) {
-         getLogger().debug("Stored b - [%s] - connectionId[%s] - [%s]", getTagQueueQueryId(), connection, toStore);
-         storeTags(connection, toStore);
+         int numTags = storeTags(connection, toStore);
+         getLogger().debug("Stored %d tags for query id [%d]", numTags, getTagQueueQueryId());
       }
       return tagCollector.getTotalTags();
    }
@@ -183,16 +182,16 @@ public final class IndexingTaskDatabaseTxCallable extends AbstractDatastoreTxCal
       }
    }
 
-   private void removeIndexingTaskFromQueue(JdbcConnection connection) throws OseeCoreException {
+   private void removeIndexingTaskFromQueue(JdbcConnection connection) {
       getJdbcClient().runPreparedUpdate(connection, JoinItem.TAG_GAMMA_QUEUE.getDeleteSql(), getTagQueueQueryId());
    }
 
    private boolean isStorageAllowed(Map<Long, Collection<Long>> searchTags) {
-      int cummulative = 0;
       boolean needsStorage = false;
+      int cummulative = 0;
       for (Collection<Long> tags : searchTags.values()) {
          cummulative += tags.size();
-         if (!isCacheAll && cummulative >= cacheLimit) {
+         if (cummulative >= cacheLimit) {
             needsStorage = true;
             break;
          }
@@ -200,7 +199,7 @@ public final class IndexingTaskDatabaseTxCallable extends AbstractDatastoreTxCal
       return needsStorage;
    }
 
-   public int deleteTags(JdbcConnection connection, Collection<IndexedResource> sources) throws OseeCoreException {
+   private int deleteTags(JdbcConnection connection, Collection<IndexedResource> sources) {
       int numberDeleted = 0;
       if (!sources.isEmpty()) {
          List<Object[]> datas = new ArrayList<Object[]>();
@@ -212,7 +211,7 @@ public final class IndexingTaskDatabaseTxCallable extends AbstractDatastoreTxCal
       return numberDeleted;
    }
 
-   private int storeTags(JdbcConnection connection, Map<Long, Collection<Long>> toStore) throws OseeCoreException {
+   private int storeTags(JdbcConnection connection, Map<Long, Collection<Long>> toStore) {
       int updated = 0;
       if (!toStore.isEmpty()) {
          List<Object[]> data = new ArrayList<Object[]>();
@@ -220,7 +219,7 @@ public final class IndexingTaskDatabaseTxCallable extends AbstractDatastoreTxCal
             Long gammaId = entry.getKey();
             for (Long codedTag : entry.getValue()) {
                data.add(new Object[] {gammaId, codedTag});
-               getLogger().debug("Storing: gamma:[%s] tag:[%s]", gammaId, codedTag);
+               //               getLogger().info("Storing: gamma:[%s] tag:[%s]", gammaId, codedTag);
             }
          }
          toStore.clear();
@@ -231,8 +230,9 @@ public final class IndexingTaskDatabaseTxCallable extends AbstractDatastoreTxCal
       return updated;
    }
 
-   private void notifyOnIndexItemComplete(long gammaId, int totalTags, long processingTime) {
+   private void notifyOnIndexItemComplete(long gammaId, int totalTags, long startItemTime) {
       if (collector != null) {
+         long processingTime = System.currentTimeMillis() - startItemTime;
          collector.onIndexItemComplete(getTagQueueQueryId(), gammaId, totalTags, processingTime);
       }
    }
@@ -263,7 +263,7 @@ public final class IndexingTaskDatabaseTxCallable extends AbstractDatastoreTxCal
       }
 
       @Override
-      public void addTag(String word, Long codedTag) {
+      public void addTag(Long gammaId, String word, Long codedTag) {
          if (currentTag != null && gammaId != null) {
             if (currentTag.add(codedTag)) {
                totalTags++;

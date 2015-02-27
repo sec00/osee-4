@@ -13,6 +13,7 @@ package org.eclipse.osee.orcs.db.internal.search.indexer.data;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.resource.management.IResourceManager;
 import org.eclipse.osee.jdbc.JdbcClient;
+import org.eclipse.osee.jdbc.JdbcConnection;
 import org.eclipse.osee.jdbc.JdbcStatement;
 import org.eclipse.osee.logger.Log;
 import org.eclipse.osee.orcs.core.ds.IndexedResource;
@@ -62,7 +63,7 @@ public class GammaQueueIndexerDataSourceLoader implements IndexedResourceLoader 
    }
 
    @Override
-   public void loadSource(OrcsDataHandler<IndexedResource> handler, int tagQueueQueryId) throws OseeCoreException {
+   public void loadSource(OrcsDataHandler<IndexedResource> handler, int tagQueueQueryId) {
       boolean loadSuccess = loadData(handler, tagQueueQueryId);
       // Re-try in case query id hasn't been committed to the database
       int retry = 0;
@@ -77,6 +78,11 @@ public class GammaQueueIndexerDataSourceLoader implements IndexedResourceLoader 
          loadSuccess = loadData(handler, tagQueueQueryId);
          retry++;
       }
+   }
+
+   @Override
+   public void cleanupSource(JdbcConnection connection, int tagQueueQueryId) {
+      //jdbcClient.runPreparedUpdate(connection, JoinItem.TAG_GAMMA_QUEUE.getDeleteSql(), tagQueueQueryId);
    }
 
    private IndexedResource createData(int localId, long typeUuid, long gammaId, String value, String uri) {

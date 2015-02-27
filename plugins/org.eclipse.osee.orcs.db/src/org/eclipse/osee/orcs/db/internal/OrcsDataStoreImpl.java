@@ -93,7 +93,6 @@ public class OrcsDataStoreImpl implements OrcsDataStore {
          new LoaderModule(logger, jdbcClient, idManager, sqlProvider, proxyProvider, joinFactory);
 
       queryModule = new QueryModule(logger, executorAdmin, jdbcClient, joinFactory, idManager, sqlProvider);
-      queryModule.startIndexer(resourceManager);
 
       BranchModule branchModule =
          new BranchModule(logger, jdbcClient, joinFactory, idManager, preferences, executorAdmin, resourceManager);
@@ -102,7 +101,8 @@ public class OrcsDataStoreImpl implements OrcsDataStore {
 
       AdminModule adminModule = new AdminModule(logger, jdbcClient, idManager, preferences, typesDataStore);
 
-      dataModuleFactory = new DataModuleFactory(logger, loaderModule, queryModule, branchModule, txModule, adminModule);
+      dataModuleFactory =
+         new DataModuleFactory(logger, loaderModule, queryModule, branchModule, txModule, adminModule, resourceManager);
    }
 
    public void stop() throws Exception {

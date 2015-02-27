@@ -56,18 +56,20 @@ public class QueryModule {
       this.sqlProvider = sqlProvider;
    }
 
-   public void startIndexer(IResourceManager resourceManager) throws Exception {
-      taggingEngine = newTaggingEngine(logger);
+   public void startIndexer(IResourceManager resourceManager, AttributeTypes attributeTypes) {
+      taggingEngine = newTaggingEngine(logger, attributeTypes);
       queryIndexer =
          newIndexingEngine(logger, jdbcClient, sqlJoinFactory, taggingEngine, executorAdmin, resourceManager);
 
       executorAdmin.createFixedPoolExecutor(IndexerConstants.INDEXING_CONSUMER_EXECUTOR_ID, 4);
+      executorAdmin.createFixedPoolExecutor(IndexerConstants.INDEXING_EXECUTOR_ID, 4);
    }
 
-   public void stopIndexer() throws Exception {
+   public void stopIndexer() {
       queryIndexer = null;
       taggingEngine = null;
       executorAdmin.shutdown(IndexerConstants.INDEXING_CONSUMER_EXECUTOR_ID);
+      executorAdmin.shutdown(IndexerConstants.INDEXING_EXECUTOR_ID);
    }
 
    public QueryEngineIndexer getQueryIndexer() {
@@ -86,5 +88,4 @@ public class QueryModule {
             attrTypes);
       return new QueryEngineImpl(factory1, factory2, factory3, factory4);
    }
-
 }

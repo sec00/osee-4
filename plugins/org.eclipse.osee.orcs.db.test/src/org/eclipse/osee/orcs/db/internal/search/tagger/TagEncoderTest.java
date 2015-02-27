@@ -42,7 +42,7 @@ public class TagEncoderTest {
    @Test
    public void testTagEncoder() {
       List<Pair<String, Long>> actualTags = new ArrayList<Pair<String, Long>>();
-      encoder.encode(toEncode, new MockTagCollector(actualTags));
+      encoder.encode(-1L, toEncode, new MockTagCollector(actualTags));
       SearchAsserts.assertTagsEqual(expected, actualTags);
    }
 

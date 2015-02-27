@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.orcs.db.internal;
 
+import org.eclipse.osee.framework.resource.management.IResourceManager;
 import org.eclipse.osee.logger.Log;
 import org.eclipse.osee.orcs.OrcsTypes;
 import org.eclipse.osee.orcs.core.ds.BranchDataStore;
@@ -40,15 +41,16 @@ public class DataModuleFactory {
    private final BranchModule branchModule;
    private final TxModule txModule;
    private final AdminModule adminModule;
+   private final IResourceManager resourceManager;
 
-   public DataModuleFactory(Log logger, LoaderModule loaderModule, QueryModule queryModule, BranchModule branchModule, TxModule txModule, AdminModule adminModule) {
-      super();
+   public DataModuleFactory(Log logger, LoaderModule loaderModule, QueryModule queryModule, BranchModule branchModule, TxModule txModule, AdminModule adminModule, IResourceManager resourceManager) {
       this.logger = logger;
       this.loaderModule = loaderModule;
       this.queryModule = queryModule;
       this.branchModule = branchModule;
       this.txModule = txModule;
       this.adminModule = adminModule;
+      this.resourceManager = resourceManager;
    }
 
    public DataModule createDataModule(OrcsTypes orcsTypes) {
@@ -57,6 +59,7 @@ public class DataModuleFactory {
       ArtifactTypes artifactTypes = orcsTypes.getArtifactTypes();
       AttributeTypes attributeTypes = orcsTypes.getAttributeTypes();
 
+      queryModule.startIndexer(resourceManager, attributeTypes);
       final QueryEngineIndexer indexer = queryModule.getQueryIndexer();
       final ProxyDataFactory proxyFactory = loaderModule.createProxyDataFactory(attributeTypes);
       final OrcsObjectFactory objectFactory = loaderModule.createOrcsObjectFactory(proxyFactory);

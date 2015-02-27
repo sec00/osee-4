@@ -56,7 +56,7 @@ public class TagEncoder {
     * represent up to 12 characters (all that can be stuffed into 64-bits). Longer search tags will be turned into
     * consecutive search tags
     */
-   public void encode(String text, TagCollector collector) {
+   public void encode(Long gammaId, String text, TagCollector collector) {
       int tagBitsPos = 0;
       long tagBits = 0;
       for (int index = 0; index < text.length(); index++) {
@@ -64,7 +64,7 @@ public class TagEncoder {
 
          if (c == '\t' || c == '\n' || c == '\r' || tagBitsPos == 60) {
             if (tagBitsPos > 10) {
-               collector.addTag(text, tagBits);
+               collector.addTag(gammaId, text, tagBits);
             }
             tagBits = 0;
             tagBitsPos = 0;
@@ -82,17 +82,7 @@ public class TagEncoder {
          }
       }
       if (tagBits != 0) {
-         collector.addTag(text, tagBits);
+         collector.addTag(gammaId, text, tagBits);
       }
-   }
-
-   public static final void main(String[] args) {
-      new TagEncoder().encode("1", new TagCollector() {
-
-         @Override
-         public void addTag(String word, Long codedTag) {
-            System.out.printf("%s %s\n", word, codedTag);
-         }
-      });
    }
 }

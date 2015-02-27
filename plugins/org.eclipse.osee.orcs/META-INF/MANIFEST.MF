@@ -7,6 +7,7 @@ Bundle-Vendor: Eclipse Open System Engineering Environment
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.google.gson;version="2.1.0",
  org.eclipse.core.runtime,
+ org.eclipse.osee.activity.api,
  org.eclipse.osee.executor.admin,
  org.eclipse.osee.framework.core.data,
  org.eclipse.osee.framework.core.enums,
@@ -16,6 +17,7 @@ Import-Package: com.google.gson;version="2.1.0",
  org.eclipse.osee.framework.jdk.core.type,
  org.eclipse.osee.framework.jdk.core.util,
  org.eclipse.osee.framework.resource.management,
+ org.eclipse.osee.logger,
  org.json
 Export-Package: org.eclipse.osee.orcs,
  org.eclipse.osee.orcs.data,

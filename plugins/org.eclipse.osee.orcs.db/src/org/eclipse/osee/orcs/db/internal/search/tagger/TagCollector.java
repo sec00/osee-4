@@ -15,5 +15,5 @@ package org.eclipse.osee.orcs.db.internal.search.tagger;
  */
 public interface TagCollector {
 
-   public void addTag(String word, Long codedTag);
+   public void addTag(Long gammaId, String word, Long codedTag);
 }

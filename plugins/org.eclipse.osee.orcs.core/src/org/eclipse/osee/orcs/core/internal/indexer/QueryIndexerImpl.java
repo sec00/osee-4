@@ -10,10 +10,13 @@
  *******************************************************************************/
 package org.eclipse.osee.orcs.core.internal.indexer;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
+import org.eclipse.osee.activity.api.ActivityLog;
 import org.eclipse.osee.executor.admin.CancellableCallable;
+import org.eclipse.osee.framework.core.data.IAttributeType;
 import org.eclipse.osee.orcs.OrcsSession;
 import org.eclipse.osee.orcs.core.ds.QueryEngineIndexer;
 import org.eclipse.osee.orcs.data.AttributeTypes;
@@ -65,6 +68,16 @@ public class QueryIndexerImpl implements QueryIndexer {
    @Override
    public CancellableCallable<Integer> purgeAllIndexes() {
       return engineIndexer.purgeAllIndexes(session);
+   }
+
+   @Override
+   public void indexAllBranches(Collection<? extends IAttributeType> attributeTypesToTag, ActivityLog activityLog) {
+      engineIndexer.indexAllBranches(attributeTypes, attributeTypesToTag, activityLog);
+   }
+
+   @Override
+   public void indexAllBranches(ActivityLog activityLog) {
+      indexAllBranches(attributeTypes.getAllTaggable(), activityLog);
    }
 
 }

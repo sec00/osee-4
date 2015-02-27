@@ -17,6 +17,7 @@ public final class IndexerConstants {
    }
 
    public static final String INDEXING_CONSUMER_EXECUTOR_ID = "indexing.consumer.executor.id";
+   public static final String INDEXING_EXECUTOR_ID = "indexing.executor.id";
    public static final int INDEXER_CACHE_LIMIT = 1000;
    public static final boolean INDEXER_CACHE_ALL_ITEMS = false;
    public static final int INDEX_QUERY_ID_LOADER_TOTAL_RETRIES = 10;

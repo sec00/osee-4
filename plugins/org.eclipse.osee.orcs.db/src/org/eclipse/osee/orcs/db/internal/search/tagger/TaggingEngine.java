@@ -11,22 +11,36 @@
 package org.eclipse.osee.orcs.db.internal.search.tagger;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.eclipse.osee.framework.core.data.IAttributeType;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.util.Conditions;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
+import org.eclipse.osee.orcs.data.AttributeTypes;
 
 /**
  * @author Roberto E. Escobar
  */
 public class TaggingEngine {
-
    private final Map<String, Tagger> taggers;
    private final TagProcessor tagProcessor;
+   private final ConcurrentHashMap<Long, Tagger> typeIdToTaggerMap = new ConcurrentHashMap<Long, Tagger>(1000);
 
-   public TaggingEngine(Map<String, Tagger> taggers, TagProcessor tagProcessor) {
+   public TaggingEngine(Map<String, Tagger> taggers, TagProcessor tagProcessor, AttributeTypes attributeTypes) {
       this.taggers = taggers;
       this.tagProcessor = tagProcessor;
+      loadCache(attributeTypes);
+   }
+
+   private void loadCache(AttributeTypes attributeTypes) {
+      for (IAttributeType type : attributeTypes.getAll()) {
+         String taggerId = attributeTypes.getTaggerId(type);
+         if (!taggerId.equals("")) {
+            Tagger tagger = getTagger(taggerId);
+            typeIdToTaggerMap.put(type.getGuid(), tagger);
+         }
+      }
    }
 
    public TagProcessor getTagProcessor() {
@@ -58,4 +72,7 @@ public class TaggingEngine {
       return tagger;
    }
 
+   public Tagger getTagger(Long attributeTypeId) {
+      return typeIdToTaggerMap.get(attributeTypeId);
+   }
 }

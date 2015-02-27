@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.orcs.db.internal.search.indexer;
 
-import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
+import org.eclipse.osee.jdbc.JdbcConnection;
 import org.eclipse.osee.orcs.core.ds.IndexedResource;
 import org.eclipse.osee.orcs.core.ds.OrcsDataHandler;
 
@@ -19,6 +19,8 @@ import org.eclipse.osee.orcs.core.ds.OrcsDataHandler;
  */
 public interface IndexedResourceLoader {
 
-   void loadSource(OrcsDataHandler<IndexedResource> handler, int tagQueueQueryId) throws OseeCoreException;
+   void loadSource(OrcsDataHandler<IndexedResource> handler, int tagQueueQueryId);
+
+   void cleanupSource(JdbcConnection connection, int tagQueueQueryId);
 
 }

@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
+import org.eclipse.osee.activity.api.ActivityLog;
 import org.eclipse.osee.executor.admin.CancellableCallable;
 import org.eclipse.osee.framework.core.data.IAttributeType;
 import org.eclipse.osee.orcs.OrcsSession;
@@ -29,6 +30,8 @@ public interface QueryEngineIndexer {
    void addCollector(IndexerCollector collector);
 
    void removeCollector(IndexerCollector collector);
+
+   void indexAllBranches(AttributeTypes types, Collection<? extends IAttributeType> typesToTag, ActivityLog activityLog);
 
    CancellableCallable<IndexerData> getIndexerData(OrcsSession session);
 

@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.eclipse.osee.framework.core.data.IAttributeType;
-import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
+import org.eclipse.osee.framework.core.exception.OseeExceptions;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.orcs.core.ds.criteria.CriteriaAttributeKeywords;
 import org.eclipse.osee.orcs.db.internal.search.tagger.HasTagProcessor;
@@ -63,7 +63,7 @@ public class AttributeTokenSqlHandler extends SqlHandler<CriteriaAttributeKeywor
    }
 
    @Override
-   public void addWithTables(AbstractSqlWriter writer) throws OseeCoreException {
+   public void addWithTables(AbstractSqlWriter writer) {
       String gammaAlias = writer.getNextAlias(GAMMA_WITH);
       StringBuilder gammaSb = new StringBuilder();
       Collection<? extends IAttributeType> types = criteria.getTypes();
@@ -83,7 +83,11 @@ public class AttributeTokenSqlHandler extends SqlHandler<CriteriaAttributeKeywor
       int valueIdx = 0;
       for (String value : values) {
          List<Long> tags = new ArrayList<Long>();
-         tokenize(value, tags);
+         try {
+            tokenize(value, tags);
+         } catch (Exception ex) {
+            OseeExceptions.wrapAndThrow(ex);
+         }
          int tagsSize = tags.size();
          gammaSb.append("  ( \n");
          if (tagsSize == 0) {
@@ -180,7 +184,7 @@ public class AttributeTokenSqlHandler extends SqlHandler<CriteriaAttributeKeywor
    }
 
    @Override
-   public boolean addPredicates(AbstractSqlWriter writer) throws OseeCoreException {
+   public boolean addPredicates(AbstractSqlWriter writer) {
       boolean artTableAdded = false;
       boolean txsTableAdded = false;
 
@@ -216,11 +220,11 @@ public class AttributeTokenSqlHandler extends SqlHandler<CriteriaAttributeKeywor
    private void tokenize(String value, final Collection<Long> codedTags) {
       TagCollector collector = new TagCollector() {
          @Override
-         public void addTag(String word, Long codedTag) {
+         public void addTag(Long gammaId, String word, Long codedTag) {
             codedTags.add(codedTag);
          }
       };
-      getTagProcessor().collectFromString(value, collector);
+      getTagProcessor().collectFromString(-1L, value, collector);
    }
 
 }

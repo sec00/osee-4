@@ -77,7 +77,7 @@ public class LoaderTest {
    private DataLoaderFactory loaderFactory;
 
    @Before
-   public void setUp() throws OseeCoreException {
+   public void setUp() {
       MockitoAnnotations.initMocks(this);
 
       when(types.getArtifactTypes()).thenReturn(artTypes);

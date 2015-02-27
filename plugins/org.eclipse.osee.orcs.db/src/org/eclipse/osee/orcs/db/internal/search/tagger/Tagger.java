@@ -21,7 +21,7 @@ import com.google.common.io.InputSupplier;
  */
 public interface Tagger {
 
-   void tagIt(InputSupplier<? extends InputStream> provider, TagCollector collector) throws Exception;
+   void tagIt(Long gammaId, InputSupplier<? extends InputStream> provider, TagCollector collector) throws Exception;
 
    List<MatchLocation> find(InputSupplier<? extends InputStream> provider, String toSearch, boolean matchAllLocations, QueryOption... options) throws Exception;
 

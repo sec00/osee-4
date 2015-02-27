@@ -26,7 +26,7 @@ public class MockTagCollector implements TagCollector {
    }
 
    @Override
-   public void addTag(String word, Long codedTag) {
+   public void addTag(Long gammaId, String word, Long codedTag) {
       actualTags.add(new Pair<String, Long>(word, codedTag));
    }
 }

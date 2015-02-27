@@ -124,7 +124,7 @@ public final class Engines {
       return new ObjectQueryCallableFactory(logger, objectLoader, sqlContextFactory, filterFactory);
    }
 
-   public static TaggingEngine newTaggingEngine(Log logger) {
+   public static TaggingEngine newTaggingEngine(Log logger, AttributeTypes attributeTypes) {
       TagProcessor tagProcessor = new TagProcessor(new EnglishLanguage(logger), new TagEncoder());
       Map<String, Tagger> taggers = new HashMap<String, Tagger>();
 
@@ -132,7 +132,7 @@ public final class Engines {
       taggers.put("DefaultAttributeTaggerProvider", new TextStreamTagger(tagProcessor, matcher));
       taggers.put("XmlAttributeTaggerProvider", new XmlTagger(tagProcessor, matcher));
 
-      return new TaggingEngine(taggers, tagProcessor);
+      return new TaggingEngine(taggers, tagProcessor, attributeTypes);
    }
 
    public static QuerySqlContextFactory newSqlContextFactory(Log logger, SqlJoinFactory joinFactory, SqlProvider sqlProvider, TableEnum table, String idColumn, SqlHandlerFactory handlerFactory, ObjectQueryType type) {
@@ -156,7 +156,8 @@ public final class Engines {
       IndexerCallableFactory callableFactory =
          new IndexerCallableFactoryImpl(logger, jdbcClient, taggingEngine, resourceLoader);
       IndexingTaskConsumer indexConsumer = new IndexingTaskConsumerImpl(executorAdmin, callableFactory);
-      return new QueryEngineIndexerImpl(logger, jdbcClient, sqlJoinFactory, indexConsumer);
+      return new QueryEngineIndexerImpl(logger, jdbcClient, sqlJoinFactory, indexConsumer, taggingEngine, resourceManager,
+         executorAdmin);
    }
 
 }

@@ -54,7 +54,7 @@ public class TagProcessorTest {
    public void testCollectFromString() {
       List<Pair<String, Long>> actual = new ArrayList<Pair<String, Long>>();
       TagCollector tagCollector = new MockTagCollector(actual);
-      tagProcessor.collectFromString(expectedParsed, tagCollector);
+      tagProcessor.collectFromString(-1L, expectedParsed, tagCollector);
       SearchAsserts.assertTagsEqual(expected, actual);
    }
 
@@ -65,7 +65,7 @@ public class TagProcessorTest {
          inputStream = new XmlTextInputStream(rawData);
          List<Pair<String, Long>> actual = new ArrayList<Pair<String, Long>>();
          TagCollector tagCollector = new MockTagCollector(actual);
-         tagProcessor.collectFromInputStream(inputStream, tagCollector);
+         tagProcessor.collectFromInputStream(-1L, inputStream, tagCollector);
          SearchAsserts.assertTagsEqual(expected, actual);
       } finally {
          Lib.close(inputStream);
@@ -79,7 +79,7 @@ public class TagProcessorTest {
          sourceScanner = new Scanner(new XmlTextInputStream(rawData), "UTF-8");
          List<Pair<String, Long>> actual = new ArrayList<Pair<String, Long>>();
          TagCollector tagCollector = new MockTagCollector(actual);
-         tagProcessor.collectFromScanner(sourceScanner, tagCollector);
+         tagProcessor.collectFromScanner(-1L, sourceScanner, tagCollector);
          SearchAsserts.assertTagsEqual(expected, actual);
       } finally {
          if (sourceScanner != null) {

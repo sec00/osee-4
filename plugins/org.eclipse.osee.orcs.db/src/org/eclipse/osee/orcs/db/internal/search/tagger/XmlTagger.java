@@ -31,11 +31,11 @@ public class XmlTagger extends AbstractTagger {
    }
 
    @Override
-   public void tagIt(InputSupplier<? extends InputStream> provider, TagCollector collector) throws Exception {
+   public void tagIt(Long gammaId, InputSupplier<? extends InputStream> provider, TagCollector collector) throws IOException {
       InputStream inputStream = null;
       try {
          inputStream = getStream(provider);
-         getTagProcessor().collectFromInputStream(inputStream, collector);
+         getTagProcessor().collectFromInputStream(gammaId, inputStream, collector);
       } finally {
          Lib.close(inputStream);
       }

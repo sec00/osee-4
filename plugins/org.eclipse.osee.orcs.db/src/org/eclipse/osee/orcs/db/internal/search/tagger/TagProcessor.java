@@ -28,21 +28,21 @@ public class TagProcessor {
       this.encoder = encoder;
    }
 
-   public void collectFromString(String value, TagCollector tagCollector) {
+   public void collectFromString(Long gammaId, String value, TagCollector tagCollector) {
       if (Strings.isValid(value)) {
          Scanner scanner = new Scanner(value);
          while (scanner.hasNext()) {
-            processWord(scanner.next(), tagCollector);
+            processWord(gammaId, scanner.next(), tagCollector);
          }
       }
    }
 
-   public void collectFromInputStream(InputStream inputStream, TagCollector tagCollector) {
+   public void collectFromInputStream(Long gammaId, InputStream inputStream, TagCollector tagCollector) {
       if (inputStream != null) {
          Scanner scanner = new Scanner(inputStream, "UTF-8");
          try {
             while (scanner.hasNext()) {
-               processWord(scanner.next(), tagCollector);
+               processWord(gammaId, scanner.next(), tagCollector);
             }
          } finally {
             scanner.close();
@@ -50,7 +50,7 @@ public class TagProcessor {
       }
    }
 
-   public void collectFromScanner(Scanner sourceScanner, TagCollector tagCollector) {
+   public void collectFromScanner(Long gammaId, Scanner sourceScanner, TagCollector tagCollector) {
       try {
          while (sourceScanner.hasNext()) {
             String entry = sourceScanner.next();
@@ -58,7 +58,7 @@ public class TagProcessor {
                Scanner innerScanner = new Scanner(entry);
                while (innerScanner.hasNext()) {
                   String entry1 = innerScanner.next();
-                  processWord(entry1, tagCollector);
+                  processWord(gammaId, entry1, tagCollector);
                }
             }
          }
@@ -67,13 +67,13 @@ public class TagProcessor {
       }
    }
 
-   private void processWord(String original, TagCollector tagCollector) {
+   private void processWord(Long gammaId, String original, TagCollector tagCollector) {
       if (Strings.isValid(original) && (original.length() >= 2 || 0 == WordsUtil.countPuntuation(original))) {
          original = original.toLowerCase();
          for (String toEncode : WordsUtil.splitOnPunctuation(original)) {
             if (language.isWord(toEncode)) {
                String target = language.toSingular(toEncode);
-               encoder.encode(target, tagCollector);
+               encoder.encode(gammaId, target, tagCollector);
             }
          }
       }

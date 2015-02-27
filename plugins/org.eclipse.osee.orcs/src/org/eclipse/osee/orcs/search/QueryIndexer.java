@@ -10,10 +10,13 @@
  *******************************************************************************/
 package org.eclipse.osee.orcs.search;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
+import org.eclipse.osee.activity.api.ActivityLog;
 import org.eclipse.osee.executor.admin.CancellableCallable;
+import org.eclipse.osee.framework.core.data.IAttributeType;
 import org.eclipse.osee.orcs.data.BranchReadable;
 
 /**
@@ -22,6 +25,10 @@ import org.eclipse.osee.orcs.data.BranchReadable;
 public interface QueryIndexer {
 
    CancellableCallable<Integer> indexAllFromQueue(IndexerCollector... collector);
+
+   void indexAllBranches(Collection<? extends IAttributeType> attributeTypes, ActivityLog activityLog);
+
+   void indexAllBranches(ActivityLog activityLog);
 
    CancellableCallable<Integer> indexBranches(Set<BranchReadable> branches, boolean indexOnlyMissing, IndexerCollector... collector);
 
