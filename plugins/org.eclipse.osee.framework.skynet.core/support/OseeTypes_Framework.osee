@@ -1796,3 +1796,43 @@ attributeType "Graphiti Diagram" extends StringAttribute {
 	mediaType "text/xml"
 	defaultValue "<?xml version=\"1.0\" encoding=\"ASCII\"?><pi:Diagram xmi:version=\"2.0\" xmlns:xmi=\"http://www.omg.org/XMI\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:al=\"http://eclipse.org/graphiti/mm/algorithms\" xmlns:pi=\"http://eclipse.org/graphiti/mm/pictograms\" visible=\"true\" gridUnit=\"10\" diagramTypeId=\"mbse\" name=\"mbse basic\" snapToGrid=\"true\" version=\"0.11.0\"><graphicsAlgorithm xsi:type=\"al:Rectangle\" background=\"//@colors.1\" foreground=\"//@colors.0\" lineWidth=\"1\" transparency=\"0.0\" width=\"1000\" height=\"1000\"/><colors red=\"227\" green=\"238\" blue=\"249\"/><colors red=\"255\" green=\"255\" blue=\"255\"/></pi:Diagram>"
 }
+
+artifactType "Model Definition" extends "Artifact" {
+   uuid 0x0000000000000060
+   attribute "Artifact Type UUID for Occurrences"
+   attribute "Model Graphics"
+}
+
+artifactType "Model Definition Usage" extends "Artifact" {
+   uuid 0x0000000000000061
+}
+
+attributeType "Artifact Type UUID for Occurrences" extends StringAttribute {
+	uuid 0x1000000000000154
+	dataProvider DefaultAttributeDataProvider
+	min 0
+	max 1
+	taggerId DefaultAttributeTaggerProvider
+	mediaType "text/plain"
+}
+
+attributeType "Model Graphics" extends StringAttribute {
+	uuid 0x1000000000000156
+   dataProvider DefaultAttributeDataProvider
+   min 0
+   max 1
+   taggerId DefaultAttributeTaggerProvider
+   defaultValue "{}"
+   fileExtension "txt"
+	mediaType "application/json"
+}
+
+relationType "Model Usage" {
+	uuid 0x0000000000000070
+	sideAName "Model Definition"
+	sideAArtifactType "Model Definition"
+	sideBName "Model Definition Usage"
+	sideBArtifactType "Model Definition Usage"
+	defaultOrderType Lexicographical_Ascending
+	multiplicity ONE_TO_MANY
+}
