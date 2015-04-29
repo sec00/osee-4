@@ -33,6 +33,7 @@ angular
 							var openTeamTmpl = '<button class="btn btn-default btn-sm" ng-click="openTeam(row.entity)">Open</button>';
 							var configTeamTmpl = '<button class="btn btn-default btn-sm" ng-click="configTeam(row.entity)">Config</button>';
 							var openBacklogImpl = '<button class="btn btn-default btn-sm" ng-click="openBacklog(row.entity)">Backlog</button>';
+							var openKanbanImpl = '<button class="btn btn-default btn-sm" ng-click="openKanban(row.entity)">Kanban</button>';
 
 							$scope.teamGridOptions = {
 								data : 'teams',
@@ -52,11 +53,6 @@ angular
 									field : 'name',
 									displayName : 'Name',
 									width : 290
-								}, {
-									field : "open",
-									displayName : 'Open',
-									width : 66,
-									cellTemplate : openTeamTmpl
 								}, {
 									field : "backlog",
 									displayName : 'Backlog',
@@ -92,27 +88,29 @@ angular
 								AgileFactory.getTeamSingle($scope.team).$promise
 										.then(function(data) {
 											$scope.selectedTeam = data;
-										//	$scope.updateSprints();
-										//	$scope.updateFeatureGroups();
-											AgileFactory.getBacklog($scope.selectedTeam).$promise
-											.then(function(data) {
-												if (data && data.name) {
-													$scope.selectedTeam.backlog = data.name;
-													$scope.selectedTeam.backlogUuid = data.uuid;
-												}
-											});
-											AgileFactory.getSprintCurrent($scope.selectedTeam).$promise
-											.then(function(data) {
-												if (data && data.name) {
-													$scope.selectedTeam.sprint = data.name;
-													$scope.selectedTeam.sprintUuid = data.uuid;
-												}
-											});
-										//	LayoutService
-										//			.resizeElementHeight("sprintConfigTable");
-										//	LayoutService
-										//			.resizeElementHeight("featureGroupConfigTable");
-										//	LayoutService.refresh();
+											// $scope.updateSprints();
+											// $scope.updateFeatureGroups();
+											AgileFactory
+													.getBacklog($scope.selectedTeam).$promise
+													.then(function(data) {
+														if (data && data.name) {
+															$scope.selectedTeam.backlog = data.name;
+															$scope.selectedTeam.backlogUuid = data.uuid;
+														}
+													});
+											AgileFactory
+													.getSprintCurrent($scope.selectedTeam).$promise
+													.then(function(data) {
+														if (data && data.name) {
+															$scope.selectedTeam.sprint = data.name;
+															$scope.selectedTeam.sprintUuid = data.uuid;
+														}
+													});
+											// LayoutService
+											// .resizeElementHeight("sprintConfigTable");
+											// LayoutService
+											// .resizeElementHeight("featureGroupConfigTable");
+											// LayoutService.refresh();
 											loadingModal.close();
 											$scope.isLoaded = "true";
 										});
