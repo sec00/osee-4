@@ -9,6 +9,11 @@
 		<diagramType id="org.eclipse.osee.framework.ui.data.model.editor.graphiti.mbse"
       name="Mbse Graphiti Diagram Type" type="mbse">
 		</diagramType>
+		<diagramType
+      	id="org.eclipse.osee.framework.ui.data.model.editor.graphiti.DiagramType"
+      	name="ORCS Types Graphiti Diagram Type"
+      	type="orcsTypes">
+		</diagramType>
 	</extension>
 		
    <extension point="org.eclipse.graphiti.ui.diagramTypeProviders">
@@ -18,6 +23,14 @@
           name="Model-based Systems Engineering Type Provider">
       	<diagramType
 				id="org.eclipse.osee.framework.ui.data.model.editor.graphiti.mbse">
+			</diagramType>
+		</diagramTypeProvider>	
+		<diagramTypeProvider
+      	class="org.eclipse.osee.framework.ui.data.model.editor.OrcsTypesDiagramTypeProvider"
+			id="org.eclipse.osee.framework.ui.data.model.editor.graphiti.OrcsTypesDiagramProvider"
+			name="ORCS types Graphiti editor">
+			<diagramType
+				id="org.eclipse.osee.framework.ui.data.model.editor.graphiti.DiagramType">
 			</diagramType>
 		</diagramTypeProvider>
 	</extension>
