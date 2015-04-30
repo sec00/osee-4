@@ -13,7 +13,10 @@ package org.eclipse.osee.framework.ui.plugin.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osee.framework.core.util.Result;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.framework.logging.OseeLevel;
@@ -133,17 +136,13 @@ public final class AWorkbench {
          getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
+               Shell shell = getActiveShell();
                if (messageType == MessageType.Informational) {
-                  MessageDialog.openInformation(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title,
-                     message);
+                  MessageDialog.openInformation(shell, title, message);
                } else if (messageType == MessageType.Error) {
-                  MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title,
-                     message);
-
+                  MessageDialog.openError(shell, title, message);
                } else if (messageType == MessageType.Confirm) {
-                  MessageDialog.openConfirm(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title,
-                     message);
-
+                  MessageDialog.openConfirm(shell, title, message);
                }
             }
          });
@@ -157,5 +156,24 @@ public final class AWorkbench {
    public static IWorkbenchPage getActivePage() {
       IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
       return workbenchWindow != null ? workbenchWindow.getActivePage() : null;
+   }
+
+   /**
+    * Opens an text input dialog with OK and Cancel buttons.
+    * <p>
+    * 
+    * @param dialogTitle the dialog title, or <code>null</code> if none
+    * @param dialogMessage the dialog message, or <code>null</code> if none
+    * @param initialValue the initial input value, or <code>null</code> if none (equivalent to the empty string)
+    * @param validator used to validate the user's input
+    * @return the user's input or null if dialog was cancelled
+    */
+   public static String popupTextInput(String dialogTitle, String dialogMessage, String initialValue, IInputValidator validator) {
+      String userInput = null;
+      InputDialog inputDialog = new InputDialog(getActiveShell(), dialogTitle, dialogMessage, initialValue, validator);
+      if (inputDialog.open() == Window.OK) {
+         userInput = inputDialog.getValue();
+      }
+      return userInput;
    }
 }
