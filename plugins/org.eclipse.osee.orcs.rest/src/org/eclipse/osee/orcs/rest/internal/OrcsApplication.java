@@ -21,7 +21,7 @@ import org.eclipse.osee.orcs.OrcsApi;
 
 /**
  * Get application.wadl at this context to get rest documentation
- * 
+ *
  * @author Roberto E. Escobar
  */
 @ApplicationPath("orcs")

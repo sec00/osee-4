@@ -162,4 +162,9 @@ public class AtsBranchServiceImpl extends AbstractAtsBranchService {
       return BranchManager.getBranch(destinationBranch).getBaseTransaction();
    }
 
+   @Override
+   public ITransaction getSourceTransaction(IOseeBranch branch) {
+      return BranchManager.getBranch(branch).getSourceTransaction();
+   }
+
 }

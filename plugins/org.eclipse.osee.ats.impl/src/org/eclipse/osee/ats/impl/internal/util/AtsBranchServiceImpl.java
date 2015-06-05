@@ -164,4 +164,10 @@ public class AtsBranchServiceImpl extends AbstractAtsBranchService {
       TransactionQuery txQuery = orcsApi.getQueryFactory().transactionQuery();
       return txQuery.andBranch(branch).andIs(TransactionDetailsType.Baselined).getResults().getExactlyOne();
    }
+
+   @Override
+   public ITransaction getSourceTransaction(IOseeBranch branch) {
+      TransactionQuery txQuery = orcsApi.getQueryFactory().transactionQuery();
+      return txQuery.andBranch(branch).andIs(TransactionDetailsType.Baselined).getResults().getExactlyOne();
+   }
 }

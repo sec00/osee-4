@@ -20,6 +20,7 @@ import org.eclipse.osee.ats.rest.internal.config.ActionableItemResource;
 import org.eclipse.osee.ats.rest.internal.config.ConvertCreateUpdateAtsConfig;
 import org.eclipse.osee.ats.rest.internal.config.ConvertResource;
 import org.eclipse.osee.ats.rest.internal.config.ProgramResource;
+import org.eclipse.osee.ats.rest.internal.config.ReportResource;
 import org.eclipse.osee.ats.rest.internal.config.TeamResource;
 import org.eclipse.osee.ats.rest.internal.config.UserResource;
 import org.eclipse.osee.ats.rest.internal.config.VersionResource;
@@ -32,6 +33,7 @@ import org.eclipse.osee.framework.jdk.core.type.IResourceRegistry;
 import org.eclipse.osee.framework.jdk.core.type.ResourceRegistry;
 import org.eclipse.osee.logger.Log;
 import org.eclipse.osee.orcs.OrcsApi;
+import org.eclipse.osee.orcs.rest.model.TransactionEndpoint;
 import org.eclipse.osee.template.engine.OseeTemplateTokens;
 
 /**
@@ -46,6 +48,7 @@ public class AtsApplication extends Application {
    private OrcsApi orcsApi;
    private IAtsServer atsServer;
    private CpaServiceRegistry cpaRegistry;
+   private TransactionEndpoint transactionEndpoint;
 
    public void setOrcsApi(OrcsApi orcsApi) {
       this.orcsApi = orcsApi;
@@ -63,7 +66,13 @@ public class AtsApplication extends Application {
       this.cpaRegistry = cpaRegistry;
    }
 
+   public void setTransactionEndpoint(TransactionEndpoint transactionEndpoint) {
+      System.out.println("Satisfied");
+      this.transactionEndpoint = transactionEndpoint;
+   }
+
    public void start() {
+      System.out.println("Strating ATS");
       IResourceRegistry registry = new ResourceRegistry();
       OseeTemplateTokens.register(registry);
 
@@ -89,6 +98,8 @@ public class AtsApplication extends Application {
       singletons.add(new AtsEndpointImpl(atsServer, logger, registry, cpaRegistry));
 
       singletons.add(new ActionUiResource(atsServer, logger));
+
+      singletons.add(new ReportResource(orcsApi, transactionEndpoint, atsServer));
    }
 
    public void stop() {

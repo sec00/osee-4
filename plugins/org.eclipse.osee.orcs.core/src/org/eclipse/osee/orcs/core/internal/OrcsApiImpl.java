@@ -267,8 +267,7 @@ public class OrcsApiImpl implements OrcsApi {
          }
       };
       QueryFactory queryFactory = getQueryFactory();
-      return new OrcsBranchImpl(logger, session, module.getBranchDataStore(), queryFactory, systemUser,
-         getOrcsTypes());
+      return new OrcsBranchImpl(logger, session, module.getBranchDataStore(), queryFactory, systemUser, getOrcsTypes());
    }
 
    @Override

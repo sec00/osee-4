@@ -84,7 +84,7 @@ public abstract class AbstractAtsBranchService implements IAtsBranchService {
    /**
     * Return working branch associated with SMA whether it is committed or not; This data is cached across all workflows
     * with the cache being updated by local and remote events.
-    * 
+    *
     * @param force == true does not used cached value
     */
    @Override
@@ -632,4 +632,8 @@ public abstract class AbstractAtsBranchService implements IAtsBranchService {
       }
    }
 
+   //   @Override
+   //   public TransactionRecord getHeadTransaction(IOseeBranch branch) {
+   //      return null;
+   //   }
 }

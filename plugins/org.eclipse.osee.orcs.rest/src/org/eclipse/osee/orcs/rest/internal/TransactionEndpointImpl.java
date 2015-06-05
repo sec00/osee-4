@@ -19,10 +19,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
 import org.eclipse.osee.framework.core.enums.CoreBranches;
 import org.eclipse.osee.framework.core.model.change.ChangeItem;
 import org.eclipse.osee.framework.jdk.core.type.ResultSet;
@@ -48,18 +46,36 @@ import com.google.common.collect.Sets.SetView;
  */
 public class TransactionEndpointImpl implements TransactionEndpoint {
 
-   private final OrcsApi orcsApi;
+   private OrcsApi orcsApi;
 
-   @Context
-   private UriInfo uriInfo;
+   //   @Context
+   //   private UriInfo uriInfo;
 
+   public TransactionEndpointImpl() {
+
+   }
+
+   // Might need to remove this
    public TransactionEndpointImpl(OrcsApi orcsApi) {
       this.orcsApi = orcsApi;
    }
 
-   protected void setUriInfo(UriInfo uriInfo) {
-      this.uriInfo = uriInfo;
+   public void setOrcsApi(OrcsApi orcsApi) {
+      this.orcsApi = orcsApi;
    }
+
+   public void start() {
+      System.out.println("Starting");
+      //
+   }
+
+   public void stop() {
+      //
+   }
+
+   //   protected void setUriInfo(UriInfo uriInfo) {
+   //      this.uriInfo = uriInfo;
+   //   }
 
    private TransactionQuery newTxQuery() {
       return orcsApi.getQueryFactory().transactionQuery();
