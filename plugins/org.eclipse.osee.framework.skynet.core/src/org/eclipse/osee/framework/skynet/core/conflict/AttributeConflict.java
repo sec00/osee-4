@@ -76,14 +76,6 @@ public class AttributeConflict extends Conflict {
       computeEqualsValues();
    }
 
-   public AttributeConflict(int sourceGamma, int destGamma, int artId, TransactionRecord commitTransaction, String sourceValue, int attrId, long attrTypeId, Branch mergeBranch, Branch destBranch) throws OseeCoreException {
-      super(sourceGamma, destGamma, artId, commitTransaction, mergeBranch, destBranch);
-      this.attrId = attrId;
-      this.attrTypeId = attrTypeId;
-      this.status = ConflictStatus.EDITED;
-      computeEqualsValues();
-   }
-
    public Attribute<?> getAttribute() throws OseeCoreException {
       if (attribute != null) {
          return attribute;

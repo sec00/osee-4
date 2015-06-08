@@ -65,14 +65,15 @@ public class ConflictManagerInternal {
       ArrayList<Conflict> conflicts = new ArrayList<Conflict>();
       JdbcStatement chStmt = ConnectionHandler.getStatement();
       try {
-         chStmt.runPreparedQuery(ServiceUtil.getSql(OseeSql.CONFLICT_GET_HISTORICAL_ATTRIBUTES),
-            commitTransaction.getId());
+         String sql = ServiceUtil.getSql(OseeSql.CONFLICT_GET_HISTORICAL_ATTRIBUTES);
+         chStmt.runPreparedQuery(sql, commitTransaction.getId());
          while (chStmt.next()) {
             AttributeConflict attributeConflict =
                new AttributeConflict(chStmt.getInt("source_gamma_id"), chStmt.getInt("dest_gamma_id"),
                   chStmt.getInt("art_id"), commitTransaction, chStmt.getString("source_value"),
                   chStmt.getInt("attr_id"), chStmt.getLong("attr_type_id"),
                   BranchManager.getBranch(chStmt.getLong("merge_branch_id")),
+                  BranchManager.getBranch(chStmt.getLong("source_branch_id")),
                   BranchManager.getBranch(chStmt.getLong("dest_branch_id")));
             attributeConflict.setStatus(ConflictStatus.valueOf(chStmt.getInt("status")));
             conflicts.add(attributeConflict);
