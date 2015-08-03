@@ -16,24 +16,46 @@
 	<name>OSEE Coverage - Parent (Incubation)</name>
 	<version>0.21.0-SNAPSHOT</version>
 
-	<modules>
-		<module>../../plugins/org.eclipse.osee.coverage</module>
-		<module>../../plugins/org.eclipse.osee.coverage.test</module>
-
-		<module>../../plugins/org.eclipse.osee.coverage.help.ui</module>
-
-		<module>../../features/org.eclipse.osee.coverage.feature</module>
-
-		<module>../../plugins/org.eclipse.osee.coverage.demo</module>
-
-		<module>../../features/org.eclipse.osee.coverage.demo.feature</module>
-
-		<module>../../plugins/org.eclipse.osee.coverage.integration.tests</module>
-
-		<module>../../plugins/org.eclipse.osee.coverage.p2</module>
-	</modules>
-
 	<profiles>
+
+		<profile>
+			<id>coverage-minimal</id>
+			<activation>
+				<property>
+					<name>no-int-tests</name>
+				</property>
+			</activation>
+			<modules>
+				<module>../../plugins/org.eclipse.osee.coverage</module>
+				<module>../../plugins/org.eclipse.osee.coverage.test</module>
+				<module>../../plugins/org.eclipse.osee.coverage.help.ui</module>
+				<module>../../features/org.eclipse.osee.coverage.feature</module>
+				<module>../../plugins/org.eclipse.osee.coverage.demo</module>
+				<module>../../features/org.eclipse.osee.coverage.demo.feature</module>
+				<module>../../plugins/org.eclipse.osee.coverage.p2</module>
+			</modules>
+		</profile>
+
+		<profile>
+			<id>coverage-release</id>
+			<activation>
+				<property>
+					<name>!no-int-tests</name>
+				</property>
+			</activation>
+			<modules>
+				<module>../../plugins/org.eclipse.osee.coverage</module>
+				<module>../../plugins/org.eclipse.osee.coverage.test</module>
+				<module>../../plugins/org.eclipse.osee.coverage.help.ui</module>
+				<module>../../features/org.eclipse.osee.coverage.feature</module>
+				<module>../../plugins/org.eclipse.osee.coverage.demo</module>
+				<module>../../features/org.eclipse.osee.coverage.demo.feature</module>
+				<module>../../plugins/org.eclipse.osee.coverage.integration.tests</module>
+				<module>../../plugins/org.eclipse.osee.coverage.p2</module>
+			</modules>
+		</profile>
+
+
 		<profile>
 			<id>coverage-help-test</id>
 			<activation>
