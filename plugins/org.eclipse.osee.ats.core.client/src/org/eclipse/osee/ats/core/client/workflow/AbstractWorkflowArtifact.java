@@ -517,7 +517,7 @@ public abstract class AbstractWorkflowArtifact extends AbstractAtsArtifact imple
          }
       } else {
          if (changes.isAttributeTypeValid(this, AtsAttributeTypes.CreatedBy)) {
-            changes.setSoleAttributeValue((ArtifactId) this, AtsAttributeTypes.CreatedBy, user.getUserId());
+            changes.setSoleAttributeValue((IAtsWorkItem) this, AtsAttributeTypes.CreatedBy, user.getUserId());
          }
          if (changes.isAttributeTypeValid(this, AtsAttributeTypes.CreatedDate)) {
             changes.setSoleAttributeValue(this, AtsAttributeTypes.CreatedDate, date);
@@ -545,7 +545,7 @@ public abstract class AbstractWorkflowArtifact extends AbstractAtsArtifact imple
    public void internalSetCreatedBy(IAtsUser user, IAtsChangeSet changes) throws OseeCoreException {
       getLog().internalResetOriginator(user);
       if (changes.isAttributeTypeValid(this, AtsAttributeTypes.CreatedBy)) {
-         changes.setSoleAttributeValue((ArtifactId) this, AtsAttributeTypes.CreatedBy, user.getUserId());
+         changes.setSoleAttributeValue((IAtsWorkItem) this, AtsAttributeTypes.CreatedBy, user.getUserId());
       }
    }
 
@@ -601,7 +601,7 @@ public abstract class AbstractWorkflowArtifact extends AbstractAtsArtifact imple
       if (changes == null) {
          setSoleAttributeValue(AtsAttributeTypes.CancelledReason, reason);
       } else {
-         changes.setSoleAttributeValue((ArtifactId) this, AtsAttributeTypes.CancelledReason, reason);
+         changes.setSoleAttributeValue((IAtsWorkItem) this, AtsAttributeTypes.CancelledReason, reason);
       }
    }
 
@@ -791,7 +791,7 @@ public abstract class AbstractWorkflowArtifact extends AbstractAtsArtifact imple
 
    @Override
    public void setAtsId(String atsId, IAtsChangeSet changes) throws OseeCoreException {
-      changes.setSoleAttributeValue((ArtifactId) this, AtsAttributeTypes.AtsId, atsId);
+      changes.setSoleAttributeValue((IAtsWorkItem) this, AtsAttributeTypes.AtsId, atsId);
    }
 
    @Override
