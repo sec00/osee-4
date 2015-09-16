@@ -20,6 +20,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    AbstractAtsQueryImplTest.class,
+   AtsChangeSetTest.class,
    AtsDeleteManagerTest.class,
    AtsImageTest.class,
    AtsXWidgetsExampleBlamTest.class,

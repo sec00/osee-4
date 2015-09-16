@@ -55,6 +55,7 @@ import org.eclipse.osee.ats.core.util.PercentCompleteTotalUtil;
 import org.eclipse.osee.ats.core.workflow.state.StateManagerUtility;
 import org.eclipse.osee.ats.core.workflow.transition.TransitionManager;
 import org.eclipse.osee.framework.access.AccessControlManager;
+import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.IArtifactType;
 import org.eclipse.osee.framework.core.enums.DeletionFlag;
 import org.eclipse.osee.framework.core.enums.PermissionEnum;
@@ -135,9 +136,9 @@ public abstract class AbstractWorkflowArtifact extends AbstractAtsArtifact imple
                   }
                }
             } else {
-               OseeLog.log(Activator.class, Level.SEVERE, String.format(
-                  "Invalid CompletedFromState [%s] for Worklfow [%s] and WorkDefinition [%s]", completedFromState,
-                  toStringWithId(), getWorkDefinition().getName()));
+               OseeLog.log(Activator.class, Level.SEVERE,
+                  String.format("Invalid CompletedFromState [%s] for Worklfow [%s] and WorkDefinition [%s]",
+                     completedFromState, toStringWithId(), getWorkDefinition().getName()));
             }
          }
       }
@@ -258,7 +259,8 @@ public abstract class AbstractWorkflowArtifact extends AbstractAtsArtifact imple
    }
 
    public double getEstimatedHoursTotal(IStateToken relatedToState) throws OseeCoreException {
-      return getEstimatedHoursFromArtifact() + getEstimatedHoursFromTasks(relatedToState) + getEstimatedHoursFromReviews(relatedToState);
+      return getEstimatedHoursFromArtifact() + getEstimatedHoursFromTasks(
+         relatedToState) + getEstimatedHoursFromReviews(relatedToState);
    }
 
    public double getEstimatedHoursTotal() throws OseeCoreException {
@@ -273,7 +275,8 @@ public abstract class AbstractWorkflowArtifact extends AbstractAtsArtifact imple
       if (est == 0) {
          return getEstimatedHoursFromArtifact();
       }
-      return est - est * PercentCompleteTotalUtil.getPercentCompleteTotal(this, AtsClientService.get().getServices()) / 100.0;
+      return est - est * PercentCompleteTotalUtil.getPercentCompleteTotal(this,
+         AtsClientService.get().getServices()) / 100.0;
    }
 
    public double getRemainHoursTotal() throws OseeCoreException {
@@ -332,8 +335,8 @@ public abstract class AbstractWorkflowArtifact extends AbstractAtsArtifact imple
                if (rString == null) {
                   rString = RelationManager.reportHasDirtyLinks(artifact);
                }
-               return new Result(true, String.format("Artifact [%s][%s] is dirty\n\n%s", artifact, artifact.getGuid(),
-                  rString));
+               return new Result(true,
+                  String.format("Artifact [%s][%s] is dirty\n\n%s", artifact, artifact.getGuid(), rString));
             }
          }
       } catch (Exception ex) {
@@ -514,7 +517,7 @@ public abstract class AbstractWorkflowArtifact extends AbstractAtsArtifact imple
          }
       } else {
          if (changes.isAttributeTypeValid(this, AtsAttributeTypes.CreatedBy)) {
-            changes.setSoleAttributeValue(this, AtsAttributeTypes.CreatedBy, user.getUserId());
+            changes.setSoleAttributeValue((ArtifactId) this, AtsAttributeTypes.CreatedBy, user.getUserId());
          }
          if (changes.isAttributeTypeValid(this, AtsAttributeTypes.CreatedDate)) {
             changes.setSoleAttributeValue(this, AtsAttributeTypes.CreatedDate, date);
@@ -542,7 +545,7 @@ public abstract class AbstractWorkflowArtifact extends AbstractAtsArtifact imple
    public void internalSetCreatedBy(IAtsUser user, IAtsChangeSet changes) throws OseeCoreException {
       getLog().internalResetOriginator(user);
       if (changes.isAttributeTypeValid(this, AtsAttributeTypes.CreatedBy)) {
-         changes.setSoleAttributeValue(this, AtsAttributeTypes.CreatedBy, user.getUserId());
+         changes.setSoleAttributeValue((ArtifactId) this, AtsAttributeTypes.CreatedBy, user.getUserId());
       }
    }
 
@@ -598,7 +601,7 @@ public abstract class AbstractWorkflowArtifact extends AbstractAtsArtifact imple
       if (changes == null) {
          setSoleAttributeValue(AtsAttributeTypes.CancelledReason, reason);
       } else {
-         changes.setSoleAttributeValue(this, AtsAttributeTypes.CancelledReason, reason);
+         changes.setSoleAttributeValue((ArtifactId) this, AtsAttributeTypes.CancelledReason, reason);
       }
    }
 
@@ -788,7 +791,7 @@ public abstract class AbstractWorkflowArtifact extends AbstractAtsArtifact imple
 
    @Override
    public void setAtsId(String atsId, IAtsChangeSet changes) throws OseeCoreException {
-      changes.setSoleAttributeValue(this, AtsAttributeTypes.AtsId, atsId);
+      changes.setSoleAttributeValue((ArtifactId) this, AtsAttributeTypes.AtsId, atsId);
    }
 
    @Override

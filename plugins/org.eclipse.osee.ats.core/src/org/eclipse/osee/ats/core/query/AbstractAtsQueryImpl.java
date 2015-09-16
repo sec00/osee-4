@@ -12,7 +12,6 @@ package org.eclipse.osee.ats.core.query;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -91,6 +90,15 @@ public abstract class AbstractAtsQueryImpl implements IAtsQuery {
    }
 
    @Override
+   public IAtsQuery andAttr(IAttributeType attributeType, String value, QueryOption[] options) {
+      andAttr.put(attributeType, String.valueOf(value));
+      for (QueryOption option : options) {
+         andAttrOptions.put(attributeType, option);
+      }
+      return this;
+   }
+
+   @Override
    public IAtsQuery andRelated(IAtsObject object, IRelationTypeSide relation) {
       andRels.put(relation, object);
       return this;
@@ -139,6 +147,13 @@ public abstract class AbstractAtsQueryImpl implements IAtsQuery {
       return artifactTypes;
    }
 
+   protected QueryOption[] getQueryOptions(IAttributeType key) {
+      Collection<QueryOption> values = andAttrOptions.getValues(key);
+      if (values != null) {
+         return values.toArray(new QueryOption[values.size()]);
+      }
+      return new QueryOption[0];
+   }
    @Override
    public IAtsQuery andAttr(IAttributeType attributeType, String value, QueryOption... queryOption) {
       return andAttr(attributeType, Collections.singleton(value), queryOption);

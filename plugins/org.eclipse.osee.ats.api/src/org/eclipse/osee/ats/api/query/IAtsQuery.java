@@ -39,6 +39,7 @@ public interface IAtsQuery {
 
    IAtsQuery andAttr(IAttributeType attributeType, Collection<String> values, QueryOption... queryOption) throws OseeCoreException;
 
+   IAtsQuery andAttr(IAttributeType attributeType, String value, QueryOption[] options);
    IAtsQuery andAtsIds(Collection<String> atsIds);
 
    IAtsQuery andRelated(IAtsObject object, IRelationTypeSide relation);
