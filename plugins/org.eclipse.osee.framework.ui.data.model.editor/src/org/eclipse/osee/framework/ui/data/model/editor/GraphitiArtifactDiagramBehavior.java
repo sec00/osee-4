@@ -16,6 +16,8 @@ import org.eclipse.emf.ecore.resource.ContentHandler;
 import org.eclipse.emf.ecore.resource.URIConverter;
 import org.eclipse.emf.ecore.resource.URIHandler;
 import org.eclipse.emf.ecore.resource.impl.ExtensibleURIConverterImpl;
+import org.eclipse.graphiti.ui.editor.DefaultPersistencyBehavior;
+import org.eclipse.graphiti.ui.editor.DefaultUpdateBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 import org.eclipse.graphiti.ui.editor.IDiagramContainerUI;
 
@@ -35,5 +37,27 @@ public class GraphitiArtifactDiagramBehavior extends DiagramBehavior {
    protected void editingDomainInitialized() {
       super.editingDomainInitialized();
       getEditingDomain().getResourceSet().setURIConverter(converter);
+
+      //      EList<URIHandler> uriHandlers = getEditingDomain().getResourceSet().getURIConverter().getURIHandlers();
+      //      uriHandlers.clear();
+      //      uriHandlers.add(new ArtifactURIHandler());
+   }
+
+   @Override
+   protected void registerBusinessObjectsListener() {
+      super.registerBusinessObjectsListener();
+   }
+
+   /**
+    * Creates the behavior extension that deals with the persistence handling by using artifacts of type "Model Diagram"
+    */
+   @Override
+   protected DefaultPersistencyBehavior createPersistencyBehavior() {
+      return new ArtifactPersistencyBehavior(this);
+   }
+
+   @Override
+   protected DefaultUpdateBehavior createUpdateBehavior() {
+      return new GraphitiArtifactUpdateBehavior(this);
    }
 }

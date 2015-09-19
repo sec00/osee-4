@@ -45,6 +45,13 @@ public class ArtifactURL {
       return url;
    }
 
+   public static String getAttributeUrlString(final Artifact artifact, Integer attrbiuteId) throws OseeCoreException {
+      String conext =
+         String.format("orcs/branch/%d/artifact/%s/attribute/%d", artifact.getBranchUuid(), artifact.getGuid(),
+            attrbiuteId);
+      return getPermanentLinkBaseUrl(conext, null);
+   }
+
    public static URL getOpenInOseeLink(final Artifact artifact, String cmd) throws OseeCoreException {
       Map<String, String> parameters = new HashMap<String, String>();
       parameters.put("sessionId", ClientSessionManager.getSessionId());

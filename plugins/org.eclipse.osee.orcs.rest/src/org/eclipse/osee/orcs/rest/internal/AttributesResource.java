@@ -30,7 +30,7 @@ import org.eclipse.osee.orcs.search.QueryFactory;
 @Path("attribute")
 public class AttributesResource {
 
-   // Allows to insert contextual objects into the class, 
+   // Allows to insert contextual objects into the class,
    // e.g. ServletContext, Request, Response, UriInfo
    @Context
    private final UriInfo uriInfo;
@@ -47,7 +47,7 @@ public class AttributesResource {
       this.artifactUuid = artifactUuid;
    }
 
-   @Path("{attributeId}")
+   @Path("{attributeId}{param1 : (/0)?}")
    public AttributeResource getAttribute(@PathParam("attributeId") int attributeId) {
       return new AttributeResource(uriInfo, request, branchUuid, artifactUuid, attributeId);
    }
