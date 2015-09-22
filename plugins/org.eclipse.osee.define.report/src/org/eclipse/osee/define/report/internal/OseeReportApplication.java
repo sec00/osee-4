@@ -57,6 +57,7 @@ public final class OseeReportApplication extends Application {
       OseeAppResourceTokens.register(resourceRegistry);
       logger.debug(">>>>> registered Requirement resource");
       singletons.add(new SystemSafetyResource(logger, resourceRegistry, orcsApi));
+      singletons.add(new IpaDemoResource(orcsApi));
       logger.debug(">>>>> registered Safety resource");
       singletons.add(new PublishLowHighReqTraceabilityResource(logger, resourceRegistry, orcsApi));
       logger.debug(">>>>> registered Low/High Trace resource");
