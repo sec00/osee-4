@@ -42,9 +42,6 @@ public class ProcessOutfileSax implements IExceptionableRunnable {
 
    private final IFile file;
 
-   private static final int _1_MB = 1048576;
-   private static final int _20_MB = _1_MB * 20;
-
    private final List<TestPointData> testPointDatas = new ArrayList<TestPointData>();
    private TestPointData currentData = null;
    private CheckPointData currentCheckPoint = null;
@@ -57,11 +54,6 @@ public class ProcessOutfileSax implements IExceptionableRunnable {
    @Override
    public IStatus run(IProgressMonitor monitor) throws Exception {
       File outfile = AWorkspace.iFileToFile(file);
-      if (outfile.length() > _20_MB) {
-         OseeLog.logf(MarkerPlugin.class, Level.WARNING, 
-            "%s has a length of [%d], the max size processed is [%d].", file.getName(), outfile.length(), _20_MB);
-         return Status.OK_STATUS;
-      }
       if (!file.isSynchronized(0)) {
          OseeLog.logf(MarkerPlugin.class, Level.WARNING, "%s is not synchronized.", file.getName());
          file.refreshLocal(0, monitor);
@@ -69,8 +61,6 @@ public class ProcessOutfileSax implements IExceptionableRunnable {
 
       monitor.setTaskName(String.format("Computing overview information for [%s].", file.getName()));
 
-//      InputStream contents = file.getContents();
-      
       boolean hadParseException = false;
       int numberOfTries = 0;
       do{
