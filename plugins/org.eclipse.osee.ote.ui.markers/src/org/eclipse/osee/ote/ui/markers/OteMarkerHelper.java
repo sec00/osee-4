@@ -30,6 +30,7 @@ import org.eclipse.osee.ote.core.framework.saxparse.elements.StacktraceData;
  */
 public class OteMarkerHelper {
 
+   private static final int MAX_NUMBER_MARKERS = 50;
    private final List<MarkerInfo> markerInfo;
    private final List<IMarker> markersToDelete;
    private final Map<CheckPointHelper, CheckPointHelper> count = new HashMap<CheckPointHelper, CheckPointHelper>();
@@ -45,7 +46,8 @@ public class OteMarkerHelper {
    }
 
    private void doWork() {
-      for (TestPointData data : testPonitDatas) {
+      for (int i = 0; i < testPonitDatas.size() && i < MAX_NUMBER_MARKERS; i++){
+         TestPointData data = testPonitDatas.get(i);
          String description = getDescription(data.getCheckPointData());
          String number = data.getNumber();
          int num = Integer.parseInt(number);
