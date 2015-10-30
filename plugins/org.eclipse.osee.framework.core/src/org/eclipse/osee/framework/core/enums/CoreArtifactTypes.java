@@ -45,6 +45,8 @@ public final class CoreArtifactTypes {
    public static final IArtifactType InterfaceRequirement = TokenFactory.createArtifactType(0x0000000000000020L, "Interface Requirement");
    public static final IArtifactType ImplementationDetails = TokenFactory.createArtifactType(0x000000000000001AL, "Implementation Details");
    public static final IArtifactType ModelDiagram = TokenFactory.createArtifactType(0x0000000000000062L, "Model Diagram");
+   public static final IArtifactType NativeArtifact = TokenFactory.createArtifactType(0x0000000000000014L, "Native Artifact");
+   public static final IArtifactType WholeWord = TokenFactory.createArtifactType(0x0000000000000012L, "MS Word Whole Document");
    public static final IArtifactType OseeApp = TokenFactory.createArtifactType(0x0000000000000059L, "OSEE App");
    public static final IArtifactType OseeTypeDefinition = TokenFactory.createArtifactType(0x000000000000003CL, "Osee Type Definition");
    public static final IArtifactType RendererTemplate = TokenFactory.createArtifactType(0x0000000000000009L, "Renderer Template");
