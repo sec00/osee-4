@@ -14,6 +14,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.connection.jini.JiniServiceSideConnector;
 import org.eclipse.osee.ote.properties.OtePropertiesCore;
@@ -22,7 +23,6 @@ import org.eclipse.osee.ote.server.PropertyParamter;
 import org.eclipse.osee.ote.server.TestEnvironmentServiceConfigImpl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 
 public class OTEServerCreationComponent {
 
@@ -55,9 +55,10 @@ public class OTEServerCreationComponent {
             final TestEnvironmentServiceConfigImpl config =
                   new TestEnvironmentServiceConfigImpl(keepEnvAliveWithNoUsers, title, name, outfileLocation, null);
 
+            
             String version = "unknown";
             String comment = "";
-            Bundle bundle = FrameworkUtil.getBundle(OTEServerCreationComponent.class);
+            Bundle bundle = Platform.getBundle("org.eclipse.osee.ote.core");
             if(bundle != null){
                BundleContext context = bundle.getBundleContext();
                if(context != null){
