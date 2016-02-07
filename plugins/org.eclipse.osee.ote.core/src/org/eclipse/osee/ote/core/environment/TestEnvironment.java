@@ -14,15 +14,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.ExportException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -30,9 +26,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import org.eclipse.osee.connection.service.IServiceConnector;
-import org.eclipse.osee.connection.service.LocalConnector;
 import org.eclipse.osee.framework.jdk.core.reportdata.ReportDataListener;
-import org.eclipse.osee.framework.jdk.core.util.EnhancedProperties;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.framework.logging.OseeLog;
@@ -81,32 +75,19 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
    private IServiceConnector connector;
    private final IRuntimeLibraryManager runtimeManager;
 
-   @Deprecated
    private final HashMap<Class<?>, Object> associatedObjects;
-   @Deprecated
    private final HashMap<Class<?>, ArrayList<IAssociatedObjectListener>> associatedObjectListeners;
-   @Deprecated
    private boolean isEnvSetup = false;
-   @Deprecated
    private final List<IScriptCompleteEvent> scriptCompleteListeners = new ArrayList<>();
-   @Deprecated
    private final List<IScriptSetupEvent> scriptSetupListeners = new ArrayList<>();
 
-//   private OteServerSideEndprointRecieve oteServerSideEndpointRecieve;
-//   private OteServerSideEndpointSender oteServerSideEndpointSender;
-//   private final ServiceTracker messagingServiceTracker;
 
    private volatile boolean isShutdown = false;
-//   private NodeInfo oteEmbeddedBroker;
    private ServiceRegistration<TestEnvironmentInterface> myRegistration;
 
-   protected TestEnvironment(IEnvironmentFactory factory) {
+   protected TestEnvironment(IEnvironmentFactory factory, IServiceConnector serviceConnector) {
       GCHelper.getGCHelper().addRefWatch(this);
-//      try {
-//         oteEmbeddedBroker = new NodeInfo("OTEEmbeddedBroker", new URI("vm://localhost?broker.persistent=false"));
-//      } catch (URISyntaxException ex) {
-//         OseeLog.log(TestEnvironment.class, Level.SEVERE, ex);
-//      }
+      this.connector = serviceConnector;
       this.factory = factory;
       this.testStation = factory.getTestStation();
       this.runtimeManager = factory.getRuntimeManager();
@@ -115,38 +96,7 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
       this.associatedObjects = new HashMap<>(100);
       this.batchMode = OteProperties.isOseeOteInBatchModeEnabled();
 
-//      messagingServiceTracker = setupOteMessagingSenderAndReceiver();
    }
-
-   public void init(IServiceConnector connector) {
-      this.connector = connector;
-   }
-
-   private void setupDefaultConnector() {
-      EnhancedProperties props = new EnhancedProperties();
-      try {
-         props.setProperty("station", InetAddress.getLocalHost().getHostName());
-      } catch (UnknownHostException ex) {
-         OseeLog.log(TestEnvironment.class, Level.SEVERE, ex);
-      }
-      props.setProperty("date", new Date());
-      props.setProperty("group", "OSEE Test Environment");
-      props.setProperty("owner", OtePropertiesCore.userName.getValue());
-      connector = new LocalConnector(this, Integer.toString(this.getUniqueId()), props);
-   }
-
-//   private ServiceTracker setupOteMessagingSenderAndReceiver() {
-//      oteServerSideEndpointRecieve = new OteServerSideEndprointRecieve();
-//      oteServerSideEndpointSender = new OteServerSideEndpointSender(this);
-//      BundleContext context = Platform.getBundle("org.eclipse.osee.ote.core").getBundleContext();
-//      return getServiceTracker(MessagingGateway.class.getName(), new OteEnvironmentTrackerCustomizer(context,
-//            oteServerSideEndpointRecieve, oteServerSideEndpointSender,
-//            OteServerSideEndpointSender.OTE_SERVER_SIDE_SEND_PROTOCOL));
-//   }
-//
-//   public void sendMessageToServer(Message message) {
-//      oteServerSideEndpointRecieve.recievedMessage(message);
-//   }
 
    public ServiceTracker getServiceTracker(String clazz, ServiceTrackerCustomizer customizer) {
       return Activator.getInstance().getServiceTracker(clazz, customizer);
@@ -329,8 +279,6 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
          this.associatedObjects.clear();// get rid of all models and support
       }
 
-//      messagingServiceTracker.close();
-
       OseeLog.log(TestEnvironment.class, Level.FINE, "shutting down environment");
       factory.getTimerControl().cancelTimers();
       stop();
@@ -413,12 +361,10 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
       return connector;
    }
 
-   @Deprecated
    public void setEnvSetup(boolean isEnvSetup) {
       this.isEnvSetup = isEnvSetup;
    }
 
-   @Deprecated
    public void addScriptCompleteListener(IScriptCompleteEvent scriptComplete) {
       this.scriptCompleteListeners.add(scriptComplete);
    }
@@ -428,22 +374,18 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
       this.scriptCompleteListeners.remove(scriptComplete);
    }
 
-   @Deprecated
    public void addScriptSetupListener(IScriptSetupEvent scriptSetup) {
       this.scriptSetupListeners.add(scriptSetup);
    }
 
-   @Deprecated
    public void removeScriptSetupListener(IScriptSetupEvent scriptSetup) {
       this.scriptSetupListeners.remove(scriptSetup);
    }
 
-   @Deprecated
    protected boolean isEnvSetup() {
       return isEnvSetup;
    }
 
-   @Deprecated
    /**
     * alerts the environment of an exception. The environment will take any necessary actions and alert any interested
     * entities of the problem. Any runing test script will be terminated
@@ -453,7 +395,6 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
       handleException(t, "An exception has occurred in the environment", logLevel, true);
    }
 
-   @Deprecated
    /**
     * @param abortScript true will cause the currently running script to abort
     */
@@ -461,7 +402,6 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
       handleException(t, "An exception has occurred in the environment", logLevel, abortScript);
    }
 
-   @Deprecated
    /**
     * alerts the environment of an exception. The environment will take any necessary actions and alert any interested
     * entities of the problem
@@ -484,7 +424,6 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
       }
    }
 
-   @Deprecated
    public void testEnvironmentCommandComplete(ICommandHandle handle) {
       for (ITestEnvironmentListener listener : envListeners) {
          try {
@@ -516,7 +455,6 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
    }
 
    @Override
-   @Deprecated
    public void onScriptComplete() throws InterruptedException {
       factory.getScriptControl().setScriptReady(false);
 
@@ -535,7 +473,6 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
    }
 
    @Override
-   @Deprecated
    public void associateObject(Class<?> c, Object obj) {
       associatedObjects.put(c, obj);
       ArrayList<IAssociatedObjectListener> listeners = this.associatedObjectListeners.get(c);
@@ -552,13 +489,11 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
    }
 
    @Override
-   @Deprecated
    public Object getAssociatedObject(Class<?> c) {
       return associatedObjects.get(c);
    }
 
    @Override
-   @Deprecated
    public Set<Class<?>> getAssociatedObjects() {
       return associatedObjects.keySet();
    }
@@ -573,22 +508,13 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
    }
 
    @Override
-   @Deprecated
    public void abortTestScript() {
       getRunManager().abort();
    }
 
    @Override
-   @Deprecated
    public void abortTestScript(Throwable t) {
       getRunManager().abort(t, false);
    }
 
-//   public void setOteNodeInfo(NodeInfo oteEmbeddedBroker) {
-//      this.oteEmbeddedBroker = oteEmbeddedBroker;
-//   }
-//
-//   public NodeInfo getOteNodeInfo() {
-//      return oteEmbeddedBroker;
-//   }
 }

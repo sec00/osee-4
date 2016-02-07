@@ -1,7 +1,6 @@
 package org.eclipse.osee.ote.rest.client.internal;
 
 import java.io.File;
-import java.net.InetAddress;
 import java.net.URI;
 import java.util.List;
 
@@ -9,7 +8,6 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
-import org.eclipse.osee.framework.jdk.core.util.network.PortUtil;
 import org.eclipse.osee.jaxrs.client.JaxRsClient;
 import org.eclipse.osee.jaxrs.client.JaxRsWebTarget;
 import org.eclipse.osee.ote.classserver.HeadlessClassServer;
@@ -19,6 +17,8 @@ import org.eclipse.osee.ote.rest.model.OTEConfiguration;
 import org.eclipse.osee.ote.rest.model.OTEConfigurationIdentity;
 import org.eclipse.osee.ote.rest.model.OTEConfigurationItem;
 import org.eclipse.osee.ote.rest.model.OTEJobStatus;
+import org.eclipse.ote.network.EthernetUtil;
+import org.eclipse.ote.network.PortUtil;
 
 public class ConfigureOteServer extends BaseClientCallable<Progress> {
 
@@ -86,7 +86,7 @@ public class ConfigureOteServer extends BaseClientCallable<Progress> {
          OTEConfigurationIdentity identity = new OTEConfigurationIdentity();
          identity.setName("test");
          localConfiguration.setIdentity(identity);
-         classServer = new HeadlessClassServer(PortUtil.getInstance().getValidPort(), InetAddress.getLocalHost(), jars);
+         classServer = new HeadlessClassServer(PortUtil.getInstance(EthernetUtil.getServerClientAddress()).getValidPort(), EthernetUtil.getServerClientAddress(), jars);
          for (BundleInfo bundleInfo : classServer.getBundles()) {
             OTEConfigurationItem item = new OTEConfigurationItem();
             item.setBundleName(bundleInfo.getSymbolicName());

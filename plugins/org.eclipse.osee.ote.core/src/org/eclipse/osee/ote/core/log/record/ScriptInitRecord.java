@@ -10,10 +10,6 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.core.log.record;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.LogRecord;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 

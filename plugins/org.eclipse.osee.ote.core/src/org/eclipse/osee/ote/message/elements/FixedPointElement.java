@@ -179,6 +179,14 @@ public class FixedPointElement extends RealElement {
    public Double getValue() {
       return toFixed(getRaw(), signed, resolution, offset);
    }
+   
+   public void setDouble(double value){
+      getMsgData().getMem().setLong(toFixedLong(value, signed, resolution, offset), byteOffset, msb, lsb);
+   }
+   
+   public double getDouble(){
+      return toFixed(getRaw(), signed, resolution, offset);
+   }
 
    @Override
    public Double valueOf(MemoryResource mem) {

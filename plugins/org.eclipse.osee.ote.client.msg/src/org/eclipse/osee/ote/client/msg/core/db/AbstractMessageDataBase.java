@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.client.msg.core.db;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,13 +18,19 @@ import java.util.logging.Level;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.framework.plugin.core.util.ExportClassLoader;
 import org.eclipse.osee.ote.client.msg.core.internal.MessageReference;
+import org.eclipse.osee.ote.core.environment.EnvironmentTask;
+import org.eclipse.osee.ote.core.environment.TestEnvironment;
+import org.eclipse.osee.ote.core.environment.interfaces.ICancelTimer;
+import org.eclipse.osee.ote.core.environment.interfaces.ITimeout;
+import org.eclipse.osee.ote.core.environment.interfaces.ITimerControl;
+import org.eclipse.osee.ote.core.framework.IRunManager;
+import org.eclipse.osee.ote.message.ClassLocator;
 import org.eclipse.osee.ote.message.Message;
-import org.eclipse.osee.ote.message.data.MessageData;
+import org.eclipse.osee.ote.message.MessageController;
 import org.eclipse.osee.ote.message.enums.DataType;
+import org.eclipse.osee.ote.message.interfaces.IMessageRequestor;
 import org.eclipse.osee.ote.message.interfaces.IMsgToolServiceClient;
 import org.eclipse.osee.ote.message.tool.MessageMode;
-import org.eclipse.osee.ote.messaging.dds.entity.DataReader;
-import org.eclipse.osee.ote.messaging.dds.entity.EntityFactory;
 
 /**
  * @author Ken J. Aguilar
@@ -40,17 +44,105 @@ public abstract class AbstractMessageDataBase {
 
 	private IMsgToolServiceClient client;
 	private volatile boolean connected = false;
-	private final DataReader reader = new DataReader(null, null, true, null, new EntityFactory() {
-
-		@Override
-		public boolean isEnabled() {
-			return true;
-		}
-
-	});
+	private MessageController messageController;
+	
+	ITimerControl fakeTimerControl = new ITimerControl() {
+      
+      @Override
+      public void step() {
+      }
+      
+      @Override
+      public ICancelTimer setTimerFor(ITimeout objToNotify, int milliseconds) {
+         return null;
+      }
+      
+      @Override
+      public void setRunManager(IRunManager runManager) {
+      }
+      
+      @Override
+      public void setCycleCount(int cycle) {
+      }
+      
+      @Override
+      public void removeTask(EnvironmentTask task) {
+      }
+      
+      @Override
+      public boolean isRealtime() {
+         return false;
+      }
+      
+      @Override
+      public void incrementCycleCount() {
+      }
+      
+      @Override
+      public long getTimeOfDay() {
+         return 0;
+      }
+      
+      @Override
+      public IRunManager getRunManager() {
+         return null;
+      }
+      
+      @Override
+      public long getEnvTime() {
+         return 0;
+      }
+      
+      @Override
+      public int getCycleCount() {
+         return 0;
+      }
+      
+      @Override
+      public void envWait(int milliseconds) throws InterruptedException {
+      }
+      
+      @Override
+      public void envWait(ITimeout obj, int milliseconds) throws InterruptedException {
+      }
+      
+      @Override
+      public void dispose() {
+      }
+      
+      @Override
+      public void cancelTimers() {
+      }
+      
+      @Override
+      public void cancelAllTasks() {
+      }
+      
+      @Override
+      public void addTask(EnvironmentTask task, TestEnvironment environment) {
+      }
+   };
+   private IMessageRequestor req;
+   
+//	private final DataReader reader = new DataReader(null, null, true, null, new EntityFactory() {
+//
+//		@Override
+//		public boolean isEnabled() {
+//			return true;
+//		}
+//
+//	});
 
 	protected AbstractMessageDataBase(IMsgToolServiceClient service) {
 	   client = service;
+	   messageController = new MessageController(new ClassLocator() {
+         ExportClassLoader loader = ExportClassLoader.getInstance();
+         @Override
+         public Class<?> findClass(String name) throws ClassNotFoundException {
+            return loader.loadClass(name);
+         }
+      }, fakeTimerControl);
+	   req = messageController.createMessageRequestor("messageDb");
 	}
 
 	public MessageInstance findInstance(String name, MessageMode mode, DataType type) {
@@ -64,20 +156,26 @@ public abstract class AbstractMessageDataBase {
 
 	public MessageInstance acquireInstance(String name, MessageMode mode, DataType type) throws Exception {
 		if (type == null) {
-			Class<? extends Message> msgClass = ExportClassLoader.getInstance().loadClass(name).asSubclass(Message.class);
-
-			type = msgClass.newInstance().getDefaultMessageData().getType();
+		   type = messageController.getMessageClass(name).newInstance().getDefaultMessageData().getType();
 		}
+		
+		
+		
 		MessageReference reference = new MessageReference(type, mode, name);
 		MessageInstance instance = referenceToMsgMap.get(reference);
 		if (instance == null) {
-			Class<? extends Message> msgClass = ExportClassLoader.getInstance().loadClass(name).asSubclass(Message.class);
-			Message msg = createMessage(msgClass);
-			for (ArrayList<MessageData> dataList : (Collection<ArrayList<MessageData>>) msg.getAllData()) {
-				for (MessageData data : dataList) {
-					data.setReader(reader);
-				}
-			}
+		   Message msg;
+		   if(mode == MessageMode.READER){
+		      msg = req.getMessageReader(name);
+		   } else {
+		      msg = req.getMessageWriter(name);
+		   }
+//			Class<? extends Message> msgClass = ExportClassLoader.getInstance().loadClass(name).asSubclass(Message.class);
+//			Message msg = createMessage(msgClass);
+			
+//			for (MessageData data : (Collection<MessageData>) msg.getAllData()) {
+//			   data.setReader(reader);
+//			}
 			msg.setMemSource(type);
 			instance = new MessageInstance(msg, mode, type);
 			referenceToMsgMap.put(reference, instance);
@@ -90,9 +188,7 @@ public abstract class AbstractMessageDataBase {
 	}
 
 	public MessageInstance acquireInstance(String name, MessageMode mode, String dataType) throws Exception {
-		Class<? extends Message> msgClass = ExportClassLoader.getInstance().loadClass(name).asSubclass(Message.class);
-		Message msg = msgClass.newInstance();
-
+	   Message msg = req.getMessageReader(name);
 		//Set<DataType> available = msg.getAvailableMemTypes();
 		Set<DataType> available = msg.getAssociatedMessages().keySet();
 		DataType requestDataType = msg.getDefaultMessageData().getType();
@@ -101,18 +197,16 @@ public abstract class AbstractMessageDataBase {
 				requestDataType = type;
 				break;
 			}
-
 		}
 		MessageReference reference = new MessageReference(requestDataType, mode, name);
 		MessageInstance instance = referenceToMsgMap.get(reference);
 		if (instance == null) {
-			msg = createMessage(msgClass);
 			msg.setMemSource(requestDataType);
-			for (ArrayList<MessageData> dataList : (Collection<ArrayList<MessageData>>) msg.getAllData()) {
-				for (MessageData data : dataList) {
-					data.setReader(reader);
-				}
-			}
+//			for (ArrayList<MessageData> dataList : (Collection<ArrayList<MessageData>>) msg.getAllData()) {
+//				for (MessageData data : dataList) {
+//					data.setReader(reader);
+//				}
+//			}
 			instance = new MessageInstance(msg, mode, requestDataType);
 			referenceToMsgMap.put(reference, instance);
 		}
@@ -133,14 +227,14 @@ public abstract class AbstractMessageDataBase {
 			MessageReference reference =
 					new MessageReference(instance.getType(), instance.getMode(), instance.getMessage().getClass().getName());
 			referenceToMsgMap.remove(reference);
-			destroyMessage(instance.getMessage());
+			req.remove(instance.getMessage());
 		}
 
 	}
 
-	protected abstract Message createMessage(Class<? extends Message> msgClass) throws Exception;
+//	protected abstract Message createMessage(Class<? extends Message> msgClass) throws Exception;
 
-	protected abstract void destroyMessage(Message message) throws Exception;
+//	protected abstract void destroyMessage(Message message) throws Exception;
 
 	public void attachToService(IMsgToolServiceClient client) {
 	   connected = true;

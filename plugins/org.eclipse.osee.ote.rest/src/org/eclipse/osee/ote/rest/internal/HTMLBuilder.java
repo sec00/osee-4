@@ -2,7 +2,8 @@ package org.eclipse.osee.ote.rest.internal;
 
 import java.io.File;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
+
+import org.eclipse.ote.network.EthernetUtil;
 
 public class HTMLBuilder {
    
@@ -12,12 +13,8 @@ public class HTMLBuilder {
    private StringBuilder sb;
    
    static {
-      try {
-         InetAddress localHost = InetAddress.getLocalHost();
-         hostname = localHost.getHostName();
-      } catch (UnknownHostException e) {
-         e.printStackTrace();
-      }
+      InetAddress localHost = EthernetUtil.getServerClientAddress();
+      hostname = localHost.getHostName();
    }
    
    public HTMLBuilder() {

@@ -387,6 +387,7 @@ public abstract class TestScript implements ITimeout {
     * {@link java.lang.Object#notifyAll()}method for this object.
     */
    public synchronized void testWait(int milliseconds) throws InterruptedException {
+//      long time = System.currentTimeMillis();
       if (milliseconds < 2) {
          return;
       }
@@ -395,6 +396,7 @@ public abstract class TestScript implements ITimeout {
       wait();
       this.getTestEnvironment().getScriptCtrl().lock();
       environment.getLogger().methodEnded(this.environment);
+//      System.out.printf("%d vs. actual %d\n", milliseconds, System.currentTimeMillis()-time);
    }
 
    public synchronized void testWaitNoLog(int milliseconds) throws InterruptedException {

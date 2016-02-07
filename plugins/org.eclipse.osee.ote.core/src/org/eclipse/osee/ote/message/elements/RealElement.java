@@ -53,6 +53,10 @@ public abstract class RealElement extends NumericElement<Double> {
    public void setValue(Float value) {
       setValue(value.doubleValue());
    }
+   
+   public abstract void setDouble(double value);
+   
+   public abstract double getDouble();
 
    @Override
    public String valueOf() {

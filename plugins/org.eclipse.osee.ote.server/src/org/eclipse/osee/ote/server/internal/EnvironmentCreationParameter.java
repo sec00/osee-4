@@ -67,9 +67,9 @@ class EnvironmentCreationParameter {
             exportClassLoader.loadClass(environmentFactoryClass).asSubclass(TestEnvironmentFactory.class);
          factory = clazz.newInstance();
       }
-      MessageSystemTestEnvironment testEnvironment = factory.createEnvironment(runtimeLibraryManager);
+      MessageSystemTestEnvironment testEnvironment = factory.createEnvironment(runtimeLibraryManager, serviceConnector);
     //  testEnvironment.setOteNodeInfo(oteEmbeddedBroker);
-      testEnvironment.init(serviceConnector);
+//      testEnvironment.init(serviceConnector);
       return testEnvironment;
    }
 

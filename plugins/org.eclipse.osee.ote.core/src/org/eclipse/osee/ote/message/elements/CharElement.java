@@ -10,13 +10,9 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.message.elements;
 
-import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.ListIterator;
-import java.util.logging.Level;
 
-import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.core.MethodFormatter;
 import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironmentAccessor;
 import org.eclipse.osee.ote.core.testPoint.CheckGroup;

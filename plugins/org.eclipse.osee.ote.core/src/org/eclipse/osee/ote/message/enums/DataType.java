@@ -24,4 +24,5 @@ public interface DataType extends Serializable, INamespace {
    int getToolingDepth();
 
    int getToolingBufferSize();
+   
 }

@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
@@ -17,6 +16,8 @@ import java.nio.channels.SocketChannel;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+
+import org.eclipse.ote.network.EthernetUtil;
 
 public class TcpFileTransfer {
 
@@ -73,7 +74,7 @@ public class TcpFileTransfer {
 
 		final ServerSocketChannel channel = ServerSocketChannel.open();
 		channel.configureBlocking(false);
-		channel.socket().bind(new InetSocketAddress(InetAddress.getLocalHost(), port));
+		channel.socket().bind(new InetSocketAddress(EthernetUtil.getServerClientAddress(), port));
 		InetSocketAddress localAddress = (InetSocketAddress) channel.socket().getLocalSocketAddress();
 
 		Callable<Boolean> c = new Callable<Boolean>() {

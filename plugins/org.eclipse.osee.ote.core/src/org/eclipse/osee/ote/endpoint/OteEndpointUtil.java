@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
 import org.eclipse.osee.ote.OTEException;
+import org.eclipse.ote.network.EthernetUtil;
 
 public class OteEndpointUtil {
 
@@ -25,7 +26,7 @@ public class OteEndpointUtil {
       }
       if(addPort != null && addPort.length == 2){
          try {
-         InetAddress byName = InetAddress.getByName(addPort[0]);
+         InetAddress byName = EthernetUtil.getByName(addPort[0]);
          int port = Integer.parseInt(addPort[1]);
          return new InetSocketAddress(byName, port);
          } catch (UnknownHostException ex){
@@ -40,7 +41,7 @@ public class OteEndpointUtil {
    
    public static InetSocketAddress getAddress(final String address, final int port) {
       try {
-         InetAddress byName = InetAddress.getByName(address);
+         InetAddress byName = EthernetUtil.getByName(address);
          return new InetSocketAddress(byName, port);
       } catch (UnknownHostException ex){
          throw new OTEException(String.format("Invalid address[%s]", address), ex);

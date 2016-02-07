@@ -112,6 +112,15 @@ public class Float64Element extends RealElement {
       getMsgData().getMem().setLong(Double.doubleToLongBits(obj), byteOffset, msb, lsb);
    }
 
+   
+   public void setDouble(double value){
+      getMsgData().getMem().setLong(Double.doubleToLongBits(value), byteOffset, msb, lsb);
+   }
+   
+   public double getDouble(){
+      return Double.longBitsToDouble(getMsgData().getMem().getLong(byteOffset, msb, lsb));
+   }
+   
    /**
     * Sets the element to the "value" passed.
     * 

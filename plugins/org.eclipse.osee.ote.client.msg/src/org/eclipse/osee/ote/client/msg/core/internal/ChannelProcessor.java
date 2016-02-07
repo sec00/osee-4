@@ -65,11 +65,14 @@ final public class ChannelProcessor {
                onUpdate(instance, buffer, time);
             }
             // return to the queue
-            queue.put(this);
-         } catch (InterruptedException e) {
-            // do nothing
          } catch (Exception ex) {
             OseeLog.log(Activator.class, Level.SEVERE, "failed to process message update", ex);
+         } finally {
+            try {
+               queue.put(this);
+            } catch (InterruptedException e) {
+               e.printStackTrace();
+            }
          }
       }
    }

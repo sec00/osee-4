@@ -1,14 +1,11 @@
 package org.eclipse.osee.ote.master.rest.client.internal;
 
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.UriBuilder;
 
-import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.jaxrs.client.JaxRsClient;
 import org.eclipse.osee.ote.master.rest.client.OTEMasterServerResult;
 import org.eclipse.osee.ote.master.rest.model.OTEServer;

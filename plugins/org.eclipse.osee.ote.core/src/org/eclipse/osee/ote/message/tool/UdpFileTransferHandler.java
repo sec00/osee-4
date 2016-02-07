@@ -34,6 +34,7 @@ import java.util.logging.Level;
 
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.message.MessageSystemTestEnvironment;
+import org.eclipse.ote.network.EthernetUtil;
 
 public class UdpFileTransferHandler {
 
@@ -234,7 +235,7 @@ public class UdpFileTransferHandler {
       try {
          final UdpFileTransferHandler rec = new UdpFileTransferHandler();
          String file = args[0];
-         InetAddress ipAddr = InetAddress.getByName(args[1]);
+         InetAddress ipAddr = EthernetUtil.getByName(args[1]);
          int remotePort = Integer.parseInt(args[2]);
          int localPort = Integer.parseInt(args[3]);
          TransferConfig.Direction direction = TransferConfig.Direction.values()[Integer.parseInt(args[4])];
@@ -246,7 +247,7 @@ public class UdpFileTransferHandler {
                localPort);
          }
          TransferConfig config =
-            new TransferConfig(file, address, new InetSocketAddress(InetAddress.getLocalHost(), localPort), direction,
+            new TransferConfig(file, address, new InetSocketAddress(EthernetUtil.getServerClientAddress(), localPort), direction,
                7 * 188);
          rec.registerTransfer(config);
          System.in.read();

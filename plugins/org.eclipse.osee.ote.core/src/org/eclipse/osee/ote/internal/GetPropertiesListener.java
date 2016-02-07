@@ -7,7 +7,6 @@ import org.eclipse.osee.ote.OTEApi;
 import org.eclipse.osee.ote.core.environment.interfaces.IHostTestEnvironment;
 import org.eclipse.osee.ote.endpoint.OteUdpEndpoint;
 import org.eclipse.osee.ote.endpoint.OteUdpEndpointInlineSender;
-import org.eclipse.osee.ote.endpoint.OteUdpEndpointSender;
 import org.eclipse.osee.ote.message.event.OteEventMessage;
 import org.eclipse.osee.ote.message.event.OteEventMessageUtil;
 import org.eclipse.osee.ote.remote.messages.SerializedEnhancedProperties;

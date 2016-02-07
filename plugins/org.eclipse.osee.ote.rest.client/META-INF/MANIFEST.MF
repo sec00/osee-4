@@ -22,7 +22,8 @@ Import-Package: javax.ws.rs;version="2.0.0",
  org.eclipse.osee.framework.logging,
  org.eclipse.osee.jaxrs.client,
  org.eclipse.osee.ote.classserver,
- org.eclipse.osee.ote.core
+ org.eclipse.osee.ote.core,
+ org.eclipse.ote.network
 Export-Package: org.eclipse.osee.ote.rest.client
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.core.runtime,

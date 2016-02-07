@@ -65,6 +65,18 @@ public class SignedInteger16Element extends NumericElement<Integer> {
    public Integer getValue() {
       return Integer.valueOf(getMsgData().getMem().getSignedInt16(byteOffset, msb, lsb));
    }
+   
+   public short getShort(){
+      return getMsgData().getMem().getSignedInt16(byteOffset, msb, lsb);
+   }
+   
+   public int getInt(){
+      return getMsgData().getMem().getSignedInt16(byteOffset, msb, lsb);
+   }
+   
+   public void setInt(int value){
+      getMsgData().getMem().setInt(value, byteOffset, msb, lsb);
+   }
 
    @Override
    public Integer valueOf(MemoryResource mem) {

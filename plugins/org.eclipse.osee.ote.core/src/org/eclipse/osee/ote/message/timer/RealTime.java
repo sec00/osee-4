@@ -59,8 +59,10 @@ public class RealTime extends TimerControl {
                   if (h != null) {
                      h.cancel(false);
                   }
-                  te.get().handleException(ex, "exception while running one cycle for task " + task.toString(),
-                        Level.SEVERE, false);
+                  if(te.get() != null){
+                     te.get().handleException(ex, "exception while running one cycle for task " + task.toString(),
+                           Level.SEVERE, false);
+                  }
                }
             }
 

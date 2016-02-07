@@ -1,6 +1,5 @@
 package org.eclipse.osee.ote.rest.model;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;

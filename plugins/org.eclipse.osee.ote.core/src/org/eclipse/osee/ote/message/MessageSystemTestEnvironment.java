@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.osee.connection.service.IServiceConnector;
 import org.eclipse.osee.ote.Configuration;
 import org.eclipse.osee.ote.core.IUserSession;
 import org.eclipse.osee.ote.core.ServiceUtility;
@@ -38,9 +39,10 @@ public abstract class MessageSystemTestEnvironment extends TestEnvironment imple
    private final List<IPreScriptInstantiation> preInstantiation = new ArrayList<>();
    protected boolean promptResponse = false;
    private IOInstrumentationDB ioInstrumentation;
+   private IMessageManager messageManager;
 
-   protected MessageSystemTestEnvironment(IEnvironmentFactory factory) {
-      super(factory);
+   protected MessageSystemTestEnvironment(IEnvironmentFactory factory, IServiceConnector serviceConnector) {
+      super(factory, serviceConnector);
       getScriptCtrl().setScriptReady(false);
    }
 
@@ -61,10 +63,12 @@ public abstract class MessageSystemTestEnvironment extends TestEnvironment imple
       }
    }
 
-   @SuppressWarnings("rawtypes")
    @Override
    public IMessageManager getMsgManager() {
-      return ServiceUtility.getService(IMessageManager.class, false);
+      if(messageManager == null){
+         messageManager = ServiceUtility.getService(IMessageManager.class, false);
+      }
+      return messageManager;
    }
 
    public IModelManager getModelManager() {

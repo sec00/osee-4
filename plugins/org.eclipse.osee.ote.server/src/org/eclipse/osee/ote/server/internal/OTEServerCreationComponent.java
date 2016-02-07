@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.server.internal;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.logging.Level;
 
 import org.eclipse.osee.framework.logging.OseeLog;
@@ -20,6 +18,7 @@ import org.eclipse.osee.ote.properties.OtePropertiesCore;
 import org.eclipse.osee.ote.server.OteServiceStarter;
 import org.eclipse.osee.ote.server.PropertyParamter;
 import org.eclipse.osee.ote.server.TestEnvironmentServiceConfigImpl;
+import org.eclipse.ote.network.EthernetUtil;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -66,11 +65,7 @@ public class OTEServerCreationComponent {
                }
             }
             String station = "unknown";
-            try {
-               station = InetAddress.getLocalHost().getHostName();
-            } catch (UnknownHostException ex) {
-               OseeLog.log(OTEServerCreationComponent.class, Level.SEVERE, ex);
-            }
+            station = EthernetUtil.getServerClientAddress().getHostName();
             boolean useJiniLookup = OtePropertiesCore.useLookup.getValue() != null;
             boolean isLocalConnector = false;
 

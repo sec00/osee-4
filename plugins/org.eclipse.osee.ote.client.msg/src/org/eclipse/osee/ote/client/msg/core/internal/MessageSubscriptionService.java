@@ -27,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import org.eclipse.osee.connection.service.IServiceConnector;
-import org.eclipse.osee.framework.jdk.core.util.network.PortUtil;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.framework.plugin.core.util.ExportClassLoader;
 import org.eclipse.osee.ote.client.msg.IOteMessageService;
@@ -47,6 +46,8 @@ import org.eclipse.osee.ote.message.tool.UdpFileTransferHandler;
 import org.eclipse.osee.ote.service.ConnectionEvent;
 import org.eclipse.osee.ote.service.IOteClientService;
 import org.eclipse.osee.ote.service.ITestConnectionListener;
+import org.eclipse.ote.network.EthernetUtil;
+import org.eclipse.ote.network.PortUtil;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
@@ -103,7 +104,7 @@ public class MessageSubscriptionService implements IOteMessageService, ITestConn
    }
    
    public MessageSubscriptionService() throws IOException {
-      localAddress = InetAddress.getLocalHost();
+      localAddress = EthernetUtil.getServerClientAddress();
       msgDatabase = new MessageDatabase(this);
       OseeLog.log(Activator.class, Level.INFO,
          "OTE client message service started on: " + localAddress.getHostAddress());
@@ -305,20 +306,20 @@ public class MessageSubscriptionService implements IOteMessageService, ITestConn
          fileTransferHandler = new UdpFileTransferHandler();
          fileTransferHandler.start();
       }
-      int port = PortUtil.getInstance().getValidPort();
+      int port = PortUtil.getInstance(EthernetUtil.getServerClientAddress()).getValidPort();
       // get the address of the socket the message recorder is going to write
       // data to
       InetSocketAddress recorderOutputAddress = MessageServiceSupport.getRecorderSocketAddress();
 
       // setup a transfer from a socket to a file
       TransferConfig config =
-         new TransferConfig(fileName, recorderOutputAddress, new InetSocketAddress(InetAddress.getLocalHost(), port),
+         new TransferConfig(fileName, recorderOutputAddress, new InetSocketAddress(EthernetUtil.getServerClientAddress(), port),
             TransferConfig.Direction.SOCKET_TO_FILE, 128000);
       IFileTransferHandle handle = fileTransferHandler.registerTransfer(config);
 
       // send the command to start recording
       RecordCommand cmd =
-         new RecordCommand(this.getTestSessionKey(), new InetSocketAddress(InetAddress.getLocalHost(), port), list);
+         new RecordCommand(this.getTestSessionKey(), new InetSocketAddress(EthernetUtil.getServerClientAddress(), port), list);
       MessageServiceSupport.startRecording(cmd);
       OseeLog.log(
          Activator.class,

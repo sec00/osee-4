@@ -14,93 +14,80 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
+import org.eclipse.osee.framework.jdk.core.type.Pair;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.core.CopyOnWriteNoIteratorList;
 import org.eclipse.osee.ote.core.GCHelper;
-import org.eclipse.osee.ote.core.log.Env;
-import org.eclipse.osee.ote.message.IMessageDisposeListener;
 import org.eclipse.osee.ote.message.IMessageHeader;
 import org.eclipse.osee.ote.message.IMessageSendListener;
+import org.eclipse.osee.ote.message.IOType;
+import org.eclipse.osee.ote.message.LegacyMessageMapper;
 import org.eclipse.osee.ote.message.Message;
 import org.eclipse.osee.ote.message.MessageSystemException;
 import org.eclipse.osee.ote.message.MessageSystemTestEnvironment;
 import org.eclipse.osee.ote.message.enums.DataType;
 import org.eclipse.osee.ote.message.interfaces.Namespace;
-import org.eclipse.osee.ote.messaging.dds.Data;
-import org.eclipse.osee.ote.messaging.dds.DataSample;
-import org.eclipse.osee.ote.messaging.dds.IDestination;
-import org.eclipse.osee.ote.messaging.dds.ISource;
-import org.eclipse.osee.ote.messaging.dds.ReturnCode;
-import org.eclipse.osee.ote.messaging.dds.entity.DataReader;
-import org.eclipse.osee.ote.messaging.dds.entity.DataWriter;
-import org.eclipse.osee.ote.messaging.dds.listener.DataReaderListener;
-import org.eclipse.osee.ote.messaging.dds.listener.DataWriterListener;
-import org.eclipse.osee.ote.messaging.dds.service.Key;
-import org.eclipse.osee.ote.messaging.dds.service.TypeSupport;
-import org.eclipse.osee.ote.messaging.dds.status.LivelinessChangedStatus;
-import org.eclipse.osee.ote.messaging.dds.status.LivelinessLostStatus;
-import org.eclipse.osee.ote.messaging.dds.status.OfferedDeadlineMissedStatus;
-import org.eclipse.osee.ote.messaging.dds.status.OfferedIncompatibleQosStatus;
-import org.eclipse.osee.ote.messaging.dds.status.PublicationMatchStatus;
-import org.eclipse.osee.ote.messaging.dds.status.RequestedDeadlineMissedStatus;
-import org.eclipse.osee.ote.messaging.dds.status.RequestedIncompatibleQosStatus;
-import org.eclipse.osee.ote.messaging.dds.status.SampleLostStatus;
-import org.eclipse.osee.ote.messaging.dds.status.SampleRejectedStatus;
-import org.eclipse.osee.ote.messaging.dds.status.SubscriptionMatchStatus;
 import org.eclipse.osee.ote.properties.OtePropertiesCore;
 
 /**
  * @author Andrew M. Finkbeiner
  */
-public abstract class MessageData implements DataReaderListener, DataWriterListener, Data, Key {
+public class MessageData {
 
+   private LegacyMessageMapper mapper;
+   
    private static long debugTimeout = OtePropertiesCore.timeDebugTimeout.getLongValue();
    private static boolean debugTime = OtePropertiesCore.timeDebug.getBooleanValue();
 
-   private DataWriter writer;
-   private DataReader reader;
-   private DataSample myDataSample;
+   private final CopyOnWriteNoIteratorList<IMessageSendListener> messageSendListeners = new CopyOnWriteNoIteratorList<IMessageSendListener>(IMessageSendListener.class);
 
    private final MemoryResource mem;
    private final String typeName;
    private final String name;
-   private final CopyOnWriteNoIteratorList<Message> messages = new CopyOnWriteNoIteratorList<>(Message.class);
-   private final CopyOnWriteNoIteratorList<IMessageSendListener> messageSendListeners = new CopyOnWriteNoIteratorList<>(IMessageSendListener.class);
    private final int defaultDataByteSize;
    private final DataType memType;
-   private final boolean isEnabled = true;
    private long activityCount = 0;
    private long sentCount;
    private int currentLength;
    private boolean isScheduled = false;
    private long time = -1;
 
-   public MessageData(String typeName, String name, int dataByteSize, int offset, DataType memType) {
+   private boolean isWriter = false;
+   private Map<Class<?>, Pair<Message, MemoryResource>>overrideMessages = new HashMap<Class<?>, Pair<Message, MemoryResource>>();
+
+   private boolean isWrapbackEnabled = true;
+
+   private IOType ioType;
+   
+   public MessageData(String typeName, String name, int dataByteSize, int offset, DataType memType, IOType ioType) {
       mem = new MemoryResource(new byte[dataByteSize], offset, dataByteSize - offset);
-      myDataSample = new DataSample(this);
       this.typeName = typeName;
       this.name = name;
       this.defaultDataByteSize = dataByteSize;
       this.currentLength = dataByteSize;
       this.memType = memType;
+      this.ioType = ioType;
    }
 
-   public MessageData(String typeName, String name, MemoryResource mem, DataType memType) {
+   public MessageData(String typeName, String name, MemoryResource mem, DataType memType, IOType ioType) {
       this.mem = mem;
-      myDataSample = new DataSample(this);
       this.typeName = typeName;
       this.name = name;
       this.defaultDataByteSize = mem.getLength();
       this.currentLength = mem.getLength();
       this.memType = memType;
+      this.ioType = ioType;
       GCHelper.getGCHelper().addRefWatch(this);
    }
 
-   public MessageData(String name, int dataByteSize, int offset, DataType memType) {
-      this(name, name, dataByteSize, offset, memType);
+   public MessageData(String name, int dataByteSize, int offset, DataType memType, IOType ioType) {
+      this(name, name, dataByteSize, offset, memType, ioType);
    }
 
    public MessageData(byte[] data, int dataByteSize, int offset) {
@@ -110,6 +97,7 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
       this.defaultDataByteSize = dataByteSize;
       this.currentLength = dataByteSize;
       this.memType = null;
+      this.ioType = null;
       GCHelper.getGCHelper().addRefWatch(this);
    }
 
@@ -124,13 +112,25 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
       this.defaultDataByteSize = memoryResource.getLength();
       this.currentLength = memoryResource.getLength();
       this.memType = null;
+      this.ioType = null;
       GCHelper.getGCHelper().addRefWatch(this);
    }
+   
+   //TODO move this to the message package and make it package private
+   public void setMapper(LegacyMessageMapper mapper){
+      this.mapper = mapper;
+   }
 
-   public abstract IMessageHeader getMsgHeader();
+   public IMessageHeader getMsgHeader(){
+      return null;
+   }
 
    public DataType getType() {
       return memType;
+   }
+   
+   public IOType getIOType() {
+      return ioType;
    }
 
    /**
@@ -147,23 +147,13 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
    }
 
    /**
-    * adds a {@link Message} who are mapped to this data object
-    */
-   public void addMessage(Message message) {
-      if (!messages.contains(message)) {
-         messages.add(message);
-         message.addPreMessageDisposeListener(disposeListener);
-      }
-   }
-
-   /**
     * returns a list of the message that this data is a source for. <BR>
     * 
     * @return a collection of messages
     */
    public Collection<Message> getMessages() {
-      return messages.fillCollection(new ArrayList<Message>());
-      //      return new ArrayList<Message>(messages);
+      checkMapper();
+      return mapper.getMessages(this).fillCollection(new ArrayList<Message>());
    }
 
    /**
@@ -193,35 +183,16 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
    }
 
    public boolean isEnabled() {
-      return isEnabled;
+      return true;
    }
 
-   public abstract void visit(IMessageDataVisitor visitor);
+   public void visit(IMessageDataVisitor visitor){
+   }
 
    public void dispose() {
-
-      try{
-         Message[] msgs = messages.get();
-         for (int i = 0; i < msgs.length; i++){
-            Message local = msgs[i];
-            if(local != null){
-               local.removePreMessageDisposeListener(disposeListener);
-            }
-         }
-      } catch (Throwable th){
-         OseeLog.log(getClass(), Level.SEVERE, "failed to remove message dispose listener.", th);
+      if(mapper != null){
+         mapper.cleanup(this);
       }
-      messages.clear();
-      if (writer != null) {
-         writer.getPublisher().deleteDataWriter(writer);
-         writer.dispose(this, null);
-         writer = null;
-      } else if (reader != null && reader.getSubscriber() != null) {
-         reader.getSubscriber().deleteDataReader(reader);
-         reader.dispose();
-         reader = null;
-      }
-      disposeListener = null;
    }
 
    public void copyData(int destOffset, byte[] data, int srcOffset, int length) {
@@ -249,8 +220,9 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
     * Notifies all {@link Message}s that have this registered as a data source of the update
     */
    public void notifyListeners() throws MessageSystemException {
+      checkMapper();
       final DataType memType = getType();
-      Message[] ref = messages.get();
+      Message[] ref = mapper.getMessages(this).get();
       for (int i = 0; i < ref.length; i++) {
          Message message = ref[i];
          try {
@@ -319,7 +291,9 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
 
    }
 
-   public abstract void initializeDefaultHeaderValues();
+   public void initializeDefaultHeaderValues(){
+      
+   }
 
    /**
     * @return the mem
@@ -332,73 +306,6 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
       return defaultDataByteSize;
    }
 
-   @Override
-   public synchronized void onDataAvailable(DataReader theReader) {
-      // System.out.println(String.format("data available %s %s", this.getName(),
-      // this.getNamespace()));
-      if (isEnabled()) {
-         ReturnCode val = theReader.takeNextSample(myDataSample);
-         if (val == ReturnCode.OK) {
-            incrementActivityCount();
-            notifyListeners();
-         } else {
-            Env.getInstance().severe(val.getDescription());
-         }
-      }
-   }
-
-   @Override
-   public void onLivelinessChanged(DataReader theReader, LivelinessChangedStatus status) {
-   }
-
-   @Override
-   public void onRequestedDeadlineMissed(DataReader theReader, RequestedDeadlineMissedStatus status) {
-   }
-
-   @Override
-   public void onRequestedIncompatibleQos(DataReader theReader, RequestedIncompatibleQosStatus status) {
-   }
-
-   @Override
-   public void onSampleLost(DataReader theReader, SampleLostStatus status) {
-   }
-
-   @Override
-   public void onSampleRejected(DataReader theReader, SampleRejectedStatus status) {
-   }
-
-   @Override
-   public void onSubscriptionMatch(DataReader theReader, SubscriptionMatchStatus status) {
-   }
-
-   @Override
-   public synchronized void onDataSentToMiddleware(DataWriter theWriter) {
-      // header.setSequenceNumber(header.getSequenceNumber() + 1);
-      notifyListeners();
-   }
-
-   @Override
-   public void onLivelinessLost(DataWriter theWriter, LivelinessLostStatus status) {
-   }
-
-   @Override
-   public void onOfferedDeadlineMissed(DataWriter theWriter, OfferedDeadlineMissedStatus status) {
-   }
-
-   @Override
-   public void onOfferedIncompatibleQos(DataWriter theWriter, OfferedIncompatibleQosStatus status) {
-   }
-
-   @Override
-   public void onPublicationMatch(DataWriter theWriter, PublicationMatchStatus status) {
-   }
-
-   @Override
-   public Object getKeyValue() {
-      return null;
-   }
-
-   @Override
    public void setFromByteArray(byte[] input) {
       try {
          copyData(0, input, 0, input.length);
@@ -411,7 +318,6 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
       }
    }
 
-   @Override
    public void setFromByteBuffer(ByteBuffer buffer) {
       try {
          copyData(buffer);
@@ -423,7 +329,6 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
       }
    }
 
-   @Override
    public ByteBuffer toByteBuffer() {
       return mem.getAsBuffer();
    }
@@ -461,73 +366,16 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
       }
    }
 
-   @Override
    public byte[] toByteArray() {
       return mem.getData();
-   }
-
-   public void setReader(DataReader reader) {
-      this.reader = reader;
-   }
-
-   public void setWriter(DataWriter writer) {
-      this.writer = writer;
-   }
-
-   public void send() throws MessageSystemException {
-      if (writer == null) {
-         OseeLog.log(MessageSystemTestEnvironment.class, Level.SEVERE, getName() + " - the writer is null");
-      } else if (shouldSendData()) {
-         try {
-            notifyPreSendListeners();
-            long start = 0, elapsed;
-            if(debugTime){
-               start = System.nanoTime();
-            }
-            getMem().setDataHasChanged(false);
-            writer.write(null, null, this, null);
-            incrementSentCount();
-            if(debugTime){
-               elapsed = System.nanoTime() - start;
-               if(elapsed > debugTimeout){
-                  Locale.setDefault(Locale.US);
-                  System.out.printf("%s SLOW IOSEND %,d\n", getName(), elapsed);
-               }
-            }
-            notifyPostSendListeners();
-         } catch (Throwable ex) {
-            throw new MessageSystemException("Could not send message data " + getName(), Level.SEVERE, ex);
-         }
-      }
-   }
-
-   protected void sendTo(IDestination destination, ISource source) throws MessageSystemException {
-      if (writer == null) {
-         OseeLog.log(MessageSystemTestEnvironment.class, Level.WARNING, getName() + " - the writer is null");
-      } else if (shouldSendData()) {
-         try {
-            notifyPreSendListeners();
-            // this.initializeDefaultHeaderValues();
-            getMem().setDataHasChanged(false);
-            writer.write(destination, source, this, null);
-            incrementSentCount();
-            notifyPostSendListeners();
-         } catch (Throwable ex) {
-            throw new MessageSystemException("Could not send message data " + getName(), Level.SEVERE, ex);
-         }
-      }
    }
 
    /**
     * Override this method if you want to specialize the send criteria in a data source. For example, if you only want
     * to send data to the MUX driver if the data has changed.
     */
-   protected boolean shouldSendData() {
+   public boolean shouldSendData() {
       return true;
-   }
-
-   public TypeSupport getTypeSupport() {
-      return new DDSTypeSupport(this, getName(), getName(), getPayloadSize());
    }
 
    public String getTopicName() {
@@ -538,17 +386,8 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
       return typeName;
    }
 
-   @Override
-   public boolean isSameInstance(byte[] data1, byte[] data2) {
-      return true;
-   }
-
    public Namespace getNamespace() {
-      if (isWriter()) {
-         return new Namespace(writer.getTopic().getNamespace());
-      } else {
-         return new Namespace(reader.getTopicDescription().getNamespace());
-      }
+      return new Namespace(getType().name());
    }
 
    /*
@@ -556,33 +395,12 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
     * determine all of it's possible namespaces
     */
    public boolean isWriter() {
-      if (writer != null && reader == null) {
-         return true;
-      } else if (writer == null && reader != null) {
-         return false;
-      } else {
-         throw new MessageSystemException(
-               "This is an illegal message it has neither a reader or a writer [" + this.getName() + "].", Level.SEVERE);
-      }
+      return isWriter;
    }
-
-   private IMessageDisposeListener disposeListener = new IMessageDisposeListener() {
-
-      @Override
-      public void onPreDispose(Message message) {
-         messages.remove(message);
-      }
-
-      @Override
-      public void onPostDispose(Message message) {
-      }
-
-   };
-
-   @Override
-   public void copyFrom(Data data) {
-      ByteBuffer buffer = data.toByteBuffer();
-      copyData(data.getOffset(), buffer, buffer.remaining());
+   
+   //TODO move class and make this package private  
+   public void setWriter(boolean isWriter){
+      this.isWriter = isWriter;
    }
 
    @Override
@@ -590,7 +408,6 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
       return getClass().getName() + ": name=" + getName();
    }
 
-   @Override
    public int getOffset() {
       return 0;
    }
@@ -609,7 +426,7 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
       this.isScheduled = isScheduled;
    }
 
-   private void notifyPostSendListeners() {
+   public void notifyPostSendListeners() {
       try {
          long start = 0, elapsed;
          IMessageSendListener[] listeners = messageSendListeners.get();
@@ -632,7 +449,7 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
       }
    }
 
-   private void notifyPreSendListeners() {
+   public void notifyPreSendListeners() {
       try {
          long start = 0, elapsed;
          IMessageSendListener[] listeners = messageSendListeners.get();
@@ -668,7 +485,14 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
    }
 
    public boolean isMessageCollectionNotEmpty() {
-      return messages.get().length > 0;
+      checkMapper();
+      return mapper.getMessages(this).get().length > 0;
+   }
+   
+   private void checkMapper(){
+      if(mapper == null){
+         throw new IllegalStateException("Unable to call method when mapper has not been set");
+      }
    }
 
    public void zeroize() {
@@ -686,5 +510,113 @@ public abstract class MessageData implements DataReaderListener, DataWriterListe
 
    public void setTime(long time) {
       this.time = time;
+   }
+   
+   public void performOverride() {
+      if (getMem().isDataChanged()) {
+         synchronized(overrideMessages) {
+            if(!overrideMessages.isEmpty()){
+               for (Pair<Message, MemoryResource> override : overrideMessages.values()) {
+                  byte[] overrideMsgData = override.getFirst().getData();
+                  byte[] overrideMask = override.getSecond().getData();
+                  if (null != overrideMsgData && null != overrideMask) {
+                     byte[] targetMsgData = getMem().getData();
+                     int targetMsgHeaderSize = getMem().getOffset();
+                     int minLength = Math.min(targetMsgData.length - targetMsgHeaderSize, overrideMsgData.length - targetMsgHeaderSize);
+                     minLength = Math.min(minLength, overrideMask.length);
+                     int targetIndex;
+                     int overrideIndex;
+                     int overrideMsgHeaderSize = override.getFirst().getHeaderSize();
+                     for (int byteIndex=0; byteIndex < minLength; byteIndex++) {
+                        if (overrideMask[byteIndex] != 0x0) {
+                           targetIndex = byteIndex+targetMsgHeaderSize;
+                           overrideIndex = byteIndex + overrideMsgHeaderSize;
+                           overrideMsgData[overrideIndex] &= overrideMask[byteIndex]; // zeroize non override regions
+                           targetMsgData[targetIndex] &= ~overrideMask[byteIndex]; // zeroize regions to override
+                           targetMsgData[targetIndex] = (byte) (targetMsgData[targetIndex] | overrideMsgData[overrideIndex]);
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   public MemoryResource getOverrideResource(Class<? extends Message> clazz) {
+      MemoryResource memResource = null;
+      Pair<Message, MemoryResource> override = getOverride(clazz);
+      if (override != null) {
+         memResource = override.getSecond();
+      }
+      return memResource;
+   }
+
+   public Message getOverrideMessage(Class<? extends Message> clazz) {
+      Message message = null;
+      Pair<Message, MemoryResource> override = getOverride(clazz);
+      if (override != null) {
+         message = override.getFirst();
+      }
+      return message;
+
+   }
+
+   private Pair<Message, MemoryResource> getOverride(Class<? extends Message> clazz) {
+      Pair<Message, MemoryResource> override = overrideMessages.get(clazz);
+      if (override == null) {
+         synchronized(overrideMessages) {
+            try {
+               Message msg = clazz.newInstance();
+               byte[] mask = new byte[msg.getMaxDataSize()];
+               MemoryResource memoryResource = new MemoryResource(mask, 0, mask.length);
+               override = new Pair<Message, MemoryResource>(msg, memoryResource);
+               overrideMessages.put(clazz, override);
+            } catch (Throwable th) {
+               th.printStackTrace();
+            }
+         }
+      }
+      return override;
+   }
+   
+
+   /**
+    * Remove any override messages for which there are no more overridden elements 
+    */
+   public void cleanupOverrides() {
+      synchronized(overrideMessages) {
+         Set<Class<?>> keySet = overrideMessages.keySet();
+         for (Class<?> clazz : keySet) {
+            byte[] overrideMask = overrideMessages.get(clazz).getSecond().getData();
+            boolean overrides = false;
+            for (byte checkByte : overrideMask) {
+               if (checkByte != (byte) 0x0) {
+                  overrides = true;
+                  break;
+               }
+            }
+            if (!overrides) {
+               overrideMessages.remove(clazz);
+            }
+         }
+      }
+   }
+   
+   /**
+    * Remove all overrides
+    */
+   public void clearOverrides() {
+      synchronized(overrideMessages) {
+         overrideMessages.clear();
+      }
+   }
+
+   public boolean isWrapbackEnabled() {
+      return isWrapbackEnabled;
+   }
+   
+   public void setWrapbackEnabled(boolean isWrapbackEnabled) {
+      this.isWrapbackEnabled = isWrapbackEnabled;
    }
 }

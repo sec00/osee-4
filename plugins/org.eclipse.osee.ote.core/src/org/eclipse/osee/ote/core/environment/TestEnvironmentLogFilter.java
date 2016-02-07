@@ -14,7 +14,6 @@ import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 import org.eclipse.osee.framework.logging.ILoggerFilter;
-import org.eclipse.osee.ote.properties.OtePropertiesCore;
 
 public class TestEnvironmentLogFilter implements ILoggerFilter {
    private static Level level;

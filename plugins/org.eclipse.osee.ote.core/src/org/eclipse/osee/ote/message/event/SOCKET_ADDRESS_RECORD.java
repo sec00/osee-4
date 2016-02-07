@@ -57,7 +57,7 @@ public class SOCKET_ADDRESS_RECORD extends ArrayElement{
    }
    
    public int getPort(){
-      return port.getValue();
+      return port.getInt();
    }
    
    public void setPort(int port){

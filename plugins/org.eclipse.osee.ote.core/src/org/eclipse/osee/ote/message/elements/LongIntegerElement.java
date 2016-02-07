@@ -69,6 +69,14 @@ public class LongIntegerElement extends NumericElement<Long> {
    public Long getValue() {
       return Long.valueOf(getMsgData().getMem().getLong(byteOffset, msb, lsb));
    }
+   
+   public long getLong() {
+      return getMsgData().getMem().getLong(byteOffset, msb, lsb);
+   }
+   
+   public void setLong(long value) {
+      getMsgData().getMem().setLong(value, byteOffset, msb, lsb);
+   }
 
    @Override
    public Long valueOf(MemoryResource mem) {

@@ -50,7 +50,9 @@ public class SimulatedTime extends TimerControl {
          } catch (Throwable ex) {
             OseeLog.log(MessageSystemTestEnvironment.class, Level.SEVERE,
                   "Aborting the test script because an Environment Task is failing", ex);
-            env.getRunManager().abort(ex, false);
+            if(env != null){
+               env.getRunManager().abort(ex, false);
+            }
          }
       }
    }

@@ -10,10 +10,9 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.core.environment.console.cmd;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import org.eclipse.osee.ote.core.environment.console.ConsoleCommand;
 import org.eclipse.osee.ote.core.environment.console.ConsoleShell;
+import org.eclipse.ote.network.EthernetUtil;
 
 /**
  * @author Ken J. Aguilar
@@ -29,11 +28,7 @@ public class HostCmd extends ConsoleCommand {
 
    @Override
    protected void doCmd(ConsoleShell shell, String[] switches, String[] args) {
-      try {
-         println(InetAddress.getLocalHost().toString());
-      } catch (UnknownHostException e) {
-         println("problems getting local host");
-      }
+         println(EthernetUtil.getServerClientAddress().toString());
    }
 
 }

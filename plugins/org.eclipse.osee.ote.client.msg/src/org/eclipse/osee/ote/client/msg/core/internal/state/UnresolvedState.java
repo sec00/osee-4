@@ -68,7 +68,7 @@ public class UnresolvedState extends AbstractSubscriptionState {
          return new InactiveState(instance, msgDB, this);
       } catch (Exception e) {
     	 // Yes we do need to log this
-         OseeLog.log(UnresolvedState.class, Level.SEVERE, "problems acquring instance for " + getMsgClassName());
+         OseeLog.log(UnresolvedState.class, Level.SEVERE, "problems acquring instance for " + getMsgClassName(), e);
          getSubscription().notifyInvalidated();
          return this;
       }

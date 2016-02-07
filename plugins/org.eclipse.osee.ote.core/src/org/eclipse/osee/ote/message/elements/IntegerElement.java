@@ -63,6 +63,14 @@ public class IntegerElement extends NumericElement<Integer> {
    public void setValue(Integer value) {
       getMsgData().getMem().setInt(value, byteOffset, msb, lsb);
    }
+   
+   public void setInt(int value) {
+      getMsgData().getMem().setInt(value, byteOffset, msb, lsb);
+   }
+   
+   public int getInt() {
+      return getMsgData().getMem().getInt(byteOffset, msb, lsb);
+   }
 
    @Override
    public Integer getValue() {

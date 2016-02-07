@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.server.internal;
 
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -18,7 +17,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -64,7 +62,7 @@ public class OteServiceStarterImpl implements OteServiceStarter {
 
    private ScheduledExecutorService executor;
    private OTEServer oteServerEntry;
-   private ScheduledFuture<?> taskToCancel;
+//   private ScheduledFuture<?> taskToCancel;
    private LookupRegistration lookupRegistration;
    private URI masterURI;
 //   private NodeInfo nodeInfo;
@@ -220,7 +218,7 @@ public class OteServiceStarterImpl implements OteServiceStarter {
 			      masterURI = new URI(masterURIStr);
 			      oteServerEntry = createOTEServer(environmentCreationParameter, propertyParameter, service.getServiceID().toString());
 			      lookupRegistration = new LookupRegistration(masterURI, masterServer, oteServerEntry, service);
-			      taskToCancel = executor.scheduleWithFixedDelay(lookupRegistration, 0, 30, TimeUnit.SECONDS);
+//			      taskToCancel = executor.scheduleWithFixedDelay(lookupRegistration, 0, 30, TimeUnit.SECONDS);
 			   } catch(Throwable th){
 			      OseeLog.log(getClass(), Level.SEVERE, th);
 			   }
@@ -306,7 +304,7 @@ public class OteServiceStarterImpl implements OteServiceStarter {
 		if(oteServerEntry != null) {
 		   try{
 		      lookupRegistration.stop();
-		      taskToCancel.cancel(true);
+//		      taskToCancel.cancel(true);
 		   } finally {
 		      Future<OTEMasterServerResult> removeServer = masterServer.removeServer(masterURI, oteServerEntry);
 		      try {

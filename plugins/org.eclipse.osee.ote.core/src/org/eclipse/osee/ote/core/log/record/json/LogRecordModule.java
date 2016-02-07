@@ -5,10 +5,7 @@ import java.util.logging.LogRecord;
 
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonSubTypes;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.module.SimpleModule;
-import org.eclipse.osee.ote.core.log.record.TestRecord;
 
 public class LogRecordModule extends SimpleModule {
 

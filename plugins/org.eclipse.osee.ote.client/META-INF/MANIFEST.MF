@@ -61,6 +61,7 @@ Import-Package: net.jini.activation,
  org.eclipse.osee.ote.core.framework,
  org.eclipse.osee.ote.core.framework.prompt,
  org.eclipse.osee.ote.message,
+ org.eclipse.ote.network,
  org.osgi.framework,
  org.osgi.service.packageadmin,
  org.osgi.util.tracker

@@ -24,7 +24,7 @@ public class OteEndpointReceiveRunnable implements Runnable {
    private static final int ONE_MEG = 1024 * 1024;
 
    private volatile boolean run = true;
-   private volatile boolean debugOutput = false;
+   private volatile boolean debugOutput = true;
    private Class<OteEndpointReceiveRunnable> logger = OteEndpointReceiveRunnable.class;
    private final InetSocketAddress address;
 

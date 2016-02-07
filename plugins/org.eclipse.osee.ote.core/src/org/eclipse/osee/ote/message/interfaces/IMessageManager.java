@@ -10,39 +10,90 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.message.interfaces;
 
+import java.nio.ByteBuffer;
 import java.util.Collection;
-import org.eclipse.osee.ote.core.TestException;
+import java.util.Set;
+
+import org.eclipse.osee.ote.message.DestinationInfo;
+import org.eclipse.osee.ote.message.IMessageCreationListener;
 import org.eclipse.osee.ote.message.Message;
+import org.eclipse.osee.ote.message.MessageDataWriter;
+import org.eclipse.osee.ote.message.MessageId;
+import org.eclipse.osee.ote.message.MessagePublishingHandler;
+import org.eclipse.osee.ote.message.PublishInfo;
 import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.enums.DataType;
 
 /**
  * @author Andrew M. Finkbeiner
  */
-public interface IMessageManager<T extends MessageData, U extends Message<? extends ITestEnvironmentMessageSystemAccessor, T, U>> {
+public interface IMessageManager {
    void destroy();
 
-   <CLASSTYPE extends U> CLASSTYPE createMessage(Class<CLASSTYPE> messageClass) throws TestException;
+//   <CLASSTYPE extends Message> CLASSTYPE createMessage(Class<CLASSTYPE> messageClass) throws TestException;
 
-   <CLASSTYPE extends U> int getReferenceCount(CLASSTYPE classtype);
+   Class<? extends Message> getMessageClass(String msgClass) throws ClassNotFoundException;
+   
+   <CLASSTYPE extends Message> int getReferenceCount(CLASSTYPE classtype);
 
-   <CLASSTYPE extends U> CLASSTYPE findInstance(Class<CLASSTYPE> clazz, boolean writer);
+   <CLASSTYPE extends Message> CLASSTYPE findInstance(Class<CLASSTYPE> clazz, boolean writer);
 
-   Collection<U> getAllMessages();
+   Collection<Message> getAllMessages();
 
-   Collection<U> getAllReaders();
+   Collection<Message> getAllReaders();
 
-   Collection<U> getAllWriters();
+   Collection<Message> getAllWriters();
 
-   Collection<U> getAllReaders(DataType type);
+   Collection<Message> getAllReaders(DataType type);
 
-   Collection<U> getAllWriters(DataType type);
+   Collection<Message> getAllWriters(DataType type);
 
    void init() throws Exception;
 
    void publishMessages(boolean publish);
 
    boolean isPhysicalTypeAvailable(DataType physicalType);
+   
+   Set<DataType> getAvailableDataTypes();
 
-   IMessageRequestor<T, U> createMessageRequestor(String name);
+   IMessageRequestor createMessageRequestor(String name);
+   
+   void update(MessageId id, ByteBuffer data);
+   
+   void publish(Message msg);
+   
+   void publish(Message msg, PublishInfo info);
+   
+//   void publishAtFrameCompletion(Message msg);
+
+   void write(Message message, DestinationInfo object);
+   
+   /*
+    * If using update is not feasible then the receiver of the message can update the 
+    * data itself and call this to do all the listener notification. 
+    */
+   public void notifyListenersOfUpdate(MessageData messageData);
+
+   public void registerWriter(MessageDataWriter writer);
+   
+   public void unregisterWriter(MessageDataWriter writer);
+   
+   public void addMessagePublishingHandler(MessagePublishingHandler handler);
+   public void removeMessagePublishingHandler(MessagePublishingHandler handler);
+
+   void addPostCreateMessageListener(IMessageCreationListener listener);
+   
+   void removePostCreateMessageListener(IMessageCreationListener listener);
+
+   void addPreCreateMessageListener(IMessageCreationListener listener);
+
+   void addInstanceRequestListener(IMessageCreationListener listener);
+   
+   public void schedulePublish(Message message);
+   
+   public void unschedulePublish(Message message);
+
+   void changeMessageRate(Message message, double newRate, double rate);
+
+
 }

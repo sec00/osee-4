@@ -21,17 +21,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.eclipse.osee.connection.service.IServiceConnector;
+import org.eclipse.osee.connection.service.IServicePropertyChangeListener;
+import org.eclipse.osee.framework.jdk.core.util.EnhancedProperties;
+import org.eclipse.osee.framework.plugin.core.util.ExportClassLoader;
+import org.eclipse.osee.ote.core.environment.interfaces.IHostTestEnvironment;
+import org.eclipse.ote.network.EthernetUtil;
+
 import net.jini.export.Exporter;
 import net.jini.jeri.BasicILFactory;
 import net.jini.jeri.BasicJeriExporter;
 import net.jini.jeri.tcp.TcpServerEndpoint;
-
-import org.eclipse.osee.connection.service.IServiceConnector;
-import org.eclipse.osee.connection.service.IServicePropertyChangeListener;
-import org.eclipse.osee.framework.jdk.core.util.EnhancedProperties;
-import org.eclipse.osee.framework.jdk.core.util.Network;
-import org.eclipse.osee.framework.plugin.core.util.ExportClassLoader;
-import org.eclipse.osee.ote.core.environment.interfaces.IHostTestEnvironment;
 
 /**
  * @author Andrew M. Finkbeiner
@@ -111,7 +111,7 @@ public class JmsToJiniBridgeConnector implements IServiceConnector {
    }
 
    private Exporter createExporter() throws UnknownHostException {
-      return new BasicJeriExporter(TcpServerEndpoint.getInstance(Network.getValidIP().getHostAddress(), 0),
+      return new BasicJeriExporter(TcpServerEndpoint.getInstance(EthernetUtil.getServerClientAddress().getHostAddress(), 0),
          new BasicILFactory(null, null, exportClassLoader), false, false);
    }
 

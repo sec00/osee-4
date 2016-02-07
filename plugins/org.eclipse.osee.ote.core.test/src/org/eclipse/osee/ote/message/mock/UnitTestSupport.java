@@ -41,7 +41,7 @@ public class UnitTestSupport {
 
          @Override
          public void runOneCycle() throws InterruptedException, TestException {
-            TestMessageData data = msg.getActiveDataSource();
+            MessageData data = msg.getActiveDataSource();
             data.incrementActivityCount();
             data.notifyListeners();
 

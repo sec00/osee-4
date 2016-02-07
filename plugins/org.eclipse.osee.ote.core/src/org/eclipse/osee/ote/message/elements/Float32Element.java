@@ -113,6 +113,14 @@ public class Float32Element extends RealElement {
    public void setValue(Float obj) {
       getMsgData().getMem().setInt(Float.floatToIntBits(obj), byteOffset, msb, lsb);
    }
+   
+   public void setDouble(double value){
+      getMsgData().getMem().setInt(Float.floatToIntBits((float)value), byteOffset, msb, lsb);
+   }
+   
+   public double getDouble(){
+      return Float.intBitsToFloat(getMsgData().getMem().getInt(byteOffset, msb, lsb));
+   }
 
    @Override
    protected double toDouble(long value) {

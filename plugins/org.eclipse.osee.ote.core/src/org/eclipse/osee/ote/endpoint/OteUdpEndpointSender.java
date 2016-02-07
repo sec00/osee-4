@@ -71,15 +71,15 @@ public class OteUdpEndpointSender implements OteEndpointSender {
       obj.getBuffer().flip();
       obj.setAddress(address);
       try {
+         if (!thread.isAlive()) {
+            // our thread has sat idle for too long and self terminated go ahead and start a new one
+            start();
+         }
          toSend.put(obj);
       } catch (InterruptedException e) {
          throw new OTEException(e);
       }
 
-      if (!thread.isAlive()) {
-         // our thread has sat idle for too long and self terminated go ahead and start a new one
-         start();
-      }
    }
 
    @Override

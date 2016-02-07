@@ -56,8 +56,8 @@ public class OteEventMessageHeader implements IMessageHeader {
       ADDRESS = new SOCKET_ADDRESS_RECORD(msg, "ADDRESS", headerData, 164 + 32, 0, SOCKET_ADDRESS_RECORD.SIZE * 8 - 1);
 
       TOPIC.setValue(topic);
-      MARKER.setValue(MARKER_VALUE);
-      MESSAGE_ID.setValue(messageId);
+      MARKER.setInt(MARKER_VALUE);
+      MESSAGE_ID.setInt(messageId);
       addElement(MARKER);
       addElement(TOPIC);
       addElement(MESSAGE_ID);

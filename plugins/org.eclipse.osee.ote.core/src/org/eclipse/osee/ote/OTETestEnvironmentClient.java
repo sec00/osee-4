@@ -3,7 +3,6 @@ package org.eclipse.osee.ote;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
 import java.rmi.RemoteException;
@@ -21,7 +20,6 @@ import org.eclipse.osee.framework.jdk.core.type.IPropertyStore;
 import org.eclipse.osee.framework.jdk.core.type.PropertyStore;
 import org.eclipse.osee.framework.jdk.core.util.EnhancedProperties;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
-import org.eclipse.osee.framework.jdk.core.util.network.PortUtil;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.framework.plugin.core.util.ExportClassLoader;
 import org.eclipse.osee.ote.classserver.HeadlessClassServer;
@@ -62,6 +60,8 @@ import org.eclipse.osee.ote.remote.messages.SerializedRequestRemoteTestEnvironme
 import org.eclipse.osee.ote.remote.messages.TestEnvironmentServerShutdown;
 import org.eclipse.osee.ote.remote.messages.TestEnvironmentSetBatchMode;
 import org.eclipse.osee.ote.remote.messages.TestEnvironmentTransferFile;
+import org.eclipse.ote.network.EthernetUtil;
+import org.eclipse.ote.network.PortUtil;
 import org.osgi.service.event.EventAdmin;
 
 public class OTETestEnvironmentClient {
@@ -127,7 +127,7 @@ public class OTETestEnvironmentClient {
       Configuration localConfiguration = new Configuration();
       try{
        
-         classServer = new HeadlessClassServer(PortUtil.getInstance().getValidPort(), InetAddress.getLocalHost(), bundlesToSend);
+         classServer = new HeadlessClassServer(PortUtil.getInstance(EthernetUtil.getServerClientAddress()).getValidPort(), EthernetUtil.getServerClientAddress(), bundlesToSend);
          for (BundleInfo bundleInfo : classServer.getBundles()) {
             ConfigurationItem item = new ConfigurationItem(bundleInfo.getServerBundleLocation().toString(),bundleInfo.getVersion(),bundleInfo.getSymbolicName(), bundleInfo.getMd5Digest(), installBundles);
             localConfiguration.addItem(item);
@@ -194,7 +194,7 @@ public class OTETestEnvironmentClient {
       try{
          List<File> bundlesToSend = new ArrayList<>();
          bundlesToSend.add(oteBuilderRootFolder);
-         classServer = new HeadlessClassServer(PortUtil.getInstance().getValidPort(), InetAddress.getLocalHost(), bundlesToSend);
+         classServer = new HeadlessClassServer(PortUtil.getInstance(EthernetUtil.getServerClientAddress()).getValidPort(), EthernetUtil.getServerClientAddress(), bundlesToSend);
          File[] jars = oteBuilderRootFolder.listFiles(new FilenameFilter(){
             @Override
             public boolean accept(File arg0, String arg1) {

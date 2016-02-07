@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.core.log.record;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +28,7 @@ import org.eclipse.osee.ote.core.environment.TestEnvironment;
 import org.eclipse.osee.ote.core.environment.config.ScriptVersionConfig;
 import org.eclipse.osee.ote.core.log.TestLevel;
 import org.eclipse.osee.ote.core.test.tags.BaseTestTags;
+import org.eclipse.ote.network.EthernetUtil;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -79,12 +78,10 @@ public class ScriptConfigRecord extends TestRecord {
     public Element toXml(Document doc) {
         Element configElement = doc.createElement(BaseTestTags.CONFIG_ENTRY);
         try {
-            configElement.setAttribute("machineName", InetAddress.getLocalHost().getHostName());
+            configElement.setAttribute("machineName", EthernetUtil.getServerClientAddress().getHostName());
         } catch (DOMException e) {
             OseeLog.log(TestEnvironment.class, Level.SEVERE, e);
-        } catch (UnknownHostException e) {
-            OseeLog.log(TestEnvironment.class, Level.SEVERE, e);
-        }
+        } 
         configElement.appendChild(Jaxp.createElement(doc, BaseTestTags.SCRIPT_NAME, getMessage()));
         Element user = doc.createElement("User");
         user.setAttribute("name", this.userName);
@@ -113,12 +110,10 @@ public class ScriptConfigRecord extends TestRecord {
     public void toXml(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement(BaseTestTags.CONFIG_ENTRY);
         try {
-            writer.writeAttribute("machineName", InetAddress.getLocalHost().getHostName());
+            writer.writeAttribute("machineName", EthernetUtil.getServerClientAddress().getHostName());
         } catch (DOMException e) {
             OseeLog.log(TestEnvironment.class, Level.SEVERE, e);
-        } catch (UnknownHostException e) {
-            OseeLog.log(TestEnvironment.class, Level.SEVERE, e);
-        }
+        } 
         writeElement(writer, BaseTestTags.SCRIPT_NAME, getMessage());
         writer.writeStartElement("User");
         writer.writeAttribute("name", this.userName);
@@ -157,13 +152,7 @@ public class ScriptConfigRecord extends TestRecord {
 
     @JsonProperty
     public String getMachineName() {
-        try {
-            return InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
+       return EthernetUtil.getServerClientAddress().getHostName();
     }
 
     @JsonProperty

@@ -18,16 +18,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.eclipse.osee.connection.service.IServiceConnector;
+import org.eclipse.osee.connection.service.IServicePropertyChangeListener;
+import org.eclipse.osee.framework.jdk.core.util.EnhancedProperties;
+import org.eclipse.ote.network.EthernetUtil;
+
 import net.jini.core.entry.Entry;
 import net.jini.export.Exporter;
 import net.jini.jeri.BasicILFactory;
 import net.jini.jeri.BasicJeriExporter;
 import net.jini.jeri.tcp.TcpServerEndpoint;
-
-import org.eclipse.osee.connection.service.IServiceConnector;
-import org.eclipse.osee.connection.service.IServicePropertyChangeListener;
-import org.eclipse.osee.framework.jdk.core.util.EnhancedProperties;
-import org.eclipse.osee.framework.jdk.core.util.Network;
 
 /**
  * @author Ken J. Aguilar
@@ -96,7 +96,7 @@ public abstract class JiniConnector implements IServiceConnector {
    }
 
    private Exporter createExporter() throws UnknownHostException {
-      return new BasicJeriExporter(TcpServerEndpoint.getInstance(Network.getValidIP().getHostAddress(), 0),
+      return new BasicJeriExporter(TcpServerEndpoint.getInstance(EthernetUtil.getServerClientAddress().getHostAddress(), 0),
          new BasicILFactory(null, null, Activator.getDefault().getExportClassLoader()), false, false);
    }
 

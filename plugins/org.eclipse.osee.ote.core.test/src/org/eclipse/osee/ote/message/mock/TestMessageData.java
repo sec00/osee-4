@@ -18,7 +18,7 @@ import org.eclipse.osee.ote.message.enums.DataType;
 public class TestMessageData extends MessageData {
 
    public TestMessageData(String typeName, String name, int dataByteSize, int offset, DataType memType) {
-      super(typeName, name, dataByteSize, offset, memType);
+      super(typeName, name, dataByteSize, offset, memType, null);
    }
 
    @Override

@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.core.log.record;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,8 +22,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonSubTypes;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.eclipse.osee.framework.jdk.core.persistence.Xmlizable;
 import org.eclipse.osee.framework.jdk.core.persistence.XmlizableStream;
 import org.eclipse.osee.framework.jdk.core.util.xml.Jaxp;
@@ -33,7 +29,6 @@ import org.eclipse.osee.framework.jdk.core.util.xml.XMLStreamWriterUtil;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.core.environment.TestEnvironment;
 import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironmentAccessor;
-import org.eclipse.osee.ote.message.log.record.MessageJarConfigrecord;
 import org.eclipse.osee.ote.properties.OtePropertiesCore;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

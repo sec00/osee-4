@@ -10,9 +10,10 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.server;
 
+import org.eclipse.osee.connection.service.IServiceConnector;
 import org.eclipse.osee.ote.core.environment.interfaces.IRuntimeLibraryManager;
 import org.eclipse.osee.ote.message.MessageSystemTestEnvironment;
 
 public interface TestEnvironmentFactory {
-   MessageSystemTestEnvironment createEnvironment(IRuntimeLibraryManager runtimeLibraryManager) throws Throwable;
+   MessageSystemTestEnvironment createEnvironment(IRuntimeLibraryManager runtimeLibraryManager, IServiceConnector serviceConnector) throws Throwable;
 }
