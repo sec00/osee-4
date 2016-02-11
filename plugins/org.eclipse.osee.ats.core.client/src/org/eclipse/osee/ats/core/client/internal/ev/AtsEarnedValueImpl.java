@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import org.eclipse.osee.ats.api.IAtsConfigObject;
 import org.eclipse.osee.ats.api.IAtsObject;
+import org.eclipse.osee.ats.api.IAtsServices;
 import org.eclipse.osee.ats.api.IAtsWorkItem;
 import org.eclipse.osee.ats.api.ai.IAtsActionableItem;
 import org.eclipse.osee.ats.api.data.AtsAttributeTypes;
@@ -27,9 +28,9 @@ import org.eclipse.osee.ats.api.insertion.IAtsInsertionActivity;
 import org.eclipse.osee.ats.api.review.IAtsAbstractReview;
 import org.eclipse.osee.ats.api.util.AtsEvents;
 import org.eclipse.osee.ats.api.workflow.IAtsTeamWorkflow;
-import org.eclipse.osee.ats.core.client.ev.WorkPackageArtifact;
 import org.eclipse.osee.ats.core.client.internal.AtsClientService;
 import org.eclipse.osee.ats.core.client.workflow.AbstractWorkflowArtifact;
+import org.eclipse.osee.ats.core.model.WorkPackage;
 import org.eclipse.osee.ats.core.util.AtsObjects;
 import org.eclipse.osee.ats.core.util.AtsUtilCore;
 import org.eclipse.osee.framework.core.data.ArtifactId;
@@ -42,15 +43,24 @@ import org.eclipse.osee.framework.skynet.core.attribute.AttributeTypeManager;
 import org.eclipse.osee.framework.skynet.core.event.OseeEventManager;
 import org.eclipse.osee.framework.skynet.core.event.model.EventType;
 import org.eclipse.osee.framework.skynet.core.event.model.TopicEvent;
+import org.eclipse.osee.logger.Log;
 
 /**
  * @author Donald G. Dunne
  */
 public class AtsEarnedValueImpl implements IAtsEarnedValueService {
 
+   private final Log logger;
+   private final IAtsServices services;
+
+   public AtsEarnedValueImpl(Log logger, IAtsServices services) {
+      this.logger = logger;
+      this.services = services;
+   }
+
    @Override
    public IAtsWorkPackage getWorkPackage(IAtsWorkItem workItem) throws OseeCoreException {
-      WorkPackageArtifact wpa = null;
+      WorkPackage wpa = null;
       Artifact artifact = AtsClientService.get().getArtifact(workItem);
       Conditions.checkNotNull(artifact, "workItem", "Can't Find Artifact matching [%s]", workItem.toString());
       if (artifact instanceof AbstractWorkflowArtifact) {
@@ -58,7 +68,7 @@ public class AtsEarnedValueImpl implements IAtsEarnedValueService {
          String workPackageGuid = awa.getSoleAttributeValue(AtsAttributeTypes.WorkPackageGuid, null);
          if (Strings.isValid(workPackageGuid)) {
             Artifact workPkgArt = ArtifactQuery.getArtifactFromId(workPackageGuid, AtsUtilCore.getAtsBranch());
-            wpa = new WorkPackageArtifact(workPkgArt);
+            wpa = new WorkPackage(logger, workPkgArt, services);
          }
       }
       return wpa;
@@ -78,7 +88,7 @@ public class AtsEarnedValueImpl implements IAtsEarnedValueService {
          Artifact artifact = AtsClientService.get().getArtifact(configObj);
          if (artifact != null) {
             for (Artifact workPackageArt : artifact.getRelatedArtifacts(AtsRelationTypes.WorkPackage_WorkPackage)) {
-               workPackageOptions.add(new WorkPackageArtifact(workPackageArt));
+               workPackageOptions.add(new WorkPackage(logger, workPackageArt, services));
             }
          }
       }
@@ -145,7 +155,7 @@ public class AtsEarnedValueImpl implements IAtsEarnedValueService {
 
    @Override
    public IAtsWorkPackage getWorkPackage(ArtifactId artifact) {
-      return new WorkPackageArtifact((Artifact) artifact);
+      return new WorkPackage(logger, artifact, services);
    }
 
    @Override
@@ -158,7 +168,7 @@ public class AtsEarnedValueImpl implements IAtsEarnedValueService {
       List<IAtsWorkPackage> workPackages = new ArrayList<>();
       for (Artifact artifact : AtsClientService.get().getArtifact(insertionActivity.getUuid()).getRelatedArtifacts(
          AtsRelationTypes.InsertionActivityToWorkPackage_WorkPackage)) {
-         workPackages.add(new WorkPackageArtifact(artifact));
+         workPackages.add(new WorkPackage(logger, artifact, services));
       }
       return workPackages;
    }
