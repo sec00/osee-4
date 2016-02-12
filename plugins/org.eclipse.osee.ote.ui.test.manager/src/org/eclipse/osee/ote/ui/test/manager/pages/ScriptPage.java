@@ -158,6 +158,9 @@ public abstract class ScriptPage extends TestManagerPage {
       AWorkbench.getDisplay().asyncExec(new Runnable() {
          @Override
          public void run() {
+            if(runButton.isDisposed()){
+               return;
+            }
             if (running) {
                runButton.setEnabled(false);
                abortButton.setEnabled(true);
