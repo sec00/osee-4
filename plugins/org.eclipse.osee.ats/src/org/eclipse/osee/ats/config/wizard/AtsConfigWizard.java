@@ -14,7 +14,9 @@ import java.util.Collection;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osee.ats.AtsOpenOption;
@@ -36,6 +38,7 @@ import org.eclipse.osee.framework.plugin.core.util.Jobs;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 import org.eclipse.osee.framework.ui.skynet.render.PresentationType;
 import org.eclipse.osee.framework.ui.skynet.render.RendererManager;
+import org.eclipse.osee.framework.ui.swt.Displays;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.progress.UIJob;
@@ -67,10 +70,22 @@ public class AtsConfigWizard extends Wizard implements INewWizard {
 
          AtsConfigOperation.Display display = new OpenAtsConfigEditors();
          AtsConfigOperation operation = new AtsConfigOperation(workDefName, teamDefName, versionNames, aias);
-         Operations.executeAsJob(operation, true);
+         Operations.executeAsJob(operation, true, Job.LONG, new JobChangeAdapter() {
 
-         display.openAtsConfigurationEditors(operation.getTeamDefinition(), operation.getActionableItems(),
-            operation.getWorkDefinition());
+            @Override
+            public void done(IJobChangeEvent event) {
+               Displays.ensureInDisplayThread(new Runnable() {
+
+                  @Override
+                  public void run() {
+                     display.openAtsConfigurationEditors(operation.getTeamDefinition(), operation.getActionableItems(),
+                        operation.getWorkDefinition());
+                  }
+               });
+            }
+
+         }, null);
+
       } catch (OseeCoreException ex) {
          OseeLog.log(Activator.class, OseeLevel.SEVERE_POPUP, ex);
          return false;
