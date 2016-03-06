@@ -94,6 +94,8 @@ public class Message implements Xmlizable, XmlizableStream {
    private final List<IMessageDisposeListener> postMessageDisposeListeners = new CopyOnWriteArrayList<IMessageDisposeListener>();
 
    private MessageId id;
+   
+   
 
    private IMessageManager messageManager;
    
@@ -128,6 +130,26 @@ public class Message implements Xmlizable, XmlizableStream {
       GCHelper.getGCHelper().addRefWatch(this);
       this.removableListenerHandler = new MessageSystemListener(this);
       this.isTurnedOff = true;
+   }
+   
+   ArrayList<IMessageScheduleChangeListener> getSchedulingChangeListeners(){
+      return schedulingChangeListeners;
+   }
+   
+   List<IMemSourceChangeListener> getPreMemSourceChangeListeners(){
+      return preMemSourceChangeListeners;
+   }
+   
+   List<IMemSourceChangeListener> getPostMemSourceChangeListeners(){
+      return postMemSourceChangeListeners;
+   }
+   
+   List<IMessageDisposeListener> getPreMessageDisposeListeners(){
+      return preMessageDisposeListeners;
+   }
+   
+   List<IMessageDisposeListener> getPostMessageDisposeListeners(){
+      return postMessageDisposeListeners;
    }
 
    void setMapper(LegacyMessageMapper mapper){

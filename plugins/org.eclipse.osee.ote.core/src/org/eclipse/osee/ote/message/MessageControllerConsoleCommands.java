@@ -27,6 +27,8 @@ import org.apache.felix.service.command.Parameter;
 import org.eclipse.osee.ote.core.CopyOnWriteNoIteratorList;
 import org.eclipse.osee.ote.core.ServiceUtility;
 import org.eclipse.osee.ote.message.enums.DataType;
+import org.eclipse.osee.ote.message.interfaces.IMessageScheduleChangeListener;
+import org.eclipse.osee.ote.message.listener.IOSEEMessageListener;
 import org.osgi.framework.ServiceRegistration;
 
 public class MessageControllerConsoleCommands {
@@ -87,6 +89,7 @@ public class MessageControllerConsoleCommands {
 
    @Descriptor("list messages that are currently instantiated in the environment")
    public void ml(
+         @Descriptor("show verbose info (listeners)") @Parameter(names = { "-v", "--verbose" }, presentValue = "true", absentValue = "false") boolean verbose,
          @Descriptor("show readers") @Parameter(names = { "-r", "--readers" }, presentValue = "true", absentValue = "false") boolean showReaders,
          @Descriptor("show writers") @Parameter(names = { "-w", "--writers" }, presentValue = "true", absentValue = "false") boolean showWriters,
          @Descriptor("regex name match (.* is the java regex wildcard)") @Parameter(names = { "-m" }, absentValue = "") String pattern
@@ -126,8 +129,62 @@ public class MessageControllerConsoleCommands {
             } 
             if(printMessage){
                printMessageInfo(msg, count);
+               if(verbose){
+                  printListenerInfo(msg);
+               }
             }
          }
+   }
+
+   private void printListenerInfo(Message msg) {
+      System.out.println("\tIOSEEMessageListener:");
+      for(IOSEEMessageListener listener: msg.getListener().getRegisteredFastListeners()){
+         print(listener);
+      }
+      for(IOSEEMessageListener listener: msg.getListener().getRegisteredSlowListeners()){
+         print(listener);
+      }
+      for(IOSEEMessageListener listener: msg.getRemoveableListener().getRegisteredFastListeners()){
+         print(listener);
+      }
+      for(IOSEEMessageListener listener: msg.getRemoveableListener().getRegisteredSlowListeners()){
+         print(listener);
+      }
+      
+      if(!msg.getSchedulingChangeListeners().isEmpty()){
+         System.out.println("\tIMessageScheduleChangeListener:");   
+         for(IMessageScheduleChangeListener listener:msg.getSchedulingChangeListeners()){
+            print(listener);
+         }
+      }
+      if(!msg.getPreMemSourceChangeListeners().isEmpty()){
+         System.out.println("\tPre IMemSourceChangeListener:");
+         for(IMemSourceChangeListener listener:msg.getPreMemSourceChangeListeners()){
+            print(listener);
+         }
+      }
+      if(!msg.getPostMemSourceChangeListeners().isEmpty()){
+         System.out.println("\tPost IMemSourceChangeListener:");
+         for(IMemSourceChangeListener listener:msg.getPostMemSourceChangeListeners()){
+            print(listener);
+         }
+      }
+      if(!msg.getPreMessageDisposeListeners().isEmpty()){
+         System.out.println("\tPre IMemSourceChangeListener:");
+         for(IMessageDisposeListener listener:msg.getPreMessageDisposeListeners()){
+            print(listener);
+         }
+      }
+      if(!msg.getPostMemSourceChangeListeners().isEmpty()){
+         System.out.println("\tPost IMessageDisposeListener:");
+         for(IMessageDisposeListener listener:msg.getPostMessageDisposeListeners()){
+            print(listener);
+         }
+      }
+   }
+   
+   private void print(Object listener){
+      System.out.printf("\t\t%-80s [%s]\n", listener.getClass().getName(), listener.toString());
    }
 
    @SuppressWarnings({ "deprecation" })
