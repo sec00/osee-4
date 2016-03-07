@@ -10,6 +10,7 @@
 	<version>0.24.3-SNAPSHOT</version>
 
 	<modules>
+	    <module>../../plugins/org.eclipse.ote.network</module>
 		<module>../../plugins/org.eclipse.osee.framework.ui.workspacebundleloader</module>
 		<module>../../plugins/org.eclipse.osee.ote.master</module>
 		<module>../../plugins/org.eclipse.osee.ote.master.test</module>
@@ -350,6 +351,7 @@
 	</build>
 
 	<profiles>
+<!--
 		<profile>
 			<id>external-repos</id>
 			<activation>
@@ -384,6 +386,7 @@
 				</repository>
 			</repositories>
 		</profile>
+-->
 		<profile>
 			<id>client-external-p2</id>
 			<activation>

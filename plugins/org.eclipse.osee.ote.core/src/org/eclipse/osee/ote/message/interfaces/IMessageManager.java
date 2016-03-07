@@ -17,6 +17,8 @@ import java.util.Set;
 import org.eclipse.osee.ote.message.DestinationInfo;
 import org.eclipse.osee.ote.message.IMessageCreationListener;
 import org.eclipse.osee.ote.message.Message;
+import org.eclipse.osee.ote.message.MessageDataReceiver;
+import org.eclipse.osee.ote.message.MessageDataUpdater;
 import org.eclipse.osee.ote.message.MessageDataWriter;
 import org.eclipse.osee.ote.message.MessageId;
 import org.eclipse.osee.ote.message.MessagePublishingHandler;
@@ -77,6 +79,10 @@ public interface IMessageManager {
    public void registerWriter(MessageDataWriter writer);
    
    public void unregisterWriter(MessageDataWriter writer);
+   
+   public MessageDataUpdater registerDataReceiver(MessageDataReceiver receiver);
+   
+   public void unregisterDataReceiver(MessageDataReceiver receiver);
    
    public void addMessagePublishingHandler(MessagePublishingHandler handler);
    public void removeMessagePublishingHandler(MessagePublishingHandler handler);

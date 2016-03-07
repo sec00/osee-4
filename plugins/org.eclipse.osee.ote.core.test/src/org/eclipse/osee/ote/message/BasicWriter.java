@@ -14,7 +14,7 @@ class BasicWriter implements MessageDataWriter {
       }
       
       @Override
-      public IOType getDataType() {
+      public IOType getIOType() {
          return type;
       }
 
@@ -37,7 +37,7 @@ class BasicWriter implements MessageDataWriter {
       }
 
       @Override
-      public DataType getType() {
+      public DataType getDataType() {
          return dataType;
       }
       

@@ -424,7 +424,6 @@ class LegacyMessageMapperService implements LegacyMessageMapper {
       }
       messageLookup.remove(message);
       messageDataLookup.remove(message.getDefaultMessageData());
-      System.out.printf("Remove Message[%s] - %s\n", message.getName(), (message.isWriter() ? "writer" : "reader"));
    }
 
 

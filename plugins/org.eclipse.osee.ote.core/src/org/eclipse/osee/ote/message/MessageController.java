@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 import org.eclipse.osee.framework.logging.OseeLog;
@@ -37,6 +38,7 @@ public class MessageController implements IMessageManager {
    
    private final Set<Integer> printIdMessage = new HashSet<>();
    
+   private final List<MessageDataReceiver> messageDataReceivers = new CopyOnWriteArrayList<>();
    
    private final  List<IMessageCreationListener> preCreation = new ArrayList<IMessageCreationListener>();
    private final  List<IMessageCreationListener> postCreation = new ArrayList<IMessageCreationListener>();
@@ -63,6 +65,8 @@ public class MessageController implements IMessageManager {
       return messagePublishingHandlers;
    }
    
+   
+   
    @Override
    public void destroy() {
       commands.dispose();
@@ -87,7 +91,9 @@ public class MessageController implements IMessageManager {
       return instanceRequestListeners;
    }
  
-   
+   List<MessageDataReceiver> getMessageDataReceivers(){
+      return messageDataReceivers;
+   }
 
    private <CLASSTYPE extends Message> void notifyPreCreateMessage(Class<CLASSTYPE> messageClass, IMessageRequestor requestor, boolean writer){
       for (IMessageCreationListener listener : preCreation) {
@@ -317,29 +323,36 @@ public class MessageController implements IMessageManager {
    }
    
    public void registerWriter(MessageDataWriter writer){
-      CopyOnWriteNoIteratorList<MessageDataWriter> list = messageDataWriters.get(writer.getDataType());
+      CopyOnWriteNoIteratorList<MessageDataWriter> list = messageDataWriters.get(writer.getIOType());
       if(list == null){
          list = new CopyOnWriteNoIteratorList<>(MessageDataWriter.class);
-         messageDataWriters.put(writer.getDataType(), list);
+         messageDataWriters.put(writer.getIOType(), list);
       }
       if(!list.contains(writer)){
          list.add(writer);
       }
       //TODO fix this, we should have this as part of the ENV configuration... or io configuration
-      availableDataTypes.add(writer.getType());
+      availableDataTypes.add(writer.getDataType());
    }
    
    public void unregisterWriter(MessageDataWriter writer){
-      CopyOnWriteNoIteratorList<MessageDataWriter> list = messageDataWriters.get(writer.getDataType());
+      CopyOnWriteNoIteratorList<MessageDataWriter> list = messageDataWriters.get(writer.getIOType());
       if(list != null){
          list.remove(writer);
          if(list.length() == 0){
-            messageDataWriters.remove(writer.getDataType());
+            messageDataWriters.remove(writer.getIOType());
          }
       }
    }
    
+   public MessageDataUpdater registerDataReceiver(MessageDataReceiver receiver){
+      messageDataReceivers.add(receiver);
+      return new MessageDataUpdaterImpl();
+   }
    
+   public void unregisterDataReceiver(MessageDataReceiver receiver){
+      messageDataReceivers.remove(receiver);
+   }
    
    @Override
    public void update(MessageId id, ByteBuffer data) {
@@ -640,6 +653,15 @@ public class MessageController implements IMessageManager {
          }
          return filterList;
       }
+   }
+   
+   private class MessageDataUpdaterImpl implements MessageDataUpdater {
+
+      @Override
+      public void update(MessageId id, ByteBuffer data) {
+         MessageController.this.update(id, data);
+      }
+      
    }
 
 }

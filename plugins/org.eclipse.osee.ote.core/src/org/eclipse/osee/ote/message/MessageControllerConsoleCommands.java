@@ -50,20 +50,24 @@ public class MessageControllerConsoleCommands {
    @Descriptor ("print ote message io info")
    public void io(CommandSession session, String[] args) throws Exception
    {
-      System.out.println("Available DataType");
+      System.out.println("Available DataTypes");
       for(DataType type:messageController.getAvailableDataTypes()){
          System.out.printf("\t%s\n", type.toString());
       }
-      System.out.println("Available MessagePublishingHandler");
+      System.out.println("Available MessagePublishingHandlers");
       for(Entry<IOType, MessagePublishingHandler> entry: messageController.getMessagePublishers().entrySet()){
          System.out.printf("\t%-20s  %-50s %s\n", entry.getKey().name(), entry.getValue().getClass(), entry.getValue().toString());
       }
-      System.out.println("Available MessageDataWriter");
+      System.out.println("Available MessageDataWriters");
       for(Entry<IOType, CopyOnWriteNoIteratorList<MessageDataWriter>> entry: messageController.getDataWriters().entrySet()){
          MessageDataWriter[] writers = entry.getValue().get();
          for(int i = 0; i < writers.length; i++){
             System.out.printf("\t%-20s  %-50s %s\n", entry.getKey().name(), writers[i].getClass(), writers[i].toString());
          }
+      }
+      System.out.println("Available MessageDataReceivers");
+      for(MessageDataReceiver entry: messageController.getMessageDataReceivers()){
+         System.out.printf("\t%-20s  %-50s %s\n", entry.getDataType().name(), entry.getClass(),entry.toString());
       }
    }	
    
