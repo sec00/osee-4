@@ -242,7 +242,7 @@ class LegacyMessageMapperService implements LegacyMessageMapper {
    @SuppressWarnings({ "rawtypes", "unchecked" })
    private Object getNoMapping(Class<?> type, Element object) {
       for(ElementNoMappingProvider provider:nonMappingProviders){
-         if(provider.providesType(object.getClass())){
+         if(provider.providesType(type)){
             return provider.getNonMappingElement(object);
          }
       }

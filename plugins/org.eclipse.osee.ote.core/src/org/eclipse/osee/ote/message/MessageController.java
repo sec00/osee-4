@@ -138,8 +138,8 @@ public class MessageController implements IMessageManager {
                   otherMessage = requestor.getMessageReader(messageClass);
                }
                mapper.addMessageTypeAssociation(message, type, otherMessage);
-               message.setMemSource(type);
             }
+            message.setMemSource(type);
          }
       }
    }
