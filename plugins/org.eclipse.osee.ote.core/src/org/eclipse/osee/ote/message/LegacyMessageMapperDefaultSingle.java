@@ -1,5 +1,6 @@
 package org.eclipse.osee.ote.message;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -72,18 +73,21 @@ class LegacyMessageMapperDefaultSingle implements LegacyMessageMapper {
 
 
 
+   @SuppressWarnings({ "rawtypes", "unchecked" })
    @Override
    public CopyOnWriteNoIteratorList<Message> getMessages(Message message, DataType type) {
-      // TODO Auto-generated method stub
-      return null;
+      CopyOnWriteNoIteratorList list = new CopyOnWriteNoIteratorList<>(Message.class);
+      list.add(message);
+      return list;
    }
 
 
 
    @Override
    public List<MessageData> getAllMessageDatas(Message message) {
-      // TODO Auto-generated method stub
-      return null;
+      List<MessageData> datas = new ArrayList<MessageData>();
+      datas.add(message.getDefaultMessageData());
+      return datas;
    }
 
 

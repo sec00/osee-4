@@ -304,7 +304,7 @@ public class Message implements Xmlizable, XmlizableStream {
       if(messageManager != null){
          messageManager.publish(this);
       } else {
-         throw new IllegalStateException(String.format("Unable to send [%s] because message manager has not been set", getName()));
+         OseeLog.log(getClass(), Level.WARNING, String.format("Unable to send [%s] because message manager has not been set", getName()));
       }
    }
    
@@ -312,7 +312,7 @@ public class Message implements Xmlizable, XmlizableStream {
       if(messageManager != null){
          messageManager.publish(this, info);
       } else {
-         throw new IllegalStateException(String.format("Unable to send [%s] because message manager has not been set", getName()));
+         OseeLog.log(getClass(), Level.WARNING, String.format("Unable to send [%s] because message manager has not been set", getName()));
       }
    }
    
