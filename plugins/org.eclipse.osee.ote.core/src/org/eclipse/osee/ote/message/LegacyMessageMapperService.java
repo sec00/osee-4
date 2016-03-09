@@ -24,6 +24,7 @@ import org.eclipse.osee.ote.message.elements.Float32Element;
 import org.eclipse.osee.ote.message.elements.Float64Element;
 import org.eclipse.osee.ote.message.elements.IntegerElement;
 import org.eclipse.osee.ote.message.elements.LongIntegerElement;
+import org.eclipse.osee.ote.message.elements.RealElement;
 import org.eclipse.osee.ote.message.elements.RecordElement;
 import org.eclipse.osee.ote.message.elements.nonmapping.NonMappingCharElement;
 import org.eclipse.osee.ote.message.elements.nonmapping.NonMappingEmptyEnumElement;
@@ -65,22 +66,22 @@ class LegacyMessageMapperService implements LegacyMessageMapper {
             return new NonMappingEmptyEnumElement(elementGettingReplaced);
          }
       });
-      nonMappingProviders.add(new GenericNonMappingProvider<FixedPointElement>(FixedPointElement.class) {
+      nonMappingProviders.add(new GenericNonMappingProvider<RealElement>(FixedPointElement.class) {
          @Override
-         public FixedPointElement getNonMappingElement(FixedPointElement elementGettingReplaced) {
-            return new NonMappingFixedPointElement(elementGettingReplaced);
+         public RealElement getNonMappingElement(RealElement elementGettingReplaced) {
+            return (RealElement)new NonMappingFixedPointElement((FixedPointElement)elementGettingReplaced);
          }
       });
-      nonMappingProviders.add(new GenericNonMappingProvider<Float32Element>(Float32Element.class) {
+      nonMappingProviders.add(new GenericNonMappingProvider<RealElement>(Float32Element.class) {
          @Override
-         public Float32Element getNonMappingElement(Float32Element elementGettingReplaced) {
-            return new NonMappingFloat32Element(elementGettingReplaced);
+         public RealElement getNonMappingElement(RealElement elementGettingReplaced) {
+            return (RealElement)new NonMappingFloat32Element((Float32Element)elementGettingReplaced);
          }
       });
-      nonMappingProviders.add(new GenericNonMappingProvider<Float64Element>(Float64Element.class) {
+      nonMappingProviders.add(new GenericNonMappingProvider<RealElement>(Float64Element.class) {
          @Override
-         public Float64Element getNonMappingElement(Float64Element elementGettingReplaced) {
-            return new NonMappingFloat64Element(elementGettingReplaced);
+         public RealElement getNonMappingElement(RealElement elementGettingReplaced) {
+            return (RealElement)new NonMappingFloat64Element((Float64Element)elementGettingReplaced);
          }
       });
       nonMappingProviders.add(new GenericNonMappingProvider<LongIntegerElement>(LongIntegerElement.class) {
@@ -242,7 +243,7 @@ class LegacyMessageMapperService implements LegacyMessageMapper {
    @SuppressWarnings({ "rawtypes", "unchecked" })
    private Object getNoMapping(Class<?> type, Element object) {
       for(ElementNoMappingProvider provider:nonMappingProviders){
-         if(provider.providesType(type)){
+         if(provider.providesType(object.getClass())){
             return provider.getNonMappingElement(object);
          }
       }
@@ -335,15 +336,15 @@ class LegacyMessageMapperService implements LegacyMessageMapper {
    
    private static abstract class GenericNonMappingProvider<T> implements ElementNoMappingProvider<T> {
 
-      private Class<T> clazz;
+      private Class<?> clazz;
 
-      public GenericNonMappingProvider(Class<T> clazz) {
+      public GenericNonMappingProvider(Class<?> clazz) {
          this.clazz = clazz;
       }
       
       @Override
       public boolean providesType(Class<?> clazz) {
-         return clazz.isAssignableFrom(this.clazz);
+         return this.clazz.isAssignableFrom(clazz);
       }
    }
    
@@ -358,7 +359,7 @@ class LegacyMessageMapperService implements LegacyMessageMapper {
       
       @Override
       public boolean providesType(Class<?> clazz) {
-         return clazz.isAssignableFrom(this.clazz);
+         return this.clazz.isAssignableFrom(clazz);
       }
 
       @SuppressWarnings("unchecked")
