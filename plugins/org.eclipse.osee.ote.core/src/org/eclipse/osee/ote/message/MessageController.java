@@ -14,6 +14,7 @@ import java.util.logging.Level;
 
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.core.CopyOnWriteNoIteratorList;
+import org.eclipse.osee.ote.core.ServiceUtility;
 import org.eclipse.osee.ote.core.TestException;
 import org.eclipse.osee.ote.core.environment.interfaces.ITimerControl;
 import org.eclipse.osee.ote.message.data.MessageData;
@@ -46,6 +47,7 @@ public class MessageController implements IMessageManager {
    private MessagePublishingHandler defaultpublisher = new MessagePublishingHandlerDefault();
    private boolean debug = false;
    private MessageControllerConsoleCommands commands;
+   private boolean useSpecialMapping;
  
    //ITimerControl should become Scheduler
    public MessageController(ClassLocator classLocator, ITimerControl timerControl){
@@ -55,7 +57,11 @@ public class MessageController implements IMessageManager {
       this.periodicPublish = new PeriodicPublishMap(this, timerControl);      
       
       commands = new MessageControllerConsoleCommands(this);
+      
+      useSpecialMapping = Boolean.parseBoolean(System.getProperty("ote.signal.mapping", "false"));
    }
+   
+   
    
    Map<IOType, CopyOnWriteNoIteratorList<MessageDataWriter>> getDataWriters(){
       return messageDataWriters;
@@ -112,8 +118,15 @@ public class MessageController implements IMessageManager {
    private void setupMessageMapping(IMessageRequestor requestor, Message message){
 
       mapper.addMessage(message);
-
-      Map<? extends DataType, Class<? extends Message>[]> types = message.getAssociatedMessages();
+      Map<? extends DataType, Class<? extends Message>[]> types;
+      MessageAssociationLookup lookup = ServiceUtility.getService(MessageAssociationLookup.class);
+     
+      if(lookup != null && useSpecialMapping){
+         types = lookup.getAssociatedMessages((Class<Message>) message.getClass());
+      } else {
+         types = message.getAssociatedMessages();
+      }
+      
       for(DataType type: types.keySet()){
          if (!availableDataTypes.isEmpty() && isPhysicalTypeAvailable(type)) {
             Class<? extends Message>[] messages = types.get(type);
