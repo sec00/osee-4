@@ -258,6 +258,9 @@ public class MessageController implements IMessageManager {
          if (list.isEmpty()) {
             requestorReferenceMap.remove(msg);
             if (!msg.isDestroyed()) {
+               if(!msg.isWriter()){
+                  idToDataMap.remove(msg.getMessageId());
+               }
                messageCollection.remove(msg);
             } else {
                OseeLog.log(MessageController.class, Level.WARNING,
