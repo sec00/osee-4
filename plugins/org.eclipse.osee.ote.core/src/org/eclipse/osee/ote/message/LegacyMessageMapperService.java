@@ -15,16 +15,20 @@ import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.core.CopyOnWriteNoIteratorList;
 import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.elements.CharElement;
+import org.eclipse.osee.ote.message.elements.CharElementGroup;
 import org.eclipse.osee.ote.message.elements.Element;
 import org.eclipse.osee.ote.message.elements.ElementGroup;
 import org.eclipse.osee.ote.message.elements.EmptyEnum_Element;
 import org.eclipse.osee.ote.message.elements.EnumeratedElement;
+import org.eclipse.osee.ote.message.elements.EnumeratedElementGroup;
 import org.eclipse.osee.ote.message.elements.FixedPointElement;
 import org.eclipse.osee.ote.message.elements.Float32Element;
 import org.eclipse.osee.ote.message.elements.Float64Element;
 import org.eclipse.osee.ote.message.elements.IntegerElement;
+import org.eclipse.osee.ote.message.elements.IntegerElementGroup;
 import org.eclipse.osee.ote.message.elements.LongIntegerElement;
 import org.eclipse.osee.ote.message.elements.RealElement;
+import org.eclipse.osee.ote.message.elements.RealElementGroup;
 import org.eclipse.osee.ote.message.elements.RecordElement;
 import org.eclipse.osee.ote.message.elements.nonmapping.NonMappingCharElement;
 import org.eclipse.osee.ote.message.elements.nonmapping.NonMappingEmptyEnumElement;
@@ -36,6 +40,8 @@ import org.eclipse.osee.ote.message.elements.nonmapping.NonMappingIntegerElement
 import org.eclipse.osee.ote.message.elements.nonmapping.NonMappingLongIntegerElement;
 import org.eclipse.osee.ote.message.elements.nonmapping.NonMappingRecordElement;
 import org.eclipse.osee.ote.message.enums.DataType;
+
+
 
 class LegacyMessageMapperService implements LegacyMessageMapper {
 
@@ -237,6 +243,17 @@ class LegacyMessageMapperService implements LegacyMessageMapper {
 
    @SuppressWarnings("rawtypes")
    private ElementGroup createElementGroup(Message message, Class<?> type) {
+      if(EnumeratedElement.class.isAssignableFrom(type)){
+         return new EnumeratedElementGroup(message, type);
+      } else if( RealElement.class.isAssignableFrom(type)) {
+         return new RealElementGroup(message);
+      } else if( IntegerElement.class.isAssignableFrom(type)) {
+         return new IntegerElementGroup(message);
+      } else if( RealElement.class.isAssignableFrom(type)) {
+         return new RealElementGroup(message);
+      } else if( CharElement.class.isAssignableFrom(type)) {
+         return new CharElementGroup(message);
+      }
       return null;
    }
 
