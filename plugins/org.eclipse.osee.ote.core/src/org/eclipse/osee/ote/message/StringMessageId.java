@@ -35,7 +35,7 @@ public class StringMessageId implements MessageId {
          return true;
       if (obj == null)
          return false;
-      if (getClass() != obj.getClass())
+      if (!(obj instanceof StringMessageId))
          return false;
       StringMessageId other = (StringMessageId) obj;
       if (id == null) {
