@@ -22,6 +22,8 @@ import org.eclipse.osee.ote.core.environment.TestEnvironment;
 import org.eclipse.osee.ote.core.environment.TimerControl;
 import org.eclipse.osee.ote.core.environment.interfaces.ICancelTimer;
 import org.eclipse.osee.ote.core.environment.interfaces.ITimeout;
+import org.eclipse.ote.scheduler.SchedulerImpl;
+import org.eclipse.ote.scheduler.SchedulerImpl.DelayStrategy;
 
 /**
  * @author Ryan D. Brooks
@@ -35,7 +37,7 @@ public class RealTime extends TimerControl {
     * Constructor
     */
    public RealTime() {
-      super((Runtime.getRuntime().availableProcessors() + 1) / 2 + 1);
+      super(new SchedulerImpl(false, DelayStrategy.sleep), (Runtime.getRuntime().availableProcessors() + 1) / 2 + 1);
    }
 
    @Override

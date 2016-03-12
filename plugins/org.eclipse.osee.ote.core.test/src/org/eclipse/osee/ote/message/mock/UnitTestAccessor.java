@@ -53,6 +53,7 @@ import org.eclipse.osee.ote.message.enums.DataType;
 import org.eclipse.osee.ote.message.interfaces.IMessageManager;
 import org.eclipse.osee.ote.message.interfaces.ITestAccessor;
 import org.eclipse.osee.ote.message.interfaces.ITestEnvironmentMessageSystemAccessor;
+import org.eclipse.ote.scheduler.Scheduler;
 
 public class UnitTestAccessor implements ITestEnvironmentMessageSystemAccessor, ITestAccessor {
    private final HashMap<EnvironmentTask, ScheduledFuture<?>> handleMap =
@@ -662,6 +663,12 @@ public class UnitTestAccessor implements ITestEnvironmentMessageSystemAccessor, 
 
    @Override
    public Set<DataType> getDataTypes() {
+      return null;
+   }
+
+   @Override
+   public Scheduler getScheduler() {
+      // TODO Auto-generated method stub
       return null;
    }
 

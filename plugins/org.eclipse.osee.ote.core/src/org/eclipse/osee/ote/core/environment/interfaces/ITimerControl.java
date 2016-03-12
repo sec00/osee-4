@@ -13,6 +13,7 @@ package org.eclipse.osee.ote.core.environment.interfaces;
 import org.eclipse.osee.ote.core.environment.EnvironmentTask;
 import org.eclipse.osee.ote.core.environment.TestEnvironment;
 import org.eclipse.osee.ote.core.framework.IRunManager;
+import org.eclipse.ote.scheduler.Scheduler;
 
 public interface ITimerControl {
    void addTask(EnvironmentTask task, TestEnvironment environment);
@@ -46,6 +47,8 @@ public interface ITimerControl {
    public void setRunManager(IRunManager runManager);
 
    public IRunManager getRunManager();
+   
+   public Scheduler getScheduler();
 
    public boolean isRealtime();
 }

@@ -54,6 +54,8 @@ import org.eclipse.osee.ote.core.framework.command.ITestContext;
 import org.eclipse.osee.ote.core.framework.command.ITestServerCommand;
 import org.eclipse.osee.ote.core.internal.Activator;
 import org.eclipse.osee.ote.properties.OtePropertiesCore;
+import org.eclipse.ote.scheduler.Scheduler;
+import org.eclipse.ote.scheduler.SchedulerImpl;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
@@ -84,6 +86,7 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
 
    private volatile boolean isShutdown = false;
    private ServiceRegistration<TestEnvironmentInterface> myRegistration;
+   private Scheduler scheduler;
 
    protected TestEnvironment(IEnvironmentFactory factory, IServiceConnector serviceConnector) {
       GCHelper.getGCHelper().addRefWatch(this);
@@ -95,7 +98,13 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
       this.associatedObjectListeners = new HashMap<>();
       this.associatedObjects = new HashMap<>(100);
       this.batchMode = OteProperties.isOseeOteInBatchModeEnabled();
-
+      
+      scheduler = factory.getTimerControl().getScheduler();
+      scheduler.start();
+   }
+   
+   public Scheduler getScheduler(){
+      return scheduler;
    }
 
    public ServiceTracker getServiceTracker(String clazz, ServiceTrackerCustomizer customizer) {
@@ -313,6 +322,7 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
 
    protected void stop() {
       try{
+         scheduler.stop();
          myRegistration.unregister();
       } catch (IllegalStateException ex){
          //ignore if it's already unregistered

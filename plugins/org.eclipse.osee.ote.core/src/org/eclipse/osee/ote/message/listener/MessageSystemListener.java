@@ -13,6 +13,8 @@ package org.eclipse.osee.ote.message.listener;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -25,6 +27,7 @@ import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironmentAccessor
 import org.eclipse.osee.ote.core.environment.interfaces.ITimeout;
 import org.eclipse.osee.ote.message.Message;
 import org.eclipse.osee.ote.message.MessageSystemException;
+import org.eclipse.osee.ote.message.WaitOnCondition;
 import org.eclipse.osee.ote.message.condition.ICondition;
 import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.elements.MsgWaitResult;
@@ -132,6 +135,9 @@ public class MessageSystemListener implements IOSEEMessageReaderListener, IOSEEM
    }
 
    public MsgWaitResult waitForCondition(ITestEnvironmentAccessor accessor, ICondition condition, boolean maintain, int milliseconds) throws InterruptedException {
+      
+//      WaitOnCondition waitOnCondition = new WaitOnCondition(accessor.getScheduler(), condition, maintain, Collections.singletonList(this.message.get()), (long)milliseconds);
+//      return waitOnCondition.startWaiting();
       long time = 0l;
       boolean pass;
       if (milliseconds > 0) {

@@ -40,6 +40,7 @@ import org.eclipse.osee.ote.core.framework.testrun.ITestRunListener;
 import org.eclipse.osee.ote.core.framework.testrun.ITestRunListenerProvider;
 import org.eclipse.osee.ote.core.log.ITestPointTally;
 import org.eclipse.osee.ote.core.log.record.ScriptResultRecord;
+import org.eclipse.ote.scheduler.Scheduler;
 
 /**
  * TestScript is the abstract base class for all test scripts. This class provides the interfaces necessary to allow a
@@ -625,6 +626,10 @@ public abstract class TestScript implements ITimeout {
 
    public String getOutfileComment() {
       return "\nNO_OUTFILE_COMMENT\n";
+   }
+   
+   public Scheduler getScheduler(){
+      return environment.getScheduler();
    }
 
 }

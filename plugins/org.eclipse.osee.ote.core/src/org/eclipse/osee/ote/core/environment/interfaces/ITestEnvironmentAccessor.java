@@ -13,6 +13,7 @@ package org.eclipse.osee.ote.core.environment.interfaces;
 import java.util.Set;
 import org.eclipse.osee.ote.core.TestScript;
 import org.eclipse.osee.ote.core.environment.EnvironmentTask;
+import org.eclipse.ote.scheduler.Scheduler;
 
 /**
  * @author Ryan D. Brooks
@@ -44,6 +45,8 @@ public interface ITestEnvironmentAccessor {
    ITestStation getTestStation();
 
    ITimerControl getTimerCtrl();
+   
+   Scheduler getScheduler();
 
    void onScriptComplete() throws InterruptedException;
 

@@ -40,6 +40,7 @@ import org.eclipse.osee.ote.core.log.record.RequirementRecord;
 import org.eclipse.osee.ote.core.log.record.TestCaseRecord;
 import org.eclipse.osee.ote.core.log.record.TestDescriptionRecord;
 import org.eclipse.osee.ote.core.log.record.TestRecord;
+import org.eclipse.ote.scheduler.Scheduler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -457,5 +458,9 @@ public abstract class TestCase implements ITestEnvironmentAccessor, Xmlizable, X
        } else {
            return traceability;
        }
+   }
+   
+   public Scheduler getScheduler(){
+      return environment.getScheduler();
    }
 }
