@@ -163,7 +163,9 @@ public class MessageController implements IMessageManager {
          }
          notifyPostCreateMessage(messageClass, requestor, writer, message);
          //message sending is disabled until all post create message listeners have been called
-         message.setTurnOn();
+         if(writer && message.isScheduledFromStart()){
+            schedulePublish(message);
+         }
          return message;
       } catch (InstantiationException e) {
          throw new TestException("Failed message createion", Level.SEVERE, e);
@@ -186,10 +188,10 @@ public class MessageController implements IMessageManager {
    }
 
    private void setupMessageWriter(Message message) {
-      if(message.getRate() != 0.0){
-         PeriodicPublishTask task = periodicPublish.get(message.getRate(), 1);
-         task.put(message);
-      }
+//      if(message.getRate() != 0.0){
+//         PeriodicPublishTask task = periodicPublish.get(message.getRate(), 1);
+//         task.put(message);
+//      }
       //move functionality to Message creation listener --- post create
 //      for(MessageWriterSetupHandler handler:messageSetupHandlers){
 //         handler.setup(message);

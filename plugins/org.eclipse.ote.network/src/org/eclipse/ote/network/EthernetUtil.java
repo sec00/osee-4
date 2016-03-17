@@ -21,10 +21,13 @@ public class EthernetUtil {
    private static InetAddress defaultLocalTestInterface;
    private static InetAddress defaultWanInterface;
    private static boolean checkNetwork;
+   private static boolean useLoopbackWhenNoTestInterface;
 
    static {
       String checkNetworkStr = System.getProperty("ote.network.check", "true");
+      String useLoopbackWhenNoTestInterfaceStr = System.getProperty("ote.network.test.loopback", "true");
       checkNetwork = Boolean.parseBoolean(checkNetworkStr);
+      useLoopbackWhenNoTestInterface = Boolean.parseBoolean(useLoopbackWhenNoTestInterfaceStr);
       String testInterfaces = System.getProperty("ote.test.interfaces", "192.168.0.254,192.168.1.254");
       String[] interfaces = testInterfaces.split(",");
       updateAvailableInterfaces();
@@ -174,6 +177,14 @@ public class EthernetUtil {
 //   }
 
  
+   public static InetAddress getTestAddress(){
+      if(checkNetwork && (isLocalRange(defaultWanInterface) || (useLoopbackWhenNoTestInterface))&& !isLabInterfaceAvailable()){
+         return loopback;
+      } else {
+         return defaultWanInterface;
+      }
+   }
+   
    public static InetAddress getServerClientAddress(){
       if(checkNetwork && isLocalRange(defaultWanInterface) && !isLabInterfaceAvailable()){
          return loopback;

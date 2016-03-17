@@ -199,15 +199,13 @@ public class Message implements Xmlizable, XmlizableStream {
 
    public void destroy() {
       turnOff();
-      mapper.removeMessage(this);
-      
       notifyPreDestroyListeners();
+
+      mapper.removeMessage(this);
       destroyed = true;
       defaultMessageData.dispose();
-
       listenerHandler.dispose();
 
-      notifyPostDestroyListeners();
       schedulingChangeListeners.clear();
       postMessageDisposeListeners.clear();
       preMessageDisposeListeners.clear();
@@ -219,6 +217,8 @@ public class Message implements Xmlizable, XmlizableStream {
          messageRequestor.dispose();
       }
       removableListenerHandler.dispose();
+      
+      notifyPostDestroyListeners();
    }
 
    private void notifyPostDestroyListeners() {
