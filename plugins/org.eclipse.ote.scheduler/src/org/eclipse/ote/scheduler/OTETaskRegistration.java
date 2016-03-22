@@ -11,6 +11,7 @@ public class OTETaskRegistration {
    }
 
    public void unregister(){
+      System.out.println("unregister " + scheduler.getTime() + " " + task.toString());
       task.setCanceled();
       scheduler.removeTask(task);
    }

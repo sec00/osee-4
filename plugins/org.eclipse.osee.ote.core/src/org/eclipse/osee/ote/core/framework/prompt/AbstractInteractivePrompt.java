@@ -26,6 +26,7 @@ public abstract class AbstractInteractivePrompt<T> extends AbstractRemotePrompt 
    private final TestScript script;
    protected Exception exception;
    protected T response;
+   private volatile boolean waiting = true;
 
    public AbstractInteractivePrompt(IServiceConnector connector, TestScript script, String id, String message) throws UnknownHostException {
       super(connector, id, message);
@@ -33,6 +34,7 @@ public abstract class AbstractInteractivePrompt<T> extends AbstractRemotePrompt 
    }
 
    public T open(Executor executor) throws InterruptedException, Exception {
+      waiting = true;
       response = null;
       exception = null;
       if (executor != null) {
@@ -59,13 +61,14 @@ public abstract class AbstractInteractivePrompt<T> extends AbstractRemotePrompt 
 
    protected void endPrompt(T response, Exception exception) {
 
-      script.getTestEnvironment().getScriptCtrl().setExecutionUnitPause(false);
-      script.getTestEnvironment().getScriptCtrl().setScriptPause(false);
-      synchronized (script) {
-         this.response = response;
-         this.exception = exception;
-         script.notifyAll();
-      }
+//      script.getTestEnvironment().getScriptCtrl().setExecutionUnitPause(false);
+//      script.getTestEnvironment().getScriptCtrl().setScriptPause(false);
+//      synchronized (script) {
+//         this.response = response;
+//         this.exception = exception;
+//         script.notifyAll();
+//      }
+      waiting = false;
    }
 
    protected abstract void doPrompt() throws Exception;
@@ -75,20 +78,25 @@ public abstract class AbstractInteractivePrompt<T> extends AbstractRemotePrompt 
    }
 
    protected T waitForResponse(TestScript script, boolean executionUnitPause) throws InterruptedException, Exception {
-      synchronized (script) {
-         script.getTestEnvironment().getScriptCtrl().setScriptPause(true);
-         script.getTestEnvironment().getScriptCtrl().setExecutionUnitPause(executionUnitPause);
-         script.getTestEnvironment().getScriptCtrl().unlock();
-         try {
-            script.wait();
-         } catch (InterruptedException e) {
-            terminatePrompt();
-            throw new InterruptedException();
-         } finally {
-            script.getTestEnvironment().getScriptCtrl().lock();
-         }
-         return response;
+      
+      while(waiting){
+         script.testWaitNoLog(500);
       }
+//      synchronized (script) {
+//         script.testWait(milliseconds);
+//         script.getTestEnvironment().getScriptCtrl().setScriptPause(true);
+//         script.getTestEnvironment().getScriptCtrl().setExecutionUnitPause(executionUnitPause);
+//         script.getTestEnvironment().getScriptCtrl().unlock();
+//         try {
+//            script.wait();
+//         } catch (InterruptedException e) {
+//            terminatePrompt();
+//            throw new InterruptedException();
+//         } finally {
+//            script.getTestEnvironment().getScriptCtrl().lock();
+//         }
+         return response;
+//      }
    }
 
    /**

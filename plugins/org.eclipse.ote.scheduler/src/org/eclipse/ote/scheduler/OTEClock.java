@@ -34,6 +34,10 @@ abstract class OTEClock {
    public abstract long currentTimeMillis();
 
    static final long spinForTimeoutThreshold = 1000L;
+
+   public void reset() {
+      tick = 0;
+   }
    
 //   void lockSupportParkUntil(Object conditionObject, long abstime) {
 //      lockSupportParkNanos(conditionObject, (abstime - currentTimeMillis()) * 1000000);

@@ -27,21 +27,21 @@ public class AddServer implements Callable<OTEMasterServerResult> {
    @Override
    public OTEMasterServerResult call() throws Exception {
       OTEMasterServerResult result = new OTEMasterServerResult();
-      try {
-         URI targetUri =
-               UriBuilder.fromUri(uri).path(OTEMasterServerImpl.CONTEXT_NAME).path(OTEMasterServerImpl.CONTEXT_SERVERS).build();
-
-         if(HttpUtil.canConnect(targetUri)){
-            JaxRsWebTarget target = webClientProvider.target(targetUri);
-            javax.ws.rs.client.Invocation.Builder builder = target.request(MediaType.APPLICATION_XML);
-            builder.post(Entity.xml(server));
-         } else {
-            result.setSuccess(false);
-         }
-      } catch (Throwable th) {
-         result.setSuccess(false);
-         //         result.setThrowable(th);
-      }
+//      try {
+//         URI targetUri =
+//               UriBuilder.fromUri(uri).path(OTEMasterServerImpl.CONTEXT_NAME).path(OTEMasterServerImpl.CONTEXT_SERVERS).build();
+//
+//         if(HttpUtil.canConnect(targetUri)){
+//            JaxRsWebTarget target = webClientProvider.target(targetUri);
+//            javax.ws.rs.client.Invocation.Builder builder = target.request(MediaType.APPLICATION_XML);
+//            builder.post(Entity.xml(server));
+//         } else {
+//            result.setSuccess(false);
+//         }
+//      } catch (Throwable th) {
+//         result.setSuccess(false);
+//         //         result.setThrowable(th);
+//      }
       return result;
    }
 }

@@ -19,10 +19,12 @@ public interface Scheduler {
     * @param msInTheFuture
     * @return
     */
-   public OTETaskRegistration scheduleWithDelay(Runnable runnable, boolean mainThread, long msInTheFuture);
+   public OTETaskRegistration scheduleWithDelay(Runnable runnable, long msInTheFuture);
 
    public void envWait(long milliseconds);
    
    public void setMainThread(Thread thread);
+
+   public void resetClock();
    
 }

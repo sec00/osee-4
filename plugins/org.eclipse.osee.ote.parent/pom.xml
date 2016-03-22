@@ -11,6 +11,7 @@
 
 	<modules>
 	    <module>../../plugins/org.eclipse.ote.network</module>
+	    <module>../../plugins/org.eclipse.ote.scheduler</module>
 		<module>../../plugins/org.eclipse.osee.framework.ui.workspacebundleloader</module>
 		<module>../../plugins/org.eclipse.osee.ote.master</module>
 		<module>../../plugins/org.eclipse.osee.ote.master.test</module>

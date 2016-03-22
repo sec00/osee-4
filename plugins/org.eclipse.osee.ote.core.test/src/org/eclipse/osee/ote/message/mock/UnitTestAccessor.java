@@ -531,6 +531,12 @@ public class UnitTestAccessor implements ITestEnvironmentMessageSystemAccessor, 
          return false;
       }
 
+      @Override
+      public Scheduler getScheduler() {
+         // TODO Auto-generated method stub
+         return null;
+      }
+
    };
 
    public UnitTestAccessor() {
@@ -663,12 +669,6 @@ public class UnitTestAccessor implements ITestEnvironmentMessageSystemAccessor, 
 
    @Override
    public Set<DataType> getDataTypes() {
-      return null;
-   }
-
-   @Override
-   public Scheduler getScheduler() {
-      // TODO Auto-generated method stub
       return null;
    }
 

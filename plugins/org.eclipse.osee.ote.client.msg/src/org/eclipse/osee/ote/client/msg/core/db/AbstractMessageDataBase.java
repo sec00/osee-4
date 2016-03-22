@@ -31,6 +31,7 @@ import org.eclipse.osee.ote.message.enums.DataType;
 import org.eclipse.osee.ote.message.interfaces.IMessageRequestor;
 import org.eclipse.osee.ote.message.interfaces.IMsgToolServiceClient;
 import org.eclipse.osee.ote.message.tool.MessageMode;
+import org.eclipse.ote.scheduler.Scheduler;
 
 /**
  * @author Ken J. Aguilar
@@ -121,6 +122,13 @@ public abstract class AbstractMessageDataBase {
       @Override
       public void addTask(EnvironmentTask task, TestEnvironment environment) {
       }
+
+      @Override
+      public Scheduler getScheduler() {
+         // TODO Auto-generated method stub
+         return null;
+      }
+
    };
    private IMessageRequestor req;
    

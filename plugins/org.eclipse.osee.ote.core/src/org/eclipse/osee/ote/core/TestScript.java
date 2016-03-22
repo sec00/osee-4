@@ -40,7 +40,6 @@ import org.eclipse.osee.ote.core.framework.testrun.ITestRunListener;
 import org.eclipse.osee.ote.core.framework.testrun.ITestRunListenerProvider;
 import org.eclipse.osee.ote.core.log.ITestPointTally;
 import org.eclipse.osee.ote.core.log.record.ScriptResultRecord;
-import org.eclipse.ote.scheduler.Scheduler;
 
 /**
  * TestScript is the abstract base class for all test scripts. This class provides the interfaces necessary to allow a
@@ -148,7 +147,7 @@ import org.eclipse.ote.scheduler.Scheduler;
  * @author Robert A. Fisher
  * @see org.eclipse.osee.ote.core.TestCase
  */
-public abstract class TestScript implements ITimeout {
+public abstract class TestScript extends OTERuntimeAnnotations implements ITimeout {
    private static final Set<Class<? extends TestScript>> instances =
       Collections.synchronizedSet(new HashSet<Class<? extends TestScript>>());
    private static final AtomicLong constructed = new AtomicLong(0);
@@ -201,6 +200,10 @@ public abstract class TestScript implements ITimeout {
       this.testPointTally = new TestPointTally(this.getClass().getName());
       shouldPauseOnFail = OteProperties.isPauseOnFailEnabled();
       printFailToConsole = OteProperties.isPrintFailToConsoleEnabled();
+      
+      for(TestCase tc:super.getTestCases()){
+         addTestCase(tc);
+      }
    }
 
    public void abort() {
@@ -389,24 +392,29 @@ public abstract class TestScript implements ITimeout {
     */
    public synchronized void testWait(int milliseconds) throws InterruptedException {
 //      long time = System.currentTimeMillis();
-      if (milliseconds < 2) {
-         return;
-      }
+//      if (milliseconds < 2) {
+//         return;
+//      }
+      try{
       environment.getLogger().methodCalled(this.environment, new MethodFormatter().add(milliseconds));
-      environment.setTimerFor(this, milliseconds);
-      wait();
-      this.getTestEnvironment().getScriptCtrl().lock();
+//      environment.setTimerFor(this, milliseconds);
+//      wait();
+//      this.getTestEnvironment().getScriptCtrl().lock();
+      environment.getScheduler().envWait(milliseconds);
+      }finally{
       environment.getLogger().methodEnded(this.environment);
+      }
 //      System.out.printf("%d vs. actual %d\n", milliseconds, System.currentTimeMillis()-time);
    }
 
    public synchronized void testWaitNoLog(int milliseconds) throws InterruptedException {
-      if (milliseconds < 2) {
-         return;
-      }
-      environment.setTimerFor(this, milliseconds);
-      wait();
-      this.getTestEnvironment().getScriptCtrl().lock();
+//      if (milliseconds < 2) {
+//         return;
+//      }
+//      environment.setTimerFor(this, milliseconds);
+//      wait();
+//      this.getTestEnvironment().getScriptCtrl().lock();
+      environment.getScheduler().envWait(milliseconds);
    }
 
    /**
@@ -506,6 +514,7 @@ public abstract class TestScript implements ITimeout {
    }
 
    protected void dispose() {
+      super.dispose();
       OseeLog.log(TestScript.class, Level.FINEST, "calling dispose on the TestScript.class");
    }
 
@@ -628,8 +637,4 @@ public abstract class TestScript implements ITimeout {
       return "\nNO_OUTFILE_COMMENT\n";
    }
    
-   public Scheduler getScheduler(){
-      return environment.getScheduler();
-   }
-
 }

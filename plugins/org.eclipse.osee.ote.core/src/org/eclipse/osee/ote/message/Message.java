@@ -111,7 +111,7 @@ public class Message implements Xmlizable, XmlizableStream {
       this.isScheduledFromStart = isScheduled;
       GCHelper.getGCHelper().addRefWatch(this);
       this.removableListenerHandler = new MessageSystemListener(this);
-      this.isTurnedOff = true;
+//      this.isTurnedOff = true;
    }
    
    public Message(MessageId id, String name, MessageData data) {
@@ -129,7 +129,7 @@ public class Message implements Xmlizable, XmlizableStream {
       this.isScheduledFromStart = false;
       GCHelper.getGCHelper().addRefWatch(this);
       this.removableListenerHandler = new MessageSystemListener(this);
-      this.isTurnedOff = true;
+//      this.isTurnedOff = true;
    }
    
    ArrayList<IMessageScheduleChangeListener> getSchedulingChangeListeners(){
@@ -560,14 +560,14 @@ public class Message implements Xmlizable, XmlizableStream {
       }
    }
 
-   /**
-    * This is the turnOn being called from the method register in MessageCollection. Messages shouldn't be scheduled at
-    * this point b/c the control message hasn't gone out yet. Messages can't go out until the control message goes out
-    * the first time so that collisions in the box are avoided.
-    */
-   public void whenBeingRegisteredTurnOn() {
-      isTurnedOff = false;
-   }
+//   /**
+//    * This is the turnOn being called from the method register in MessageCollection. Messages shouldn't be scheduled at
+//    * this point b/c the control message hasn't gone out yet. Messages can't go out until the control message goes out
+//    * the first time so that collisions in the box are avoided.
+//    */
+//   public void whenBeingRegisteredTurnOn() {
+//      isTurnedOff = false;
+//   }
 
    /**
     * Returns if the message is turned off.

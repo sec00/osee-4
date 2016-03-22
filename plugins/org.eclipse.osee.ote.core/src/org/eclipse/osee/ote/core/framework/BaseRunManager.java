@@ -52,6 +52,7 @@ public class BaseRunManager implements IRunManager {
    @Override
    public IMethodResult run(TestEnvironment env, IPropertyStore propertyStore) {
       try {
+         env.getScheduler().resetClock();
          this.resultCollector = resultCollectorFactory.createCollector();
          this.resultCollector.initialize(propertyStore, env);
          ResultBuilder rb = new ResultBuilder(true);

@@ -48,7 +48,7 @@ public interface ITimerControl {
 
    public IRunManager getRunManager();
    
-   public Scheduler getScheduler();
-
    public boolean isRealtime();
+
+   Scheduler getScheduler();
 }

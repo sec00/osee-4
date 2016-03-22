@@ -70,13 +70,23 @@ public class OTETask implements Callable<OTETaskResult>, Comparable<OTETask>{
 
    @Override
    public int compareTo(OTETask o) {
-      long diff = time - o.time;
-      if(diff > 0){
-         return 1;
-      } else if(diff == 0){
+      if(equals(o)){
          return 0;
-      } else {
+      }
+      long delta = getTime() - o.getTime();
+      if(delta > 0){
+         return 1;
+      } else if (delta < 0){
          return -1;
+      } else {
+         long periodDelta = period() - o.period();
+         if(periodDelta > 0){
+            return 1;
+         } else if (periodDelta < 0){
+            return -1;
+         } else {
+            return hashCode() - o.hashCode();
+         }
       }
    }
 
@@ -85,7 +95,7 @@ public class OTETask implements Callable<OTETaskResult>, Comparable<OTETask>{
    }
    
    public String toString(){
-      return String.format("%d %s", period, r.toString());
+      return String.format("%d %d %s", this.time, period, r.toString());
    }
 
    public void setMain(boolean isMainThread) {

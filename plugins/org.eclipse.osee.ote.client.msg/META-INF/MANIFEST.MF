@@ -20,4 +20,5 @@ Bundle-Vendor: Eclipse Open System Engineering Environment
 Service-Component: OSGI-INF/*.xml
 Import-Package: org.eclipse.osee.framework.jdk.core.persistence,
  org.eclipse.ote.network,
+ org.eclipse.ote.scheduler,
  org.osgi.service.event

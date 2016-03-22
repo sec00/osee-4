@@ -47,6 +47,7 @@ public class TestRunThread extends OseeTestThread {
    @Override
    protected void run() throws Exception {
       try {
+         getEnvironment().getScheduler().setMainThread(this.getThread());
          rb.append(listenerProvider.notifyPreRun(dataProvider.createOnPreRun(propertyStore, test)));
          if (rb.isReturnStatusOK()) {
             List<TestCase> testCases = test.getTestCases();
@@ -102,6 +103,7 @@ public class TestRunThread extends OseeTestThread {
          if (getEnvironment().getScriptCtrl().isLocked()) {
             getEnvironment().getScriptCtrl().unlock();
          }
+         getEnvironment().getScheduler().setMainThread(null);
       }
    }
 

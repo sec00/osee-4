@@ -167,7 +167,7 @@ public abstract class TestCase implements ITestEnvironmentAccessor, Xmlizable, X
    }
 
    public void writeTestCaseClassName(XMLStreamWriter writer) throws XMLStreamException {
-      String name = this.getClass().getName();
+      String name = getName();
       if (name == null || name.length() == 0) {
          name = "";
       }
@@ -176,7 +176,7 @@ public abstract class TestCase implements ITestEnvironmentAccessor, Xmlizable, X
    
    @JsonProperty
    public String getName() {
-       return this.getClass().getName();
+       return this.getClass().getSimpleName();
    }
 
    public void writeTracability(XMLStreamWriter writer) throws XMLStreamException {
@@ -322,7 +322,7 @@ public abstract class TestCase implements ITestEnvironmentAccessor, Xmlizable, X
 
       environment.getTestScript().setTestCase(this);
       OseeLog.logf(TestEnvironment.class, OteLevel.TEST_EVENT, "Starting Test Case %s.%s",
-         this.getTestScript().getClass().getSimpleName(), this.getClass().getSimpleName());
+         this.getTestScript().getClass().getSimpleName(), getName());
       doTestCase(environment, environment.getLogger());
    }
 
@@ -460,7 +460,4 @@ public abstract class TestCase implements ITestEnvironmentAccessor, Xmlizable, X
        }
    }
    
-   public Scheduler getScheduler(){
-      return environment.getScheduler();
-   }
 }

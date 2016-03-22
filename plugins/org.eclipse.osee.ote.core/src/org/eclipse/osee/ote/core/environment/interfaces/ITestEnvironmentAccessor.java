@@ -46,7 +46,7 @@ public interface ITestEnvironmentAccessor {
 
    ITimerControl getTimerCtrl();
    
-   Scheduler getScheduler();
+//   Scheduler getScheduler();
 
    void onScriptComplete() throws InterruptedException;
 
