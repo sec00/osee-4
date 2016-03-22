@@ -1,7 +1,6 @@
 package org.eclipse.ote.scheduler;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
@@ -95,7 +94,7 @@ public class SchedulerImpl implements Scheduler {
          mainTimer = new Thread(new Runnable(){
             @Override
             public void run() {
-               int pauseCount = 0;
+//               int pauseCount = 0;
                while(run){
                   boolean paused = false;
                   if(isTimeSimulated) {
@@ -135,7 +134,7 @@ public class SchedulerImpl implements Scheduler {
                      }
                   } 
                   if(paused){
-                     pauseCount++;
+//                     pauseCount++;
 //                     if(pauseCount < 1000000){
 //                        SchedulerImpl.this.busyDelay.run();
 //                     } else
@@ -154,7 +153,7 @@ public class SchedulerImpl implements Scheduler {
 //                     if(pauseCount > 1){
 //                     System.out.println(pauseCount);
 //                     }
-                     pauseCount = 0;
+//                     pauseCount = 0;
                      executeTasks();
                      clock.step();
                   }
@@ -361,15 +360,22 @@ public class SchedulerImpl implements Scheduler {
 
    void removeTask(OTETask task) {
 //      System.out.println("remove " + getTime() + " " + task.toString());
-      if(!tasks.remove(task)){
+      boolean removed = false;
+      if(isTimeSimulated){
+         removed = simulatedEnvNotifyTasks.remove(task);
+      }
+      if(!removed){
+         removed = tasks.remove(task);
+         System.out.printf("Removed Task: %s\n", task.toString());
+      }
+      if(!removed){
          System.out.println("failed to remove :************************************************************" + task);   
       }
-      
-      System.out.println("removed task:************************************************************");
-      for(OTETask t:tasks){
-         System.out.println(t);
-      }
-      System.out.println("**************************************************************");
+//      System.out.println("removed task:************************************************************");
+//      for(OTETask t:tasks){
+//         System.out.println(t);
+//      }
+//      System.out.println("**************************************************************");
    }
 
    @Override
