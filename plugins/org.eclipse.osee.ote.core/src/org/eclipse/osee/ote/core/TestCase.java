@@ -98,7 +98,7 @@ import org.w3c.dom.Element;
  */
 public abstract class TestCase implements ITestEnvironmentAccessor, Xmlizable, XmlizableStream {
    protected ITestLogger logger;
-   private final ITestEnvironmentAccessor environment;
+   private ITestEnvironmentAccessor environment;
    private final boolean standAlone;
    private final WeakReference<TestScript> testScript;
    private final TestDescriptionRecord testDescription;
@@ -133,6 +133,10 @@ public abstract class TestCase implements ITestEnvironmentAccessor, Xmlizable, X
       this.testScript = new WeakReference<>(testScript);
       this.environment = testScript.getTestEnvironment();
       GCHelper.getGCHelper().addRefWatch(this);
+   }
+   
+   protected void setEnv(ITestEnvironmentAccessor env){
+      this.environment = env;
    }
 
    public TestCase(ITestEnvironmentAccessor accessor) {

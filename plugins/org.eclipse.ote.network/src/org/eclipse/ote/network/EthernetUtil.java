@@ -58,7 +58,7 @@ public class EthernetUtil {
                   boolean localHostSame = true;
                   while(localHostSame){
                      try {
-                        Thread.sleep(50);
+                        Thread.sleep(500);
                      } catch (InterruptedException e) {
                      }
                      InetAddress local = null;

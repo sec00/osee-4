@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironmentAccessor;
 import org.eclipse.osee.ote.core.model.IModelManager;
 import org.eclipse.osee.ote.message.interfaces.IMessageManager;
 import org.eclipse.osee.ote.message.interfaces.IMessageRequestor;
@@ -32,7 +33,8 @@ public class OTERuntimeAnnotations {
       }
       annotationHandlers.put( Service.class, new ServiceHandler());
       if(this instanceof TestScript){
-         annotationHandlers.put( OTETestCase.class, new OTETestCaseHandler((TestScript)this, testCases));
+         ITestEnvironmentAccessor accessor = ServiceUtility.getService(ITestEnvironmentAccessor.class);
+         annotationHandlers.put( OTETestCase.class, new OTETestCaseHandler((TestScript)this, testCases, accessor));
       }
       try {
          initAnnotations(this);

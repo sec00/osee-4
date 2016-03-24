@@ -6,20 +6,16 @@ public class OTETask implements Callable<OTETaskResult>, Comparable<OTETask>{
 
    private long time = 0;
    private Runnable r;
-   private OTETaskResult result;
    private int period;
    private final boolean isScheduled;
    private volatile boolean complete = false;
    private boolean canceled;
    private boolean isMainThread = false;
-   private Stopwatch stopwatch;
    
    public OTETask(Runnable runnable, int period){
       isScheduled = true;
       this.r = runnable;
       this.period = period;
-      result = new OTETaskResult();
-      stopwatch = new Stopwatch(runnable.toString());
    }
    
    public OTETask(Runnable runnable, long time) {
@@ -27,8 +23,6 @@ public class OTETask implements Callable<OTETaskResult>, Comparable<OTETask>{
       this.time = time;
       this.r = runnable;
       this.period = 0;
-      result = new OTETaskResult();
-      stopwatch = new Stopwatch(runnable.toString());
    }
 
    public long getTime() {
@@ -37,19 +31,15 @@ public class OTETask implements Callable<OTETaskResult>, Comparable<OTETask>{
 
    @Override
    public OTETaskResult call() throws Exception {
-      stopwatch.start();
-      result.th = null;
       try{
          if(!canceled){
             r.run();
          }
       } catch (Throwable th){
-         result.th = th;
+         th.printStackTrace();
       } 
       complete  = true;
-      stopwatch.stop();
-      result.elapsedTime = stopwatch.getLastElapsedTime();
-      return result;
+      return null;
    }
    
    public boolean isComplete(){
@@ -99,7 +89,7 @@ public class OTETask implements Callable<OTETaskResult>, Comparable<OTETask>{
    }
    
    public String toString(){
-      return String.format("%d %d %s %s", this.time, period, r.toString(), stopwatch.toString());
+      return String.format("%d %d %s", this.time, period, r.toString());
    }
 
    public void setMain(boolean isMainThread) {

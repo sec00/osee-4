@@ -6,10 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
-import org.eclipse.osee.framework.jdk.core.util.xml.XMLStreamWriterUtil;
 import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironmentAccessor;
 import org.eclipse.osee.ote.core.environment.interfaces.ITestLogger;
 
@@ -17,10 +13,12 @@ class OTETestCaseHandler implements AnnotationHandler<OTETestCase> {
 
    private TestScript testScript;
    private List<TestCase> testCases;
-
-   public OTETestCaseHandler(TestScript testScript, List<TestCase> testCases) {
+   private ITestEnvironmentAccessor accessor;
+   
+   public OTETestCaseHandler(TestScript testScript, List<TestCase> testCases, ITestEnvironmentAccessor accessor) {
       this.testScript = testScript;
       this.testCases = testCases;
+      this.accessor = accessor;
    }
 
    @Override
@@ -35,16 +33,17 @@ class OTETestCaseHandler implements AnnotationHandler<OTETestCase> {
 
    @Override
    public void process(Annotation annotation, Object object, Method method) {
-      testCases.add(new TestCaseAnnotated(testScript, method));
+      testCases.add(new TestCaseAnnotated(testScript, method, accessor));
    }
    
    private static class TestCaseAnnotated extends TestCase {
 
       private Method method;
 
-      public TestCaseAnnotated(TestScript testScript, Method method) {
+      public TestCaseAnnotated(TestScript testScript, Method method, ITestEnvironmentAccessor accessor) {
          super(testScript, true, false);
          this.method = method;
+         setEnv(accessor);
       }
 
       @Override

@@ -40,6 +40,8 @@ public class SchedulerImpl implements Scheduler {
    protected boolean doTasksHaveAnyMainThreadWaits = false;
    private Thread mainThread;
    
+   private SchedulerImpl wallClockScheduler;
+   
    /**
     * if time is simulated we wait for tasks to complete, if not fire and forget
     * 
@@ -48,6 +50,8 @@ public class SchedulerImpl implements Scheduler {
    public SchedulerImpl(boolean isTimeSimulated, DelayStrategy delayStrategy){
       if(isTimeSimulated){
          clock = new OTEClockSimulated();
+         wallClockScheduler = new SchedulerImpl(false, DelayStrategy.sleep);
+         wallClockScheduler.start();
       } else {
          switch(delayStrategy){
          case busy:
@@ -65,7 +69,7 @@ public class SchedulerImpl implements Scheduler {
       }
       submittedTasks = new ArrayList<Future<OTETaskResult>>();
 //      newTasks = new ConcurrentLinkedQueue<OTETask>();
-      pool = Executors.newCachedThreadPool(new ThreadFactory() {
+      pool = Executors.newFixedThreadPool(10, new ThreadFactory() {
          private int count = 0;
          @Override
          public Thread newThread(Runnable r) {
@@ -86,7 +90,10 @@ public class SchedulerImpl implements Scheduler {
    }
    
    public void stop(){
-      run = false;      
+      run = false; 
+      if(wallClockScheduler != null){
+         wallClockScheduler.stop();
+      }
    }
    
    private void run(){
@@ -163,7 +170,11 @@ public class SchedulerImpl implements Scheduler {
 
             
          });
-         mainTimer.setName("OTEScheduler MASTER");
+         String name = "OTEScheduler MASTER";
+         if(isTimeSimulated){
+            name+="(sim)";
+         }
+         mainTimer.setName(name);
          mainTimer.start();   
       }
    }
@@ -239,7 +250,7 @@ public class SchedulerImpl implements Scheduler {
       double periodMS = 1000.0/d;
       int period = (int)periodMS;
 //      synchronized (newTasks) {
-         OTETask task = new OTETask(runnable, period);
+         OTETask task = new OTETaskHeavy(runnable, period);
          reg = new OTETaskRegistration(this, task);
 //         System.out.println("new task " + task);
          try{
@@ -283,6 +294,16 @@ public class SchedulerImpl implements Scheduler {
       return reg;
    }
    
+   
+   public OTETaskRegistration scheduleWithDelayRealTime(Runnable runnable, long msInTheFuture){
+      OTETaskRegistration reg;
+      if(isTimeSimulated){
+         reg = wallClockScheduler.scheduleWithDelay(runnable, msInTheFuture);
+      } else {
+         reg = scheduleWithDelay(runnable, msInTheFuture);
+      }
+      return reg;
+   }
    
 //   void setTimerFor(OteReentrantLock lock, OteCondition condition, int milliseconds){
 //      addEnvEvent(new Timeout(lock, condition), milliseconds);
@@ -366,7 +387,7 @@ public class SchedulerImpl implements Scheduler {
       }
       if(!removed){
          removed = tasks.remove(task);
-         System.out.printf("Removed Task: %s\n", task.toString());
+//         System.out.printf("Removed Task: %s\n", task.toString());
       }
       if(!removed){
          System.out.println("failed to remove :************************************************************" + task);   

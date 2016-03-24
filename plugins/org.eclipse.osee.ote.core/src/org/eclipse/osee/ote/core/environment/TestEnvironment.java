@@ -34,6 +34,7 @@ import org.eclipse.osee.ote.OseeLogStatusCallback;
 import org.eclipse.osee.ote.core.GCHelper;
 import org.eclipse.osee.ote.core.OseeTestThread;
 import org.eclipse.osee.ote.core.OteProperties;
+import org.eclipse.osee.ote.core.ServiceUtility;
 import org.eclipse.osee.ote.core.TestScript;
 import org.eclipse.osee.ote.core.environment.interfaces.IAssociatedObjectListener;
 import org.eclipse.osee.ote.core.environment.interfaces.ICancelTimer;
@@ -55,7 +56,6 @@ import org.eclipse.osee.ote.core.framework.command.ITestServerCommand;
 import org.eclipse.osee.ote.core.internal.Activator;
 import org.eclipse.osee.ote.properties.OtePropertiesCore;
 import org.eclipse.ote.scheduler.Scheduler;
-import org.eclipse.ote.scheduler.SchedulerImpl;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
@@ -101,6 +101,8 @@ public abstract class TestEnvironment implements TestEnvironmentInterface, ITest
       
       scheduler = factory.getTimerControl().getScheduler();
       scheduler.start();
+      
+      ServiceUtility.getContext().registerService(Scheduler.class, scheduler, null);
    }
    
    public Scheduler getScheduler(){
