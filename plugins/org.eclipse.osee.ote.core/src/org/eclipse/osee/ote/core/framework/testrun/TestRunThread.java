@@ -16,6 +16,7 @@ import org.eclipse.osee.framework.jdk.core.type.IPropertyStore;
 import org.eclipse.osee.framework.logging.BaseStatus;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.core.OseeTestThread;
+import org.eclipse.osee.ote.core.ServiceUtility;
 import org.eclipse.osee.ote.core.TestCase;
 import org.eclipse.osee.ote.core.TestException;
 import org.eclipse.osee.ote.core.TestScript;
@@ -26,6 +27,7 @@ import org.eclipse.osee.ote.core.framework.ResultBuilder;
 import org.eclipse.osee.ote.core.framework.ReturnCode;
 import org.eclipse.osee.ote.core.internal.Activator;
 import org.eclipse.osee.ote.properties.OtePropertiesCore;
+import org.eclipse.ote.scheduler.Scheduler;
 
 public class TestRunThread extends OseeTestThread {
 
@@ -120,10 +122,15 @@ public class TestRunThread extends OseeTestThread {
    }
 
    public boolean abort() {
+      boolean result = false;
       abort = true;
       this.test.setAborted(true);
       if (Thread.currentThread() == this.getThread()) {
          throw new TestException("", Level.SEVERE);
+      }
+      Scheduler sch = ServiceUtility.getService(Scheduler.class);
+      if(sch != null){
+         sch.cancelAndIgnoreWaits(true);
       }
       if (OtePropertiesCore.abortMultipleInterrupt.getBooleanValue()) {
     	  this.interrupt();
@@ -145,9 +152,13 @@ public class TestRunThread extends OseeTestThread {
       if (this.isAlive()) {
          OseeLog.reportStatus(new BaseStatus(TestEnvironment.class.getName(), Level.SEVERE,
             "Waited 60s for test to abort but the thread did not die."));
-         return false;
+      } else {
+         result = true;
       }
-      return true;
+      if(sch != null){
+         sch.cancelAndIgnoreWaits(false);
+      }
+      return result;
    }
 
    public boolean abort(Throwable th, boolean wait) {

@@ -27,5 +27,7 @@ public interface Scheduler {
    public void setMainThread(Thread thread);
 
    public void resetClock();
+
+   public void cancelAndIgnoreWaits(boolean b);
    
 }

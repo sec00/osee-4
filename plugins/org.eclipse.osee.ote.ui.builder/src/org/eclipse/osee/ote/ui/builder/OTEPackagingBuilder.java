@@ -8,6 +8,7 @@ import java.util.logging.Level;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
@@ -22,6 +23,10 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.framework.plugin.core.util.OseeData;
+import org.eclipse.pde.core.IModel;
+import org.eclipse.pde.core.plugin.PluginRegistry;
+import org.eclipse.pde.internal.core.exports.FeatureExportInfo;
+import org.eclipse.pde.internal.core.exports.PluginExportOperation;
 import org.osgi.service.prefs.Preferences;
 
 public class OTEPackagingBuilder extends IncrementalProjectBuilder {
@@ -111,6 +116,26 @@ public class OTEPackagingBuilder extends IncrementalProjectBuilder {
    @SuppressWarnings("rawtypes")
    protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
 	   try{
+	      System.out.println("here we go");
+	      
+	      FeatureExportInfo info = new FeatureExportInfo();
+	      info.toDirectory = true;
+	      info.useJarFormat = true;
+	      info.exportSource = false;
+	      info.exportSourceBundle = false;
+	      info.allowBinaryCycles = true;
+	      info.useWorkspaceCompiledClasses = true;
+	      info.destinationDirectory = getWorkspaceArchiveFolder().getAbsolutePath();
+	      info.zipFileName = getProject().getName()+".jar";
+	      IProjectDescription desc = getProject().getDescription();
+	      IModel model = PluginRegistry.findModel(getProject());
+	      info.items = new Object[]{model};
+	      info.signingInfo = null;
+	      info.qualifier = Long.toString(System.currentTimeMillis());
+	      
+	      PluginExportOperation op = new PluginExportOperation(info, "test");
+	      op.schedule();
+	      
 	      if(!isOTEBuilderActive()){
 	         return null;
 	      }

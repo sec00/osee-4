@@ -10,15 +10,20 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.message.condition;
 
-public class TransmissionCountCondition extends AbstractCondition {
+import org.eclipse.osee.ote.message.Message;
+
+public class MessageTransmissionCountCondition extends AbstractCondition {
 
    private int max = 0;
+   private Message message;
 
-   public TransmissionCountCondition(int max) {
+   public MessageTransmissionCountCondition(Message message, int max) {
+      this.message = message;
       this.max = max;
    }
    
-   public TransmissionCountCondition() {
+   public MessageTransmissionCountCondition(Message message) {
+      this.message = message;
    }
    
    public void setTrasmitCount(int count){
@@ -27,7 +32,7 @@ public class TransmissionCountCondition extends AbstractCondition {
 
    @Override
    public boolean check() {
-      return getCheckCount() >= max;
+      return message.getActivityCount() >= max;
    }
 
    public int getMaxTransmitCount() {

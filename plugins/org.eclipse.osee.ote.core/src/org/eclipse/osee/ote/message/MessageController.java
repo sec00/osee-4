@@ -22,6 +22,7 @@ import org.eclipse.osee.ote.message.enums.DataType;
 import org.eclipse.osee.ote.message.interfaces.IMessageManager;
 import org.eclipse.osee.ote.message.interfaces.IMessageRequestor;
 import org.eclipse.osee.ote.message.interfaces.Namespace;
+import org.eclipse.osee.ote.message.listener.IOSEEMessageListener;
 
 public class MessageController implements IMessageManager {
 
@@ -29,6 +30,7 @@ public class MessageController implements IMessageManager {
    private final ClassLocator classLocator;
    private final LegacyMessageMapper mapper;
    private final HashMap<Message, HashSet<IMessageRequestor>> requestorReferenceMap = new HashMap<Message, HashSet<IMessageRequestor>>(200);
+   private final Map<Message, MessageListenerContainer> messageListeners = new ConcurrentHashMap<Message, MessageListenerContainer>();
    private final Map<IOType, CopyOnWriteNoIteratorList<MessageDataWriter>> messageDataWriters = new ConcurrentHashMap<IOType, CopyOnWriteNoIteratorList<MessageDataWriter>>();
    private final Map<IOType, MessagePublishingHandler> messagePublishingHandlers = new ConcurrentHashMap<IOType, MessagePublishingHandler>();
    private final Map<MessageId, MessageData> idToDataMap = new ConcurrentHashMap<MessageId, MessageData>(400);
@@ -61,8 +63,6 @@ public class MessageController implements IMessageManager {
       useSpecialMapping = Boolean.parseBoolean(System.getProperty("ote.signal.mapping", "false"));
    }
    
-   
-   
    Map<IOType, CopyOnWriteNoIteratorList<MessageDataWriter>> getDataWriters(){
       return messageDataWriters;
    }
@@ -71,11 +71,25 @@ public class MessageController implements IMessageManager {
       return messagePublishingHandlers;
    }
    
-   
-   
    @Override
    public void destroy() {
       commands.dispose();
+   }
+   
+   public void addMessageListener(Message message, IOSEEMessageListener listener){
+      MessageListenerContainer container = messageListeners.get(message);
+      if(container == null){
+         container = new MessageListenerContainer();
+         messageListeners.put(message, container);
+      }
+      container.add(listener);
+   }
+   
+   public void removeMessageListener(Message message, IOSEEMessageListener listener){
+      MessageListenerContainer container = messageListeners.get(message);
+      if(container != null){
+         container.remove(listener);
+      }
    }
    
    public void addMessagePublishingHandler(MessagePublishingHandler handler){
@@ -378,7 +392,8 @@ public class MessageController implements IMessageManager {
       if(messageData != null){
          messageData.copyData(data);
          messageData.incrementActivityCount();
-         notifyListenersOfUpdate(messageData);
+//         notifyListenersOfUpdate(messageData);
+         messageData.notifyListeners();
       } else {
          if(debug){
             if(!printIdMessage.contains(id.hashCode())){
@@ -396,7 +411,10 @@ public class MessageController implements IMessageManager {
       if(msgs != null){
          Message[] msgsArr = msgs.get();
          for(int i = 0; i < msgsArr.length; i++){
-            msgsArr[i].notifyListeners(messageData, messageData.getType());
+            MessageListenerContainer listeners = messageListeners.get(msgsArr[i]);
+            if(listeners != null){
+               listeners.newDataAvailable(messageData);
+            }
          }
       }
    }
@@ -429,6 +447,7 @@ public class MessageController implements IMessageManager {
             MessageDataWriter[] writersArray = writers.get();
             data.performOverride();
             data.notifyPreSendListeners();
+            data.getMem().setDataHasChanged(false);
             for(int i = 0; i < writersArray.length; i++){
                writersArray[i].publishAndSend(data, info);
             }
@@ -678,6 +697,27 @@ public class MessageController implements IMessageManager {
       @Override
       public void update(MessageId id, ByteBuffer data) {
          MessageController.this.update(id, data);
+      }
+      
+   }
+   
+   private static class MessageListenerContainer {
+      
+      CopyOnWriteNoIteratorList<IOSEEMessageListener> listeners = new CopyOnWriteNoIteratorList<>(IOSEEMessageListener.class);
+      
+      public void add(IOSEEMessageListener listener) {
+         listeners.add(listener);
+      }
+
+      public void newDataAvailable(MessageData messageData) {
+         IOSEEMessageListener[] arr = listeners.get();
+         for(int i = 0; i < arr.length; i++){
+            arr[i].onDataAvailable(messageData, messageData.getType());
+         }
+      }
+
+      public void remove(IOSEEMessageListener listener) {
+         listeners.remove(listener);
       }
       
    }

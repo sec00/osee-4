@@ -84,7 +84,7 @@ public class Message implements Xmlizable, XmlizableStream {
 
    //need to rework the waitforData notification to remove the listnerHandlers
    private final MessageSystemListener listenerHandler;
-   protected final MessageSystemListener removableListenerHandler;
+//   protected final MessageSystemListener removableListenerHandler;
    
    
    protected final ArrayList<IMessageScheduleChangeListener> schedulingChangeListeners = new ArrayList<IMessageScheduleChangeListener>(10);
@@ -95,8 +95,6 @@ public class Message implements Xmlizable, XmlizableStream {
 
    private MessageId id;
    
-   
-
    private IMessageManager messageManager;
    
    public Message(String name, int defaultByteSize, int defaultOffset, boolean isScheduled, int phase, double rate) {
@@ -110,8 +108,7 @@ public class Message implements Xmlizable, XmlizableStream {
       this.defaultRate = rate;
       this.isScheduledFromStart = isScheduled;
       GCHelper.getGCHelper().addRefWatch(this);
-      this.removableListenerHandler = new MessageSystemListener(this);
-//      this.isTurnedOff = true;
+//      this.removableListenerHandler = new MessageSystemListener(this);
    }
    
    public Message(MessageId id, String name, MessageData data) {
@@ -128,8 +125,7 @@ public class Message implements Xmlizable, XmlizableStream {
       this.defaultRate = rate;
       this.isScheduledFromStart = false;
       GCHelper.getGCHelper().addRefWatch(this);
-      this.removableListenerHandler = new MessageSystemListener(this);
-//      this.isTurnedOff = true;
+//      this.removableListenerHandler = new MessageSystemListener(this);
    }
    
    ArrayList<IMessageScheduleChangeListener> getSchedulingChangeListeners(){
@@ -176,7 +172,8 @@ public class Message implements Xmlizable, XmlizableStream {
     * @param listener The removable listener to remove
     */
    public void removeRemovableListener(IOSEEMessageListener listener) {
-      removableListenerHandler.removeListener(listener);
+      removeListener(listener);
+//      removableListenerHandler.removeListener(listener);
    }
 
    /**
@@ -185,7 +182,8 @@ public class Message implements Xmlizable, XmlizableStream {
     * @param listener the removable listern to add.
     */
    public void addRemovableListener(IOSEEMessageListener listener) {
-      removableListenerHandler.addListener(listener);
+      addListener(listener);
+//      removableListenerHandler.addListener(listener);
    }
 
    /**
@@ -193,7 +191,7 @@ public class Message implements Xmlizable, XmlizableStream {
     * completion but can be used by anyone. Other listeners can be removed using the traditional removeListener call.
     */
    public void clearRemovableListeners() {
-      this.removableListenerHandler.clearListeners();
+//      this.removableListenerHandler.clearListeners();
 
    }
 
@@ -216,7 +214,7 @@ public class Message implements Xmlizable, XmlizableStream {
       if (messageRequestor != null) {
          messageRequestor.dispose();
       }
-      removableListenerHandler.dispose();
+//      removableListenerHandler.dispose();
       
       notifyPostDestroyListeners();
    }
@@ -644,15 +642,23 @@ public class Message implements Xmlizable, XmlizableStream {
    }
 
    public MessageSystemListener getRemoveableListener() {
-      return removableListenerHandler;
+//      return removableListenerHandler;
+      return null;
    }
 
    public void addListener(IOSEEMessageListener listener) {
-      listenerHandler.addListener(listener);
+      if(messageManager != null){
+         messageManager.addMessageListener(this, listener);
+      }
+//      listenerHandler.addListener(listener);
    }
 
    public boolean removeListener(IOSEEMessageListener listener) {
-      return listenerHandler.removeListener(listener);
+      if(messageManager != null){
+         messageManager.removeMessageListener(this, listener);
+      }
+      return true;
+//      return listenerHandler.removeListener(listener);
    }
 
    /**
@@ -665,8 +671,11 @@ public class Message implements Xmlizable, XmlizableStream {
     */
    public void notifyListeners(final MessageData data, final DataType type) {
 //      checkState();
+      if(messageManager != null){
+         messageManager.notifyListenersOfUpdate(data);
+      }
       this.listenerHandler.onDataAvailable(data, type);
-      this.removableListenerHandler.onDataAvailable(data, type);
+//      this.removableListenerHandler.onDataAvailable(data, type);
    }
 
    /*

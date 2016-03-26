@@ -25,18 +25,27 @@ import org.eclipse.osee.ote.message.MessagePublishingHandler;
 import org.eclipse.osee.ote.message.PublishInfo;
 import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.enums.DataType;
+import org.eclipse.osee.ote.message.listener.IOSEEMessageListener;
 
 /**
  * @author Andrew M. Finkbeiner
  */
 public interface IMessageManager {
-   void destroy();
+   void addInstanceRequestListener(IMessageCreationListener listener);
 
 //   <CLASSTYPE extends Message> CLASSTYPE createMessage(Class<CLASSTYPE> messageClass) throws TestException;
 
-   Class<? extends Message> getMessageClass(String msgClass) throws ClassNotFoundException;
+   public void addMessagePublishingHandler(MessagePublishingHandler handler);
    
-   <CLASSTYPE extends Message> int getReferenceCount(CLASSTYPE classtype);
+   void addPostCreateMessageListener(IMessageCreationListener listener);
+
+   void addPreCreateMessageListener(IMessageCreationListener listener);
+
+   void changeMessageRate(Message message, double newRate, double rate);
+
+   IMessageRequestor createMessageRequestor(String name);
+
+   void destroy();
 
    <CLASSTYPE extends Message> CLASSTYPE findInstance(Class<CLASSTYPE> clazz, boolean writer);
 
@@ -44,31 +53,23 @@ public interface IMessageManager {
 
    Collection<Message> getAllReaders();
 
-   Collection<Message> getAllWriters();
-
    Collection<Message> getAllReaders(DataType type);
 
+   Collection<Message> getAllWriters();
+   
    Collection<Message> getAllWriters(DataType type);
 
-   void init() throws Exception;
-
-   void publishMessages(boolean publish);
-
-   boolean isPhysicalTypeAvailable(DataType physicalType);
-   
    Set<DataType> getAvailableDataTypes();
-
-   IMessageRequestor createMessageRequestor(String name);
    
-   void update(MessageId id, ByteBuffer data);
+   Class<? extends Message> getMessageClass(String msgClass) throws ClassNotFoundException;
    
-   void publish(Message msg);
+   <CLASSTYPE extends Message> int getReferenceCount(CLASSTYPE classtype);
    
-   void publish(Message msg, PublishInfo info);
+   void init() throws Exception;
    
 //   void publishAtFrameCompletion(Message msg);
 
-   void write(Message message, DestinationInfo object);
+   boolean isPhysicalTypeAvailable(DataType physicalType);
    
    /*
     * If using update is not feasible then the receiver of the message can update the 
@@ -76,30 +77,32 @@ public interface IMessageManager {
     */
    public void notifyListenersOfUpdate(MessageData messageData);
 
-   public void registerWriter(MessageDataWriter writer);
+   void publish(Message msg);
    
-   public void unregisterWriter(MessageDataWriter writer);
+   void publish(Message msg, PublishInfo info);
+   
+   void publishMessages(boolean publish);
    
    public MessageDataUpdater registerDataReceiver(MessageDataReceiver receiver);
    
-   public void unregisterDataReceiver(MessageDataReceiver receiver);
-   
-   public void addMessagePublishingHandler(MessagePublishingHandler handler);
+   public void registerWriter(MessageDataWriter writer);
    public void removeMessagePublishingHandler(MessagePublishingHandler handler);
 
-   void addPostCreateMessageListener(IMessageCreationListener listener);
-   
    void removePostCreateMessageListener(IMessageCreationListener listener);
-
-   void addPreCreateMessageListener(IMessageCreationListener listener);
-
-   void addInstanceRequestListener(IMessageCreationListener listener);
    
    public void schedulePublish(Message message);
+
+   public void unregisterDataReceiver(MessageDataReceiver receiver);
+
+   public void unregisterWriter(MessageDataWriter writer);
    
    public void unschedulePublish(Message message);
+   
+   void update(MessageId id, ByteBuffer data);
 
-   void changeMessageRate(Message message, double newRate, double rate);
+   void write(Message message, DestinationInfo object);
 
+   void addMessageListener(Message message, IOSEEMessageListener listener);
 
+   void removeMessageListener(Message message, IOSEEMessageListener listener);
 }
