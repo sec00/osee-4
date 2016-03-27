@@ -10,7 +10,7 @@ import org.eclipse.osee.ote.message.event.OteEventMessage;
 /**
  * Launches a Thread that monitors a queue for data to send to specified UDP endpoints.
  *
- * @author b1528444
+ * @author Andrew M. Finkbeiner
  */
 public class OteUdpEndpointInlineSender implements OteEndpointSender {
    private static final int SEND_BUFFER_SIZE = 1024 * 512;

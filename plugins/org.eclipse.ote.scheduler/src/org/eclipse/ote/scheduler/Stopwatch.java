@@ -6,7 +6,7 @@
 package org.eclipse.ote.scheduler;
 
 /**
- * @author b1528444
+ * @author Andrew M. Finkbeiner
  *
  */
 public class Stopwatch {

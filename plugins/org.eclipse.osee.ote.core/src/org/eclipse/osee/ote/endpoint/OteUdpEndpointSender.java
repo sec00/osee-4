@@ -12,7 +12,7 @@ import org.eclipse.osee.ote.message.event.OteEventMessage;
 /**
  * Launches a Thread that monitors a queue for data to send to specified UDP endpoints.
  *
- * @author b1528444
+ * @author Andrew M. Finkbeiner
  *
  */
 public class OteUdpEndpointSender implements OteEndpointSender {

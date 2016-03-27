@@ -5,7 +5,7 @@ import org.eclipse.osee.ote.message.enums.DataType;
 /**
  * This should only be used in cases where we want to reuse the object.  Like in a receiver of messages where it has to decode bytes.
  * 
- * @author b1528444
+ * @author Andrew M. Finkbeiner
  *
  */
 public class ModifiableIntegerMessageId extends IntegerMessageId {

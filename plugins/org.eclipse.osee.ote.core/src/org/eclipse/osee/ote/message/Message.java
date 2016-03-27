@@ -60,8 +60,8 @@ import org.w3c.dom.Document;
 public class Message implements Xmlizable, XmlizableStream {
   
    private static final double doubleTolerance = 0.000001;
-
    private static final int TransmissionTimeoutDefault = 15000;
+   
    private final LinkedHashMap<String, Element> elementMap;
    //need to rework the waitforData notification to remove the listnerHandlers
    private final MessageSystemListener listenerHandler;
