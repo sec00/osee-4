@@ -61,23 +61,24 @@ public class Message implements Xmlizable, XmlizableStream {
   
    private static final double doubleTolerance = 0.000001;
 
+   private static final int TransmissionTimeoutDefault = 15000;
    private final LinkedHashMap<String, Element> elementMap;
    //need to rework the waitforData notification to remove the listnerHandlers
    private final MessageSystemListener listenerHandler;
    private final MessageSystemListener removableListenerHandler;
    private final Set<DataType> memTypeActive = new HashSet<DataType>();
+
    @JsonProperty
    private final String name;
-
    private final boolean isScheduledFromStart;
    private final double defaultRate;
    private final int defaultByteSize;
    private final int defaultOffset;
+
    private final int phase;
-
    private volatile boolean destroyed = false;
-   private volatile boolean isTurnedOff = false;
 
+   private volatile boolean isTurnedOff = false;
    private boolean regularUnscheduleCalled = false;
    private DataType currentMemType;
    private double rate;
@@ -85,22 +86,9 @@ public class Message implements Xmlizable, XmlizableStream {
    private IMessageRequestor messageRequestor = null;
    private LegacyMessageMapper mapper = new LegacyMessageMapperDefaultSingle();
    private MessageData defaultMessageData;
-   private MessageId id;
 
    
-   public Message(String name, int defaultByteSize, int defaultOffset, boolean isScheduled, int phase, double rate) {
-      listenerHandler = new MessageSystemListener(this);
-      this.name = name;
-      this.defaultByteSize = defaultByteSize;
-      this.defaultOffset = defaultOffset;
-      elementMap = new LinkedHashMap<String, Element>(20);
-      this.phase = phase;
-      this.rate = rate;
-      this.defaultRate = rate;
-      this.isScheduledFromStart = isScheduled;
-      GCHelper.getGCHelper().addRefWatch(this);
-      this.removableListenerHandler = new MessageSystemListener(this);
-   }
+   private MessageId id;
    
    public Message(MessageId id, String name, MessageData data) {
       this.id = id;
@@ -119,32 +107,69 @@ public class Message implements Xmlizable, XmlizableStream {
       this.removableListenerHandler = new MessageSystemListener(this);
    }
    
-   void setMapper(LegacyMessageMapper mapper){
-      this.mapper = mapper;
-      this.defaultMessageData.setMapper(mapper);
+   public Message(String name, int defaultByteSize, int defaultOffset, boolean isScheduled, int phase, double rate) {
+      listenerHandler = new MessageSystemListener(this);
+      this.name = name;
+      this.defaultByteSize = defaultByteSize;
+      this.defaultOffset = defaultOffset;
+      elementMap = new LinkedHashMap<String, Element>(20);
+      this.phase = phase;
+      this.rate = rate;
+      this.defaultRate = rate;
+      this.isScheduledFromStart = isScheduled;
+      GCHelper.getGCHelper().addRefWatch(this);
+      this.removableListenerHandler = new MessageSystemListener(this);
    }
    
-   void setMessageManager(IMessageManager messageManager){
-      this.messageManager = messageManager;
+   public void addElement(Element element) {
+      checkState();
+      elementMap.put(element.getName(), element);
    }
    
-   void setTurnOn(){
-      this.isTurnedOff = false;
+   public void addElements(Element... elements) {
+      checkState();
+      for (Element element : elements) {
+         elementMap.put(element.getElementName(), element);
+         element.addPath(this.getClass().getName());
+      }
    }
    
-   void setWriter(boolean isWriter){
-      getActiveDataSource().setWriter(isWriter);
+   public void addListener(IOSEEMessageListener listener) {
+      if(messageManager != null){
+         messageManager.addMessageListener(this, listener);
+      }
    }
 
-   /**
-    * Attemps to remove the specified listener from the list of REMOVABLE listeners. This will NOT remove any listener
-    * added using the addListener() call, only those added using the addRemovableListener() call will be removed.
-    * 
-    * @param listener The removable listener to remove
-    */
-   public void removeRemovableListener(IOSEEMessageListener listener) {
-//      removeListener(listener);
-      removableListenerHandler.removeListener(listener);
+   public void addMessageTypeAssociation(DataType memType, Message messageToBeAdded) {
+      mapper.addMessageTypeAssociation(this, memType, messageToBeAdded);
+   }
+
+   public void addPostMemSourceChangeListener(IMemSourceChangeListener listener) {
+      checkState();
+      if(messageManager != null){
+         messageManager.addPostMemSourceChangeListener(this, listener);
+      }
+   }
+
+   public void addPostMessageDisposeListener(IMessageDisposeListener listener) {
+      checkState();
+      if(messageManager != null){
+         messageManager.addPostMessageDisposeListener(this, listener);
+      }
+   }
+
+   public void addPreMemSourceChangeListener(IMemSourceChangeListener listener) {
+      checkState();
+      if(messageManager != null){
+         messageManager.addPreMemSourceChangeListener(this, listener);
+      }
+   }
+
+   public void addPreMessageDisposeListener(IMessageDisposeListener listener) {
+      checkState();
+      if(messageManager != null){
+         messageManager.addPreMessageDisposeListener(this, listener);
+      }
    }
 
    /**
@@ -157,525 +182,88 @@ public class Message implements Xmlizable, XmlizableStream {
       removableListenerHandler.addListener(listener);
    }
 
-   /**
-    * Removes all the listeners from the RemovableListenerHandler. This method is meant to be called upon script
-    * completion but can be used by anyone. Other listeners can be removed using the traditional removeListener call.
-    */
-   public void clearRemovableListeners() {
-      this.removableListenerHandler.clearListeners();
-
-   }
-
-   public void destroy() {
-      turnOff();
-      if(messageManager != null){
-         messageManager.notifyPreDestroyListeners(this);
-      }
-
-      mapper.removeMessage(this);
-      destroyed = true;
-      defaultMessageData.dispose();
-      listenerHandler.dispose();
-
-      elementMap.clear();
-
-      if (messageRequestor != null) {
-         messageRequestor.dispose();
-      }
-      removableListenerHandler.dispose();
-      if(messageManager != null){
-         messageManager.notifyPostDestroyListeners(this);
-      }
-   }
-
-   public void setData(byte[] data) {
-      MessageData messageData = mapper.getMessageData(this, currentMemType);
-      messageData.setFromByteArray(data);
-   }
-
-   public void setData(ByteBuffer data, int length) {
-      MessageData messageData = mapper.getMessageData(this, currentMemType);
-      messageData.setFromByteArray(data, length);
-   }
-
-   public void setData(byte[] data, int length) {
-      MessageData messageData = mapper.getMessageData(this, currentMemType);
-      messageData.setFromByteArray(data, length);
-   }
-
-   public void setBackingBuffer(byte[] data) {
-      MessageData messageData = mapper.getMessageData(this, currentMemType);
-      messageData.setNewBackingBuffer(data);
-   }
-
-   public byte[] getData() {
+   public void addSchedulingChangeListener(IMessageScheduleChangeListener listener) {
       checkState();
-      return getActiveDataSource().toByteArray();
-   }
-
-   public MessageData getMemoryResource() {
-      return mapper.getMessageData(this, currentMemType);
-   }
-
-   /**
-    * Returns the number of byte words in the payload of this message.
-    * 
-    * @return number of bytes in the message payload
-    */
-   public int getPayloadSize() {
-      return mapper.getMessageData(this, currentMemType).getPayloadSize();
-   }
-
-   public int getPayloadSize(DataType type) {
-      return mapper.getMessageData(this, type).getPayloadSize();
-   }
-
-   /**
-    * Returns the number of byte words in the header of this message.
-    * 
-    * @return the number of bytes in the header
-    */
-   public int getHeaderSize() {
-      final IMessageHeader hdr =  mapper.getMessageData(this, currentMemType).getMsgHeader();
-      if (hdr != null) {
-         return hdr.getHeaderSize();
-      }
-      return 0;
-   }
-
-   public int getHeaderSize(DataType type) {
-      return mapper.getMessageData(this, currentMemType).getMsgHeader().getHeaderSize();
-   }
-
-   /*
-    * protected static final ThreadLocal current = new ThreadLocal() { protected Object initialValue() { return new
-    * MemMessageHolder(); } };
-    */
-   public void send() throws MessageSystemException {
-      if(messageManager != null){
-         messageManager.publish(this);
-      } else {
-         OseeLog.log(getClass(), Level.WARNING, String.format("Unable to send [%s] because message manager has not been set", getName()));
+      if(messageManager !=null){
+         messageManager.addSchedulingChangeListener(this, listener);
       }
    }
-   
-   public void send(PublishInfo info) throws MessageSystemException {
-      if(messageManager != null){
-         messageManager.publish(this, info);
-      } else {
-         OseeLog.log(getClass(), Level.WARNING, String.format("Unable to send [%s] because message manager has not been set", getName()));
-      }
-   }
-   
+
    public void addSendListener(IMessageSendListener listener) {
       getActiveDataSource().addSendListener(listener);
    }
 
-   public void removeSendListener(IMessageSendListener listener) {
-      getActiveDataSource().removeSendListener(listener);
-   }
-
-   public boolean containsSendListener(IMessageSendListener listener) {
-      return getActiveDataSource().containsSendListener(listener);
-   }
-
-   public void send(DataType type) throws MessageSystemException {
-      checkState();
-      if (!isTurnedOff) {
-         Message[] messages = mapper.getMessages(this, type).get();
-         for(int i = 0; i < messages.length; i++){
-            messages[i].send();
-         }
-      } else {
-         OseeLog.log(MessageSystemTestEnvironment.class, Level.WARNING,
-            this.getMessageName() + " has attempted a send(), but is currently turned off.");
-      }
-   }
-
-   public boolean setMemSource(ITestEnvironmentAccessor accessor, DataType type) {
-      return setMemSource(type);
-   }
-
-   public void addMessageTypeAssociation(DataType memType, Message messageToBeAdded) {
-      mapper.addMessageTypeAssociation(this, memType, messageToBeAdded);
-   }
-
-   //get rid of collection return
-   public Collection<MessageData> getMemSource(DataType type) {
-      MessageData data = mapper.getMessageData(this, type);
-      List<MessageData> list =  new ArrayList<MessageData>();
-      if(data != null){
-         list.add(data);
-      }
-      return list;
-   }
-
-   public boolean getMemSource(DataType type, Collection<MessageData> listToAddto) {
-      MessageData messageData = mapper.getMessageData(this, currentMemType);
-      if(messageData!=null){
-         return listToAddto.add(messageData);
-      }
-      return false;
-   }
-
-   public DataType getMemType() {
-      return currentMemType;
-   }
-
-   public void addElement(Element element) {
-      checkState();
-      elementMap.put(element.getName(), element);
-   }
-
    /**
-    * Gets a list of all the message's data elements.
-    * <br>
-    * This returns ALL the elements, which may not be mapped to the
-    * active data type and/or may be non-mapping elements.
+    * Changes the rate a message is being published at. NOTE: This is only going to be allowed to be used on periodic
+    * message & users are not allowed to set rate to zero.
     * 
-    * Use {@link #getElements(DataType)} to get mapped elements
-    * 
-    * @return a collection of {@link Element}s
+    * @param newRate - hz
     */
-   public Collection<Element> getElements() {
-      checkState();
-      return elementMap.values();
-   }
-
-   public void getAllElements(Collection<Element> elements) {
-      checkState();
-      IMessageHeader header = getActiveDataSource().getMsgHeader();
-      if (header != null) {
-         Collections.addAll(elements, header.getElements());
+   public void changeRate(double newRate) {
+      if (Math.abs(newRate - 0.0) < doubleTolerance) { //newRate == 0.0
+         throw new IllegalArgumentException(
+            "Cannot change message rate to zero (" + getName() + ")!\n\tUse unschedule() to do that!");
       }
-      elements.addAll(elementMap.values());
-
-   }
-
-   /**
-    * @return a collection of mapped {@link Element}s for the specified DataType
-    */
-   public Collection<Element> getElements(DataType type) {
-      Message[] messages = mapper.getMessages(this, type).get();
-      ArrayList<Element> elements = new ArrayList<Element>();
-      for(int i = 0; i < messages.length; i++){
-         elements.addAll(messages[i].getLocalElements());
-      }
-      return elements;
-   }
-
-   private Collection<Element> getLocalElements() {
-      return elementMap.values();
-   }
-
-   /**
-    * @return true if the Message contains an element with the given name, false otherwise
-    */
-   public boolean hasElement(String elementName) {
-      checkState();
-      return elementMap.containsKey(elementName);
-   }
-
-   /**
-    * @return HashMap<String, Element>
-    */
-   public HashMap<String, Element> getElementMap() {
-      checkState();
-      return elementMap;
-   }
-
-   /**
-    * @param elementName the name of the element as defined in the message ( All caps ).
-    * @return the element associated with the given name
-    * @throws IllegalArgumentException if an element doesn't exist with given name. Use {@link #hasElement(String)} with
-    * any use of this function.
-    */
-   public Element getElement(String elementName) {
-      return getElement(elementName, currentMemType);
-   }
-
-   public <E extends Element> E getElement(String elementName, Class<E> clazz) {
-      checkState();
-      return clazz.cast(getElement(elementName, currentMemType));
-   }
-
-   public boolean hasElement(List<Object> elementPath) {
-      return getElement(elementPath) != null;
-   }
-
-   public Element getElement(List<Object> elementPath) {
-      CopyOnWriteNoIteratorList<Message> messages = mapper.getMessages(this, currentMemType);
-      return findElement(messages, elementPath);
-   }
-
-   /**
-    * DO NOT USE THIS.
-    * 
-    * @param messages
-    * @param elementPath
-    * @return
-    */
-   private Element findElement(CopyOnWriteNoIteratorList<Message> messages, List<Object> elementPath){
-      Element el = null;
-      RecordElement rel = null;
-      if (elementPath.size() == 1) {
-         el = elementMap.get(elementPath.get(0));
-      } else {
-         String string = (String) elementPath.get(1);
-         if (string.startsWith("HEADER(")) {
-            Element[] elements = getActiveDataSource(currentMemType).getMsgHeader().getElements();
-            for (Element element : elements) {
-               if (element.getName().equals(elementPath.get(2))) {
-                  return element;
-               }
-            }
-            return null;
-         } else {
-            el = this.elementMap.get(string);
-            if (el instanceof RecordElement) {
-               rel = (RecordElement) el;
-            }
-         }
-         for (int i = 2; i < elementPath.size(); i++) {
-            if (elementPath.get(i) instanceof String) {
-               String name = (String) elementPath.get(i);
-               el = rel.getElementMap().get(name);
-               if (el instanceof RecordElement) {
-                  rel = (RecordElement) el;
-               }
-            } else if (elementPath.get(i) instanceof Integer) {
-               Integer index = (Integer) elementPath.get(i);
-               rel = rel.get(index);
-               el = rel;
-            }
-         }
-      }
-      return el;
-   }
-   
-   private Element findElement(CopyOnWriteNoIteratorList<Message> messages, String elementName){
-      Message[] messagesArr = messages.get();
-      Element el = null;
-      for(int i = 0; i < messagesArr.length; i++){
-         el = messagesArr[i].getElementMap().get(elementName);
-         if(el != null){
-            return el;
-         }
-      }
-      return null;
-   }
-
-   public Element getElement(List<Object> elementPath, DataType type) {
-      CopyOnWriteNoIteratorList<Message> messages = mapper.getMessages(this, type);
-      return findElement(messages, elementPath);
-   }
-
-   /**
-    * @return the element associated with the given name
-    * @throws IllegalArgumentException if an element doesn't exist with given name. Use {@link #hasElement(String)} with
-    * any use of this function.
-    */
-   public Element getElement(String elementName, DataType type) {
-      CopyOnWriteNoIteratorList<Message> messages = mapper.getMessages(this, type);
-      return findElement(messages, elementName);
-   }
-
-   public Element getBodyOrHeaderElement(String elementName) {
-      return getBodyOrHeaderElement(elementName, currentMemType);
-   }
-
-  
-   public Element getBodyOrHeaderElement(String elementName, DataType type) {
-      CopyOnWriteNoIteratorList<Message> messages = mapper.getMessages(this, type);
-      return findElement(messages, elementName);
-   }
-
-   /**
-    * Turning off a message causes sends to be short-circuited and the message to be unscheduled.
-    */
-   public void turnOff() {
-      checkState();
-      isTurnedOff = true;
-      unschedule();
-   }
-
-   /**
-    * Turning on message allows sends to work again & reschedules message if that is the default state defined by the
-    * message constructor call.
-    */
-   public void turnOn() {
-      checkState();
-      isTurnedOff = false;
-      if (isScheduledFromStart()) {
-         schedule();
-      }
-   }
-
-//   /**
-//    * This is the turnOn being called from the method register in MessageCollection. Messages shouldn't be scheduled at
-//    * this point b/c the control message hasn't gone out yet. Messages can't go out until the control message goes out
-//    * the first time so that collisions in the box are avoided.
-//    */
-//   public void whenBeingRegisteredTurnOn() {
-//      isTurnedOff = false;
-//   }
-
-   /**
-    * Returns if the message is turned off.
-    */
-   public boolean isTurnedOff() {
-      return isTurnedOff;
-   }
-
-   private void setSchedule(boolean newValue) {
-      mapper.getMessageData(this, currentMemType).setScheduled(newValue);
-   }
-
-   /**
-    * This method schedules the message. There is also some code that allows the scheduled state to be updated in
-    * Message Watch.
-    */
-   public void schedule() {
-      checkState();
-      if (!isTurnedOff) {
-         setSchedule(true);
-         regularUnscheduleCalled = false;
+      if (Math.abs(newRate - rate) > doubleTolerance) { //newRate != rate
          if(messageManager != null){
-            messageManager.notifySchedulingChangeListeners(this, true);
+            messageManager.changeMessageRate(this, newRate, rate);
+         }
+         double oldRate = rate;
+         rate = newRate;
+         if(messageManager != null){
+            messageManager.notifySchedulingChangeListeners(this, oldRate, newRate);
          }
       }
    }
 
    /**
-    * This method unschedules the message. The variable regularUnscheduledCalled is used to preserve unschedules that
-    * are called in constructors, which is before the control message goes out for the first time.
+    * Changes the rate back to the default rate.
     */
-   public void unschedule() {
-      checkState();
-      setSchedule(false);
-      regularUnscheduleCalled = true;
+   public void changeRateToDefault(ITestEnvironmentMessageSystemAccessor accessor) {
+      //      accessor.getMsgManager().changeMessageRate(this, defaultRate, rate);
+      double oldRate = getRate();
+      rate = defaultRate;
       if(messageManager != null){
-         messageManager.notifySchedulingChangeListeners(this, false);
+         messageManager.notifySchedulingChangeListeners(this, oldRate, defaultRate);
       }
    }
 
    /**
-    * Returns if the message is scheduled or not.
-    */
-   @Deprecated
-   public boolean isScheduled() {
-      return mapper.getMessageData(this, currentMemType).isScheduled();
-   }
-
-   /**
-    * This is called at the end of a script run to reset the "hard" unschedule variable that is used to preserve
-    * unschedules called in constructors.
-    */
-   public void resetScheduling() {
-      regularUnscheduleCalled = false;
-
-   }
-
-   /**
-    * @return - double - rate of message
-    */
-   public double getRate() {
-      return rate;
-   }
-
-   /**
-    * @return - int - phase of message
-    */
-   public int getPhase() {
-      return phase;
-   }
-
-   public MessageSystemListener getListener() {
-      return listenerHandler;
-   }
-
-   public void addListener(IOSEEMessageListener listener) {
-      if(messageManager != null){
-         messageManager.addMessageListener(this, listener);
-      }
-   }
-
-   public boolean removeListener(IOSEEMessageListener listener) {
-      if(messageManager != null){
-         return messageManager.removeMessageListener(this, listener);
-      }
-      return false;
-   }
-
-   /**
-    * Notifies all registered listeners of an update.
-    * <P>
-    * <B>NOTE: </B>Should only be called from sub classes of {@link MessageData}
+    * Verifies that the message is not sent within the time specified.
     * 
-    * @param data the Message Data object that has been updated
-    * @param type the memtype of the message data object
+    * @param milliseconds the amount to time (in milliseconds) to check
+    * @return if the check passed
     */
-   public void notifyListeners(final MessageData data, final DataType type) {
-//      checkState();
-      if(messageManager != null){
-         messageManager.notifyListenersOfUpdate(data);
-      }
-      this.listenerHandler.onDataAvailable(data, type);
-      this.removableListenerHandler.onDataAvailable(data, type);
-   }
-
-   /*
-    * public HashMap getTypeToMessageData(){ return typeToMessageData; }
-    */
-   /**
-    * @return Returns the name.
-    */
-   public String getName() {
-      return name;
-   }
-
-   private static final int TransmissionTimeoutDefault = 15000;
-
-   @Override
-   public String toString() {
-      return name;
-   }
-
-   /**
-    * @return Returns the messageName.
-    */
-   public String getMessageName() {
-      return name;
-   }
-
-   @Override
-   public org.w3c.dom.Element toXml(Document doc) {
-      org.w3c.dom.Element rootElement = doc.createElement("Message");
-      rootElement.appendChild(Jaxp.createElement(doc, "Name", name));
-      rootElement.appendChild(Jaxp.createElement(doc, "Type", getMemType().name()));
-      return rootElement;
-   }
-
-   @Override
-   public void toXml(XMLStreamWriter writer) throws XMLStreamException {
-      writer.writeStartElement("Message");
-      XMLStreamWriterUtil.writeElement(writer, "Name", name);
-      XMLStreamWriterUtil.writeElement(writer, "Type", getMemType().name());
-      writer.writeEndElement();
-   }
-
-   @JsonProperty
-   public String getType() {
-       return getMemType().name();
-   }
-   
-   public void zeroize() {
+   public boolean checkForNoTransmissions(ITestEnvironmentMessageSystemAccessor accessor, int milliseconds) throws InterruptedException {
       checkState();
-      for (DataType memType : mapper.getAvailableDataTypes(this)) {
-         for (Element el : getElements(memType)) {
-            el.zeroize();
-         }
+      if (accessor == null) {
+         throw new IllegalArgumentException("accessor cannot be null");
       }
+      accessor.getLogger().methodCalledOnObject(accessor, getMessageName(), new MethodFormatter().add(milliseconds),
+         this);
+      long time = accessor.getEnvTime();
+      org.eclipse.osee.ote.core.environment.interfaces.ICancelTimer cancelTimer =
+         accessor.setTimerFor(listenerHandler, milliseconds);
+
+      boolean result;
+      listenerHandler.waitForData(); // will also return if the timer (set above)
+      // expires
+
+      result = listenerHandler.isTimedOut();
+
+      cancelTimer.cancelTimer();
+      time = accessor.getEnvTime() - time;
+
+      accessor.getLogger().testpoint(
+         accessor,
+         accessor.getTestScript(),
+         accessor.getTestScript().getTestCase(),
+         new CheckPoint(this.getMessageName(), "No Transmissions",
+            result ? "No Transmissions" : "Transmissions Occurred", result, time));
+      if (accessor != null) {
+         accessor.getLogger().methodEnded(accessor);
+      }
+      return result;
    }
 
    /**
@@ -730,43 +318,695 @@ public class Message implements Xmlizable, XmlizableStream {
       accessor.getLogger().methodEnded(accessor);
       return passFail.isPass();
    }
+   
+   /**
+    * Removes all the listeners from the RemovableListenerHandler. This method is meant to be called upon script
+    * completion but can be used by anyone. Other listeners can be removed using the traditional removeListener call.
+    */
+   public void clearRemovableListeners() {
+      this.removableListenerHandler.clearListeners();
+
+   }
+   
+   public boolean containsSendListener(IMessageSendListener listener) {
+      return getActiveDataSource().containsSendListener(listener);
+   }
+
+   public void destroy() {
+      turnOff();
+      if(messageManager != null){
+         messageManager.notifyPreDestroyListeners(this);
+      }
+
+      mapper.removeMessage(this);
+      destroyed = true;
+      defaultMessageData.dispose();
+      listenerHandler.dispose();
+
+      elementMap.clear();
+
+      if (messageRequestor != null) {
+         messageRequestor.dispose();
+      }
+      removableListenerHandler.dispose();
+      if(messageManager != null){
+         messageManager.notifyPostDestroyListeners(this);
+      }
+   }
+
+   public MessageData getActiveDataSource() {
+      return mapper.getMessageData(this, currentMemType);
+   }
+
+   public MessageData getActiveDataSource(DataType type) {
+      return mapper.getMessageData(this, type);
+   }
+
+   public long getActivityCount() {
+      return getActiveDataSource().getActivityCount();
+   }
 
    /**
-    * Verifies that the message is not sent within the time specified.
-    * 
-    * @param milliseconds the amount to time (in milliseconds) to check
-    * @return if the check passed
+    * @return the memToDataMap
     */
-   public boolean checkForNoTransmissions(ITestEnvironmentMessageSystemAccessor accessor, int milliseconds) throws InterruptedException {
+   public Collection<MessageData> getAllData() {
       checkState();
-      if (accessor == null) {
-         throw new IllegalArgumentException("accessor cannot be null");
+      
+      return (Collection<MessageData>)mapper.getAllMessageDatas(this);
+   }
+
+   public void getAllElements(Collection<Element> elements) {
+      checkState();
+      IMessageHeader header = getActiveDataSource().getMsgHeader();
+      if (header != null) {
+         Collections.addAll(elements, header.getElements());
       }
-      accessor.getLogger().methodCalledOnObject(accessor, getMessageName(), new MethodFormatter().add(milliseconds),
-         this);
-      long time = accessor.getEnvTime();
-      org.eclipse.osee.ote.core.environment.interfaces.ICancelTimer cancelTimer =
-         accessor.setTimerFor(listenerHandler, milliseconds);
+      elements.addAll(elementMap.values());
 
-      boolean result;
-      listenerHandler.waitForData(); // will also return if the timer (set above)
-      // expires
+   }
 
-      result = listenerHandler.isTimedOut();
+   public Map<DataType, Class<? extends Message>[]> getAssociatedMessages() {
+      return new HashMap<DataType, Class<? extends Message>[]>();
+   }
 
-      cancelTimer.cancelTimer();
-      time = accessor.getEnvTime() - time;
+   public Set<DataType> getAvailableMemTypes() {
+      checkState();
+      return mapper.getAvailableDataTypes(this);
+   }
 
-      accessor.getLogger().testpoint(
-         accessor,
-         accessor.getTestScript(),
-         accessor.getTestScript().getTestCase(),
-         new CheckPoint(this.getMessageName(), "No Transmissions",
-            result ? "No Transmissions" : "Transmissions Occurred", result, time));
+   public int getBitOffset() {
+      return 0;
+   }
+
+   public Element getBodyOrHeaderElement(String elementName) {
+      return getBodyOrHeaderElement(elementName, currentMemType);
+   }
+
+   public Element getBodyOrHeaderElement(String elementName, DataType type) {
+      CopyOnWriteNoIteratorList<Message> messages = mapper.getMessages(this, type);
+      return findElement(messages, elementName);
+   }
+
+   public byte[] getData() {
+      checkState();
+      return getActiveDataSource().toByteArray();
+   }
+
+   public int getDefaultByteSize() {
+      return defaultByteSize;
+   }
+
+   /**
+    * @return the defaultMessageData
+    */
+   public MessageData getDefaultMessageData() {
+      return defaultMessageData;
+   }
+
+   public int getDefaultOffset() {
+      return defaultOffset;
+   }
+
+   public Element getElement(List<Object> elementPath) {
+      CopyOnWriteNoIteratorList<Message> messages = mapper.getMessages(this, currentMemType);
+      return findElement(messages, elementPath);
+   }
+
+   public Element getElement(List<Object> elementPath, DataType type) {
+      CopyOnWriteNoIteratorList<Message> messages = mapper.getMessages(this, type);
+      return findElement(messages, elementPath);
+   }
+
+   /**
+    * @param elementName the name of the element as defined in the message ( All caps ).
+    * @return the element associated with the given name
+    * @throws IllegalArgumentException if an element doesn't exist with given name. Use {@link #hasElement(String)} with
+    * any use of this function.
+    */
+   public Element getElement(String elementName) {
+      return getElement(elementName, currentMemType);
+   }
+
+   public <E extends Element> E getElement(String elementName, Class<E> clazz) {
+      checkState();
+      return clazz.cast(getElement(elementName, currentMemType));
+   }
+
+   /**
+    * @return the element associated with the given name
+    * @throws IllegalArgumentException if an element doesn't exist with given name. Use {@link #hasElement(String)} with
+    * any use of this function.
+    */
+   public Element getElement(String elementName, DataType type) {
+      CopyOnWriteNoIteratorList<Message> messages = mapper.getMessages(this, type);
+      return findElement(messages, elementName);
+   }
+   
+   public Element getElementByPath(ElementPath path) {
+      return getElementByPath(path, currentMemType);
+   }
+
+   public ListIterator<Element> getElementIterator(Element elemnt) {
+	   ArrayList<Element> list = new ArrayList<Element>(elementMap.values());
+	   int index = list.indexOf(elemnt);
+	   if (index >= 0) {
+		   return list.listIterator(index);		   
+	   }
+	   return null;
+   }
+
+   /**
+    * @return HashMap<String, Element>
+    */
+   public HashMap<String, Element> getElementMap() {
+      checkState();
+      return elementMap;
+   }
+
+   /**
+    * Gets a list of all the message's data elements.
+    * <br>
+    * This returns ALL the elements, which may not be mapped to the
+    * active data type and/or may be non-mapping elements.
+    * 
+    * Use {@link #getElements(DataType)} to get mapped elements
+    * 
+    * @return a collection of {@link Element}s
+    */
+   public Collection<Element> getElements() {
+      checkState();
+      return elementMap.values();
+   }
+
+  
+   /**
+    * @return a collection of mapped {@link Element}s for the specified DataType
+    */
+   public Collection<Element> getElements(DataType type) {
+      Message[] messages = mapper.getMessages(this, type).get();
+      ArrayList<Element> elements = new ArrayList<Element>();
+      for(int i = 0; i < messages.length; i++){
+         elements.addAll(messages[i].getLocalElements());
+      }
+      return elements;
+   }
+
+   public IMessageHeader[] getHeaders() {
+      final Collection<MessageData> dataSources = getMemSource(getMemType());
+      if (dataSources.size() > 0) {
+         final IMessageHeader[] headers = new IMessageHeader[dataSources.size()];
+         int i = 0;
+         for (MessageData dataSrc : dataSources) {
+            headers[i] = dataSrc.getMsgHeader();
+            i++;
+         }
+         return headers;
+      } else {
+         return new IMessageHeader[0];
+      }
+   }
+
+   /**
+    * Returns the number of byte words in the header of this message.
+    * 
+    * @return the number of bytes in the header
+    */
+   public int getHeaderSize() {
+      final IMessageHeader hdr =  mapper.getMessageData(this, currentMemType).getMsgHeader();
+      if (hdr != null) {
+         return hdr.getHeaderSize();
+      }
+      return 0;
+   }
+
+//   /**
+//    * This is the turnOn being called from the method register in MessageCollection. Messages shouldn't be scheduled at
+//    * this point b/c the control message hasn't gone out yet. Messages can't go out until the control message goes out
+//    * the first time so that collisions in the box are avoided.
+//    */
+//   public void whenBeingRegisteredTurnOn() {
+//      isTurnedOff = false;
+//   }
+
+   public int getHeaderSize(DataType type) {
+      return mapper.getMessageData(this, currentMemType).getMsgHeader().getHeaderSize();
+   }
+
+   public MessageSystemListener getListener() {
+      return listenerHandler;
+   }
+
+   /**
+    * @return Returns size value.
+    */
+   public int getMaxDataSize() {
+      checkState();
+      return getMaxDataSize(currentMemType);
+   }
+
+   public int getMaxDataSize(DataType type) {
+      return mapper.getMessageData(this, type).getPayloadSize();
+   }
+
+   public MessageData getMemoryResource() {
+      return mapper.getMessageData(this, currentMemType);
+   }
+
+   //get rid of collection return
+   public Collection<MessageData> getMemSource(DataType type) {
+      MessageData data = mapper.getMessageData(this, type);
+      List<MessageData> list =  new ArrayList<MessageData>();
+      if(data != null){
+         list.add(data);
+      }
+      return list;
+   }
+
+   public boolean getMemSource(DataType type, Collection<MessageData> listToAddto) {
+      MessageData messageData = mapper.getMessageData(this, currentMemType);
+      if(messageData!=null){
+         return listToAddto.add(messageData);
+      }
+      return false;
+   }
+
+   public DataType getMemType() {
+      return currentMemType;
+   }
+
+   public MessageData getMessageData(DataType type) {
+      checkState();
+      return mapper.getMessageData(this, type);
+   }
+
+   public MessageId getMessageId() {
+      return id;
+   }
+
+   /**
+    * @return Returns the messageName.
+    */
+   public String getMessageName() {
+      return name;
+   }
+
+   /**
+    * returns a {@link MessageState} object that represents this message's state. The state is intended to be used in
+    * synchronizing a remote instance of this message
+    * 
+    * @return Returns MessageState object reference.
+    */
+   public MessageState getMessageState() {
+      checkState();
+      MessageMode mode = isWriter() ? MessageMode.WRITER : MessageMode.READER;
+      return new MessageState(currentMemType, getData(), mapper.getAvailableDataTypes(this), mode);
+   }
+
+   /*
+    * public HashMap getTypeToMessageData(){ return typeToMessageData; }
+    */
+   /**
+    * @return Returns the name.
+    */
+   public String getName() {
+      return name;
+   }
+
+   /**
+    * Returns the number of byte words in the payload of this message.
+    * 
+    * @return number of bytes in the message payload
+    */
+   public int getPayloadSize() {
+      return mapper.getMessageData(this, currentMemType).getPayloadSize();
+   }
+
+   public int getPayloadSize(DataType type) {
+      return mapper.getMessageData(this, type).getPayloadSize();
+   }
+
+   /**
+    * @return - int - phase of message
+    */
+   public int getPhase() {
+      return phase;
+   }
+
+   /**
+    * @return - double - rate of message
+    */
+   public double getRate() {
+      return rate;
+   }
+
+   public long getSentCount() {
+      return getActiveDataSource().getSentCount();
+   }
+
+   @JsonProperty
+   public String getType() {
+       return getMemType().name();
+   }
+   
+   public String getTypeName() {
+      return getName();
+   }
+
+   public boolean hasElement(List<Object> elementPath) {
+      return getElement(elementPath) != null;
+   }
+
+   /**
+    * @return true if the Message contains an element with the given name, false otherwise
+    */
+   public boolean hasElement(String elementName) {
+      checkState();
+      return elementMap.containsKey(elementName);
+   }
+
+   public boolean isDestroyed() {
+      return destroyed;
+   }
+
+   /**
+    * This variable reflects whether unsubscribe has been called on the message. The main purpose of this is to preserve
+    * if an unschedule is called on a message from a constructor.
+    * 
+    * @return Returns the regularUnscheduleCalled.
+    */
+   public boolean isegularUnscheduleCalled() {
+      return regularUnscheduleCalled;
+   }
+
+   public boolean isMemTypeActive(DataType type) {
+      checkState();
+      return memTypeActive.contains(type);
+   }
+
+   /**
+    * Returns if the message is scheduled or not.
+    */
+   @Deprecated
+   public boolean isScheduled() {
+      return mapper.getMessageData(this, currentMemType).isScheduled();
+   }
+
+   /**
+    * This variable reflects whether a message is defined to start out being scheduled.
+    * 
+    * @return Returns the isScheduledFromStart.
+    */
+   public boolean isScheduledFromStart() {
+      return isScheduledFromStart;
+   }
+
+   /**
+    * Returns if the message is turned off.
+    */
+   public boolean isTurnedOff() {
+      return isTurnedOff;
+   }
+
+   public boolean isValidElement(Element currentElement, Element proposedElement) {
+      return true;
+   }
+
+   public boolean isWriter() {
+      checkState();
+      return defaultMessageData.isWriter();
+   }
+
+   /**
+    * Notifies all registered listeners of an update.
+    * <P>
+    * <B>NOTE: </B>Should only be called from sub classes of {@link MessageData}
+    * 
+    * @param data the Message Data object that has been updated
+    * @param type the memtype of the message data object
+    */
+   public void notifyListeners(final MessageData data, final DataType type) {
+//      checkState();
+      if(messageManager != null){
+         messageManager.notifyListenersOfUpdate(data);
+      }
+      this.listenerHandler.onDataAvailable(data, type);
+      this.removableListenerHandler.onDataAvailable(data, type);
+   }
+
+   public boolean removeListener(IOSEEMessageListener listener) {
+      if(messageManager != null){
+         return messageManager.removeMessageListener(this, listener);
+      }
+      return false;
+   }
+
+   public void removePostMemSourceChangeListener(IMemSourceChangeListener listener) {
+      checkState();
+      if(messageManager != null){
+         messageManager.removePostMemSourceChangeListener(this, listener);
+      }
+   }
+
+   public void removePostMessageDisposeListener(IMessageDisposeListener listener) {
+      checkState();
+      if(messageManager != null){
+         messageManager.removePostMessageDisposeListener(this, listener);
+      }
+   }
+
+   public void removePreMemSourceChangeListener(IMemSourceChangeListener listener) {
+      checkState();
+      if(messageManager != null){
+         messageManager.removePreMemSourceChangeListener(this, listener);
+      }
+   }
+
+   public void removePreMessageDisposeListener(IMessageDisposeListener listener) {
+      checkState();
+      if(messageManager != null){
+         messageManager.removePreMessageDisposeListener(this, listener);
+      }
+   }
+
+   /**
+    * Attemps to remove the specified listener from the list of REMOVABLE listeners. This will NOT remove any listener
+    * added using the addListener() call, only those added using the addRemovableListener() call will be removed.
+    * 
+    * @param listener The removable listener to remove
+    */
+   public void removeRemovableListener(IOSEEMessageListener listener) {
+//      removeListener(listener);
+      removableListenerHandler.removeListener(listener);
+   }
+
+   public void removeSchedulingChangeListener(IMessageScheduleChangeListener listener) {
+      checkState();
+      if(messageManager !=null){
+         messageManager.removeSchedulingChangeListener(this, listener);
+      }
+   }
+
+   public void removeSendListener(IMessageSendListener listener) {
+      getActiveDataSource().removeSendListener(listener);
+   }
+
+   /**
+    * This is called at the end of a script run to reset the "hard" unschedule variable that is used to preserve
+    * unschedules called in constructors.
+    */
+   public void resetScheduling() {
+      regularUnscheduleCalled = false;
+
+   }
+
+   /**
+    * This method schedules the message. There is also some code that allows the scheduled state to be updated in
+    * Message Watch.
+    */
+   public void schedule() {
+      checkState();
+      if (!isTurnedOff) {
+         setSchedule(true);
+         regularUnscheduleCalled = false;
+         if(messageManager != null){
+            messageManager.notifySchedulingChangeListeners(this, true);
+         }
+      }
+   }
+
+   /*
+    * protected static final ThreadLocal current = new ThreadLocal() { protected Object initialValue() { return new
+    * MemMessageHolder(); } };
+    */
+   public void send() throws MessageSystemException {
+      if(messageManager != null){
+         messageManager.publish(this);
+      } else {
+         OseeLog.log(getClass(), Level.WARNING, String.format("Unable to send [%s] because message manager has not been set", getName()));
+      }
+   }
+
+   public void send(DataType type) throws MessageSystemException {
+      checkState();
+      if (!isTurnedOff) {
+         Message[] messages = mapper.getMessages(this, type).get();
+         for(int i = 0; i < messages.length; i++){
+            messages[i].send();
+         }
+      } else {
+         OseeLog.log(MessageSystemTestEnvironment.class, Level.WARNING,
+            this.getMessageName() + " has attempted a send(), but is currently turned off.");
+      }
+   }
+
+   public void send(PublishInfo info) throws MessageSystemException {
+      if(messageManager != null){
+         messageManager.publish(this, info);
+      } else {
+         OseeLog.log(getClass(), Level.WARNING, String.format("Unable to send [%s] because message manager has not been set", getName()));
+      }
+   }
+
+   public void sendWithLog(ITestAccessor accessor) {
+      if (accessor != null) {
+         accessor.getLogger().methodCalledOnObject(accessor, getMessageName(), new MethodFormatter(), this);
+      }
+      send();
       if (accessor != null) {
          accessor.getLogger().methodEnded(accessor);
       }
-      return result;
+   }
+   
+   public void setActivityCount(long activityCount) {
+      getActiveDataSource().setActivityCount(activityCount);
+   }
+
+   public void setBackingBuffer(byte[] data) {
+      MessageData messageData = mapper.getMessageData(this, currentMemType);
+      messageData.setNewBackingBuffer(data);
+   }
+
+   public void setData(byte[] data) {
+      MessageData messageData = mapper.getMessageData(this, currentMemType);
+      messageData.setFromByteArray(data);
+   }
+
+   public void setData(byte[] data, int length) {
+      MessageData messageData = mapper.getMessageData(this, currentMemType);
+      messageData.setFromByteArray(data, length);
+   }
+
+   public void setData(ByteBuffer data, int length) {
+      MessageData messageData = mapper.getMessageData(this, currentMemType);
+      messageData.setFromByteArray(data, length);
+   }
+   
+   public boolean setMemSource(DataType type) {
+      checkState();
+      
+      DataType oldMemType = getMemType();
+      if(messageManager != null){
+         messageManager.notifyPreMemSourceChangeListeners(this, oldMemType, type);
+      }
+      mapper.updatePublicFieldReferences(this, type);
+      setCurrentMemType(type);
+      if(messageManager != null){
+         messageManager.notifyPostMemSourceChangeListeners(this, oldMemType, type);
+      }
+      return true;
+   }
+
+   public boolean setMemSource(ITestEnvironmentAccessor accessor, DataType type) {
+      return setMemSource(type);
+   }
+
+   public void setMemTypeActive(DataType type) {
+      checkState();
+      memTypeActive.add(type);
+      if(messageManager != null){
+         messageManager.notifyPostMemSourceChangeListeners(this, currentMemType, currentMemType);
+      }
+   }
+
+   public void setMemTypeInactive(DataType type) {
+      checkState();
+      memTypeActive.add(type);
+      if(messageManager != null){
+         messageManager.notifyPostMemSourceChangeListeners(this, currentMemType, currentMemType);
+      }
+   }
+
+   public void setMessageId(MessageId id) {
+      this.id = id;
+   }
+
+   /**
+    * restores the state of this message. The state is intended to come from a remote instance of this message.
+    */
+   public void setMessageState(final MessageState state) {
+      checkState();
+      setMemSource(state.getCurrentMemType());
+      setData(state.getData());
+   }
+
+   @Override
+   public String toString() {
+      return name;
+   }
+
+   @Override
+   public org.w3c.dom.Element toXml(Document doc) {
+      org.w3c.dom.Element rootElement = doc.createElement("Message");
+      rootElement.appendChild(Jaxp.createElement(doc, "Name", name));
+      rootElement.appendChild(Jaxp.createElement(doc, "Type", getMemType().name()));
+      return rootElement;
+   }
+
+   @Override
+   public void toXml(XMLStreamWriter writer) throws XMLStreamException {
+      writer.writeStartElement("Message");
+      XMLStreamWriterUtil.writeElement(writer, "Name", name);
+      XMLStreamWriterUtil.writeElement(writer, "Type", getMemType().name());
+      writer.writeEndElement();
+   }
+
+   /**
+    * Turning off a message causes sends to be short-circuited and the message to be unscheduled.
+    */
+   public void turnOff() {
+      checkState();
+      isTurnedOff = true;
+      unschedule();
+   }
+
+   /**
+    * Turning on message allows sends to work again & reschedules message if that is the default state defined by the
+    * message constructor call.
+    */
+   public void turnOn() {
+      checkState();
+      isTurnedOff = false;
+      if (isScheduledFromStart()) {
+         schedule();
+      }
+   }
+
+   /**
+    * This method unschedules the message. The variable regularUnscheduledCalled is used to preserve unschedules that
+    * are called in constructors, which is before the control message goes out for the first time.
+    */
+   public void unschedule() {
+      checkState();
+      setSchedule(false);
+      regularUnscheduleCalled = true;
+      if(messageManager != null){
+         messageManager.notifySchedulingChangeListeners(this, false);
+      }
+   }
+
+   public MsgWaitResult waitForCondition(ITestEnvironmentAccessor accessor, ICondition condition, boolean maintain, int milliseconds) throws InterruptedException {
+      checkState();
+      return listenerHandler.waitForCondition(accessor, condition, maintain, milliseconds);
    }
 
    /**
@@ -823,76 +1063,19 @@ public class Message implements Xmlizable, XmlizableStream {
       return result.isPassed();
    }
 
-   public MsgWaitResult waitForCondition(ITestEnvironmentAccessor accessor, ICondition condition, boolean maintain, int milliseconds) throws InterruptedException {
+   public void zeroize() {
       checkState();
-      return listenerHandler.waitForCondition(accessor, condition, maintain, milliseconds);
-   }
-
-   /**
-    * @return Returns size value.
-    */
-   public int getMaxDataSize() {
-      checkState();
-      return getMaxDataSize(currentMemType);
-   }
-
-   public int getMaxDataSize(DataType type) {
-      return mapper.getMessageData(this, type).getPayloadSize();
-   }
-
-   /**
-    * returns a {@link MessageState} object that represents this message's state. The state is intended to be used in
-    * synchronizing a remote instance of this message
-    * 
-    * @return Returns MessageState object reference.
-    */
-   public MessageState getMessageState() {
-      checkState();
-      MessageMode mode = isWriter() ? MessageMode.WRITER : MessageMode.READER;
-      return new MessageState(currentMemType, getData(), mapper.getAvailableDataTypes(this), mode);
-   }
-
-   /**
-    * restores the state of this message. The state is intended to come from a remote instance of this message.
-    */
-   public void setMessageState(final MessageState state) {
-      checkState();
-      setMemSource(state.getCurrentMemType());
-      setData(state.getData());
-   }
-
-   public void addSchedulingChangeListener(IMessageScheduleChangeListener listener) {
-      checkState();
-      if(messageManager !=null){
-         messageManager.addSchedulingChangeListener(this, listener);
+      for (DataType memType : mapper.getAvailableDataTypes(this)) {
+         for (Element el : getElements(memType)) {
+            el.zeroize();
+         }
       }
    }
 
-   public void removeSchedulingChangeListener(IMessageScheduleChangeListener listener) {
-      checkState();
-      if(messageManager !=null){
-         messageManager.removeSchedulingChangeListener(this, listener);
+   protected void checkState() throws IllegalStateException {
+      if (isDestroyed()) {
+         throw new IllegalStateException(getName() + " is destroyed");
       }
-   }
-
-   public MessageData getActiveDataSource() {
-      return mapper.getMessageData(this, currentMemType);
-   }
-
-   public MessageData getActiveDataSource(DataType type) {
-      return mapper.getMessageData(this, type);
-   }
-
-   public void addElements(Element... elements) {
-      checkState();
-      for (Element element : elements) {
-         elementMap.put(element.getElementName(), element);
-         element.addPath(this.getClass().getName());
-      }
-   }
-
-   public int getBitOffset() {
-      return 0;
    }
 
    /**
@@ -903,125 +1086,6 @@ public class Message implements Xmlizable, XmlizableStream {
       this.currentMemType = currentMemType;
    }
 
-   public boolean setMemSource(DataType type) {
-      checkState();
-      
-      DataType oldMemType = getMemType();
-      if(messageManager != null){
-         messageManager.notifyPreMemSourceChangeListeners(this, oldMemType, type);
-      }
-      mapper.updatePublicFieldReferences(this, type);
-      setCurrentMemType(type);
-      if(messageManager != null){
-         messageManager.notifyPostMemSourceChangeListeners(this, oldMemType, type);
-      }
-      return true;
-   }
-
-   public void addPreMemSourceChangeListener(IMemSourceChangeListener listener) {
-      checkState();
-      if(messageManager != null){
-         messageManager.addPreMemSourceChangeListener(this, listener);
-      }
-   }
-
-   public void addPostMemSourceChangeListener(IMemSourceChangeListener listener) {
-      checkState();
-      if(messageManager != null){
-         messageManager.addPostMemSourceChangeListener(this, listener);
-      }
-   }
-   
-   public void removePreMemSourceChangeListener(IMemSourceChangeListener listener) {
-      checkState();
-      if(messageManager != null){
-         messageManager.removePreMemSourceChangeListener(this, listener);
-      }
-   }
-
-   public void removePostMemSourceChangeListener(IMemSourceChangeListener listener) {
-      checkState();
-      if(messageManager != null){
-         messageManager.removePostMemSourceChangeListener(this, listener);
-      }
-   }
-
-   public void addPreMessageDisposeListener(IMessageDisposeListener listener) {
-      checkState();
-      if(messageManager != null){
-         messageManager.addPreMessageDisposeListener(this, listener);
-      }
-   }
-
-   public void removePreMessageDisposeListener(IMessageDisposeListener listener) {
-      checkState();
-      if(messageManager != null){
-         messageManager.removePreMessageDisposeListener(this, listener);
-      }
-   }
-
-   public void addPostMessageDisposeListener(IMessageDisposeListener listener) {
-      checkState();
-      if(messageManager != null){
-         messageManager.addPostMessageDisposeListener(this, listener);
-      }
-   }
-   
-   public void removePostMessageDisposeListener(IMessageDisposeListener listener) {
-      checkState();
-      if(messageManager != null){
-         messageManager.removePostMessageDisposeListener(this, listener);
-      }
-   }
-
-   /**
-    * @return the memToDataMap
-    */
-   public Collection<MessageData> getAllData() {
-      checkState();
-      
-      return (Collection<MessageData>)mapper.getAllMessageDatas(this);
-   }
-
-   public Set<DataType> getAvailableMemTypes() {
-      checkState();
-      return mapper.getAvailableDataTypes(this);
-   }
-
-   public MessageData getMessageData(DataType type) {
-      checkState();
-      return mapper.getMessageData(this, type);
-   }
-
-   public String getTypeName() {
-      return getName();
-   }
-
-   /**
-    * This variable reflects whether a message is defined to start out being scheduled.
-    * 
-    * @return Returns the isScheduledFromStart.
-    */
-   public boolean isScheduledFromStart() {
-      return isScheduledFromStart;
-   }
-
-   /**
-    * This variable reflects whether unsubscribe has been called on the message. The main purpose of this is to preserve
-    * if an unschedule is called on a message from a constructor.
-    * 
-    * @return Returns the regularUnscheduleCalled.
-    */
-   public boolean isegularUnscheduleCalled() {
-      return regularUnscheduleCalled;
-   }
-
-   /**
-    * @return the defaultMessageData
-    */
-   public MessageData getDefaultMessageData() {
-      return defaultMessageData;
-   }
 
    /**
     * @param defaultMessageData the defaultMessageData to set
@@ -1031,135 +1095,80 @@ public class Message implements Xmlizable, XmlizableStream {
       this.defaultMessageData = defaultMessageData;
    }
 
-   public boolean isWriter() {
-      checkState();
-      return defaultMessageData.isWriter();
+   void setMapper(LegacyMessageMapper mapper){
+      this.mapper = mapper;
+      this.defaultMessageData.setMapper(mapper);
    }
 
-   public void setMemTypeActive(DataType type) {
-      checkState();
-      memTypeActive.add(type);
-      if(messageManager != null){
-         messageManager.notifyPostMemSourceChangeListeners(this, currentMemType, currentMemType);
-      }
+   void setMessageManager(IMessageManager messageManager){
+      this.messageManager = messageManager;
    }
 
-   public void setMemTypeInactive(DataType type) {
-      checkState();
-      memTypeActive.add(type);
-      if(messageManager != null){
-         messageManager.notifyPostMemSourceChangeListeners(this, currentMemType, currentMemType);
-      }
+   void setTurnOn(){
+      this.isTurnedOff = false;
    }
 
-   public boolean isMemTypeActive(DataType type) {
-      checkState();
-      return memTypeActive.contains(type);
+   void setWriter(boolean isWriter){
+      getActiveDataSource().setWriter(isWriter);
    }
-
-   protected void checkState() throws IllegalStateException {
-      if (isDestroyed()) {
-         throw new IllegalStateException(getName() + " is destroyed");
-      }
-   }
-
-   public boolean isDestroyed() {
-      return destroyed;
-   }
-
-   public boolean isValidElement(Element currentElement, Element proposedElement) {
-      return true;
-   }
-
-   public IMessageHeader[] getHeaders() {
-      final Collection<MessageData> dataSources = getMemSource(getMemType());
-      if (dataSources.size() > 0) {
-         final IMessageHeader[] headers = new IMessageHeader[dataSources.size()];
-         int i = 0;
-         for (MessageData dataSrc : dataSources) {
-            headers[i] = dataSrc.getMsgHeader();
-            i++;
-         }
-         return headers;
-      } else {
-         return new IMessageHeader[0];
-      }
-   }
-
-   public long getActivityCount() {
-      return getActiveDataSource().getActivityCount();
-   }
-
-   public long getSentCount() {
-      return getActiveDataSource().getSentCount();
-   }
-
-   public void setActivityCount(long activityCount) {
-      getActiveDataSource().setActivityCount(activityCount);
-   }
-
-   public Map<DataType, Class<? extends Message>[]> getAssociatedMessages() {
-      return new HashMap<DataType, Class<? extends Message>[]>();
-   }
-
 
    /**
-    * Changes the rate a message is being published at. NOTE: This is only going to be allowed to be used on periodic
-    * message & users are not allowed to set rate to zero.
+    * DO NOT USE THIS.
     * 
-    * @param newRate - hz
+    * @param messages
+    * @param elementPath
+    * @return
     */
-   public void changeRate(double newRate) {
-      if (Math.abs(newRate - 0.0) < doubleTolerance) { //newRate == 0.0
-         throw new IllegalArgumentException(
-            "Cannot change message rate to zero (" + getName() + ")!\n\tUse unschedule() to do that!");
-      }
-      if (Math.abs(newRate - rate) > doubleTolerance) { //newRate != rate
-         if(messageManager != null){
-            messageManager.changeMessageRate(this, newRate, rate);
+   private Element findElement(CopyOnWriteNoIteratorList<Message> messages, List<Object> elementPath){
+      Element el = null;
+      RecordElement rel = null;
+      if (elementPath.size() == 1) {
+         el = elementMap.get(elementPath.get(0));
+      } else {
+         String string = (String) elementPath.get(1);
+         if (string.startsWith("HEADER(")) {
+            Element[] elements = getActiveDataSource(currentMemType).getMsgHeader().getElements();
+            for (Element element : elements) {
+               if (element.getName().equals(elementPath.get(2))) {
+                  return element;
+               }
+            }
+            return null;
+         } else {
+            el = this.elementMap.get(string);
+            if (el instanceof RecordElement) {
+               rel = (RecordElement) el;
+            }
          }
-         double oldRate = rate;
-         rate = newRate;
-         if(messageManager != null){
-            messageManager.notifySchedulingChangeListeners(this, oldRate, newRate);
+         for (int i = 2; i < elementPath.size(); i++) {
+            if (elementPath.get(i) instanceof String) {
+               String name = (String) elementPath.get(i);
+               el = rel.getElementMap().get(name);
+               if (el instanceof RecordElement) {
+                  rel = (RecordElement) el;
+               }
+            } else if (elementPath.get(i) instanceof Integer) {
+               Integer index = (Integer) elementPath.get(i);
+               rel = rel.get(index);
+               el = rel;
+            }
          }
       }
+      return el;
    }
 
-   /**
-    * Changes the rate back to the default rate.
-    */
-   public void changeRateToDefault(ITestEnvironmentMessageSystemAccessor accessor) {
-      //      accessor.getMsgManager().changeMessageRate(this, defaultRate, rate);
-      double oldRate = getRate();
-      rate = defaultRate;
-      if(messageManager != null){
-         messageManager.notifySchedulingChangeListeners(this, oldRate, defaultRate);
+   private Element findElement(CopyOnWriteNoIteratorList<Message> messages, String elementName){
+      Message[] messagesArr = messages.get();
+      Element el = null;
+      for(int i = 0; i < messagesArr.length; i++){
+         el = messagesArr[i].getElementMap().get(elementName);
+         if(el != null){
+            return el;
+         }
       }
+      return null;
    }
-
-   public void sendWithLog(ITestAccessor accessor) {
-      if (accessor != null) {
-         accessor.getLogger().methodCalledOnObject(accessor, getMessageName(), new MethodFormatter(), this);
-      }
-      send();
-      if (accessor != null) {
-         accessor.getLogger().methodEnded(accessor);
-      }
-   }
-
-   public int getDefaultByteSize() {
-      return defaultByteSize;
-   }
-
-   public int getDefaultOffset() {
-      return defaultOffset;
-   }
-
-   public Element getElementByPath(ElementPath path) {
-      return getElementByPath(path, currentMemType);
-   }
-
+   
    private Element getElementByPath(ElementPath path, DataType type) {
       if (path.isHeaderElement()) {
          Element[] elements = getActiveDataSource(type).getMsgHeader().getElements();
@@ -1172,22 +1181,13 @@ public class Message implements Xmlizable, XmlizableStream {
       }
       return getElement(path.getList(), type);
    }
-   
-   public ListIterator<Element> getElementIterator(Element elemnt) {
-	   ArrayList<Element> list = new ArrayList<Element>(elementMap.values());
-	   int index = list.indexOf(elemnt);
-	   if (index >= 0) {
-		   return list.listIterator(index);		   
-	   }
-	   return null;
+
+   private Collection<Element> getLocalElements() {
+      return elementMap.values();
    }
 
-   public MessageId getMessageId() {
-      return id;
-   }
-
-   public void setMessageId(MessageId id) {
-      this.id = id;
+   private void setSchedule(boolean newValue) {
+      mapper.getMessageData(this, currentMemType).setScheduled(newValue);
    }
    
 }
