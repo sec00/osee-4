@@ -22,8 +22,6 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.osee.framework.jdk.core.util.benchmark.Benchmark;
 import org.eclipse.osee.ote.core.CopyOnWriteNoIteratorList;
 import org.eclipse.osee.ote.core.ServiceUtility;
-import org.eclipse.osee.ote.core.environment.TestEnvironment;
-import org.eclipse.osee.ote.core.environment.interfaces.ICancelTimer;
 import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironmentAccessor;
 import org.eclipse.osee.ote.core.environment.interfaces.ITimeout;
 import org.eclipse.osee.ote.message.Message;
@@ -126,17 +124,6 @@ public class MessageSystemListener implements IOSEEMessageReaderListener, IOSEEM
       return isTimedOut;
    }
 
-   public synchronized boolean waitForMessageNumber(int count) throws InterruptedException {
-      while (masterMessageCount < count) {
-         messageCount = 0;
-         wait();// onDataAvailable
-         if (isTimedOut()) {//we timed out
-            return false;
-         }
-      }
-      return true;
-   }
-
    private static Scheduler scheduler;
    
    public MsgWaitResult waitForCondition(ITestEnvironmentAccessor accessor, ICondition condition, boolean maintain, int milliseconds) throws InterruptedException {
@@ -145,31 +132,6 @@ public class MessageSystemListener implements IOSEEMessageReaderListener, IOSEEM
       }
       WaitOnCondition waitOnCondition = new WaitOnCondition(scheduler, condition, maintain, Collections.singletonList(this.message.get()), (long)milliseconds);
       return waitOnCondition.startWaiting();
-//      long time = 0l;
-//      boolean pass;
-//      if (milliseconds > 0) {
-//         ICancelTimer cancelTimer;
-//         synchronized (this) {
-//            pass = condition.check();
-//            time = accessor.getEnvTime();
-//            boolean done = pass ^ maintain;
-//            cancelTimer = accessor.setTimerFor(this, milliseconds);
-//            while (!done) {
-//               if (waitForData()) {
-//                  // we timed out
-//                  break;
-//               } else {
-//                  pass = condition.checkAndIncrement();
-//                  done = pass ^ maintain;
-//               }
-//            }
-//            time = accessor.getEnvTime() - time;
-//         }
-//         cancelTimer.cancelTimer();
-//      } else {
-//         pass = condition.check();
-//      }
-//      return new MsgWaitResult(time, condition.getCheckCount(), pass);
    }
 
    /**

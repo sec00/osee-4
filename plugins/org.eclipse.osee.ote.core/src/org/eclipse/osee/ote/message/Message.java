@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 import javax.xml.stream.XMLStreamException;
@@ -62,40 +61,32 @@ public class Message implements Xmlizable, XmlizableStream {
   
    private static final double doubleTolerance = 0.000001;
 
-   private LegacyMessageMapper mapper = new LegacyMessageMapperDefaultSingle();
-   
    private final LinkedHashMap<String, Element> elementMap;
-   @JsonProperty
-   private final String name;
-   private volatile boolean destroyed = false;
-   private DataType currentMemType;
-   private final int phase;
-   protected double rate;
-   protected final double defaultRate;
-   private final boolean isScheduledFromStart;
-   private boolean regularUnscheduleCalled = false;
-   private volatile boolean isTurnedOff = false;
-   private final Set<DataType> memTypeActive = new HashSet<DataType>();
-   private MessageData defaultMessageData;
-   private final int defaultByteSize;
-   private final int defaultOffset;
-   
-   private IMessageRequestor messageRequestor = null;
-
    //need to rework the waitforData notification to remove the listnerHandlers
    private final MessageSystemListener listenerHandler;
-//   protected final MessageSystemListener removableListenerHandler;
-   
-   
-   protected final ArrayList<IMessageScheduleChangeListener> schedulingChangeListeners = new ArrayList<IMessageScheduleChangeListener>(10);
-   private final List<IMemSourceChangeListener> preMemSourceChangeListeners = new CopyOnWriteArrayList<IMemSourceChangeListener>();
-   private final List<IMemSourceChangeListener> postMemSourceChangeListeners = new CopyOnWriteArrayList<IMemSourceChangeListener>();
-   private final List<IMessageDisposeListener> preMessageDisposeListeners = new CopyOnWriteArrayList<IMessageDisposeListener>();
-   private final List<IMessageDisposeListener> postMessageDisposeListeners = new CopyOnWriteArrayList<IMessageDisposeListener>();
+   private final MessageSystemListener removableListenerHandler;
+   private final Set<DataType> memTypeActive = new HashSet<DataType>();
+   @JsonProperty
+   private final String name;
 
-   private MessageId id;
-   
+   private final boolean isScheduledFromStart;
+   private final double defaultRate;
+   private final int defaultByteSize;
+   private final int defaultOffset;
+   private final int phase;
+
+   private volatile boolean destroyed = false;
+   private volatile boolean isTurnedOff = false;
+
+   private boolean regularUnscheduleCalled = false;
+   private DataType currentMemType;
+   private double rate;
    private IMessageManager messageManager;
+   private IMessageRequestor messageRequestor = null;
+   private LegacyMessageMapper mapper = new LegacyMessageMapperDefaultSingle();
+   private MessageData defaultMessageData;
+   private MessageId id;
+
    
    public Message(String name, int defaultByteSize, int defaultOffset, boolean isScheduled, int phase, double rate) {
       listenerHandler = new MessageSystemListener(this);
@@ -108,7 +99,7 @@ public class Message implements Xmlizable, XmlizableStream {
       this.defaultRate = rate;
       this.isScheduledFromStart = isScheduled;
       GCHelper.getGCHelper().addRefWatch(this);
-//      this.removableListenerHandler = new MessageSystemListener(this);
+      this.removableListenerHandler = new MessageSystemListener(this);
    }
    
    public Message(MessageId id, String name, MessageData data) {
@@ -125,29 +116,9 @@ public class Message implements Xmlizable, XmlizableStream {
       this.defaultRate = rate;
       this.isScheduledFromStart = false;
       GCHelper.getGCHelper().addRefWatch(this);
-//      this.removableListenerHandler = new MessageSystemListener(this);
+      this.removableListenerHandler = new MessageSystemListener(this);
    }
    
-   ArrayList<IMessageScheduleChangeListener> getSchedulingChangeListeners(){
-      return schedulingChangeListeners;
-   }
-   
-   List<IMemSourceChangeListener> getPreMemSourceChangeListeners(){
-      return preMemSourceChangeListeners;
-   }
-   
-   List<IMemSourceChangeListener> getPostMemSourceChangeListeners(){
-      return postMemSourceChangeListeners;
-   }
-   
-   List<IMessageDisposeListener> getPreMessageDisposeListeners(){
-      return preMessageDisposeListeners;
-   }
-   
-   List<IMessageDisposeListener> getPostMessageDisposeListeners(){
-      return postMessageDisposeListeners;
-   }
-
    void setMapper(LegacyMessageMapper mapper){
       this.mapper = mapper;
       this.defaultMessageData.setMapper(mapper);
@@ -172,8 +143,8 @@ public class Message implements Xmlizable, XmlizableStream {
     * @param listener The removable listener to remove
     */
    public void removeRemovableListener(IOSEEMessageListener listener) {
-      removeListener(listener);
-//      removableListenerHandler.removeListener(listener);
+//      removeListener(listener);
+      removableListenerHandler.removeListener(listener);
    }
 
    /**
@@ -182,8 +153,8 @@ public class Message implements Xmlizable, XmlizableStream {
     * @param listener the removable listern to add.
     */
    public void addRemovableListener(IOSEEMessageListener listener) {
-      addListener(listener);
-//      removableListenerHandler.addListener(listener);
+//      addListener(listener);
+      removableListenerHandler.addListener(listener);
    }
 
    /**
@@ -191,47 +162,29 @@ public class Message implements Xmlizable, XmlizableStream {
     * completion but can be used by anyone. Other listeners can be removed using the traditional removeListener call.
     */
    public void clearRemovableListeners() {
-//      this.removableListenerHandler.clearListeners();
+      this.removableListenerHandler.clearListeners();
 
    }
 
    public void destroy() {
       turnOff();
-      notifyPreDestroyListeners();
+      if(messageManager != null){
+         messageManager.notifyPreDestroyListeners(this);
+      }
 
       mapper.removeMessage(this);
       destroyed = true;
       defaultMessageData.dispose();
       listenerHandler.dispose();
 
-      schedulingChangeListeners.clear();
-      postMessageDisposeListeners.clear();
-      preMessageDisposeListeners.clear();
-      postMemSourceChangeListeners.clear();
-      preMemSourceChangeListeners.clear();
       elementMap.clear();
 
       if (messageRequestor != null) {
          messageRequestor.dispose();
       }
-//      removableListenerHandler.dispose();
-      
-      notifyPostDestroyListeners();
-   }
-
-   private void notifyPostDestroyListeners() {
-      for (IMessageDisposeListener listener : postMessageDisposeListeners) {
-         listener.onPostDispose(this);
-      }
-   }
-
-   private void notifyPreDestroyListeners() {
-      for (IMessageDisposeListener listener : preMessageDisposeListeners) {
-         try {
-            listener.onPreDispose(this);
-         } catch (Exception e) {
-            OseeLog.log(MessageSystemTestEnvironment.class, Level.SEVERE, "exception during listener notification", e);
-         }
+      removableListenerHandler.dispose();
+      if(messageManager != null){
+         messageManager.notifyPostDestroyListeners(this);
       }
    }
 
@@ -587,8 +540,8 @@ public class Message implements Xmlizable, XmlizableStream {
       if (!isTurnedOff) {
          setSchedule(true);
          regularUnscheduleCalled = false;
-         for (IMessageScheduleChangeListener listener : schedulingChangeListeners) {
-            listener.isScheduledChanged(true);
+         if(messageManager != null){
+            messageManager.notifySchedulingChangeListeners(this, true);
          }
       }
    }
@@ -601,8 +554,8 @@ public class Message implements Xmlizable, XmlizableStream {
       checkState();
       setSchedule(false);
       regularUnscheduleCalled = true;
-      for (IMessageScheduleChangeListener listener : schedulingChangeListeners) {
-         listener.isScheduledChanged(false);
+      if(messageManager != null){
+         messageManager.notifySchedulingChangeListeners(this, false);
       }
    }
 
@@ -641,24 +594,17 @@ public class Message implements Xmlizable, XmlizableStream {
       return listenerHandler;
    }
 
-   public MessageSystemListener getRemoveableListener() {
-//      return removableListenerHandler;
-      return null;
-   }
-
    public void addListener(IOSEEMessageListener listener) {
       if(messageManager != null){
          messageManager.addMessageListener(this, listener);
       }
-//      listenerHandler.addListener(listener);
    }
 
    public boolean removeListener(IOSEEMessageListener listener) {
       if(messageManager != null){
-         messageManager.removeMessageListener(this, listener);
+         return messageManager.removeMessageListener(this, listener);
       }
-      return true;
-//      return listenerHandler.removeListener(listener);
+      return false;
    }
 
    /**
@@ -675,7 +621,7 @@ public class Message implements Xmlizable, XmlizableStream {
          messageManager.notifyListenersOfUpdate(data);
       }
       this.listenerHandler.onDataAvailable(data, type);
-//      this.removableListenerHandler.onDataAvailable(data, type);
+      this.removableListenerHandler.onDataAvailable(data, type);
    }
 
    /*
@@ -917,12 +863,16 @@ public class Message implements Xmlizable, XmlizableStream {
 
    public void addSchedulingChangeListener(IMessageScheduleChangeListener listener) {
       checkState();
-      schedulingChangeListeners.add(listener);
+      if(messageManager !=null){
+         messageManager.addSchedulingChangeListener(this, listener);
+      }
    }
 
    public void removeSchedulingChangeListener(IMessageScheduleChangeListener listener) {
       checkState();
-      schedulingChangeListeners.remove(listener);
+      if(messageManager !=null){
+         messageManager.removeSchedulingChangeListener(this, listener);
+      }
    }
 
    public MessageData getActiveDataSource() {
@@ -957,64 +907,71 @@ public class Message implements Xmlizable, XmlizableStream {
       checkState();
       
       DataType oldMemType = getMemType();
-      notifyPreMemSourceChangeListeners(oldMemType, type, this);
+      if(messageManager != null){
+         messageManager.notifyPreMemSourceChangeListeners(this, oldMemType, type);
+      }
       mapper.updatePublicFieldReferences(this, type);
       setCurrentMemType(type);
-      notifyPostMemSourceChangeListeners(oldMemType, type, this);
+      if(messageManager != null){
+         messageManager.notifyPostMemSourceChangeListeners(this, oldMemType, type);
+      }
       return true;
-   }
-
-   private void notifyPostMemSourceChangeListeners(DataType old, DataType newtype, Message message) {
-      checkState();
-      for (IMemSourceChangeListener listener : postMemSourceChangeListeners) {
-         try {
-            listener.onChange(old, newtype, message);
-         } catch (Exception e) {
-            OseeLog.log(MessageSystemTestEnvironment.class, Level.SEVERE, e);
-         }
-      }
-   }
-
-   private void notifyPreMemSourceChangeListeners(DataType old, DataType newtype, Message message) {
-      checkState();
-      for (IMemSourceChangeListener listener : preMemSourceChangeListeners) {
-         listener.onChange(old, newtype, message);
-      }
    }
 
    public void addPreMemSourceChangeListener(IMemSourceChangeListener listener) {
       checkState();
-      preMemSourceChangeListeners.add(listener);
+      if(messageManager != null){
+         messageManager.addPreMemSourceChangeListener(this, listener);
+      }
    }
 
    public void addPostMemSourceChangeListener(IMemSourceChangeListener listener) {
       checkState();
-      postMemSourceChangeListeners.add(listener);
+      if(messageManager != null){
+         messageManager.addPostMemSourceChangeListener(this, listener);
+      }
    }
    
    public void removePreMemSourceChangeListener(IMemSourceChangeListener listener) {
       checkState();
-      preMemSourceChangeListeners.remove(listener);
+      if(messageManager != null){
+         messageManager.removePreMemSourceChangeListener(this, listener);
+      }
    }
 
    public void removePostMemSourceChangeListener(IMemSourceChangeListener listener) {
       checkState();
-      postMemSourceChangeListeners.remove(listener);
+      if(messageManager != null){
+         messageManager.removePostMemSourceChangeListener(this, listener);
+      }
    }
 
    public void addPreMessageDisposeListener(IMessageDisposeListener listener) {
       checkState();
-      preMessageDisposeListeners.add(listener);
+      if(messageManager != null){
+         messageManager.addPreMessageDisposeListener(this, listener);
+      }
    }
 
    public void removePreMessageDisposeListener(IMessageDisposeListener listener) {
       checkState();
-      preMessageDisposeListeners.remove(listener);
+      if(messageManager != null){
+         messageManager.removePreMessageDisposeListener(this, listener);
+      }
    }
 
    public void addPostMessageDisposeListener(IMessageDisposeListener listener) {
       checkState();
-      postMessageDisposeListeners.add(listener);
+      if(messageManager != null){
+         messageManager.addPostMessageDisposeListener(this, listener);
+      }
+   }
+   
+   public void removePostMessageDisposeListener(IMessageDisposeListener listener) {
+      checkState();
+      if(messageManager != null){
+         messageManager.removePostMessageDisposeListener(this, listener);
+      }
    }
 
    /**
@@ -1082,13 +1039,17 @@ public class Message implements Xmlizable, XmlizableStream {
    public void setMemTypeActive(DataType type) {
       checkState();
       memTypeActive.add(type);
-      notifyPostMemSourceChangeListeners(currentMemType, currentMemType, this);
+      if(messageManager != null){
+         messageManager.notifyPostMemSourceChangeListeners(this, currentMemType, currentMemType);
+      }
    }
 
    public void setMemTypeInactive(DataType type) {
       checkState();
       memTypeActive.add(type);
-      notifyPostMemSourceChangeListeners(currentMemType, currentMemType, this);
+      if(messageManager != null){
+         messageManager.notifyPostMemSourceChangeListeners(this, currentMemType, currentMemType);
+      }
    }
 
    public boolean isMemTypeActive(DataType type) {
@@ -1154,12 +1115,13 @@ public class Message implements Xmlizable, XmlizableStream {
             "Cannot change message rate to zero (" + getName() + ")!\n\tUse unschedule() to do that!");
       }
       if (Math.abs(newRate - rate) > doubleTolerance) { //newRate != rate
-         messageManager.changeMessageRate(this, newRate, rate);
-//         accessor.getMsgManager().changeMessageRate(this, newRate, rate);
+         if(messageManager != null){
+            messageManager.changeMessageRate(this, newRate, rate);
+         }
          double oldRate = rate;
          rate = newRate;
-         for (IMessageScheduleChangeListener listener : schedulingChangeListeners) {
-            listener.onRateChanged(this, oldRate, newRate);
+         if(messageManager != null){
+            messageManager.notifySchedulingChangeListeners(this, oldRate, newRate);
          }
       }
    }
@@ -1171,8 +1133,8 @@ public class Message implements Xmlizable, XmlizableStream {
       //      accessor.getMsgManager().changeMessageRate(this, defaultRate, rate);
       double oldRate = getRate();
       rate = defaultRate;
-      for (IMessageScheduleChangeListener listener : schedulingChangeListeners) {
-         listener.onRateChanged(this, oldRate, defaultRate);
+      if(messageManager != null){
+         messageManager.notifySchedulingChangeListeners(this, oldRate, defaultRate);
       }
    }
 

@@ -148,43 +148,37 @@ public class MessageControllerConsoleCommands {
       for(IOSEEMessageListener listener: msg.getListener().getRegisteredSlowListeners()){
          print(listener);
       }
-      for(IOSEEMessageListener listener: msg.getRemoveableListener().getRegisteredFastListeners()){
-         print(listener);
-      }
-      for(IOSEEMessageListener listener: msg.getRemoveableListener().getRegisteredSlowListeners()){
-         print(listener);
-      }
       
-      if(!msg.getSchedulingChangeListeners().isEmpty()){
-         System.out.println("\tIMessageScheduleChangeListener:");   
-         for(IMessageScheduleChangeListener listener:msg.getSchedulingChangeListeners()){
-            print(listener);
-         }
-      }
-      if(!msg.getPreMemSourceChangeListeners().isEmpty()){
-         System.out.println("\tPre IMemSourceChangeListener:");
-         for(IMemSourceChangeListener listener:msg.getPreMemSourceChangeListeners()){
-            print(listener);
-         }
-      }
-      if(!msg.getPostMemSourceChangeListeners().isEmpty()){
-         System.out.println("\tPost IMemSourceChangeListener:");
-         for(IMemSourceChangeListener listener:msg.getPostMemSourceChangeListeners()){
-            print(listener);
-         }
-      }
-      if(!msg.getPreMessageDisposeListeners().isEmpty()){
-         System.out.println("\tPre IMemSourceChangeListener:");
-         for(IMessageDisposeListener listener:msg.getPreMessageDisposeListeners()){
-            print(listener);
-         }
-      }
-      if(!msg.getPostMemSourceChangeListeners().isEmpty()){
-         System.out.println("\tPost IMessageDisposeListener:");
-         for(IMessageDisposeListener listener:msg.getPostMessageDisposeListeners()){
-            print(listener);
-         }
-      }
+//      if(!msg.getSchedulingChangeListeners().isEmpty()){
+//         System.out.println("\tIMessageScheduleChangeListener:");   
+//         for(IMessageScheduleChangeListener listener:msg.getSchedulingChangeListeners()){
+//            print(listener);
+//         }
+//      }
+//      if(!msg.getPreMemSourceChangeListeners().isEmpty()){
+//         System.out.println("\tPre IMemSourceChangeListener:");
+//         for(IMemSourceChangeListener listener:msg.getPreMemSourceChangeListeners()){
+//            print(listener);
+//         }
+//      }
+//      if(!msg.getPostMemSourceChangeListeners().isEmpty()){
+//         System.out.println("\tPost IMemSourceChangeListener:");
+//         for(IMemSourceChangeListener listener:msg.getPostMemSourceChangeListeners()){
+//            print(listener);
+//         }
+//      }
+//      if(!msg.getPreMessageDisposeListeners().isEmpty()){
+//         System.out.println("\tPre IMemSourceChangeListener:");
+//         for(IMessageDisposeListener listener:msg.getPreMessageDisposeListeners()){
+//            print(listener);
+//         }
+//      }
+//      if(!msg.getPostMemSourceChangeListeners().isEmpty()){
+//         System.out.println("\tPost IMessageDisposeListener:");
+//         for(IMessageDisposeListener listener:msg.getPostMessageDisposeListeners()){
+//            print(listener);
+//         }
+//      }
    }
    
    private void print(Object listener){

@@ -15,7 +15,9 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.eclipse.osee.ote.message.DestinationInfo;
+import org.eclipse.osee.ote.message.IMemSourceChangeListener;
 import org.eclipse.osee.ote.message.IMessageCreationListener;
+import org.eclipse.osee.ote.message.IMessageDisposeListener;
 import org.eclipse.osee.ote.message.Message;
 import org.eclipse.osee.ote.message.MessageDataReceiver;
 import org.eclipse.osee.ote.message.MessageDataUpdater;
@@ -104,5 +106,38 @@ public interface IMessageManager {
 
    void addMessageListener(Message message, IOSEEMessageListener listener);
 
-   void removeMessageListener(Message message, IOSEEMessageListener listener);
+   boolean removeMessageListener(Message message, IOSEEMessageListener listener);
+
+   void notifyPreMemSourceChangeListeners(Message message, DataType oldMemType, DataType type);
+
+   void notifyPostMemSourceChangeListeners(Message message, DataType oldMemType, DataType type);
+
+   void addPreMemSourceChangeListener(Message message, IMemSourceChangeListener listener);
+
+   void addPostMemSourceChangeListener(Message message, IMemSourceChangeListener listener);
+
+   void removePreMemSourceChangeListener(Message message, IMemSourceChangeListener listener);
+
+   void removePostMemSourceChangeListener(Message message, IMemSourceChangeListener listener);
+
+   void addSchedulingChangeListener(Message message, IMessageScheduleChangeListener listener);
+
+   void removeSchedulingChangeListener(Message message, IMessageScheduleChangeListener listener);
+
+   void notifySchedulingChangeListeners(Message message, boolean b);
+
+   void notifySchedulingChangeListeners(Message message, double oldRate, double newRate);
+
+   void removePostMessageDisposeListener(Message message, IMessageDisposeListener listener);
+
+   void addPostMessageDisposeListener(Message message, IMessageDisposeListener listener);
+
+   void removePreMessageDisposeListener(Message message, IMessageDisposeListener listener);
+
+   void addPreMessageDisposeListener(Message message, IMessageDisposeListener listener);
+
+   void notifyPreDestroyListeners(Message message);
+
+   void notifyPostDestroyListeners(Message message);
+
 }
