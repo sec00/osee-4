@@ -116,29 +116,33 @@ public class OTEPackagingBuilder extends IncrementalProjectBuilder {
    @SuppressWarnings("rawtypes")
    protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
 	   try{
-	      System.out.println("here we go");
 	      
-	      FeatureExportInfo info = new FeatureExportInfo();
-	      info.toDirectory = true;
-	      info.useJarFormat = true;
-	      info.exportSource = false;
-	      info.exportSourceBundle = false;
-	      info.allowBinaryCycles = true;
-	      info.useWorkspaceCompiledClasses = true;
-	      info.destinationDirectory = getWorkspaceArchiveFolder().getAbsolutePath();
-	      info.zipFileName = getProject().getName()+".jar";
-	      IProjectDescription desc = getProject().getDescription();
-	      IModel model = PluginRegistry.findModel(getProject());
-	      info.items = new Object[]{model};
-	      info.signingInfo = null;
-	      info.qualifier = Long.toString(System.currentTimeMillis());
-	      
-	      PluginExportOperation op = new PluginExportOperation(info, "test");
-	      op.schedule();
 	      
 	      if(!isOTEBuilderActive()){
 	         return null;
 	      }
+	      System.out.println("here we go");
+         
+         FeatureExportInfo info = new FeatureExportInfo();
+         info.toDirectory = true;
+         info.useJarFormat = true;
+         info.exportSource = false;
+         info.exportSourceBundle = false;
+         info.allowBinaryCycles = true;
+         info.useWorkspaceCompiledClasses = true;
+         info.destinationDirectory = getWorkspaceArchiveFolder().getAbsolutePath();
+         info.zipFileName = getProject().getName()+".jar";
+         IProjectDescription desc = getProject().getDescription();
+         IModel model = PluginRegistry.findModel(getProject());
+         info.items = new Object[]{model};
+         info.signingInfo = null;
+         info.qualifier = Long.toString(System.currentTimeMillis());
+         
+         PluginExportOperation op = new PluginExportOperation(info, "test");
+         op.schedule();
+	      
+	      
+	      
 	      long time = System.currentTimeMillis();
 	      IJavaProject javaProject = JavaCore.create(getProject());
 	      if(javaProject != null){

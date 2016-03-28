@@ -145,9 +145,9 @@ public class MessageControllerConsoleCommands {
       for(IOSEEMessageListener listener: msg.getListener().getRegisteredFastListeners()){
          print(listener);
       }
-      for(IOSEEMessageListener listener: msg.getListener().getRegisteredSlowListeners()){
-         print(listener);
-      }
+//      for(IOSEEMessageListener listener: msg.getListener().getRegisteredSlowListeners()){
+//         print(listener);
+//      }
       
 //      if(!msg.getSchedulingChangeListeners().isEmpty()){
 //         System.out.println("\tIMessageScheduleChangeListener:");   
