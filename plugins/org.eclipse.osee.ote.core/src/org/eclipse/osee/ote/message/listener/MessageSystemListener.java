@@ -69,7 +69,7 @@ public class MessageSystemListener implements IOSEEMessageReaderListener, IOSEEM
     * 
     * @see MessageSystemListener#addListener(IOSEEMessageListener, SPEED)
     */
-   public boolean addListener(IOSEEMessageListener listener) {
+   private boolean addListener(IOSEEMessageListener listener) {
       return addListener(listener, SPEED.FAST);
    }
 
@@ -84,14 +84,14 @@ public class MessageSystemListener implements IOSEEMessageReaderListener, IOSEEM
     * @param listenerSpeed -
     * @return Returns boolean success indication.
     */
-   public boolean addListener(IOSEEMessageListener listener, SPEED listenerSpeed) {
+   private boolean addListener(IOSEEMessageListener listener, SPEED listenerSpeed) {
       if (!fastListeners.contains(listener)) {
          fastListeners.add(listener);
       }
       return true;
    }
 
-   public void clearListeners() {
+   private void clearListeners() {
       this.fastListeners.clear();
    }
 
@@ -101,7 +101,7 @@ public class MessageSystemListener implements IOSEEMessageReaderListener, IOSEEM
     * @return Returns presence boolean indication.
     * @see #containsListener(IOSEEMessageListener, SPEED)
     */
-   public boolean containsListener(final IOSEEMessageListener listener) {
+   private boolean containsListener(final IOSEEMessageListener listener) {
       return containsListener(listener, SPEED.FAST);
 
    }
@@ -111,7 +111,7 @@ public class MessageSystemListener implements IOSEEMessageReaderListener, IOSEEM
     * 
     * @return true if the listener is register false otherwise
     */
-   public boolean containsListener(final IOSEEMessageListener listener, final SPEED listenerSpeed) {
+   private boolean containsListener(final IOSEEMessageListener listener, final SPEED listenerSpeed) {
       return fastListeners.contains(listener);
    }
    
@@ -123,15 +123,15 @@ public class MessageSystemListener implements IOSEEMessageReaderListener, IOSEEM
    /**
     * returns the number of received messages since the last call to waitForData
     */
-   public synchronized int getLocalMessageCount() {
+   private synchronized int getLocalMessageCount() {
       return messageCount;
    }
 
-   public synchronized int getMasterMessageCount() {
+   private synchronized int getMasterMessageCount() {
       return masterMessageCount;
    }
 
-   public Collection<IOSEEMessageListener> getRegisteredFastListeners() {
+   private Collection<IOSEEMessageListener> getRegisteredFastListeners() {
       return fastListeners.fillCollection(new ArrayList<IOSEEMessageListener>(fastListeners.length()));
    }
 
@@ -182,11 +182,11 @@ public class MessageSystemListener implements IOSEEMessageReaderListener, IOSEEM
       }
    }
 
-   public boolean removeListener(IOSEEMessageListener listener) {
+   private boolean removeListener(IOSEEMessageListener listener) {
       return fastListeners.remove(listener);
    }
 
-   public boolean removeListener(IOSEEMessageListener listener, SPEED listenerSpeed) {
+   private boolean removeListener(IOSEEMessageListener listener, SPEED listenerSpeed) {
       return fastListeners.remove(listener);
    }
 

@@ -71,6 +71,12 @@ public class MessageController implements IMessageManager {
       container.add(listener);
    }
    
+   @Override
+   public void addMessageListenerRemovable(Message message, IOSEEMessageListener listener) {
+      MessageListenerContainer container = getMessageListeners(message);
+      container.addRemovable(listener);
+   }
+   
    public void addMessagePublishingHandler(MessagePublishingHandler handler){
       messagePublishingHandlers.put(handler.getType(), handler);
    }
@@ -124,6 +130,15 @@ public class MessageController implements IMessageManager {
    }
 
    @Override
+   public boolean containsListener(Message message, IOSEEMessageListener listener) {
+      MessageListenerContainer container = messageListeners.get(message);
+      if(container != null){
+         return container.containsListener(listener);
+      }
+      return false;
+   }
+   
+   @Override
    public IMessageRequestor createMessageRequestor(String name) {
       return new MessageRequestorImpl(name, this);
    }
@@ -142,7 +157,7 @@ public class MessageController implements IMessageManager {
          return (CLASSTYPE) messageCollection.findReader(clazz);
       }
    }
-   
+
    @Override
    public Collection<Message> getAllMessages() {
       return messageCollection.getAllMessages();
@@ -157,7 +172,7 @@ public class MessageController implements IMessageManager {
    public Collection<Message> getAllReaders(DataType type) {
       return messageCollection.getAllReaders(type);
    }
-
+   
    @Override
    public Collection<Message> getAllWriters() {
       return messageCollection.getAllWriters();
@@ -167,12 +182,12 @@ public class MessageController implements IMessageManager {
    public Collection<Message> getAllWriters(DataType type) {
       return messageCollection.getAllWriters(type);
    }
-   
+
    @Override
    public Set<DataType> getAvailableDataTypes() {
       return availableDataTypes;
    }
-
+   
    public Class<? extends Message> getMessageClass(String msgClass) throws ClassNotFoundException {
       return classLocator.findClass(msgClass).asSubclass(Message.class);
    }
@@ -185,7 +200,7 @@ public class MessageController implements IMessageManager {
          return 0;
       }
    }
-   
+
    @Override
    public void init() throws Exception {
    }
@@ -281,7 +296,7 @@ public class MessageController implements IMessageManager {
    @Override
    public void publishMessages(boolean publish) {
    }
-
+   
    public MessageDataUpdater registerDataReceiver(MessageDataReceiver receiver){
       messageDataReceivers.add(receiver);
       return new MessageDataUpdaterImpl();
@@ -308,6 +323,12 @@ public class MessageController implements IMessageManager {
       return false;
    }
    
+   @Override
+   public void removeMessageListenerRemovable(Message message, IOSEEMessageListener listener) {
+      MessageListenerContainer container = getMessageListeners(message);
+      container.removeRemovable(listener);
+   }
+   
    public void removeMessagePublishingHandler(MessagePublishingHandler handler){
       messagePublishingHandlers.remove(handler.getType());
    }
@@ -316,7 +337,7 @@ public class MessageController implements IMessageManager {
    public void removePostCreateMessageListener(IMessageCreationListener listener) {
       postCreation.remove(listener);
    }
-   
+
    @Override
    public void removePostMemSourceChangeListener(Message message, IMemSourceChangeListener listener) {
       MessageListenerContainer container = getMessageListeners(message);
@@ -333,7 +354,7 @@ public class MessageController implements IMessageManager {
       MessageListenerContainer container = getMessageListeners(message);
       container.removePreMemSourceChangeListener(listener);
    }
-   
+
    public void removePreMessageDisposeListener(Message message, IMessageDisposeListener listener) {
       MessageListenerContainer container = getMessageListeners(message);
       container.removePreMessageDisposeListener(listener);
@@ -350,11 +371,11 @@ public class MessageController implements IMessageManager {
          task.put(message);
       }
    }
-
+   
    public void unregisterDataReceiver(MessageDataReceiver receiver){
       messageDataReceivers.remove(receiver);
    }
-
+   
    public void unregisterWriter(MessageDataWriter writer){
       CopyOnWriteNoIteratorList<MessageDataWriter> list = messageDataWriters.get(writer.getIOType());
       if(list != null){
@@ -371,7 +392,7 @@ public class MessageController implements IMessageManager {
          task.remove(message);
       }
    }
-   
+
    @Override
    public void update(MessageId id, ByteBuffer data) {
       MessageData messageData = getMessageDataReader(id);
@@ -389,7 +410,7 @@ public class MessageController implements IMessageManager {
          }
       }
    }
-   
+
    @Override
    public void write(Message msg, DestinationInfo info) {
       MessageData data = msg.getDefaultMessageData();
@@ -414,14 +435,6 @@ public class MessageController implements IMessageManager {
          }
       }
    }
-
-   Map<IOType, CopyOnWriteNoIteratorList<MessageDataWriter>> getDataWriters(){
-      return messageDataWriters;
-   }
-
-   List<IMessageCreationListener> getInstanceRequestListeners(){
-      return instanceRequestListeners;
-   }
    
 //   @Override
 //   public void publishAtFrameCompletion(Message msg) {
@@ -438,6 +451,14 @@ public class MessageController implements IMessageManager {
 //      }
 //   }
    
+   Map<IOType, CopyOnWriteNoIteratorList<MessageDataWriter>> getDataWriters(){
+      return messageDataWriters;
+   }
+   
+   List<IMessageCreationListener> getInstanceRequestListeners(){
+      return instanceRequestListeners;
+   }
+   
    List<MessageDataReceiver> getMessageDataReceivers(){
       return messageDataReceivers;
    }
@@ -445,11 +466,11 @@ public class MessageController implements IMessageManager {
    Map<IOType, MessagePublishingHandler> getMessagePublishers(){
       return messagePublishingHandlers;
    }
-   
+
    List<IMessageCreationListener> getPostCreationListeners(){
       return postCreation;
    }
-   
+
    List<IMessageCreationListener> getPreCreationListeners(){
       return preCreation;
    }
@@ -517,7 +538,7 @@ public class MessageController implements IMessageManager {
    private MessageData getMessageDataReader(MessageId id) {
       return idToDataMap.get(id);
    }
-
+   
    private MessageListenerContainer getMessageListeners(Message message){
       MessageListenerContainer container = messageListeners.get(message);
       if(container == null){
@@ -526,7 +547,7 @@ public class MessageController implements IMessageManager {
       }
       return container;
    }
-
+   
    @SuppressWarnings("unchecked")
    private <CLASSTYPE extends Message> CLASSTYPE getMessageReader(IMessageRequestor req, Class<CLASSTYPE> messageClass) throws TestException {
       Message msg = messageCollection.findReader(messageClass);
@@ -539,7 +560,7 @@ public class MessageController implements IMessageManager {
       }
       return (CLASSTYPE)msg;
    }
-   
+
    @SuppressWarnings("unchecked")
    private <CLASSTYPE extends Message> CLASSTYPE getMessageWriter(IMessageRequestor req, Class<CLASSTYPE> messageClass) throws TestException {
       Message msg = messageCollection.findWriter(messageClass);
@@ -552,7 +573,7 @@ public class MessageController implements IMessageManager {
       }
       return (CLASSTYPE)msg;
    }
-   
+
    @SuppressWarnings("unchecked")
    private <CLASSTYPE extends Message> void notifyPostCreateMessage(Class<CLASSTYPE> messageClass, IMessageRequestor requestor, boolean writer, Message message){
       Namespace namespace = new Namespace(message.getDefaultMessageData().getType().name());
@@ -566,7 +587,7 @@ public class MessageController implements IMessageManager {
          listener.onPreCreate(messageClass, requestor, writer);
       }
    }
-
+   
    private void registerMessage(Message message) {
       if(message.getMessageId() == null){
          System.out.println(message.getDefaultMessageData().getClass().getName() + " is not setting the message id");
@@ -608,7 +629,7 @@ public class MessageController implements IMessageManager {
       //determine the MessageId for the update lookup
       registerMessage(message);
    }
-
+   
    private void setupMessageWriter(Message message) {
 //      if(message.getRate() != 0.0){
 //         PeriodicPublishTask task = periodicPublish.get(message.getRate(), 1);
@@ -696,7 +717,7 @@ public class MessageController implements IMessageManager {
          message.destroy();
       }
    }
-   
+
    private class MessageDataUpdaterImpl implements MessageDataUpdater {
 
       @Override
@@ -705,10 +726,11 @@ public class MessageController implements IMessageManager {
       }
       
    }
-   
+
    private static class MessageListenerContainer {
       
       private final CopyOnWriteNoIteratorList<IOSEEMessageListener> listeners = new CopyOnWriteNoIteratorList<>(IOSEEMessageListener.class);
+      private final CopyOnWriteNoIteratorList<IOSEEMessageListener> removablelisteners = new CopyOnWriteNoIteratorList<>(IOSEEMessageListener.class);
   
       private final ArrayList<IMessageScheduleChangeListener> schedulingChangeListeners = new ArrayList<IMessageScheduleChangeListener>(10);
       private final List<IMemSourceChangeListener> preMemSourceChangeListeners = new CopyOnWriteArrayList<IMemSourceChangeListener>();
@@ -720,6 +742,14 @@ public class MessageController implements IMessageManager {
          listeners.add(listener);
       }
 
+      public boolean containsListener(IOSEEMessageListener listener) {
+         boolean contains = listeners.contains(listener);
+         if(!contains){
+            return removablelisteners.contains(listener);
+         }
+         return contains;
+      }
+
       public void addPostMemSourceChangeListener(IMemSourceChangeListener listener) {
          postMemSourceChangeListeners.add(listener);
       }
@@ -727,26 +757,38 @@ public class MessageController implements IMessageManager {
       public void addPostMessageDisposeListener(IMessageDisposeListener listener) {
          postMessageDisposeListeners.add(listener);
       }
-      
+
       public void addPreMemSourceChangeListener(IMemSourceChangeListener listener) {
          preMemSourceChangeListeners.add(listener);
       }
-
+      
       public void addPreMessageDisposeListener(IMessageDisposeListener listener) {
          preMessageDisposeListeners.add(listener);
+      }
+
+      public void addRemovable(IOSEEMessageListener listener) {
+         removablelisteners.add(listener);
       }
 
       public void addSchedulingChangeListener(Message message, IMessageScheduleChangeListener listener) {
          schedulingChangeListeners.add(listener);
       }
 
+      public void clearRemovable(){
+         removablelisteners.clear();
+      }
+      
       public void newDataAvailable(MessageData messageData) {
          IOSEEMessageListener[] arr = listeners.get();
          for(int i = 0; i < arr.length; i++){
             arr[i].onDataAvailable(messageData, messageData.getType());
          }
+         arr = removablelisteners.get();
+         for(int i = 0; i < arr.length; i++){
+            arr[i].onDataAvailable(messageData, messageData.getType());
+         }
       }
-      
+
       public void notifySchedulingChangeListeners(boolean isScheduled) {
          for (IMessageScheduleChangeListener listener : schedulingChangeListeners) {
             listener.isScheduledChanged(isScheduled);
@@ -759,11 +801,11 @@ public class MessageController implements IMessageManager {
             listener.onRateChanged(message, oldRate, newRate);
          }
       }
-
+      
       public boolean remove(IOSEEMessageListener listener) {
          return listeners.remove(listener);
       }
-
+      
       public void removePostMemSourceChangeListener(IMemSourceChangeListener listener) {
          postMemSourceChangeListeners.remove(listener);
       }
@@ -775,9 +817,13 @@ public class MessageController implements IMessageManager {
       public void removePreMemSourceChangeListener(IMemSourceChangeListener listener) {
          preMemSourceChangeListeners.remove(listener);
       }
-      
+
       public void removePreMessageDisposeListener(IMessageDisposeListener listener) {
          preMessageDisposeListeners.remove(listener);
+      }
+      
+      public boolean removeRemovable(IOSEEMessageListener listener) {
+         return removablelisteners.remove(listener);
       }
 
       public void removeSchedulingChangeListener(Message message, IMessageScheduleChangeListener listener) {
@@ -907,6 +953,35 @@ public class MessageController implements IMessageManager {
          return name;
       }
       
+   }
+
+   @Override
+   public void clearRemovableListeners() {
+      for(MessageListenerContainer col:messageListeners.values()){
+         col.clearRemovable();
+      }
+   }
+
+   @Override
+   public IOSEEMessageListener findMessageListenerType(Message message, Class clazz) {
+      MessageListenerContainer container = messageListeners.get(message);
+      if(container != null){
+         IOSEEMessageListener[] arr = container.listeners.get();
+         for(int i = 0; i < arr.length; i++){
+            if(clazz.isAssignableFrom(arr[i].getClass())){
+               return arr[i];
+            }
+         }
+      }
+      return null;
+   }
+
+   @Override
+   public void clearRemovableListeners(Message message) {
+      MessageListenerContainer container = messageListeners.get(message);
+      if(container != null){
+         container.clearRemovable();
+      }
    }
 
 }

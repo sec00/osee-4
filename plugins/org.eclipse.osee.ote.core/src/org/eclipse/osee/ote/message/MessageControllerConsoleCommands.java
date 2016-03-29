@@ -142,9 +142,9 @@ public class MessageControllerConsoleCommands {
 
    private void printListenerInfo(Message msg) {
       System.out.println("\tIOSEEMessageListener:");
-      for(IOSEEMessageListener listener: msg.getListener().getRegisteredFastListeners()){
-         print(listener);
-      }
+//      for(IOSEEMessageListener listener: msg.getListener().getRegisteredFastListeners()){
+//         print(listener);
+//      }
 //      for(IOSEEMessageListener listener: msg.getListener().getRegisteredSlowListeners()){
 //         print(listener);
 //      }

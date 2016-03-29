@@ -140,4 +140,16 @@ public interface IMessageManager {
 
    void notifyPostDestroyListeners(Message message);
 
+   void addMessageListenerRemovable(Message message, IOSEEMessageListener listener);
+
+   void removeMessageListenerRemovable(Message message, IOSEEMessageListener listener);
+
+   boolean containsListener(Message message, IOSEEMessageListener listener);
+   
+   void clearRemovableListeners();
+
+   IOSEEMessageListener findMessageListenerType(Message message, Class clazz);
+
+   void clearRemovableListeners(Message message);
+
 }

@@ -178,8 +178,9 @@ public class Message implements Xmlizable, XmlizableStream {
     * @param listener the removable listern to add.
     */
    public void addRemovableListener(IOSEEMessageListener listener) {
-//      addListener(listener);
-      removableListenerHandler.addListener(listener);
+      if(messageManager != null){
+         messageManager.addMessageListenerRemovable(this, listener);
+      }
    }
 
    public void addSchedulingChangeListener(IMessageScheduleChangeListener listener) {
@@ -324,12 +325,20 @@ public class Message implements Xmlizable, XmlizableStream {
     * completion but can be used by anyone. Other listeners can be removed using the traditional removeListener call.
     */
    public void clearRemovableListeners() {
-      this.removableListenerHandler.clearListeners();
-
+      if(messageManager != null){
+         messageManager.clearRemovableListeners(this);
+      }
    }
    
    public boolean containsSendListener(IMessageSendListener listener) {
       return getActiveDataSource().containsSendListener(listener);
+   }
+   
+   public boolean containsListener(IOSEEMessageListener listener){
+      if(messageManager != null){
+         return messageManager.containsListener(this, listener);
+      }
+      return false;
    }
 
    public void destroy() {
@@ -352,6 +361,13 @@ public class Message implements Xmlizable, XmlizableStream {
       if(messageManager != null){
          messageManager.notifyPostDestroyListeners(this);
       }
+   }
+   
+   public IOSEEMessageListener findMessageListenerType(Class clazz) {
+      if(messageManager != null){
+         return messageManager.findMessageListenerType(this, clazz);
+      }
+      return null;
    }
 
    public MessageData getActiveDataSource() {
@@ -795,8 +811,10 @@ public class Message implements Xmlizable, XmlizableStream {
     * @param listener The removable listener to remove
     */
    public void removeRemovableListener(IOSEEMessageListener listener) {
-//      removeListener(listener);
-      removableListenerHandler.removeListener(listener);
+      checkState();
+      if(messageManager != null){
+         messageManager.removeMessageListenerRemovable(this, listener);
+      }
    }
 
    public void removeSchedulingChangeListener(IMessageScheduleChangeListener listener) {
