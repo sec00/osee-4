@@ -11,6 +11,7 @@
 package org.eclipse.osee.ote.message.mock;
 
 import org.eclipse.osee.ote.message.Message;
+import org.eclipse.osee.ote.message.StringMessageId;
 import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.elements.EnumeratedElement;
 import org.eclipse.osee.ote.message.elements.Float32Element;
@@ -30,6 +31,7 @@ public class TestMessage extends Message {
 
    public TestMessage() {
       super("TEST_MSG", 100, 0, true, 0, 50.0);
+      setMessageId(new StringMessageId(TestMemType.ETHERNET, "TestMessage"));
       TestMessageData ethData =
          new TestMessageData(this.getClass().getName(), getName(), getDefaultByteSize(), getDefaultOffset(),
             TestMemType.ETHERNET);

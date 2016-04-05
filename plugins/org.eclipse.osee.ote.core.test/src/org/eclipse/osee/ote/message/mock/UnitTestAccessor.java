@@ -10,13 +10,9 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.message.mock;
 
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Filter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -25,14 +21,13 @@ import java.util.logging.Logger;
 
 import org.eclipse.osee.framework.jdk.core.persistence.Xmlizable;
 import org.eclipse.osee.ote.core.MethodFormatter;
+import org.eclipse.osee.ote.core.ServiceUtility;
 import org.eclipse.osee.ote.core.TestCase;
 import org.eclipse.osee.ote.core.TestScript;
 import org.eclipse.osee.ote.core.environment.EnvironmentTask;
 import org.eclipse.osee.ote.core.environment.ReportDataControl;
 import org.eclipse.osee.ote.core.environment.ScriptControl;
-import org.eclipse.osee.ote.core.environment.TestEnvironment;
 import org.eclipse.osee.ote.core.environment.command.CommandDescription;
-import org.eclipse.osee.ote.core.environment.interfaces.BasicTimeout;
 import org.eclipse.osee.ote.core.environment.interfaces.ICancelTimer;
 import org.eclipse.osee.ote.core.environment.interfaces.IExecutionUnitManagement;
 import org.eclipse.osee.ote.core.environment.interfaces.IReportData;
@@ -44,22 +39,30 @@ import org.eclipse.osee.ote.core.environment.interfaces.ITestStation;
 import org.eclipse.osee.ote.core.environment.interfaces.ITimeout;
 import org.eclipse.osee.ote.core.environment.interfaces.ITimerControl;
 import org.eclipse.osee.ote.core.environment.status.CommandEndedStatusEnum;
-import org.eclipse.osee.ote.core.framework.IRunManager;
 import org.eclipse.osee.ote.core.log.ITestPointTally;
 import org.eclipse.osee.ote.core.log.TestLogger;
 import org.eclipse.osee.ote.core.log.record.TestPointRecord;
 import org.eclipse.osee.ote.core.log.record.TestRecord;
+import org.eclipse.osee.ote.message.BasicWriter;
+import org.eclipse.osee.ote.message.ClassLocator;
+import org.eclipse.osee.ote.message.MessageController;
+import org.eclipse.osee.ote.message.TestMessageDataType;
+import org.eclipse.osee.ote.message.TestMessageIOType;
 import org.eclipse.osee.ote.message.enums.DataType;
 import org.eclipse.osee.ote.message.interfaces.IMessageManager;
 import org.eclipse.osee.ote.message.interfaces.ITestAccessor;
 import org.eclipse.osee.ote.message.interfaces.ITestEnvironmentMessageSystemAccessor;
+import org.eclipse.osee.ote.message.timer.SimulatedTime;
 import org.eclipse.ote.scheduler.Scheduler;
+import org.eclipse.ote.scheduler.SchedulerImpl;
+import org.eclipse.ote.scheduler.SchedulerImpl.DelayStrategy;
+import org.osgi.framework.ServiceRegistration;
 
 public class UnitTestAccessor implements ITestEnvironmentMessageSystemAccessor, ITestAccessor {
-   private final HashMap<EnvironmentTask, ScheduledFuture<?>> handleMap =
-         new HashMap<EnvironmentTask, ScheduledFuture<?>>(32);
-   private final ScheduledExecutorService executor =
-         Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
+//   private final HashMap<EnvironmentTask, ScheduledFuture<?>> handleMap =
+//         new HashMap<EnvironmentTask, ScheduledFuture<?>>(32);
+//   private final ScheduledExecutorService executor =
+//         Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
    private final IScriptControl scriptCtrl = new ScriptControl();
    private final IReportData reportData = new ReportDataControl();
    private final ITestLogger testLogger = new TestLogger() {
@@ -401,151 +404,47 @@ public class UnitTestAccessor implements ITestEnvironmentMessageSystemAccessor, 
 
    };
 
-   private final ITimerControl timerCtrl = new ITimerControl() {
+   private ITimerControl timerCtrl;// = new SimulatedTime(sch, scriptCtrl);
+   
+private static class BasicClassLocator implements ClassLocator {
+      
+      private ClassLoader loader;
 
-      @Override
-      public void addTask(final EnvironmentTask task, TestEnvironment environment) {
-         final ScheduledFuture<?> handle = schedulePeriodicTask(new Runnable() {
-            @Override
-            public void run() {
-
-               try {
-                  if (task.isRunning()) {
-                     task.runOneCycle();
-                  }
-               } catch (Throwable ex) {
-                  ScheduledFuture<?> h = handleMap.get(task);
-                  if (h != null) {
-                     h.cancel(false);
-                  }
-                  ex.printStackTrace(System.err);
-               }
-            }
-
-         }, 0, (long) Math.rint(1000.0 / task.getHzRate()));
-         handleMap.put(task, handle);
+      public BasicClassLocator(ClassLoader loader) {
+         this.loader = loader;
       }
 
       @Override
-      public void cancelAllTasks() {
-         for (ScheduledFuture<?> handle : handleMap.values()) {
-            handle.cancel(false);
-         }
-         handleMap.clear();
+      public Class<?> findClass(String name) throws ClassNotFoundException {
+         return loader.loadClass(name);
       }
+      
+   }
 
-      @Override
-      public void cancelTimers() {
-         executor.shutdown();
-      }
-
-      @Override
-      public void dispose() {
-
-      }
-
-      @Override
-      public void envWait(ITimeout obj, int milliseconds) throws InterruptedException {
-         synchronized (obj) {
-            obj.wait(milliseconds);
-         }
-      }
-
-      @Override
-      public void envWait(int milliseconds) throws InterruptedException {
-         envWait(new BasicTimeout(), milliseconds);
-      }
-
-      @Override
-      public int getCycleCount() {
-         return (int) System.currentTimeMillis() / 20;
-      }
-
-      @Override
-      public long getEnvTime() {
-         return System.currentTimeMillis();
-      }
-
-      @Override
-      public void incrementCycleCount() {
-
-      }
-
-      @Override
-      public void removeTask(final EnvironmentTask task) {
-         ScheduledFuture<?> handle = handleMap.remove(task);
-         if (handle != null) {
-            handle.cancel(false);
-         }
-      }
-
-      @Override
-      public void setCycleCount(int cycle) {
-
-      }
-
-      @Override
-      public ICancelTimer setTimerFor(final ITimeout objToNotify, int milliseconds) {
-         objToNotify.setTimeout(false);
-         final ScheduledFuture<?> handle = scheduleOneShotTask(new Runnable() {
-
-            @Override
-            public void run() {
-               synchronized (objToNotify) {
-                  objToNotify.setTimeout(true);
-                  objToNotify.notify();
-               }
-            }
-         }, milliseconds);
-
-         return new ICancelTimer() {
-
-            @Override
-            public void cancelTimer() {
-               handle.cancel(false);
-            }
-         };
-      }
-
-      @Override
-      public void step() {
-
-      }
-
-      @Override
-      public long getTimeOfDay() {
-         return 0;
-      }
-
-      @Override
-      public void setRunManager(IRunManager runManager) {
-      }
-
-      @Override
-      public IRunManager getRunManager() {
-         return null;
-      }
-
-      @Override
-      public boolean isRealtime() {
-         return false;
-      }
-
-      @Override
-      public Scheduler getScheduler() {
-         // TODO Auto-generated method stub
-         return null;
-      }
-
-   };
+   private SchedulerImpl sch;
+   private IMessageManager msgManager;
+   private ServiceRegistration<Scheduler> reg;
 
    public UnitTestAccessor() {
-
+      sch = new SchedulerImpl(true, DelayStrategy.sleep);
+      sch.start();
+      reg = ServiceUtility.getContext().registerService(Scheduler.class, sch, null);
+      
+      try {
+         timerCtrl = new SimulatedTime(sch, scriptCtrl);
+      } catch (IOException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+      
+      msgManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), timerCtrl);
+      msgManager.registerWriter(new BasicWriter(TestMessageIOType.eth1, TestMessageDataType.eth1));
+      
    }
 
    @Override
    public IMessageManager getMsgManager() {
-      return null;
+      return msgManager;
    }
 
    @Override
@@ -648,17 +547,11 @@ public class UnitTestAccessor implements ITestEnvironmentMessageSystemAccessor, 
       return timerCtrl.setTimerFor(listener, time);
    }
 
-   public ScheduledFuture<?> schedulePeriodicTask(Runnable task, long initialDelay, long period) {
-      return executor.scheduleAtFixedRate(task, initialDelay, period, TimeUnit.MILLISECONDS);
-   }
-
-   public ScheduledFuture<?> scheduleOneShotTask(Runnable task, long delay) {
-      return executor.schedule(task, delay, TimeUnit.MILLISECONDS);
-   }
-
    public void shutdown() {
       timerCtrl.cancelAllTasks();
       timerCtrl.cancelTimers();
+      sch.stop();
+      reg.unregister();
    }
 
    @Override

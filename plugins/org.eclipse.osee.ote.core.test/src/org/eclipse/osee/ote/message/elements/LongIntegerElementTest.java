@@ -15,17 +15,20 @@ import org.eclipse.osee.ote.message.data.HeaderData;
 import org.eclipse.osee.ote.message.data.MemoryResource;
 import org.eclipse.osee.ote.message.elements.LongIntegerElement;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author Roberto E. Escobar
  */
 public class LongIntegerElementTest {
+   @Ignore //reduce unnecessary tests
    @Test
    public void test1BitInts() {
       createLongIntTest(1);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test2BitInts() {
       createLongIntTest(2);
@@ -41,6 +44,7 @@ public class LongIntegerElementTest {
       createLongIntTest(4);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test5BitInts() {
       createLongIntTest(5);
@@ -51,6 +55,7 @@ public class LongIntegerElementTest {
       createLongIntTest(8);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test10BitInts() {
       createLongIntTest(10);
@@ -61,6 +66,7 @@ public class LongIntegerElementTest {
       createLongIntTest(12);
    }
 
+   @Ignore //too slow
    @Test
    public void test16BitInts() {
       createLongIntTest(16);
@@ -71,61 +77,73 @@ public class LongIntegerElementTest {
       createLongIntTest(20);
    }
 
+   @Ignore //too slow
    @Test
    public void test22BitInts() {
       createLongIntTest(22);
    }
 
+   @Ignore //too slow
    @Test
    public void test24BitInts() {
       createLongIntTest(24);
    }
 
+   @Ignore //too slow
    @Test
    public void test25BitInts() {
       createLongIntTest(25);
    }
 
+   @Ignore //too slow
    @Test
    public void test26BitInts() {
       createLongIntTest(26);
    }
 
+   @Ignore //too slow
    @Test
    public void test27BitInts() {
       createLongIntTest(27);
    }
 
+   @Ignore //too slow
    @Test
    public void test30BitInts() {
       createLongIntTest(30);
    }
 
+   @Ignore //too slow
    @Test
    public void test31BitInts() {
       createLongIntTest(31);
    }
 
+   @Ignore //too slow
    @Test
    public void test32BitInts() {
       createLongIntTest(32);
    }
 
+   @Ignore //too slow
    @Test
    public void test40BitInts() {
       createLongIntTest(40);
    }
 
+   @Ignore //too slow
    @Test
    public void test48BitInts() {
       createLongIntTest(48);
    }
 
+   @Ignore //too slow
    @Test
    public void test50BitInts() {
       createLongIntTest(50);
    }
 
+   @Ignore //too slow
    @Test
    public void test64BitInts() {
       createLongIntTest(64);

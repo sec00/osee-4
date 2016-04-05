@@ -38,6 +38,7 @@ import org.eclipse.osee.ote.core.MethodFormatter;
 import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironmentAccessor;
 import org.eclipse.osee.ote.core.testPoint.CheckPoint;
 import org.eclipse.osee.ote.message.condition.ICondition;
+import org.eclipse.osee.ote.message.condition.NoTransmissionCondition;
 import org.eclipse.osee.ote.message.condition.TransmissionCountCondition;
 import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.elements.Element;
@@ -84,7 +85,7 @@ public class Message implements Xmlizable, XmlizableStream {
    private double rate;
    private IMessageManager messageManager;
    private IMessageRequestor messageRequestor = null;
-   private LegacyMessageMapper mapper = new LegacyMessageMapperDefaultSingle();
+   private LegacyMessageMapper mapper;
    private MessageData defaultMessageData;
 
    
@@ -105,6 +106,7 @@ public class Message implements Xmlizable, XmlizableStream {
       this.isScheduledFromStart = false;
       GCHelper.getGCHelper().addRefWatch(this);
       this.removableListenerHandler = new MessageSystemListener(this);
+      setMapper(new LegacyMessageMapperDefaultSingle());
    }
    
    public Message(String name, int defaultByteSize, int defaultOffset, boolean isScheduled, int phase, double rate) {
@@ -235,36 +237,18 @@ public class Message implements Xmlizable, XmlizableStream {
     * @param milliseconds the amount to time (in milliseconds) to check
     * @return if the check passed
     */
-   public boolean checkForNoTransmissions(ITestEnvironmentMessageSystemAccessor accessor, int milliseconds) throws InterruptedException {
+   public boolean checkForNoTransmissions(ITestAccessor accessor, int milliseconds) throws InterruptedException {
       checkState();
-      if (accessor == null) {
-         throw new IllegalArgumentException("accessor cannot be null");
-      }
-      accessor.getLogger().methodCalledOnObject(accessor, getMessageName(), new MethodFormatter().add(milliseconds),
-         this);
-      long time = accessor.getEnvTime();
-      org.eclipse.osee.ote.core.environment.interfaces.ICancelTimer cancelTimer =
-         accessor.setTimerFor(listenerHandler, milliseconds);
-
-      boolean result;
-      listenerHandler.waitForData(); // will also return if the timer (set above)
-      // expires
-
-      result = listenerHandler.isTimedOut();
-
-      cancelTimer.cancelTimer();
-      time = accessor.getEnvTime() - time;
-
-      accessor.getLogger().testpoint(
-         accessor,
-         accessor.getTestScript(),
-         accessor.getTestScript().getTestCase(),
-         new CheckPoint(this.getMessageName(), "No Transmissions",
-            result ? "No Transmissions" : "Transmissions Occurred", result, time));
-      if (accessor != null) {
-         accessor.getLogger().methodEnded(accessor);
-      }
-      return result;
+      accessor.getLogger().methodCalledOnObject(accessor, getMessageName(),
+         new MethodFormatter().add(milliseconds));
+      NoTransmissionCondition c = new NoTransmissionCondition();
+      MsgWaitResult result = waitForCondition(accessor, c, true, milliseconds);
+      CheckPoint passFail =
+         new CheckPoint(this.name, Integer.toString(0), Integer.toString(result.getXmitCount()),
+            result.isPassed(), result.getXmitCount(), result.getElapsedTime());
+      accessor.getLogger().testpoint(accessor, accessor.getTestScript(), accessor.getTestCase(), passFail);
+      accessor.getLogger().methodEnded(accessor);
+      return passFail.isPass();
    }
 
    /**
@@ -1111,6 +1095,7 @@ public class Message implements Xmlizable, XmlizableStream {
    protected void setDefaultMessageData(MessageData defaultMessageData) {
       checkState();
       this.defaultMessageData = defaultMessageData;
+      setMapper(new LegacyMessageMapperDefaultSingle());
    }
 
    void setMapper(LegacyMessageMapper mapper){

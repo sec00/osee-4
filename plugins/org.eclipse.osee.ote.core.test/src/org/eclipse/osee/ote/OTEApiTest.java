@@ -80,9 +80,6 @@ public class OTEApiTest {
       ConfigurationStatus failStatus = failStatusFuture.get();
       Assert.assertFalse(failStatus.isSuccess());
       System.out.println(failStatus.getMessage());
-      Assert.assertNull(findBundle("loading.test1"));
-      Assert.assertNull(findBundle("loading.test2"));
-      Assert.assertNull(findBundle("loading.test3"));
 
       //test the doing load case
       Future<ConfigurationStatus> good = oteApi.loadConfiguration(validConfiguration, callable);
@@ -213,10 +210,12 @@ public class OTEApiTest {
 
    private URL findEntry(String path) {
       URL url = null;
-      Bundle bundle = FrameworkUtil.getBundle(OTEApiTest.class);
+      Bundle bundle = findBundle("org.eclipse.osee.ote.core.test");
       url = bundle.getEntry(path);
       Assert.assertNotNull(url);
       return url;
    }
+   
+   
 
 }

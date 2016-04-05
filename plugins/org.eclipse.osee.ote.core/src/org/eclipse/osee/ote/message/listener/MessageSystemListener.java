@@ -196,14 +196,15 @@ public class MessageSystemListener implements IOSEEMessageReaderListener, IOSEEM
    }
 
    public MsgWaitResult waitForCondition(ITestEnvironmentAccessor accessor, ICondition condition, boolean maintain, int milliseconds) throws InterruptedException {
-      if(scheduler == null){
-         scheduler = ServiceUtility.getService(Scheduler.class);
-      }
-      WaitOnCondition waitOnCondition = new WaitOnCondition(scheduler, condition, maintain, Collections.singletonList(this.message.get()), (long)milliseconds);
+//      if(scheduler == null){
+//         scheduler = ServiceUtility.getService(Scheduler.class);
+//      }
+      //TODO figure out how to pass the scheduler along
+      WaitOnCondition waitOnCondition = new WaitOnCondition(ServiceUtility.getService(Scheduler.class), condition, maintain, Collections.singletonList(this.message.get()), (long)milliseconds);
       return waitOnCondition.startWaiting();
    }
 
-   public synchronized boolean waitForData() throws InterruptedException {
+   private synchronized boolean waitForData() throws InterruptedException {
       
       messageCount = 0;
       if (this.isTimedOut) {

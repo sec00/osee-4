@@ -44,10 +44,11 @@ public class TestFloat32Operations {
 
    @Test
    public void testCheckWaitForValue() throws InterruptedException {
-      TestMessage msg = new TestMessage();
-      support.activateMsg(msg);
+      support.setMasterTestThread();
+      TestMessage msg = support.getMessageReader(TestMessage.class);
+      TestMessage msgWriter = support.getMessageWriter(TestMessage.class);
 
-      support.genericTestCheckWaitForValue(msg.FLOAT32_ELEMENT_1, new Double[] {
+      support.genericTestCheckWaitForValue(msg.FLOAT32_ELEMENT_1, msgWriter.FLOAT32_ELEMENT_1, new Double[] {
          new Double(0.0f),
          new Double(0.2f),
          new Double(100.0f),

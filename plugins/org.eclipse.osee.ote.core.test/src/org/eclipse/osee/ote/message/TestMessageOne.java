@@ -9,7 +9,7 @@ import org.eclipse.osee.ote.message.enums.DataType;
 
 public class TestMessageOne extends Message {
 
-   public static final MessageId ID = new TestMessageId(TestMessageType.eth1, 1);
+   public static final MessageId ID = new TestMessageId(TestMessageDataType.eth1, 1);
    
    public IntegerElement INT1;
    public IntegerElement INT2;
@@ -18,7 +18,7 @@ public class TestMessageOne extends Message {
    
    
    public TestMessageOne() {
-      super(ID, "TestMessageOne", new MessageData("TestMessageOne", "TestMessageOne", 16, 0, TestMessageType.eth1, null));
+      super(ID, "TestMessageOne", new MessageData("TestMessageOne", "TestMessageOne", 16, 0, TestMessageDataType.eth1, null));
       
       INT1 = new IntegerElement(this, "INT1", getDefaultMessageData(), 0, 0, 7);
       INT2 = new IntegerElement(this, "INT2", getDefaultMessageData(), 1, 0, 7);
@@ -29,8 +29,8 @@ public class TestMessageOne extends Message {
    
    public Map<DataType, Class<? extends Message>[]> getAssociatedMessages(){
       Map<DataType, Class<? extends Message>[]> o = new LinkedHashMap<DataType, Class<? extends Message>[]>();
-      o.put(TestMessageType.eth2, new Class[]{TestMessageTwo.class});
-      o.put(TestMessageType.eth3, new Class[]{TestMessage3.class});
+      o.put(TestMessageDataType.eth2, new Class[]{TestMessageTwo.class});
+      o.put(TestMessageDataType.eth3, new Class[]{TestMessage3.class});
       return o;
    }
 

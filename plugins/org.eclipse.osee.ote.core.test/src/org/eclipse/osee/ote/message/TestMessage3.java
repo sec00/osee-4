@@ -5,7 +5,7 @@ import org.eclipse.osee.ote.message.elements.IntegerElement;
 
 public class TestMessage3 extends Message {
 
-   public static final MessageId ID = new TestMessageId(TestMessageType.eth3, 1);
+   public static final MessageId ID = new TestMessageId(TestMessageDataType.eth3, 1);
    
    
    public IntegerElement INT1;
@@ -15,7 +15,7 @@ public class TestMessage3 extends Message {
    
    
    public TestMessage3() {
-      super(ID, "TestMessage3", new MessageData("TestMessage3", "TestMessage3", 4, 0, TestMessageType.eth3, null));
+      super(ID, "TestMessage3", new MessageData("TestMessage3", "TestMessage3", 4, 0, TestMessageDataType.eth3, null));
       
       INT1 = new IntegerElement(this, "INT1", getDefaultMessageData(), 0, 0, 7);
       INT2 = new IntegerElement(this, "INT2", getDefaultMessageData(), 1, 0, 7);

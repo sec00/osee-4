@@ -18,6 +18,8 @@ import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironmentAccessor
 import org.eclipse.osee.ote.core.testPoint.CheckGroup;
 import org.eclipse.osee.ote.core.testPoint.CheckPoint;
 import org.eclipse.osee.ote.message.Message;
+import org.eclipse.osee.ote.message.condition.CharElementStringComparisonCondition;
+import org.eclipse.osee.ote.message.condition.StringOperation;
 import org.eclipse.osee.ote.message.data.MemoryResource;
 import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.elements.nonmapping.NonMappingCharElement;
@@ -109,52 +111,28 @@ public class CharElement extends DiscreteElement<Character> {
 	 * @return If the check passed.
 	 */
 	public boolean checkNot(ITestAccessor accessor, CheckGroup checkGroup, String value, int milliseconds) throws InterruptedException {
-		if (accessor == null) {
-			throw new IllegalArgumentException("accessor cannot be null");
-		}
-		accessor.getLogger().methodCalledOnObject(accessor, this.getFullName(),
-				new MethodFormatter().add(value).add(milliseconds), getMessage());
+	   if (accessor == null) {
+         throw new IllegalArgumentException("accessor cannot be null");
+      }
+      accessor.getLogger().methodCalledOnObject(accessor, this.getFullName(),
+            new MethodFormatter().add(value).add(milliseconds), this.getMessage());
+      long time = accessor.getEnvTime();
+      
+      CharElementStringComparisonCondition c = new CharElementStringComparisonCondition(this, StringOperation.NOT_EQUAL, value);
+      MsgWaitResult result = getMessage().waitForCondition(accessor, c, false, milliseconds);
+      CheckPoint passFail =
+            new CheckPoint(this.getFullName(), value, c.getLastCheckValue(), result.isPassed(), time);
 
-		long time = accessor.getEnvTime();
-		String currentValue;
-		boolean result;
-		if (milliseconds > 0) {
-			final MessageSystemListener listener = getMessage().getListener();
-			org.eclipse.osee.ote.core.environment.interfaces.ICancelTimer cancelTimer =
-					accessor.setTimerFor(listener, milliseconds);
+      if (checkGroup == null) {
+         accessor.getLogger().testpoint(accessor, accessor.getTestScript(), accessor.getTestCase(), passFail);
+      } else {
+         checkGroup.add(passFail);
+      }
 
-			accessor.getLogger().debug(accessor, "waiting............", true);
-
-			while (result = !(currentValue = getString(accessor, value.length())).equals(value)) {
-				listener.waitForData(); // will also return if the timer (set above)
-				// expires
-				/*
-				 * NOTE: had to add isTimedOut() because we were getting data at the same time we're timing out, so the
-				 * notifyAll() isn't guaranteed to work since we would not be in a waiting state at that time - so we're
-				 * forced to save the fact that we timed out.
-				 */
-				if (listener.isTimedOut()) {
-					break;
-				}
-			}
-			cancelTimer.cancelTimer();
-			accessor.getLogger().debug(accessor, "done waiting", true);
-		} else {
-			result = !(currentValue = getString(accessor, value.length())).equals(value);
-		}
-		time = accessor.getEnvTime() - time;
-		CheckPoint passFail = new CheckPoint(this.getFullName(), "Not " + value, currentValue, result, time);
-
-		if (checkGroup == null) {
-			accessor.getLogger().testpoint(accessor, accessor.getTestScript(), accessor.getTestCase(), passFail);
-		} else {
-			checkGroup.add(passFail);
-		}
-
-		if (accessor != null) {
-			accessor.getLogger().methodEnded(accessor);
-		}
-		return passFail.isPass();
+      if (accessor != null) {
+         accessor.getLogger().methodEnded(accessor);
+      }
+      return passFail.isPass();
 	}
 
 	/**
@@ -188,35 +166,11 @@ public class CharElement extends DiscreteElement<Character> {
 		accessor.getLogger().methodCalledOnObject(accessor, this.getFullName(),
 				new MethodFormatter().add(value).add(milliseconds), this.getMessage());
 		long time = accessor.getEnvTime();
-		String currentValue;
-		if (milliseconds > 0) {
-			MessageSystemListener listener = getMessage().getListener();
-			org.eclipse.osee.ote.core.environment.interfaces.ICancelTimer cancelTimer =
-					accessor.setTimerFor(listener, milliseconds);
-
-			accessor.getLogger().debug(accessor, "waiting............", true);
-
-			while (!compareString(currentValue = getString(accessor, value.length()), value)) {
-				listener.waitForData(); // will also return if the timer (set above)
-				// expires
-				/*
-				 * NOTE: had to add isTimedOut() because we were getting data at the same time we're timing out, so the
-				 * notifyAll() isn't guaranteed to work since we would not be in a waiting state at that time - so we're
-				 * forced to save the fact that we timed out.
-				 */
-				if (listener.isTimedOut()) {
-					break;
-				}
-			}
-
-			cancelTimer.cancelTimer();
-			accessor.getLogger().debug(accessor, "done waiting", true);
-		} else {
-			currentValue = getString(accessor, value.length());
-		}
-		time = accessor.getEnvTime() - time;
+		
+		CharElementStringComparisonCondition c = new CharElementStringComparisonCondition(this, StringOperation.EQUAL, value);
+		MsgWaitResult result = getMessage().waitForCondition(accessor, c, false, milliseconds);
 		CheckPoint passFail =
-				new CheckPoint(this.getFullName(), value, currentValue, compareString(currentValue, value), time);
+				new CheckPoint(this.getFullName(), value, c.getLastCheckValue(), result.isPassed(), time);
 
 		if (checkGroup == null) {
 			accessor.getLogger().testpoint(accessor, accessor.getTestScript(), accessor.getTestCase(), passFail);
@@ -468,36 +422,15 @@ public class CharElement extends DiscreteElement<Character> {
 			accessor.getLogger().methodCalledOnObject(accessor, this.getFullName(),
 					new MethodFormatter().add(value).add(milliseconds), this.getMessage());
 		}
-		String currentValue;
-		if (milliseconds > 0) {
-			MessageSystemListener listener = getMessage().getListener();
-			org.eclipse.osee.ote.core.environment.interfaces.ICancelTimer cancelTimer =
-					accessor.setTimerFor(listener, milliseconds);
-
-			accessor.getLogger().debug(accessor, "waiting............", true);
-
-			while ((currentValue = getString(accessor, value.length())).equals(value)) {
-				listener.waitForData(); // will also return if the timer (set above)
-				// expires
-				/*
-				 * NOTE: had to add isTimedOut() because we were getting data at the same time we're timing out, so the
-				 * notifyAll() isn't guaranteed to work since we would not be in a waiting state at that time - so we're
-				 * forced to save the fact that we timed out.
-				 */
-				if (listener.isTimedOut()) {
-					break;
-				}
-			}
-			cancelTimer.cancelTimer();
-			accessor.getLogger().debug(accessor, "done waiting", true);
-		} else {
-			currentValue = getString(accessor, value.length());
-		}
+		
+		CharElementStringComparisonCondition c = new CharElementStringComparisonCondition(this, StringOperation.EQUAL, value);
+      MsgWaitResult result = getMessage().waitForCondition(accessor, c, false, milliseconds);
+      
 		if (accessor != null) {
 			accessor.getLogger().methodCalledOnObject(accessor, this.getFullName(), new MethodFormatter().add(value),
 					this.getMessage());
 		}
-		return currentValue;
+		return c.getLastCheckValue();
 	}
 
 	/**
@@ -512,37 +445,15 @@ public class CharElement extends DiscreteElement<Character> {
 			accessor.getLogger().methodCalledOnObject(accessor, this.getFullName(),
 					new MethodFormatter().add(value).add(milliseconds), this.getMessage());
 		}
-		String currentValue;
-		if (milliseconds > 0) {
-
-			MessageSystemListener listener = getMessage().getListener();
-			org.eclipse.osee.ote.core.environment.interfaces.ICancelTimer cancelTimer =
-					accessor.setTimerFor(listener, milliseconds);
-
-			accessor.getLogger().debug(accessor, "waiting............", true);
-
-			while (!(currentValue = getString(accessor, value.length())).equals(value)) {
-				listener.waitForData(); // will also return if the timer (set above)
-				// expires
-				/*
-				 * NOTE: had to add isTimedOut() because we were getting data at the same time we're timing out, so the
-				 * notifyAll() isn't guaranteed to work since we would not be in a waiting state at that time - so we're
-				 * forced to save the fact that we timed out.
-				 */
-				if (listener.isTimedOut()) {
-					break;
-				}
-			}
-			cancelTimer.cancelTimer();
-			accessor.getLogger().debug(accessor, "done waiting", true);
-		} else {
-			currentValue = getString(accessor, value.length());
-		}
+		
+		CharElementStringComparisonCondition c = new CharElementStringComparisonCondition(this, StringOperation.NOT_EQUAL, value);
+      MsgWaitResult result = getMessage().waitForCondition(accessor, c, false, milliseconds);
+		
 		if (accessor != null) {
 			accessor.getLogger().methodCalledOnObject(accessor, this.getFullName(), new MethodFormatter().add(value),
 					this.getMessage());
 		}
-		return currentValue;
+		return c.getLastCheckValue();
 	}
 
 	/**

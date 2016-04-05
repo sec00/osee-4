@@ -3,7 +3,7 @@ package org.eclipse.osee.ote.message;
 import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.enums.DataType;
 
-class BasicWriter implements MessageDataWriter {
+public class BasicWriter implements MessageDataWriter {
 
       private IOType type;
       private DataType dataType;

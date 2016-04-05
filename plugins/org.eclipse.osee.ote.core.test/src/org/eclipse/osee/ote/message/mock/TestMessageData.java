@@ -11,6 +11,7 @@
 package org.eclipse.osee.ote.message.mock;
 
 import org.eclipse.osee.ote.message.IMessageHeader;
+import org.eclipse.osee.ote.message.TestMessageIOType;
 import org.eclipse.osee.ote.message.data.IMessageDataVisitor;
 import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.enums.DataType;
@@ -18,7 +19,7 @@ import org.eclipse.osee.ote.message.enums.DataType;
 public class TestMessageData extends MessageData {
 
    public TestMessageData(String typeName, String name, int dataByteSize, int offset, DataType memType) {
-      super(typeName, name, dataByteSize, offset, memType, null);
+      super(typeName, name, dataByteSize, offset, memType, TestMessageIOType.eth1);
    }
 
    @Override

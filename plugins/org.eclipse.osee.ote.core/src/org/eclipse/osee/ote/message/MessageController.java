@@ -266,13 +266,16 @@ public class MessageController implements IMessageManager {
    @Override
    public void publish(Message msg) {
       if(!msg.isTurnedOff() && !msg.isDestroyed()){
-         Message[] messages = mapper.getMessages(msg, msg.getMemType()).get();
-         for(int i = 0; i < messages.length; i++){
-            MessagePublishingHandler publisher = messagePublishingHandlers.get(messages[i].getDefaultMessageData().getIOType());
-            if(publisher != null){
-               publisher.publish(this, messages[i]);
-            } else {
-               defaultpublisher.publish(this, messages[i]);
+         CopyOnWriteNoIteratorList<Message> container = mapper.getMessages(msg, msg.getMemType());
+         if(container != null){
+            Message[] messages = container.get();
+            for(int i = 0; i < messages.length; i++){
+               MessagePublishingHandler publisher = messagePublishingHandlers.get(messages[i].getDefaultMessageData().getIOType());
+               if(publisher != null){
+                  publisher.publish(this, messages[i]);
+               } else {
+                  defaultpublisher.publish(this, messages[i]);
+               }
             }
          }
       }
@@ -600,7 +603,7 @@ public class MessageController implements IMessageManager {
 
       mapper.addMessage(message);
       Map<? extends DataType, Class<? extends Message>[]> types;
-      MessageAssociationLookup lookup = ServiceUtility.getService(MessageAssociationLookup.class);
+      MessageAssociationLookup lookup = ServiceUtility.getService(MessageAssociationLookup.class, false);
      
       if(lookup != null && useSpecialMapping){
          types = lookup.getAssociatedMessages((Class<Message>) message.getClass());

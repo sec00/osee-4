@@ -185,8 +185,6 @@ class LegacyMessageMapperService implements LegacyMessageMapper {
             }
          }
       } else {
-         MessageStorageLookup storage = getMessageStorage(message);
-         Message[] messages = storage.getMessages(type).get();
 
          List<Field> masterMessage = new ArrayList<Field>();
          Field[] fields = message.getClass().getFields();
@@ -197,17 +195,22 @@ class LegacyMessageMapperService implements LegacyMessageMapper {
             }
          }
          Map<String, List<Element>> mappedElements = new HashMap<String, List<Element>>();
-         if(messages != null){
-            for(int i = 0; i < messages.length; i++){
-               Message mappedMessage = messages[i];
-               fields = message.getClass().getFields();
-               for(Element field:mappedMessage.getElements()){
-                  List<Element> elements = mappedElements.get(field.getName());
-                  if(elements == null){
-                     elements = new ArrayList<>();
-                     mappedElements.put(field.getName(), elements);
+         MessageStorageLookup storage = getMessageStorage(message);
+         CopyOnWriteNoIteratorList<Message> msgsCollection = storage.getMessages(type);
+         if(msgsCollection != null){
+            Message[] messages = msgsCollection.get();
+            if(messages != null){
+               for(int i = 0; i < messages.length; i++){
+                  Message mappedMessage = messages[i];
+                  fields = message.getClass().getFields();
+                  for(Element field:mappedMessage.getElements()){
+                     List<Element> elements = mappedElements.get(field.getName());
+                     if(elements == null){
+                        elements = new ArrayList<>();
+                        mappedElements.put(field.getName(), elements);
+                     }
+                     elements.add(field);
                   }
-                  elements.add(field);
                }
             }
          }

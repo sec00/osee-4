@@ -82,14 +82,14 @@ public class MessageControllerTest {
       TestMessageTwo msg2 = req.getMessageWriter(TestMessageTwo.class);
       
             
-      msg1.setMemSource(TestMessageType.eth1);
+      msg1.setMemSource(TestMessageDataType.eth1);
       
       IntegerElement org1 = msg1.INT1;
       IntegerElement org2 = msg1.INT2;
       IntegerElement org3 = msg1.INT3;
       IntegerElement org4 = msg1.INT4;
       
-      msg1.setMemSource(TestMessageType.eth2);
+      msg1.setMemSource(TestMessageDataType.eth2);
       MessageData data = msg1.getActiveDataSource();
       Assert.assertEquals("TestMessageTwo", data.getName());
       
@@ -97,7 +97,7 @@ public class MessageControllerTest {
       Assert.assertEquals(msg2.INT2, msg1.INT2);
       Assert.assertEquals(msg2.INT3, msg1.INT3);
       Assert.assertEquals(msg2.INT4, msg1.INT4);
-      msg1.setMemSource(TestMessageType.eth1);
+      msg1.setMemSource(TestMessageDataType.eth1);
       Assert.assertNotEquals(msg2.INT1, msg1.INT1);
       Assert.assertNotEquals(msg2.INT2, msg1.INT2);
       Assert.assertNotEquals(msg2.INT3, msg1.INT3);
@@ -167,7 +167,7 @@ public class MessageControllerTest {
       messageManager.registerWriter(new BasicWriter(TestMessageIOType.eth3, TestMessageDataType.eth3));
       
       TestMessageOne msg1 = req.getMessageWriter(TestMessageOne.class);
-      msg1.setMemSource(TestMessageType.eth3);
+      msg1.setMemSource(TestMessageDataType.eth3);
       boolean gotNonMappingException = false;
       try{
          msg1.INT3.setValue(1);

@@ -46,9 +46,11 @@ public class TestStringOperations {
 
    @Test
    public void testCheckWaitForValue() throws InterruptedException {
-      TestMessage msg = new TestMessage();
-      support.activateMsg(msg);
-      support.genericTestCheckWaitForValue(msg.STRING_ELEMENT_1, new String[] {
+      support.setMasterTestThread();
+      TestMessage msg = support.getMessageReader(TestMessage.class);
+      TestMessage msgWriter = support.getMessageWriter(TestMessage.class);
+
+      support.genericTestCheckWaitForValue(msg.STRING_ELEMENT_1, msgWriter.STRING_ELEMENT_1, new String[] {
          "Expected 1",
          " Expected",
          "Expected ",
@@ -63,19 +65,23 @@ public class TestStringOperations {
 
    @Test
    public void testCheckNot() throws InterruptedException {
-      TestMessage msg = new TestMessage();
-      support.activateMsg(msg);
+      support.setMasterTestThread();
+      TestMessage msg = support.getMessageReader(TestMessage.class);
+      TestMessage msgWriter = support.getMessageWriter(TestMessage.class);
+
       String values[] = new String[] {" ", "a", "  ", "hi", "by", "123456789ABCDEF", "1"};
-      support.genericTestCheckNot(msg.STRING_ELEMENT_1, values);
+      support.genericTestCheckNot(msg.STRING_ELEMENT_1, msgWriter.STRING_ELEMENT_1, values);
    }
 
    @Test
    public void testCheckList() throws InterruptedException {
-      TestMessage msg = new TestMessage();
-      support.activateMsg(msg);
+      support.setMasterTestThread();
+      TestMessage msg = support.getMessageReader(TestMessage.class);
+      TestMessage msgWriter = support.getMessageWriter(TestMessage.class);
+
       String[] good = new String[] {"a b c d e f g", "b", "_", "hello", "test"};
       String[] bad = new String[] {"a b c d e f g e", "c", " ", "\t", "hellO", "t\0est"};
-      support.genericTestCheckList(msg.STRING_ELEMENT_1, good, bad);
+      support.genericTestCheckList(msg.STRING_ELEMENT_1, msgWriter.STRING_ELEMENT_1, good, bad);
    }
 
    @Test

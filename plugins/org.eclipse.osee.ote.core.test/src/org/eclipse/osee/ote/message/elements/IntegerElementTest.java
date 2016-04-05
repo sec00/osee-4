@@ -15,6 +15,7 @@ import org.eclipse.osee.ote.message.data.HeaderData;
 import org.eclipse.osee.ote.message.data.MemoryResource;
 import org.eclipse.osee.ote.message.elements.IntegerElement;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -22,11 +23,13 @@ import org.junit.Test;
  */
 public class IntegerElementTest {
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test1BitInts() {
       createTest(1);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test2BitInts() {
       createTest(2);
@@ -37,21 +40,25 @@ public class IntegerElementTest {
       createTest(3);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test4BitInts() {
       createTest(4);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test5BitInts() {
       createTest(5);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test6BitInts() {
       createTest(6);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test7BitInts() {
       createTest(7);
@@ -62,36 +69,43 @@ public class IntegerElementTest {
       createTest(8);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test9BitInts() {
       createTest(9);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test10BitInts() {
       createTest(10);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test11BitInts() {
       createTest(11);
    }
 
+   
    @Test
    public void test12BitInts() {
       createTest(12);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test13BitInts() {
       createTest(13);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test14BitInts() {
       createTest(14);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test15BitInts() {
       createTest(15);
@@ -102,16 +116,19 @@ public class IntegerElementTest {
       createTest(16);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test17BitInts() {
       createTest(17);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test18BitInts() {
       createTest(18);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test19BitInts() {
       createTest(19);
@@ -122,56 +139,67 @@ public class IntegerElementTest {
       createTest(20);
    }
 
+   @Ignore //too slow
    @Test
    public void test21BitInts() {
       createTest(21);
    }
 
+   @Ignore //too slow
    @Test
    public void test22BitInts() {
       createTest(22);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test23BitInts() {
       createTest(23);
    }
 
+   @Ignore //reduce unnecessary tests
    @Test
    public void test24BitInts() {
       createTest(24);
    }
 
+   @Ignore //too slow
    @Test
    public void test25BitInts() {
       createTest(25);
    }
 
+   @Ignore //too slow
    @Test
    public void test26BitInts() {
       createTest(26);
    }
 
+   @Ignore //too slow
    @Test
    public void test27BitInts() {
       createTest(27);
    }
 
+   @Ignore //too slow
    @Test
    public void test28BitInts() {
       createTest(28);
    }
 
+   @Ignore //too slow
    @Test
    public void test29BitInts() {
       createTest(29);
    }
 
+   @Ignore //too slow
    @Test
    public void test30BitInts() {
       createTest(30);
    }
 
+   @Ignore //too slow
    @Test
    public void test32BitInts() {
       createTest(32);

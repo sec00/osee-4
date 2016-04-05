@@ -10,29 +10,25 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.message.condition;
 
-/**
- * @author Ken J. Aguilar
- */
-public abstract class AbstractCondition implements ICondition {
+public class NoTransmissionCondition extends AbstractCondition {
 
-   @Override
-   public boolean checkAndIncrement() {
-      incrementCheckCount();
-      return check();
-   }
+   private int max = 0;
 
-   private int checkCount = 0;
-
-   protected void incrementCheckCount() {
-      checkCount++;
+     
+   public NoTransmissionCondition() {
    }
    
-   public void increment(){
-      checkCount++;
+   public void setTrasmitCount(int count){
+      this.max = count;
    }
 
    @Override
-   public int getCheckCount() {
-      return checkCount;
+   public boolean check() {
+      return getCheckCount() == 0;
    }
+
+   public int getMaxTransmitCount() {
+      return max;
+   }
+
 }

@@ -12,39 +12,45 @@ package org.eclipse.osee.ote.message.mock;
 
 import java.util.Random;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import org.junit.Assert;
+
 import org.eclipse.osee.ote.core.TestException;
 import org.eclipse.osee.ote.core.environment.EnvironmentTask;
 import org.eclipse.osee.ote.core.testPoint.CheckGroup;
 import org.eclipse.osee.ote.core.testPoint.CheckPoint;
 import org.eclipse.osee.ote.core.testPoint.Operation;
+import org.eclipse.osee.ote.message.Message;
 import org.eclipse.osee.ote.message.MessageSystemException;
 import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.elements.DiscreteElement;
 import org.eclipse.osee.ote.message.enums.DataType;
 import org.eclipse.osee.ote.message.listener.IOSEEMessageListener;
+import org.eclipse.ote.scheduler.OTETaskRegistration;
+import org.junit.Assert;
 
 public class UnitTestSupport {
 
-   private final UnitTestAccessor accessor = new UnitTestAccessor();
+   private final UnitTestAccessor accessor;
    private final Random rand = new Random();
+   
+//   private StringBuilder debug = new StringBuilder();
 
+   public void printDebug(){
+//      System.out.println(debug.toString());
+//      debug.delete(0, debug.length());
+   }
+   
    public UnitTestSupport() {
-
+         accessor = new UnitTestAccessor();
    }
 
    public void activateMsg(final TestMessage msg) {
+      
       accessor.addTask(new EnvironmentTask(msg.getRate(), 0) {
 
          @Override
          public void runOneCycle() throws InterruptedException, TestException {
-            MessageData data = msg.getActiveDataSource();
-            data.incrementActivityCount();
-            data.notifyListeners();
-
+            accessor.getMsgManager().publish(msg);
          }
 
       });
@@ -55,31 +61,44 @@ public class UnitTestSupport {
    }
 
    public <T extends Comparable<T>> void setAfter(final DiscreteElement<T> element, final T value, int millis) {
-      accessor.scheduleOneShotTask(new Runnable() {
-
+      accessor.getTimerCtrl().getScheduler().scheduleWithDelay(new Runnable() {
+         
          @Override
          public void run() {
+//            printTime();
             element.setValue(value);
+            element.getMessage().send();
+//            printTime();
+//            debug.append(String.format("%s,%d\n", element.toString(), accessor.getTimerCtrl().getScheduler().getTime()));
+//            System.out.print("poop");
+//            System.out.printf("%s,%d\n", element.toString(), accessor.getTimerCtrl().getScheduler().getTime());
          }
-
-      }, millis);
+      }, millis, true);
+      
    }
 
    public <T extends Comparable<T>> void maintain(final DiscreteElement<T> element, final T value, final T postValue, int millis) {
       element.setValue(value);
-      accessor.scheduleOneShotTask(new Runnable() {
-
+      element.getMessage().send();
+//      debug.append(String.format("%s,%d\n", element.toString(), accessor.getTimerCtrl().getScheduler().getTime()));
+  accessor.getTimerCtrl().getScheduler().scheduleWithDelay(new Runnable() {
+         
          @Override
          public void run() {
             element.setValue(postValue);
+            element.getMessage().send();
+//            debug.append(String.format("%s,%d\n", element.toString(), accessor.getTimerCtrl().getScheduler().getTime()));
+//            System.out.printf("%s,%d\n", element.toString(), accessor.getTimerCtrl().getScheduler().getTime());
          }
-
       }, millis);
+      
    }
 
    public <T extends Comparable<T>> ISequenceHandle setSequence(final DiscreteElement<T> element, final T[] sequence) throws InterruptedException {
       final SequenceHandle seqHandle = new SequenceHandle();
       element.setValue(sequence[0]);
+//      element.getMessage().send();
+      
       IOSEEMessageListener listener = new IOSEEMessageListener() {
          int index = 1;
 
@@ -87,6 +106,7 @@ public class UnitTestSupport {
          public void onDataAvailable(MessageData data, DataType type) throws MessageSystemException {
             if (index < sequence.length) {
                element.setValue(sequence[index]);
+//               element.getMessage().send();
                System.out.println(element.getName() + " is now " + element.getValue());
                index++;
             } else {
@@ -108,19 +128,23 @@ public class UnitTestSupport {
       return seqHandle;
    }
 
-   public <T extends Comparable<T>> ScheduledFuture<?> maintainRandomizedList(final DiscreteElement<T> element, final T[] values, int millis) {
+   public <T extends Comparable<T>> OTETaskRegistration maintainRandomizedList(final DiscreteElement<T> element, final T[] values, double rate) {
       element.setValue(values[0]);
-      return accessor.schedulePeriodicTask(new Runnable() {
+      element.getMessage().send();
+//      System.out.printf("%s,%d\n", values[0], accessor.getTimerCtrl().getScheduler().getTime());
+//      debug.append(String.format("%s,%d\n", values[0].toString(), accessor.getTimerCtrl().getScheduler().getTime()));
+      return accessor.getTimerCtrl().getScheduler().scheduleAtFixedRate(new Runnable() {
+         
          @Override
          public void run() {
-            try {
-               element.setValue(selectRandom(values));
-            } catch (Exception e) {
-               e.printStackTrace(System.err);
-            }
+            element.setValue(selectRandom(values));
+            element.getMessage().send();
+//            debug.append(String.format("%s,%d\n", element.toString(), accessor.getTimerCtrl().getScheduler().getTime()));
+//            System.out.printf("%s,%d\n", element.toString(), accessor.getTimerCtrl().getScheduler().getTime());
          }
-      }, 0, millis);
+      }, rate);
    }
+
 
    public <T extends Comparable<T>> void checkRange(final DiscreteElement<T> element, final T minValue, boolean minInclusive, T maxValue, boolean maxInclusive, int millis) throws InterruptedException {
       Assert.assertTrue(element.getName() + ".checkRange()->failed",
@@ -198,7 +222,7 @@ public class UnitTestSupport {
 
    public <T extends Comparable<T>> void check(DiscreteElement<T> element, T value) throws InterruptedException {
       CheckGroup grp = new CheckGroup(Operation.AND, "checkCheckGrp");
-      boolean c = element.check(accessor, grp, value);
+      boolean c = element.check(accessor, grp, value, 500);
       long time = ((CheckPoint) grp.getTestPoints().get(0)).getElpasedTime();
       Assert.assertTrue(
          element.getName() + String.format(".check()->failed, elapsed=%d, expect=<%s>, actual=<%s>", time, value,
@@ -244,6 +268,7 @@ public class UnitTestSupport {
       T val = element.checkMaintainList(accessor, chkGrp, values, true, millis);
       Assert.assertFalse(element.getName() + " .checkMaintainListFail()->failed, value=" + val.toString(),
          chkGrp.isPass());
+//      printTime();
    }
 
    public <T extends Comparable<T>> void checkWaitForValueFail(DiscreteElement<T> element, T value, int millis) throws InterruptedException {
@@ -263,156 +288,169 @@ public class UnitTestSupport {
          element.checkPulse(accessor, pulsedValue, nonPulsedValue));
    }
 
-   public <T extends Comparable<T>> void genericTestCheckNot(DiscreteElement<T> element, T[] values) throws InterruptedException {
+   public <T extends Comparable<T>> void genericTestCheckNot(DiscreteElement<T> elementReader,DiscreteElement<T> elementWriter, T[] values) throws InterruptedException {
       if (values.length < 2) {
          throw new IllegalArgumentException("array needs atleast two values");
       }
-      System.out.println("genericTestCheckNot()");
+//      System.out.println("genericTestCheckNot()");
       // check pass conditions
       for (int i = values.length - 1; i >= 1; i--) {
          T notValue = values[i];
          T goodValue = values[i - 1];
          System.out.format("\tgoodValue=%s, notValue=%s\n", goodValue, notValue);
-         element.setValue(notValue);
-         setAfter(element, goodValue, 100);
-         checkNot(element, notValue, 210);
-         check(element, goodValue); // make sure we did not pass until the goodValue was transmitted
+         elementWriter.setValue(notValue);
+         elementWriter.getMessage().send();
+         setAfter(elementWriter, goodValue, 100);
+         checkNot(elementReader, notValue, 210);
+         check(elementReader, goodValue); // make sure we did not pass until the goodValue was transmitted
       }
 
       // check fail conditions
       for (T value : values) {
-         element.setValue(value);
-         checkNotFail(element, value, 100);
+         elementWriter.setValue(value);
+         elementWriter.getMessage().send();
+         checkNotFail(elementReader, value, 100);
       }
    }
 
-   public <T extends Comparable<T>> void genericCheckMaintain(DiscreteElement<T> element, T[] values) throws InterruptedException {
+   public <T extends Comparable<T>> void genericCheckMaintain(DiscreteElement<T> elementReader, DiscreteElement<T> elementWriter, T[] values) throws InterruptedException {
       if (values.length < 2) {
          throw new IllegalArgumentException("array needs atleast two values");
       }
 
       // check pass conditions
       for (T value : values) {
-         element.setValue(value);
-         checkMaintain(element, value, 200);
-         check(element, value); // make sure we pass for the right reasons e.q. no false positives
+         elementWriter.setValue(value);
+         elementWriter.getMessage().send();
+         checkMaintain(elementReader, value, 200);
+         check(elementReader, value); // make sure we pass for the right reasons e.q. no false positives
       }
 
       // check fail conditions
       for (int i = values.length - 1; i >= 1; i--) {
          T valueToMaintain = values[i];
          T badValue = values[i - 1];
-         element.setValue(valueToMaintain);
-         setAfter(element, badValue, 100);
-         checkMaintainFail(element, valueToMaintain, badValue, 200); // make sure we fail as expected, no false negatives
+         elementWriter.setValue(valueToMaintain);
+         elementWriter.getMessage().send();
+         setAfter(elementWriter, badValue, 100);
+         checkMaintainFail(elementReader, valueToMaintain, badValue, 200); // make sure we fail as expected, no false negatives
       }
    }
 
-   public <T extends Comparable<T>> void genericTestCheckWaitForValue(DiscreteElement<T> element, T[] values, T valueToFInd) throws InterruptedException {
+   public <T extends Comparable<T>> void genericTestCheckWaitForValue(DiscreteElement<T> element, DiscreteElement<T> elementWriter, T[] values, T valueToFInd) throws InterruptedException {
       // check sequence
       element.getMessage().waitForTransmission(accessor);
-      ISequenceHandle handle = setSequence(element, values);
+      ISequenceHandle handle = setSequence(elementWriter, values);
       for (T v : values) {
          checkWaitForValue(element, v, 40);
       }
       handle.waitForEndSequence(100, TimeUnit.MILLISECONDS);
-      setSequence(element, values);
+      setSequence(elementWriter, values);
       checkWaitForValueFail(element, valueToFInd, 200);
    }
 
-   public <T extends Comparable<T>> void genericTestCheckList(DiscreteElement<T> element, T[] goodValues, T[] badValues) throws InterruptedException {
+   public <T extends Comparable<T>> void genericTestCheckList(DiscreteElement<T> element, DiscreteElement<T> elementWriter, T[] goodValues, T[] badValues) throws InterruptedException {
       // check finding of every item in the list
       for (T v : goodValues) {
-         element.setValue(selectRandom(badValues)); // value will always not be in the list until after 40 ms
-         setAfter(element, v, 40);
+         elementWriter.setValue(selectRandom(badValues)); // value will always not be in the list until after 40 ms
+         elementWriter.getMessage().send();
+         setAfter(elementWriter, v, 40);
          checkList(element, goodValues, 100);
       }
 
       // check pass
-      maintainRandomizedList(element, goodValues, 500);
-      checkList(element, goodValues, 500);
-
+      OTETaskRegistration reg = maintainRandomizedList(elementWriter, goodValues, 2.0);
+      checkList(element, goodValues, 1500);
+      reg.unregister();
+      
       // check failure
-      maintainRandomizedList(element, badValues, 500);
-      checkListFail(element, goodValues, 500);
+      reg = maintainRandomizedList(elementWriter, badValues, 2.0);
+      checkListFail(element, goodValues, 1500);
+      reg.unregister();
    }
 
-   public <T extends Comparable<T>> void genericTestCheckNotList(DiscreteElement<T> element, T[] allowedValues, T[] excludeValues) throws InterruptedException {
+   public <T extends Comparable<T>> void genericTestCheckNotList(DiscreteElement<T> element, DiscreteElement<T> elementWriter, T[] allowedValues, T[] excludeValues) throws InterruptedException {
       // check transition from fail to pass within time period
       for (T v : excludeValues) {
-         element.setValue(selectRandom(allowedValues)); // value will always not be in the list until after 40 ms
-         setAfter(element, v, 40);
+         elementWriter.setValue(selectRandom(allowedValues)); // value will always not be in the list until after 40 ms
+         setAfter(elementWriter, v, 40);
          checkNotInList(element, excludeValues, 100);
       }
 
       // check pass
-      ScheduledFuture<?> handle = maintainRandomizedList(element, allowedValues, 10);
+      OTETaskRegistration handle = maintainRandomizedList(element, allowedValues, 10);
       try {
          checkNotInList(element, excludeValues, 10);
       } finally {
          try {
-            handle.cancel(false);
-            handle.get();
+            handle.unregister();
          } catch (CancellationException ex) {
             // do nothing
-         } catch (ExecutionException ex) {
+//         } catch (ExecutionException ex) {
             throw new RuntimeException("exception while waiting for randomizedList to finish", ex);
          }
       }
 
       // check failure
-      handle = maintainRandomizedList(element, excludeValues, 10);
+      handle = maintainRandomizedList(elementWriter, excludeValues, 100);
       try {
          checkNotInListFail(element, excludeValues, 550);
       } finally {
          try {
-            handle.cancel(false);
-            handle.get();
+            handle.unregister();
          } catch (CancellationException ex) {
             // do nothing
-         } catch (ExecutionException ex) {
+//         } catch (ExecutionException ex) {
             throw new RuntimeException("exception while waiting for randomizedList to finish", ex);
          }
       }
    }
 
-   public <T extends Comparable<T>> void genericTestCheckMaintainList(DiscreteElement<T> element, T[] values, T badValue) throws InterruptedException {
+   public <T extends Comparable<T>> void genericTestCheckMaintainList(DiscreteElement<T> element, DiscreteElement<T> elementWriter, T[] values, T badValue) throws InterruptedException {
       // visit each possible value in list, make sure checkMaintainList does not fail
-      element.setValue(values[0]);
+      elementWriter.setValue(values[0]);
+      elementWriter.getMessage().send();
       int timeStep = 40;
       for (T val : values) {
-         setAfter(element, val, timeStep);
+         setAfter(elementWriter, val, timeStep);
       }
       checkMaintainList(element, values, 1000);
 
       // random elements from list
-      ScheduledFuture<?> handle = maintainRandomizedList(element, values, 15);
+      OTETaskRegistration handle = maintainRandomizedList(element, values, 66.0);
       try {
          checkMaintainList(element, values, 2000);
       } finally {
          try {
-            handle.cancel(false);
-            handle.get();
+            handle.unregister();
          } catch (CancellationException ex) {
             // do nothing
-         } catch (ExecutionException ex) {
+//         } catch (ExecutionException ex) {
             throw new RuntimeException("exception while waiting for randomizedList to finish", ex);
          }
       }
 
       // check proper failure behavior
-      handle = maintainRandomizedList(element, values, 25);
+      handle = maintainRandomizedList(elementWriter, values, 10);
       try {
-         setAfter(element, badValue, 1500);
+//         System.out.println("here we should fail");
+//         printTime();
+         setAfter(elementWriter, badValue, 1490);//make sure it doesn't align with publish or it may get clobbered
+//         printTime();
          checkMaintainListFail(element, values, 2000);
+//         printTime();
+//         System.out.println("exit check list fail");
+//         printTime();
+//         System.out.println("do a wait");
+//         printDebug();
          checkWaitForValue(element, badValue, 0);
       } finally {
+//         printTime();
          try {
-            handle.cancel(false);
-            handle.get();
+            handle.unregister();
          } catch (CancellationException ex) {
             // do nothing
-         } catch (ExecutionException ex) {
+//         } catch (ExecutionException ex) {
             throw new RuntimeException("exception while waiting for randomizedList to finish", ex);
          }
       }
@@ -436,4 +474,30 @@ public class UnitTestSupport {
    public boolean inRange(int target, int tolerance, int actual) {
       return Math.abs(actual - target) <= tolerance;
    }
+
+   public <T extends Message> T getMessageReader(Class<? extends Message> class1) {
+      
+      return (T)accessor.getMsgManager().createMessageRequestor("test").getMessageReader(class1);
+   }
+   
+ public <T extends Message> T getMessageWriter(Class<? extends Message> class1) {
+      
+      return (T)accessor.getMsgManager().createMessageRequestor("test").getMessageWriter(class1);
+   }
+
+public void setMasterTestThread() {
+   accessor.getTimerCtrl().getScheduler().cancelAndIgnoreWaits(true);
+   accessor.getTimerCtrl().getScheduler().cancelAndIgnoreWaits(false);
+   accessor.getTimerCtrl().getScheduler().resetClock();
+   accessor.getTimerCtrl().getScheduler().setMainThread(Thread.currentThread());
+}
+
+public void testWait(int i) {
+   accessor.getTimerCtrl().getScheduler().envWait(i);
+}
+
+public void printTime() {
+   // TODO Auto-generated method stub
+   System.out.println(accessor.getTimerCtrl().getScheduler().getTime());
+}
 }

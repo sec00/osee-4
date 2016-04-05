@@ -144,7 +144,7 @@ public class BiSci16ElementTest {
       checkSet(0);
       checkSet(-1);
       
-      checkTiming(0x7FF << (4 * 15));
+//      checkTiming(0x7FF << (4 * 15));
    }
 
    private void checkTiming(int input) {

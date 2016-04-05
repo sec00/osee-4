@@ -58,35 +58,39 @@ public class TestEnumElementOperations {
 
    @Test
    public void testCheckWaitForValue() throws InterruptedException {
-      TestMessage msg = new TestMessage();
-      support.activateMsg(msg);
-      support.genericTestCheckWaitForValue(msg.ENUM_ELEMENT_1, EnumSet.of(VAL_0, VAL_9).toArray(new TestEnum[] {}),
+      support.setMasterTestThread();
+      TestMessage msg = support.getMessageReader(TestMessage.class);
+      TestMessage msgWriter = support.getMessageWriter(TestMessage.class);
+      support.genericTestCheckWaitForValue(msg.ENUM_ELEMENT_1,msgWriter.ENUM_ELEMENT_1, EnumSet.of(VAL_0, VAL_9).toArray(new TestEnum[] {}),
          VAL_10);
 
-      support.genericTestCheckWaitForValue(msg.ENUM_ELEMENT_1, EnumSet.of(VAL_1, VAL_10).toArray(new TestEnum[] {}),
+      support.genericTestCheckWaitForValue(msg.ENUM_ELEMENT_1,msgWriter.ENUM_ELEMENT_1, EnumSet.of(VAL_1, VAL_10).toArray(new TestEnum[] {}),
          VAL_0);
    }
 
    @Test
    public void testCheckNot() throws InterruptedException {
-      TestMessage msg = new TestMessage();
-      support.activateMsg(msg);
-      support.genericTestCheckNot(msg.ENUM_ELEMENT_1, TestEnum.values());
+      support.setMasterTestThread();
+      TestMessage msg = support.getMessageReader(TestMessage.class);
+      TestMessage msgWriter = support.getMessageWriter(TestMessage.class);
+      support.genericTestCheckNot(msg.ENUM_ELEMENT_1, msgWriter.ENUM_ELEMENT_1, TestEnum.values());
    }
 
    @Test
    public void testCheckMaintain() throws InterruptedException {
-      TestMessage msg = new TestMessage();
-      support.activateMsg(msg);
-      support.genericCheckMaintain(msg.ENUM_ELEMENT_1, TestEnum.values());
+      support.setMasterTestThread();
+      TestMessage msg = support.getMessageReader(TestMessage.class);
+      TestMessage msgWriter = support.getMessageWriter(TestMessage.class);
+      support.genericCheckMaintain(msg.ENUM_ELEMENT_1, msgWriter.ENUM_ELEMENT_1, TestEnum.values());
    }
 
    @Test
    public void testCheckList() throws InterruptedException {
-      TestMessage msg = new TestMessage();
-      support.activateMsg(msg);
+      support.setMasterTestThread();
+      TestMessage msg = support.getMessageReader(TestMessage.class);
+      TestMessage msgWriter = support.getMessageWriter(TestMessage.class);
 
-      support.genericTestCheckList(msg.ENUM_ELEMENT_1, new TestEnum[] {VAL_0, VAL_2, VAL_4, VAL_6, VAL_8, VAL_10},
+      support.genericTestCheckList(msg.ENUM_ELEMENT_1, msgWriter.ENUM_ELEMENT_1, new TestEnum[] {VAL_0, VAL_2, VAL_4, VAL_6, VAL_8, VAL_10},
          new TestEnum[] {VAL_1, VAL_3, VAL_5, VAL_7, VAL_9});
    }
 }

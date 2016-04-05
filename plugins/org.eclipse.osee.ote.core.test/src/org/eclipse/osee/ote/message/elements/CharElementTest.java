@@ -20,7 +20,7 @@ import org.mockito.MockitoAnnotations;
 
 public class CharElementTest {
 
-   private class TestMessage extends Message {
+   public class TestMessage extends Message {
       public TestMessage(String name, int defaultByteSize, int defaultOffset, boolean isScheduled, int phase, double rate) {
          super(name, defaultByteSize, defaultOffset, isScheduled, phase, rate);
       }
@@ -59,7 +59,7 @@ public class CharElementTest {
 
    @Test
    public void parseAndSetWithNonByteAlignedElementTest() throws Exception {
-      CharElement sut = new CharElement(message, "TEST", msgData, 0, 1, 7);
+      CharElement sut = new CharElement(message, "TEST", msgData, 0, 0, 7);
       assertEquals("Start with all zeros in the byte array", "[0, 0, 0, 0, 0]",
          Arrays.toString(memoryResource.getData()));
       Arrays.fill(bytes, (byte) 0xFF);
@@ -69,6 +69,7 @@ public class CharElementTest {
       assertEquals("getValue should return 'A'", 'A', sut.getValue().charValue());
       sut.parseAndSet(null, "");
       assertEquals("getValue should return null character", '\0', sut.getValue().charValue());
+//TODO we need a test that uses a 7 bit char to test the iterator usage of parse and set
       sut.parseAndSet(null, "FOO");
       assertEquals("Unfortunately we tromple the spare bit data", "[70, 79, 79, -1, -1]",
          Arrays.toString(memoryResource.getData()));

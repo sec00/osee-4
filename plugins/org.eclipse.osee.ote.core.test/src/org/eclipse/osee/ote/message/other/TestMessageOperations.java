@@ -85,13 +85,16 @@ public class TestMessageOperations {
 
    @Test
    public void testCheckForTransmission() throws InterruptedException {
-      TestMessage msg = new TestMessage();
-      support.activateMsg(msg);
+      support.setMasterTestThread();
+      TestMessage msg = support.getMessageWriter(TestMessage.class);
+      TestMessage msgReader = support.getMessageWriter(TestMessage.class);
+//      TestMessage msg = new TestMessage();
+//      support.activateMsg(msg);
       int time = 1000;
       int expectedXmits = (int) Math.round(msg.getRate()) * (time / 1000);
-      support.checkForTransmission(msg, expectedXmits, time + 10);
+      support.checkForTransmission(msgReader, expectedXmits, time + 10);
 
-      support.checkForTransmissionFail(msg, expectedXmits, time - 10);
+      support.checkForTransmissionFail(msgReader, expectedXmits, time - 40);
    }
 
 }

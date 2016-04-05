@@ -43,22 +43,22 @@ public class MessageTest {
       TestMessageTwo msg2 = req.getMessageWriter(TestMessageTwo.class);
       TestMessage3 msg3 = req.getMessageWriter(TestMessage3.class);
       
-      msg1.setMemSource(TestMessageType.eth2);
+      msg1.setMemSource(TestMessageDataType.eth2);
       
       Assert.assertEquals(msg2.getDefaultMessageData(), msg1.getActiveDataSource());
       Assert.assertTrue(msg2.getDefaultMessageData().getMessages().contains(msg1));
       // should have one for self and one for TestMessageOne which it is mapped to
       Assert.assertEquals(2, msg2.getDefaultMessageData().getMessages().size());
       
-      msg1.setMemSource(TestMessageType.eth3);
+      msg1.setMemSource(TestMessageDataType.eth3);
 
       Assert.assertEquals(msg3.getDefaultMessageData(), msg1.getActiveDataSource());
       Assert.assertTrue(msg3.getDefaultMessageData().getMessages().contains(msg1));
       // should have one for self and one for TestMessageOne which it is mapped to
       Assert.assertEquals(2, msg3.getDefaultMessageData().getMessages().size());
       
-      Assert.assertEquals(msg2.getDefaultMessageData(), msg1.getMemSource(TestMessageType.eth2).iterator().next());
-      Assert.assertEquals(msg3.getDefaultMessageData(), msg1.getMemSource(TestMessageType.eth3).iterator().next());
+      Assert.assertEquals(msg2.getDefaultMessageData(), msg1.getMemSource(TestMessageDataType.eth2).iterator().next());
+      Assert.assertEquals(msg3.getDefaultMessageData(), msg1.getMemSource(TestMessageDataType.eth3).iterator().next());
       
       Assert.assertEquals(msg2.getDefaultMessageData(), msg2.getActiveDataSource());
       Assert.assertEquals(msg3.getDefaultMessageData(), msg3.getActiveDataSource());
@@ -74,13 +74,13 @@ public class MessageTest {
       TestMessageOne msg1 = req.getMessageWriter(TestMessageOne.class);
       TestMessageTwo msg2 = req.getMessageWriter(TestMessageTwo.class);
       
-      msg1.setMemSource(TestMessageType.eth1);
+      msg1.setMemSource(TestMessageDataType.eth1);
       Assert.assertEquals(msg1.INT1, msg1.getElement("INT1"));
       Assert.assertEquals(msg1.INT2, msg1.getElement("INT2"));
       Assert.assertEquals(msg1.INT3, msg1.getElement("INT3"));
       Assert.assertEquals(msg1.INT4, msg1.getElement("INT4"));
 
-      msg1.setMemSource(TestMessageType.eth2);
+      msg1.setMemSource(TestMessageDataType.eth2);
 
       Assert.assertEquals(msg2.INT1, msg1.getElement("INT1"));
       Assert.assertEquals(msg2.INT2, msg1.getElement("INT2"));
@@ -98,8 +98,8 @@ public class MessageTest {
       TestMessageTwo msg2 = req.getMessageWriter(TestMessageTwo.class);
       
       
-      msg1.setMemSource(TestMessageType.eth1);
-      Collection<Element> elements = msg1.getElements(TestMessageType.eth1);
+      msg1.setMemSource(TestMessageDataType.eth1);
+      Collection<Element> elements = msg1.getElements(TestMessageDataType.eth1);
       Assert.assertEquals(4, elements.size());
       Assert.assertTrue(elements.contains(msg1.INT1));
       Assert.assertTrue(elements.contains(msg1.INT2));
@@ -110,7 +110,7 @@ public class MessageTest {
       Assert.assertTrue(!elements.contains(msg2.INT3));
       Assert.assertTrue(!elements.contains(msg2.INT4));
 
-      elements = msg1.getElements(TestMessageType.eth2);
+      elements = msg1.getElements(TestMessageDataType.eth2);
       Assert.assertEquals(4, elements.size());
       Assert.assertTrue(!elements.contains(msg1.INT1));
       Assert.assertTrue(!elements.contains(msg1.INT2));

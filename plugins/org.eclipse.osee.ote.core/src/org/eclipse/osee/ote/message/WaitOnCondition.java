@@ -32,7 +32,7 @@ public class WaitOnCondition {
       this.timeoutInMs = timeoutInMs;
       lock = new ReentrantLock();
       checkCondition = lock.newCondition();
-      signalCheck = new SignalNewData(lock, checkCondition);
+      signalCheck = new SignalNewData(lock, checkCondition, condition);
       timeout = new SignalTimeout(lock, checkCondition);
       this.maintain = maintain;
    }
@@ -48,13 +48,18 @@ public class WaitOnCondition {
          for(Message msg:messages){
             msg.addListener(signalCheck);
          }
-         cancelTask = scheduler.scheduleWithDelay(timeout, timeoutInMs);
+         if(timeoutInMs > 0){
+            cancelTask = scheduler.scheduleWithDelay(timeout, timeoutInMs);
+         }
          pass = condition.check();
          boolean done = pass ^ maintain;
-         while (!done && !cancelTask.isComplete()) {
+         while (!done && (cancelTask != null && !cancelTask.isComplete())) {
             checkCondition.await(1000, TimeUnit.MILLISECONDS);
-            pass = condition.checkAndIncrement();
+            pass = condition.check();
             done = pass ^ maintain;
+            if(done){
+               cancelTask.unregister();
+            }
          }
          time = scheduler.getTime() - time;
       } catch (InterruptedException e) {
@@ -102,16 +107,19 @@ public class WaitOnCondition {
 
       private ReentrantLock lock;
       private Condition condition;
+      private ICondition check;
 
-      SignalNewData(ReentrantLock lock, Condition condition){
+      SignalNewData(ReentrantLock lock, Condition condition, ICondition check){
          this.lock = lock;
          this.condition = condition;
+         this.check = check;
       }
 
       @Override
       public void onDataAvailable(MessageData data, DataType type) throws MessageSystemException {
          lock.lock();
          try{
+            check.increment();
             condition.signal();
          } finally {
             lock.unlock();

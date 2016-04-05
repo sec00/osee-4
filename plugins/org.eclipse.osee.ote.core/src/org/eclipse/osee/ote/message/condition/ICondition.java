@@ -16,4 +16,6 @@ public interface ICondition {
    boolean checkAndIncrement();
 
    int getCheckCount();
+
+   void increment();
 }

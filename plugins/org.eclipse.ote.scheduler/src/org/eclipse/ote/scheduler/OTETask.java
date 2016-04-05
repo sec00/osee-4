@@ -9,7 +9,7 @@ public class OTETask implements Callable<OTETaskResult>, Comparable<OTETask>{
    private int period;
    private final boolean isScheduled;
    private volatile boolean complete = false;
-   private boolean canceled;
+   private volatile boolean canceled = false;
    private boolean isMainThread = false;
    
    public OTETask(Runnable runnable, int period){
@@ -33,6 +33,7 @@ public class OTETask implements Callable<OTETaskResult>, Comparable<OTETask>{
    public OTETaskResult call() throws Exception {
       try{
          if(!canceled){
+//            System.out.println(r.toString());
             r.run();
          }
       } catch (Throwable th){
@@ -86,6 +87,7 @@ public class OTETask implements Callable<OTETaskResult>, Comparable<OTETask>{
 
    void setCanceled() {
       canceled = true;
+      complete = true;
    }
    
    public String toString(){
