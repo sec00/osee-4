@@ -1,7 +1,6 @@
 package org.eclipse.ote.scheduler;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -28,8 +27,8 @@ public class SchedulerImpl implements Scheduler {
 //   private SortedOnInsertList<OTETask> simulatedEnvNotifyTasks = new SortedOnInsertList<>(OTETask.class);
    
 // +  private NavigableSet<OTETask> simulatedEnvNotifyTasks = new ConcurrentSkipListSet<OTETask>();
-   private SortedLinkedList<OTETask> tasks = new SortedLinkedList<OTETask>();
-   private SortedLinkedList<OTETask> simulatedEnvNotifyTasks = new SortedLinkedList<OTETask>();
+   private SortedLinkedListCopyOnWrite<OTETask> tasks = new SortedLinkedListCopyOnWrite<OTETask>();
+   private SortedLinkedListCopyOnWrite<OTETask> simulatedEnvNotifyTasks = new SortedLinkedListCopyOnWrite<OTETask>();
  
    private ExecutorService pool;
    private boolean isTimeSimulated;
@@ -46,6 +45,7 @@ public class SchedulerImpl implements Scheduler {
    
    private SchedulerImpl wallClockScheduler;
    private volatile boolean ignoreWaits;
+   private volatile boolean pauseSimulated;
    
    /**
     * if time is simulated we wait for tasks to complete, if not fire and forget
@@ -100,6 +100,60 @@ public class SchedulerImpl implements Scheduler {
          wallClockScheduler.stop();
       }
       pool.shutdown();
+      tasks.dispose();
+      simulatedEnvNotifyTasks.dispose();
+   }
+   
+   void step(){
+      boolean paused = false;
+      if(isTimeSimulated) {
+         if(pauseSimulated){
+            paused = true;
+         } else if (!noPause){
+            try{
+//               lock.lock();
+               long time = clock.currentTimeMillis();
+               MyInnerIterator<OTETask> simIt = simulatedEnvNotifyTasks.iterator();
+               while(simIt.hasNext()){
+                  OTETask task = simIt.next();
+                  if(task != null && task.getTime() <= time){
+                     try{
+                        boolean removed = simulatedEnvNotifyTasks.remove(task);
+                        if(!removed){
+                           System.out.println("boo");
+                        }
+                        simulatedEnvNotifyTasks.print();
+//                        simIt.remove();
+                        task.call();
+                     } catch (Exception ex){
+                        ex.printStackTrace();
+                     }
+                  } else {
+                     break;
+                  }
+               }
+               simulatedEnvNotifyTasks.doneWithIterator(simIt);
+               if(simulatedEnvNotifyTasks.isEmpty()){
+                  paused = true;
+               } else {
+//                  simulatedEnvNotifyTasks.print();
+               }
+            } finally {
+//               simulatedEnvNotifyTasks.compact();
+//               lock.unlock();
+            }
+         }
+      } 
+      if(paused){
+         SchedulerImpl.this.sleepDelay.run();
+      } else {
+         executeTasks();
+         clock.step();
+         
+//         if(isTimeSimulated){
+//         System.out.println(getTime());
+//         }
+      }
    }
    
    private void run(){
@@ -108,48 +162,10 @@ public class SchedulerImpl implements Scheduler {
             @Override
             public void run() {
                while(run){
-                  boolean paused = false;
-                  if(isTimeSimulated) {
-                     if(!noPause){
-                        try{
-//                           lock.lock();
-                           long time = clock.currentTimeMillis();
-                           Iterator<OTETask> simIt = simulatedEnvNotifyTasks.iterator();
-                           while(simIt.hasNext()){
-                              OTETask task = simIt.next();
-                              if(task != null && task.getTime() <= time){
-                                 try{
-                                    simIt.remove();
-                                    task.call();
-                                 } catch (Exception ex){
-                                    ex.printStackTrace();
-                                 }
-                              } else {
-                                 break;
-                              }
-                           }
-//                           simulatedEnvNotifyTasks.doneWithIterator(simIt);
-                           if(simulatedEnvNotifyTasks.isEmpty()){
-                              paused = true;
-                           } else {
-//                              simulatedEnvNotifyTasks.print();
-                           }
-                        } finally {
-//                           simulatedEnvNotifyTasks.compact();
-//                           lock.unlock();
-                        }
-                     }
-                  } 
-                  if(paused){
-                     SchedulerImpl.this.sleepDelay.run();
-                  } else {
-                     executeTasks();
-                     clock.step();
-                     
-//                     if(isTimeSimulated){
-//                     System.out.println(getTime());
-//                     }
-                  }
+                  step();
+               }
+               for(OTETask t:tasks){
+                  System.out.println(t);
                }
                System.out.println("exit scheduler");
             }
@@ -170,7 +186,7 @@ public class SchedulerImpl implements Scheduler {
       try{
 //         lock.lock();
          if(!tasks.isEmpty()){
-            Iterator<OTETask> it = tasks.iterator();
+            MyInnerIterator<OTETask> it = tasks.iterator();
             while(it.hasNext()){
                OTETask task = it.next();
                if(task == null){
@@ -178,7 +194,8 @@ public class SchedulerImpl implements Scheduler {
                }
                if(task != null && task.getTime() <= time){
                   submittedTasks.add(pool.submit(task));
-                  it.remove();
+                  tasks.remove(task);
+//                  it.remove();
                   if(task.isMainThread()){
                      doTasksHaveAnyMainThreadWaits = false;
                   }
@@ -191,7 +208,7 @@ public class SchedulerImpl implements Scheduler {
                   break;
                }
             }
-//            tasks.doneWithIterator(it);
+            tasks.doneWithIterator(it);
 //            tasks.compact();
 //            tasks.flushAddQueue();
          }
@@ -199,9 +216,9 @@ public class SchedulerImpl implements Scheduler {
 //         lock.unlock();
       }
       if(isTimeSimulated){
-         for(Future<OTETaskResult> f:submittedTasks){
+         for(int i = 0; i < submittedTasks.size(); i++){
             try {
-               f.get();    
+               submittedTasks.get(i).get();    
             } catch (InterruptedException e) {
                e.printStackTrace();
             } catch (ExecutionException e) {
@@ -395,8 +412,12 @@ public class SchedulerImpl implements Scheduler {
          }
 //         System.out.printf("Removed Task: %s\n", task.toString());
       }
-//      if(!removed){
-//         System.out.println("failed to remove :************************************************************" + task);   
+      if(removed && task instanceof OTETaskHeavy){
+         System.out.println(task.toString());
+      }
+//      if(removed && isTimeSimulated){
+//         System.out.println("failed to remove :************************************************************" + task);
+//         System.out.println(task.toString());
 //      }
 //      System.out.println("removed task:************************************************************");
 //      for(OTETask t:tasks){
@@ -476,11 +497,11 @@ public class SchedulerImpl implements Scheduler {
             }
          }     
          
-         System.out.println("set main thread task:" + tasks.size() +"************************************************************");
-         for(OTETask t:tasks){
-            System.out.println(t);
-         }
-         System.out.println("**************************************************************");
+//         System.out.println("set main thread task:" + tasks.size() +"************************************************************");
+//         for(OTETask t:tasks){
+//            System.out.println(t);
+//         }
+//         System.out.println("**************************************************************");
          
       } finally {
 //         lock.unlock();
@@ -489,6 +510,12 @@ public class SchedulerImpl implements Scheduler {
    
    public void resetClock(){
       clock.reset();
+   }
+
+   @Override
+   public void pauseSimulated(boolean pause) {
+      // TODO Auto-generated method stub
+      this.pauseSimulated = pause;
    }
 
 }

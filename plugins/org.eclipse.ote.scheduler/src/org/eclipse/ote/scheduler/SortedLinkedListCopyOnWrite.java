@@ -1,292 +1,240 @@
 package org.eclipse.ote.scheduler;
 
-import java.lang.reflect.Array;
-import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Vector;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class SortedLinkedListCopyOnWrite<T extends Comparable> implements List<T>{
+public class SortedLinkedListCopyOnWrite<T extends Comparable<T>> implements List<T>{
 
-   private List<T> added = new Vector<>();
-   private List<T> deleted = new Vector<>();
+
+   private ObjectPool<MyInnerIterator<T>> itpool;
+   private ObjectPool<Node<T>> nodePool;
+   private ObjectPool<LinkedList<T>> pool;
    
-   private ReentrantLock poolLock = new ReentrantLock();
-   private ArrayDeque<Node<T>> pool;
+   private ArrayList<LinkedList<T>> inUseItems;
+   
+   private AtomicReference<LinkedList<T>> data;
+   private volatile int refCount;
+   private int listCount = 4;
+   private boolean debug = false;
    
    
-   private ReentrantLock itLock = new ReentrantLock();
-   private ArrayDeque<MyIterator> itpool;
-   
-   private Node<T> head;
-   private Node<T> tail;
-   
+
+   @SuppressWarnings({ "rawtypes", "unchecked" })
    public SortedLinkedListCopyOnWrite() {
-      pool = new ArrayDeque<>();
-      for(int i = 0; i < 8; i++){
-         pool.push(new Node<T>());
+      inUseItems = new ArrayList<>();
+      data = new AtomicReference<>();
+      nodePool = new ObjectPool( new Create<Node<T>>(){
+         @Override
+         public Node<T> create() {
+            return new Node<>();
+         }
       }
-      itpool = new ArrayDeque<>();
-      for(int i = 0; i < 8; i++){
-         itpool.push(new MyIterator(this));
+      , new Initialize<Node<T>>() {
+         @Override
+         public void initialize(Node<T> obj) {
+            obj.deleted = false;
+            obj.nextNode = null;
+            obj.previousNode = null;
+            obj.object = null;
+         }
+      });
+      itpool = new ObjectPool( new Create<MyInnerIterator<T>>(){
+         @Override
+         public MyInnerIterator<T> create() {
+            // TODO Auto-generated method stub
+            return new MyInnerIterator<>();
+         }
+
       }
+      , new Initialize<MyInnerIterator<T>>() {
+
+         @Override
+         public void initialize(MyInnerIterator<T> obj) {
+
+         }
+      });
+
+      pool = new ObjectPool( new Create<LinkedList<T>>() {
+
+         @Override
+         public LinkedList<T> create() {
+            LinkedList<T> list = new LinkedList(nodePool, itpool);
+            list.setCurrent(true);
+            list.head = null;
+            list.tail = null;
+            return list;
+         }
+      }, new Initialize<LinkedList<T>>() {
+
+         @Override
+         public void initialize(LinkedList<T> obj) {
+            obj.head = null;
+            obj.tail = null; 
+            obj.setCurrent(true);
+         }
+      });
+      LinkedList<T> list = pool.get();
+      list.setCurrent(true);
+      data.set(list);
+      if(debug ){
+         System.out.printf("nodepool, itpool, linkedlistpool\n%d, %d, %d\n", nodePool.hashCode(), itpool.hashCode(), pool.hashCode());
+      }
+   }
+   
+   public void dispose(){
+      data.get().clear();
+      itpool.flush();
+      nodePool.flush();
+      pool.flush();
+      inUseItems.clear();
+   }
+   
+//   LinkedList<T> getList(){
+//      poolLock.lock();
+//      LinkedList<T> newNode;
+//      try{
+//         if(!pool.isEmpty()){
+//            newNode = pool.pop();
+//         } else {
+//            listCount++;
+//            System.out.printf("NEW LIST %d *****************************************************************\n", listCount);
+//            newNode = new LinkedList<>(nodePool);
+//         }
+//      } finally {
+//         poolLock.unlock();
+//      }
+//      return newNode;
+//   }
+//   
+//   private void pushList(LinkedList<T> node){
+//      poolLock.lock();
+//      try{
+//         pool.push(node);
+//      } finally {
+//         poolLock.unlock();
+//      }
+//   }
+   
+   private synchronized LinkedList<T> cloneList(){
+      
+      return null;
    }
    
    
    
    @Override
    public int size() {
-      Node<T> node = head;
-      int size = 0;
-      while(node != null){
-         size++;
-         node = node.nextNode;
-      }
-      return size;
+      return data.get().size();
    }
-
+   
    @Override
    public boolean isEmpty() {
-      return head == null;
+      return data.get().isEmpty();
    }
 
    @Override
    public boolean contains(Object o) {
-      Node<T> node = head;
-      while(node != null){
-         if (o.equals(node)){
-            return true;
-         } else {
-            node = node.nextNode;
-         }
-      }
-      return false;
+      return data.get().contains(o);
    }
 
    @Override
-   public synchronized Iterator<T> iterator() {
-      compact();
-      
-      
-      
-      itLock.lock();
-      MyIterator it;
-      try{
-         if(!itpool.isEmpty()){
-            it = itpool.pop();
-         } else {
-            it = new MyIterator(this);
-         }
-      } finally {
-         itLock.unlock();
-      }
-      it.currentNode = null;
-      it.currentHead = head;
-      return it;
+   public synchronized MyInnerIterator<T> iterator() {
+      refCount++;
+      return data.get().iterator();
    }
    
-   public void doneWithIterator(Iterator<T> it){
-      itLock.lock();
-      try{
-         if(it instanceof MyIterator){
-            itpool.push((MyIterator)it);
+   public synchronized void doneWithIterator(MyInnerIterator<T> it){
+      //do something smart to recoup nodes from it if the data has changed
+      
+//      if(!data.get().iterator().equals(it)){
+////         LinkedList<T> list = it.parent;
+////         list.clear();
+////         pool.push(list);
+//         System.out.println("the iterator has changed so the old array is crap "+ this.hashCode());
+//         
+//      }
+//      else {
+//         System.out.println("same iterator... no changes " + this.hashCode());
+//      }
+      inUseItems.clear();
+      pool.fillInUseItems(inUseItems);
+      for(int i = 0; i < inUseItems.size(); i++){
+         LinkedList<T> item = inUseItems.get(i);
+         if(!item.getCurrent()){
+            item.clear();
+            pool.push(item);
          }
-      } finally {
-         itLock.unlock();
       }
+      itpool.push(it);
+//      refCount--;
    }
 
    @Override
    public Object[] toArray() {
-      Object[] objs = new Object[size()];
-      Node<T> node = head;
-      int i = 0;
-      while(node != null && i < objs.length){
-         objs[i] = node.object;
-      }
-      return objs;
+//      Object[] objs = new Object[size()];
+//      Node<T> node = head;
+//      int i = 0;
+//      while(node != null && i < objs.length){
+//         objs[i] = node.object;
+//      }
+      return null;//objs;
    }
 
    @SuppressWarnings({ "unchecked", "hiding" })
    @Override
    public <T> T[] toArray(T[] a) {
-      int size = size();
-      if(a.length != size){
-         a = (T[])Array.newInstance(a.getClass(), size);
-      }
-      Node node = head;
-      int i = 0;
-      while(node != null && i < a.length){
-         a[i] = (T)node.object;
-      }
-      return a;
-   }
-
-   public boolean add(T e) {
-      return added.add(e);
-   }
-   
-   public boolean addLocal(T e) {
-      Node node = head;
-      boolean added = false;
-      Node<T> newNode;
-      poolLock.lock();
-      try{
-         if(!pool.isEmpty()){
-            newNode = pool.pop();
-            newNode.deleted = false;
-            newNode.nextNode = null;
-            newNode.previousNode = null;
-            newNode.object = null;
-         } else {
-            newNode = new Node<T>();
-         }
-      } finally {
-         poolLock.unlock();
-      }
-      newNode.object = e;
-      if(head == null){
-         head = newNode;
-         tail = newNode;
-      } else {
-         while(node != null){
-            if(e.compareTo(node.object) < 0){
-               Node before = node.previousNode;
-               Node after = node;
-               newNode.previousNode = before;
-               newNode.nextNode = node;
-               if(before != null){
-                  before.nextNode = newNode;
-               } else {
-                  head = newNode;                     
-               }
-               after.previousNode = newNode;
-               added = true;
-               break;
-            }
-            node = node.nextNode;
-         }
-         if(!added){
-            newNode.previousNode = tail;
-            tail.nextNode = newNode;
-            tail = newNode;               
-         }
-      }
-      return true;
-   }
-   
-   @Override
-   public boolean remove(Object o) {
-      
-      Node node = head;
-      while(node != null){
-         if(o.equals(node.object)){
-            node.deleted = true;
-//            if(node == head){
-//                if(node.nextNode != null){
-//                   node.nextNode.previousNode = null;
-//                   head = node.nextNode;
-//                } else {
-//                   head = null;
-//                   tail = null;
-//                }
-//            } else if(node == tail){
-//               node.previousNode.nextNode = null;
-//               tail = node.previousNode;
-//            } else {
-//               node.previousNode.nextNode = node.nextNode;
-//               node.nextNode.previousNode = node.previousNode;
-//            }
-//            node.nextNode = null;
-//            node.previousNode = null;
-//            node.object = null;   
-//            poolLock.lock();
-//            try{
-//               pool.push(node);
-//            } finally {
-//               poolLock.unlock();
-//            }
-            return true;
-         }
-         node = node.nextNode;
-      }
-      return false;
-   }
-   
-   public void compact(){
-    Node node = head;
-    while(node != null){
-       if(node.deleted){
-          if(node == head){
-              if(node.nextNode != null){
-                 node.nextNode.previousNode = null;
-                 head = node.nextNode;
-              } else {
-                 head = null;
-                 tail = null;
-              }
-          } else if(node == tail){
-             node.previousNode.nextNode = null;
-             tail = node.previousNode;
-          } else {
-             node.previousNode.nextNode = node.nextNode;
-             node.nextNode.previousNode = node.previousNode;
-          }
-//          node.nextNode = null;
-//          node.previousNode = null;
-//          node.object = null;   
-          node.object = null;
-          poolLock.lock();
-          try{
-             pool.push(node);
-          } finally {
-             poolLock.unlock();
-          }
-          node = node.nextNode;
-       } else {
-          node = node.nextNode;
-       }
-    }
-   }
-
-//   @Override
-//   public boolean remove(Object o) {
-//      Node node = head;
-//      while(node != null){
-//         if(o.equals(node.object)){
-//            if(node == head){
-//                if(node.nextNode != null){
-//                   node.nextNode.previousNode = null;
-//                   head = node.nextNode;
-//                } else {
-//                   head = null;
-//                   tail = null;
-//                }
-//            } else if(node == tail){
-//               node.previousNode.nextNode = null;
-//               tail = node.previousNode;
-//            } else {
-//               node.previousNode.nextNode = node.nextNode;
-//               node.nextNode.previousNode = node.previousNode;
-//            }
-//            node.nextNode = null;
-//            node.previousNode = null;
-//            node.object = null;   
-//            poolLock.lock();
-//            try{
-//               pool.push(node);
-//            } finally {
-//               poolLock.unlock();
-//            }
-//            return true;
-//         }
-//         node = node.nextNode;
+//      int size = size();
+//      if(a.length != size){
+//         a = (T[])Array.newInstance(a.getClass(), size);
 //      }
-//      return false;
-//   }
+//      Node node = head;
+//      int i = 0;
+//      while(node != null && i < a.length){
+//         a[i] = (T)node.object;
+//      }
+      return null;//a;
+   }
+
+   public synchronized boolean add(T e) {
+//      int currentRefcount = refCount;
+      LinkedList<T> currentList = data.get();
+      LinkedList<T> newList = copy(currentList, pool.get());
+      boolean returnVal = newList.addLocal(e);
+      data.set(newList);
+      currentList.setCurrent(false);
+//      if(currentRefcount == refCount){
+         
+//         currentList.clear();
+//         pool.push(currentList);
+//      }
+      return returnVal;
+   }
+   
+   private LinkedList<T> copy(LinkedList<T> currentList, LinkedList<T> list) {
+      list.clear();
+      Node<T> node = currentList.head;
+      while(node != null){
+        list.addLocal(node.object);
+        node = node.nextNode;
+      }
+      return list;
+   }
+
+   @Override
+   public synchronized boolean remove(Object o) {
+      LinkedList<T> currentList = data.get();
+      LinkedList<T> newList = copy(currentList, pool.get());
+      boolean returnVal = newList.removeLocal(o);
+      data.set(newList);
+      newList.setCurrent(true);
+      currentList.setCurrent(false);
+      return returnVal;
+   }
+   
+  
 
    @Override
    public boolean containsAll(Collection<?> c) {
@@ -320,8 +268,7 @@ public class SortedLinkedListCopyOnWrite<T extends Comparable> implements List<T
 
    @Override
    public void clear() {
-      // TODO Auto-generated method stub
-      
+      data.get().clear();
    }
 
    @Override
@@ -377,139 +324,17 @@ public class SortedLinkedListCopyOnWrite<T extends Comparable> implements List<T
       // TODO Auto-generated method stub
       return null;
    }
-   
-   private static class Node<T> {
-      
-      T object;
-      Node<T> previousNode;
-      Node<T> nextNode;
-      
-      T safeobject;
-      Node<T> safepreviousNode;
-      Node<T> safenextNode;
-      
-      volatile boolean deleted = false; 
-      
-      public Node(){
-         previousNode = null;
-         nextNode = null;
-      }
-      
-   }
-   
-   private static class MyIterator<T extends Comparable<T>> implements Iterator<T> {
 
-      Node<T> currentNode;
-      Node<T> currentHead;
-      private SortedLinkedListCopyOnWrite<T> parent;
-      
-      public MyIterator(SortedLinkedListCopyOnWrite<T> parent) {
-         this.parent = parent;
-      }
-      
-      public void init(Node<T> head){
-         currentHead = head;
-      }
-      
-      @Override
-      public boolean hasNext() {
-         Node nextCheck = advanceNode(currentNode);
-         return (nextCheck != null);
-      }
-
-      @Override
-      public T next() {
-         currentNode = advanceNode(currentNode);
-         if(currentNode != null){
-            return currentNode.object;
-         } else {
-            return null;
-         }
-      }
-      
-      public Node advanceNode(Node node) {
-         if(node == null){
-            node = currentHead;
-         } else {
-            node = node.nextNode;
-         }
-         if(node != null && node.deleted){
-            advanceNode(node);
-         }
-         return node;
-      }
-      
-//      public T peekNext() {
-//         if(currentNode == null){
-//            return currentHead.object;
-//         } else {
-//            currentNode = currentNode.nextNode;
-//         }
-//         return currentNode.object;
-//      }
-      
-      @Override
-      public void remove(){
-//         Node toRemove = currentNode;
-//         currentNode = currentNode.previousNode;
-//         if(currentNode == null){
-            currentHead = null;
-//         }
-         parent.remove(currentNode.object);
-      }
-      
-   }
-   
-   public static void main(String[] args){
-      SortedLinkedListCopyOnWrite<Integer> list = new SortedLinkedListCopyOnWrite<>();
-      
-      if(list.iterator().hasNext()){
-         System.out.println("no");
-      }
-      
-      list.add(1);
-      list.print();
-      list.add(30);
-      list.print();
-      list.add(35);
-      list.print();
-
-      list.add(3);
-      list.print();
-
-      list.add(10);
-      list.print();
-
-      list.add(23);
-      list.print();
-
-      list.add(350);
-      list.print();
-
-      list.add(200);
-      list.print();
-
-      list.add(31);
-      list.print();
-
-      list.add(30);
-      list.print();
-
-   }
-
-   private void print() {
-      for(T t:this){
-         System.out.printf("%s, ", t.toString()); 
-      }
-      
-      System.out.println();
-      Node node = tail;
+   public void print() {
+      LinkedList list = data.get();
+      Node node = list.head;
       while(node != null){
          System.out.printf("%s, ", node.object.toString()); 
-         node = node.previousNode;
+         node = node.nextNode;
       }
-      System.out.println();
-      
+      if(list.head != null){
+         System.out.println();
+      }
    }
    
   }

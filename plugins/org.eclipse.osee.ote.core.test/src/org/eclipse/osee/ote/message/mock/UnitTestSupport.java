@@ -26,6 +26,7 @@ import org.eclipse.osee.ote.message.elements.DiscreteElement;
 import org.eclipse.osee.ote.message.enums.DataType;
 import org.eclipse.osee.ote.message.listener.IOSEEMessageListener;
 import org.eclipse.ote.scheduler.OTETaskRegistration;
+import org.eclipse.ote.scheduler.SchedulerImpl;
 import org.junit.Assert;
 
 public class UnitTestSupport {
@@ -107,7 +108,7 @@ public class UnitTestSupport {
             if (index < sequence.length) {
                element.setValue(sequence[index]);
 //               element.getMessage().send();
-               System.out.println(element.getName() + " is now " + element.getValue());
+               System.out.println(element.getName() + " is now " + element.getValue() + " - " + index + " " + UnitTestSupport.this.accessor.getTimerCtrl().getScheduler().getTime());
                index++;
             } else {
                element.getMessage().removeListener(this);
@@ -342,7 +343,8 @@ public class UnitTestSupport {
       element.getMessage().waitForTransmission(accessor);
       ISequenceHandle handle = setSequence(elementWriter, values);
       for (T v : values) {
-         checkWaitForValue(element, v, 40);
+         System.out.println("checking for value '" + v + "' " + UnitTestSupport.this.accessor.getEnvTime());
+         checkWaitForValue(element, v, 60);
       }
       handle.waitForEndSequence(100, TimeUnit.MILLISECONDS);
       setSequence(elementWriter, values);

@@ -54,13 +54,21 @@ public class WaitOnCondition {
          pass = condition.check();
          boolean done = pass ^ maintain;
          while (!done && (cancelTask != null && !cancelTask.isComplete())) {
+            scheduler.pauseSimulated(false);
             checkCondition.await(1000, TimeUnit.MILLISECONDS);
+//            System.out.println(getClass().getSimpleName() + " done with wait - " + scheduler.getTime());
             pass = condition.check();
+//            System.out.println(getClass().getSimpleName() + " done with wait 2 - " + scheduler.getTime());
             done = pass ^ maintain;
+//            System.out.println(getClass().getSimpleName() + " done with wait 3 - " + scheduler.getTime());
             if(done){
+//               System.out.println(getClass().getSimpleName() + " done with wait 4 - " + scheduler.getTime());
                cancelTask.unregister();
+//               System.out.println(getClass().getSimpleName() + " done with wait 5 - " + scheduler.getTime());
             }
+//            System.out.println(getClass().getSimpleName() + " done with check - " + done +" " + scheduler.getTime());
          }
+//         System.out.println(getClass().getSimpleName() + " out of check loop - " + scheduler.getTime());
          time = scheduler.getTime() - time;
       } catch (InterruptedException e) {
       } finally {
@@ -70,8 +78,10 @@ public class WaitOnCondition {
          if(cancelTask != null){
             cancelTask.unregister();
          }
+         scheduler.pauseSimulated(false);
          lock.unlock();
       }
+//      System.out.println(getClass().getSimpleName() + " returning - " + scheduler.getTime());
       return new MsgWaitResult(time, condition.getCheckCount(), pass);
    }
 
@@ -91,7 +101,8 @@ public class WaitOnCondition {
          lock.lock();
          try{
             timeout = true;
-            condition.signal();            
+            condition.signal();   
+            
          } finally {
             lock.unlock();
          }
@@ -119,8 +130,10 @@ public class WaitOnCondition {
       public void onDataAvailable(MessageData data, DataType type) throws MessageSystemException {
          lock.lock();
          try{
+            scheduler.pauseSimulated(true);
             check.increment();
             condition.signal();
+//            System.out.println(getClass().getSimpleName() + " SignalNewData - " + scheduler.getTime());
          } finally {
             lock.unlock();
          }

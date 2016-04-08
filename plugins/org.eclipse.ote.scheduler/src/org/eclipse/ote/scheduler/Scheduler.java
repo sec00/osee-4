@@ -30,5 +30,7 @@ public interface Scheduler {
    public void resetClock();
 
    public void cancelAndIgnoreWaits(boolean b);
+
+   public void pauseSimulated(boolean b);
    
 }

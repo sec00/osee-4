@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.message;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,6 +18,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,6 +28,7 @@ import org.apache.felix.service.command.Descriptor;
 import org.apache.felix.service.command.Parameter;
 import org.eclipse.osee.ote.core.CopyOnWriteNoIteratorList;
 import org.eclipse.osee.ote.core.ServiceUtility;
+import org.eclipse.osee.ote.message.MessageController.MessageListenerContainer;
 import org.eclipse.osee.ote.message.enums.DataType;
 import org.eclipse.osee.ote.message.interfaces.IMessageScheduleChangeListener;
 import org.eclipse.osee.ote.message.listener.IOSEEMessageListener;
@@ -141,44 +144,59 @@ public class MessageControllerConsoleCommands {
    }
 
    private void printListenerInfo(Message msg) {
-      System.out.println("\tIOSEEMessageListener:");
-//      for(IOSEEMessageListener listener: msg.getListener().getRegisteredFastListeners()){
-//         print(listener);
-//      }
-//      for(IOSEEMessageListener listener: msg.getListener().getRegisteredSlowListeners()){
-//         print(listener);
-//      }
+      MessageListenerContainer container = messageController.getMessageListeners(msg);
       
-//      if(!msg.getSchedulingChangeListeners().isEmpty()){
-//         System.out.println("\tIMessageScheduleChangeListener:");   
-//         for(IMessageScheduleChangeListener listener:msg.getSchedulingChangeListeners()){
-//            print(listener);
-//         }
-//      }
-//      if(!msg.getPreMemSourceChangeListeners().isEmpty()){
-//         System.out.println("\tPre IMemSourceChangeListener:");
-//         for(IMemSourceChangeListener listener:msg.getPreMemSourceChangeListeners()){
-//            print(listener);
-//         }
-//      }
-//      if(!msg.getPostMemSourceChangeListeners().isEmpty()){
-//         System.out.println("\tPost IMemSourceChangeListener:");
-//         for(IMemSourceChangeListener listener:msg.getPostMemSourceChangeListeners()){
-//            print(listener);
-//         }
-//      }
-//      if(!msg.getPreMessageDisposeListeners().isEmpty()){
-//         System.out.println("\tPre IMemSourceChangeListener:");
-//         for(IMessageDisposeListener listener:msg.getPreMessageDisposeListeners()){
-//            print(listener);
-//         }
-//      }
-//      if(!msg.getPostMemSourceChangeListeners().isEmpty()){
-//         System.out.println("\tPost IMessageDisposeListener:");
-//         for(IMessageDisposeListener listener:msg.getPostMessageDisposeListeners()){
-//            print(listener);
-//         }
-//      }
+      IOSEEMessageListener[] listeners = container.listeners.get();
+      if(listeners != null && listeners.length > 0){
+         System.out.println("\tIOSEEMessageListener:");
+         for(int i = 0; i < listeners.length; i++){
+            print(listeners[i]);
+         }
+      }
+      
+      IOSEEMessageListener[] removablelisteners = container.removablelisteners.get();
+      if(removablelisteners != null && removablelisteners.length > 0){
+         System.out.println("\tRemovable IOSEEMessageListener:");
+         for(int i = 0; i < removablelisteners.length; i++){
+            print(removablelisteners[i]);
+         }
+      }
+      
+      
+      if(!container.schedulingChangeListeners.isEmpty()){
+         System.out.println("\tIMessageScheduleChangeListener:");   
+         for(IMessageScheduleChangeListener listener:container.schedulingChangeListeners){
+            print(listener);
+         }
+      }
+      
+      if(!container.preMemSourceChangeListeners.isEmpty()){
+         System.out.println("\tPre IMemSourceChangeListener:");
+         for(IMemSourceChangeListener listener:container.preMemSourceChangeListeners){
+            print(listener);
+         }
+      }
+      
+      if(!container.postMemSourceChangeListeners.isEmpty()){
+         System.out.println("\tPost IMemSourceChangeListener:");
+         for(IMemSourceChangeListener listener:container.postMemSourceChangeListeners){
+            print(listener);
+         }
+      }
+      
+      if(!container.preMessageDisposeListeners.isEmpty()){
+         System.out.println("\tPre IMessageDisposeListener:");
+         for(IMessageDisposeListener listener:container.preMessageDisposeListeners){
+            print(listener);
+         }
+      }
+      
+      if(!container.postMessageDisposeListeners.isEmpty()){
+         System.out.println("\tPost IMessageDisposeListener:");
+         for(IMessageDisposeListener listener:container.postMessageDisposeListeners){
+            print(listener);
+         }
+      }
    }
    
    private void print(Object listener){

@@ -542,7 +542,7 @@ public class MessageController implements IMessageManager {
       return idToDataMap.get(id);
    }
    
-   private MessageListenerContainer getMessageListeners(Message message){
+   MessageListenerContainer getMessageListeners(Message message){
       MessageListenerContainer container = messageListeners.get(message);
       if(container == null){
          container = new MessageListenerContainer();
@@ -730,16 +730,16 @@ public class MessageController implements IMessageManager {
       
    }
 
-   private static class MessageListenerContainer {
+   static class MessageListenerContainer {
       
-      private final CopyOnWriteNoIteratorList<IOSEEMessageListener> listeners = new CopyOnWriteNoIteratorList<>(IOSEEMessageListener.class);
-      private final CopyOnWriteNoIteratorList<IOSEEMessageListener> removablelisteners = new CopyOnWriteNoIteratorList<>(IOSEEMessageListener.class);
+      final CopyOnWriteNoIteratorList<IOSEEMessageListener> listeners = new CopyOnWriteNoIteratorList<>(IOSEEMessageListener.class);
+      final CopyOnWriteNoIteratorList<IOSEEMessageListener> removablelisteners = new CopyOnWriteNoIteratorList<>(IOSEEMessageListener.class);
   
-      private final ArrayList<IMessageScheduleChangeListener> schedulingChangeListeners = new ArrayList<IMessageScheduleChangeListener>(10);
-      private final List<IMemSourceChangeListener> preMemSourceChangeListeners = new CopyOnWriteArrayList<IMemSourceChangeListener>();
-      private final List<IMemSourceChangeListener> postMemSourceChangeListeners = new CopyOnWriteArrayList<IMemSourceChangeListener>();
-      private final List<IMessageDisposeListener> preMessageDisposeListeners = new CopyOnWriteArrayList<IMessageDisposeListener>();
-      private final List<IMessageDisposeListener> postMessageDisposeListeners = new CopyOnWriteArrayList<IMessageDisposeListener>();
+      final ArrayList<IMessageScheduleChangeListener> schedulingChangeListeners = new ArrayList<IMessageScheduleChangeListener>(10);
+      final List<IMemSourceChangeListener> preMemSourceChangeListeners = new CopyOnWriteArrayList<IMemSourceChangeListener>();
+      final List<IMemSourceChangeListener> postMemSourceChangeListeners = new CopyOnWriteArrayList<IMemSourceChangeListener>();
+      final List<IMessageDisposeListener> preMessageDisposeListeners = new CopyOnWriteArrayList<IMessageDisposeListener>();
+      final List<IMessageDisposeListener> postMessageDisposeListeners = new CopyOnWriteArrayList<IMessageDisposeListener>();
 
       public void add(IOSEEMessageListener listener) {
          listeners.add(listener);

@@ -91,7 +91,7 @@ public class OTETask implements Callable<OTETaskResult>, Comparable<OTETask>{
    }
    
    public String toString(){
-      return String.format("%d %d %s", this.time, period, r.toString());
+      return String.format("%015d %12d %6d %s", hashCode(), this.time, period, r.toString());
    }
 
    public void setMain(boolean isMainThread) {
