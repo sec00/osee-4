@@ -23,7 +23,7 @@ public class MessageControllerTest {
    
    @Before
    public void setupTest(){
-      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null);
+      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null);
       req = messageManager.createMessageRequestor("tests");
    }
    

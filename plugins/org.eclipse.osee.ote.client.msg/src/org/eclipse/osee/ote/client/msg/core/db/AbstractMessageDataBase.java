@@ -149,7 +149,7 @@ public abstract class AbstractMessageDataBase {
          public Class<?> findClass(String name) throws ClassNotFoundException {
             return loader.loadClass(name);
          }
-      }, fakeTimerControl);
+      }, fakeTimerControl, null);
 	   req = messageController.createMessageRequestor("messageDb");
 	}
 

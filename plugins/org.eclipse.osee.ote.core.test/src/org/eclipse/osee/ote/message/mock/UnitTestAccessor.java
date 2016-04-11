@@ -437,7 +437,7 @@ private static class BasicClassLocator implements ClassLocator {
          e.printStackTrace();
       }
       
-      msgManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), timerCtrl);
+      msgManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), timerCtrl, null);
       msgManager.registerWriter(new BasicWriter(TestMessageIOType.eth1, TestMessageDataType.eth1));
       
    }
