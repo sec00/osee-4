@@ -34,6 +34,7 @@ public class MessageController implements IMessageManager {
    private final HashMap<Message, HashSet<IMessageRequestor>> requestorReferenceMap = new HashMap<Message, HashSet<IMessageRequestor>>(200);
    private final LegacyMessageMapper mapper;
    private final List<MessageDataReceiver> messageDataReceivers = new CopyOnWriteArrayList<>();
+   private final List<MessageRemoveHandler> messageRemoveHandlers = new CopyOnWriteArrayList<>();
    private final List<IMessageCreationListener> preCreation = new ArrayList<IMessageCreationListener>();
    private final List<IMessageCreationListener> postCreation = new ArrayList<IMessageCreationListener>();
    private final List<IMessageCreationListener> instanceRequestListeners = new ArrayList<IMessageCreationListener>();
@@ -47,18 +48,27 @@ public class MessageController implements IMessageManager {
    private final PeriodicPublishMap periodicPublish;
    private final Set<DataType> availableDataTypes = new HashSet<>();
    private final Set<Integer> printIdMessage = new HashSet<>();
+   
 
  
    //ITimerControl should become Scheduler
-   public MessageController(ClassLocator classLocator, ITimerControl timerControl){
+   public MessageController(ClassLocator classLocator, ITimerControl timerControl, ManualMapper manualMapper){
       this.classLocator = classLocator;
       this.messageCollection = new MessageCollection(); 
-      this.mapper = new LegacyMessageMapperService();
+      this.mapper = new LegacyMessageMapperService(manualMapper);
       this.periodicPublish = new PeriodicPublishMap(this, timerControl);      
       
       commands = new MessageControllerConsoleCommands(this);
       
       useSpecialMapping = Boolean.parseBoolean(System.getProperty("ote.signal.mapping", "false"));
+   }
+   
+   public void addMessageRemoveHandler(MessageRemoveHandler messageRemoveHandler) {
+      messageRemoveHandlers.add(messageRemoveHandler);
+   }
+
+   public void removeMessageRemoveHandler(MessageRemoveHandler messageRemoveHandler) {
+      messageRemoveHandlers.remove(messageRemoveHandler);
    }
    
    @Override
@@ -484,6 +494,11 @@ public class MessageController implements IMessageManager {
          boolean result = list.remove(requestor);
          if (list.isEmpty()) {
             requestorReferenceMap.remove(msg);
+            for(MessageRemoveHandler removeHandler:messageRemoveHandlers){
+               if(!removeHandler.process(msg)){
+                  return true;
+               }
+            }
             if (!msg.isDestroyed()) {
                if(!msg.isWriter()){
                   idToDataMap.remove(msg.getMessageId());
@@ -599,6 +614,7 @@ public class MessageController implements IMessageManager {
       }
    }
 
+   @SuppressWarnings("unchecked")
    private void setupMessageMapping(IMessageRequestor requestor, Message message){
 
       mapper.addMessage(message);
@@ -965,6 +981,7 @@ public class MessageController implements IMessageManager {
       }
    }
 
+   @SuppressWarnings({ "unchecked", "rawtypes" })
    @Override
    public IOSEEMessageListener findMessageListenerType(Message message, Class clazz) {
       MessageListenerContainer container = messageListeners.get(message);

@@ -4,10 +4,13 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.osee.ote.core.OTETestCaseHandler.TestCaseAnnotated;
 import org.eclipse.osee.ote.core.environment.TestEnvironmentInterface;
 import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironmentAccessor;
 import org.eclipse.osee.ote.core.model.IModelManager;
@@ -18,7 +21,7 @@ public class OTERuntimeAnnotations {
    
    private final Map<Class<? extends Annotation>, AnnotationHandler<?>> annotationHandlers = new HashMap<Class<? extends Annotation>, AnnotationHandler<?>>();
    private IMessageRequestor req;
-   private List<TestCase> testCases;
+   private List<TestCaseAnnotated> testCases;
 
    public OTERuntimeAnnotations(){
       testCases = new ArrayList<>();
@@ -94,7 +97,13 @@ public class OTERuntimeAnnotations {
       }
    }
 
-   public List<TestCase> getTestCases() {
+   public List<TestCaseAnnotated> getAnnotatedTestCases() {
+      Collections.sort(testCases, new Comparator<TestCaseAnnotated>() {
+         @Override
+         public int compare(TestCaseAnnotated o1, TestCaseAnnotated o2) {
+            return o1.getOrder() - o2.getOrder();
+         }
+      });
       return testCases;
    }
    

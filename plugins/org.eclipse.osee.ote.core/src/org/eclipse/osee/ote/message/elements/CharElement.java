@@ -24,7 +24,6 @@ import org.eclipse.osee.ote.message.data.MemoryResource;
 import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.elements.nonmapping.NonMappingCharElement;
 import org.eclipse.osee.ote.message.interfaces.ITestAccessor;
-import org.eclipse.osee.ote.message.listener.MessageSystemListener;
 
 /**
  * @author John Butler

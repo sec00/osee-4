@@ -49,8 +49,10 @@ class LegacyMessageMapperService implements LegacyMessageMapper {
    private ConcurrentHashMap<Message, MessageStorageLookup> messageLookup;
    private ConcurrentHashMap<MessageData, MessageDataStorageLookup> messageDataLookup;
    private List<ElementNoMappingProvider<?>> nonMappingProviders;
+   private ManualMapper manualMapper;
    
-   public LegacyMessageMapperService(){
+   public LegacyMessageMapperService(ManualMapper manualMapper){
+      this.manualMapper = manualMapper;
       messageLookup = new ConcurrentHashMap<Message, MessageStorageLookup>();
       messageDataLookup = new ConcurrentHashMap<MessageData, MessageDataStorageLookup>();
       nonMappingProviders = new CopyOnWriteArrayList<>();
@@ -210,14 +212,32 @@ class LegacyMessageMapperService implements LegacyMessageMapper {
                         mappedElements.put(field.getName(), elements);
                      }
                      elements.add(field);
+                     
+                     if(manualMapper != null){
+                        String mapName = manualMapper.getName(message.getClass().getName(), mappedMessage.getClass().getName(), field.getName());
+                        if(mapName != null){
+                           elements = mappedElements.get(mapName);
+                           if(elements == null){
+                              elements = new ArrayList<>();
+                              mappedElements.put(mapName, elements);
+                           }
+                           elements.add(field);
+                        }
+                     }
+                     
                   }
+                  
+                 
                }
+               
+              
             }
          }
 
          for(Field targetField:masterMessage){
             try{
                targetField.setAccessible(true);
+               
                List<Element> assigneTo = mappedElements.get(targetField.getName());
                if(assigneTo == null) {
                   targetField.set(message, getNoMapping(targetField.getType(), (Element)targetField.get(message)));

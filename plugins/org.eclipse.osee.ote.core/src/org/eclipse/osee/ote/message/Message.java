@@ -335,19 +335,18 @@ public class Message implements Xmlizable, XmlizableStream {
       mapper.removeMessage(this);
       destroyed = true;
       defaultMessageData.dispose();
-//      listenerHandler.dispose();
 
       elementMap.clear();
 
       if (messageRequestor != null) {
          messageRequestor.dispose();
       }
-//      removableListenerHandler.dispose();
       if(messageManager != null){
          messageManager.notifyPostDestroyListeners(this);
       }
    }
    
+   @SuppressWarnings("rawtypes")
    public IOSEEMessageListener findMessageListenerType(Class clazz) {
       if(messageManager != null){
          return messageManager.findMessageListenerType(this, clazz);

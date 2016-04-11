@@ -28,8 +28,6 @@ public class EthernetUtil {
       String useLoopbackWhenNoTestInterfaceStr = System.getProperty("ote.network.test.loopback", "true");
       checkNetwork = Boolean.parseBoolean(checkNetworkStr);
       useLoopbackWhenNoTestInterface = Boolean.parseBoolean(useLoopbackWhenNoTestInterfaceStr);
-      String testInterfaces = System.getProperty("ote.test.interfaces", "192.168.0.254,192.168.1.254");
-      String[] interfaces = testInterfaces.split(",");
       updateAvailableInterfaces();
       try {
          localhost = InetAddress.getLocalHost();
@@ -37,16 +35,7 @@ public class EthernetUtil {
       } catch (UnknownHostException e) {
       }
      
-      for(String eth:interfaces){
-         InetAddress address;
-         try {
-            address = InetAddress.getByName(eth);
-            if (isAvailable(address)) {
-               labInterfaceAvailable = true;
-            } 
-         } catch (UnknownHostException e) {
-         }
-      }
+      labInterfaceAvailable = determineIfTestInterfaceIsAvailable();
       determineNetworkConfiguration();
       
       Thread th = new Thread(new Runnable(){
@@ -68,8 +57,8 @@ public class EthernetUtil {
                         localhost = local;
                      }
                   }
-                  if(!isLabInterfaceAvailable() && !isLocalRange(getLocalhost())){
-                     System.out.println("moving from local to on a wan so I am shutting down so we do not spam the network.  goodbye from EthernetUtil MONITOR");
+                  if(labInterfaceAvailable && !isLocalRange(getLocalhost()) && !determineIfTestInterfaceIsAvailable()){
+                     System.out.println("moving from local to on a wan with no test interface so I am shutting down so we do not spam the network.  goodbye from EthernetUtil MONITOR");
                      System.exit(1);
                   }
                }
@@ -84,6 +73,24 @@ public class EthernetUtil {
       th.setDaemon(true);
       th.setName("Ethernet Interface Monitor");
       th.start();
+   }
+   
+   private static boolean determineIfTestInterfaceIsAvailable(){
+      boolean isAvailable = false;
+      String testInterfaces = System.getProperty("ote.test.interfaces", "192.168.0.254,192.168.1.254");
+      String[] interfaces = testInterfaces.split(",");
+      updateAvailableInterfaces();
+      for(String eth:interfaces){
+         InetAddress address;
+         try {
+            address = InetAddress.getByName(eth);
+            if (isAvailable(address)) {
+               isAvailable = true;
+            } 
+         } catch (UnknownHostException e) {
+         }
+      }
+      return isAvailable;
    }
    
    public static InetAddress getLocalhost() {
@@ -147,6 +154,8 @@ public class EthernetUtil {
    
    private static void updateAvailableInterfaces(){
       try {
+         ipv4.clear();
+         ipv6.clear();
          Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
          ArrayList<NetworkInterface> networks = Collections.list(interfaces);
          for(NetworkInterface eth:networks){

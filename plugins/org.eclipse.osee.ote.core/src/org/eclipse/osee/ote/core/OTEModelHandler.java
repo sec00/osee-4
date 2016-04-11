@@ -22,12 +22,12 @@ public class OTEModelHandler extends AbstractAnnotationHandler<OTEModel> {
    }
 
    @Override
-   public void process(Annotation annotation, Object object) {
+   public void process(OTEModel annotation, Object object) {
       
    }
 
    @Override
-   public void process(Annotation annotation, Object object, Method method) {
+   public void process(OTEModel annotation, Object object, Method method) {
       
    }
 

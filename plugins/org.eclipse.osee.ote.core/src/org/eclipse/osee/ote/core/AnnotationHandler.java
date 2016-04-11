@@ -8,8 +8,8 @@ interface AnnotationHandler<T extends Annotation> {
 
 	void process(T annotation, Object object, Field field) throws Exception;
 
-   void process(Annotation annotation, Object object);
+   void process(T annotation, Object object);
 
-   void process(Annotation annotation, Object object, Method method);
+   void process(T annotation, Object object, Method method);
 
 }

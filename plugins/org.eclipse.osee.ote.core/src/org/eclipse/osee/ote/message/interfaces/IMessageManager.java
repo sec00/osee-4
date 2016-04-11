@@ -24,6 +24,7 @@ import org.eclipse.osee.ote.message.MessageDataUpdater;
 import org.eclipse.osee.ote.message.MessageDataWriter;
 import org.eclipse.osee.ote.message.MessageId;
 import org.eclipse.osee.ote.message.MessagePublishingHandler;
+import org.eclipse.osee.ote.message.MessageRemoveHandler;
 import org.eclipse.osee.ote.message.PublishInfo;
 import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.enums.DataType;
@@ -37,6 +38,10 @@ public interface IMessageManager {
 
 //   <CLASSTYPE extends Message> CLASSTYPE createMessage(Class<CLASSTYPE> messageClass) throws TestException;
 
+   public void addMessageRemoveHandler(MessageRemoveHandler messageRemoveHandler);
+
+   public void removeMessageRemoveHandler(MessageRemoveHandler messageRemoveHandler);
+   
    public void addMessagePublishingHandler(MessagePublishingHandler handler);
    
    void addPostCreateMessageListener(IMessageCreationListener listener);

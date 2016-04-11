@@ -12,10 +12,10 @@ import org.eclipse.osee.ote.core.environment.interfaces.ITestLogger;
 class OTETestCaseHandler implements AnnotationHandler<OTETestCase> {
 
    private TestScript testScript;
-   private List<TestCase> testCases;
+   private List<TestCaseAnnotated> testCases;
    private ITestEnvironmentAccessor accessor;
    
-   public OTETestCaseHandler(TestScript testScript, List<TestCase> testCases, ITestEnvironmentAccessor accessor) {
+   public OTETestCaseHandler(TestScript testScript, List<TestCaseAnnotated> testCases, ITestEnvironmentAccessor accessor) {
       this.testScript = testScript;
       this.testCases = testCases;
       this.accessor = accessor;
@@ -27,23 +27,31 @@ class OTETestCaseHandler implements AnnotationHandler<OTETestCase> {
    }
 
    @Override
-   public void process(Annotation annotation, Object object) {
+   public void process(OTETestCase annotation, Object object) {
       
    }
 
    @Override
-   public void process(Annotation annotation, Object object, Method method) {
-      testCases.add(new TestCaseAnnotated(testScript, method, accessor));
+   public void process(OTETestCase annotation, Object object, Method method) {
+      testCases.add(new TestCaseAnnotated(testScript, method, accessor, annotation.traceability(), annotation.order()));
    }
    
-   private static class TestCaseAnnotated extends TestCase {
+   public static class TestCaseAnnotated extends TestCase {
 
+      private int order;
       private Method method;
+      
 
-      public TestCaseAnnotated(TestScript testScript, Method method, ITestEnvironmentAccessor accessor) {
+      public TestCaseAnnotated(TestScript testScript, Method method, ITestEnvironmentAccessor accessor, String[] traceability, int order) {
          super(testScript, true, false);
          this.method = method;
          setEnv(accessor);
+         if(traceability != null){
+            for(String trace : traceability){
+               addTraceability(trace);
+            }
+         }
+         this.order = order;
       }
 
       @Override
@@ -65,6 +73,10 @@ class OTETestCaseHandler implements AnnotationHandler<OTETestCase> {
          } finally {
             method.setAccessible(false);
          }
+      }
+      
+      public int getOrder(){
+         return order;
       }
       
    }

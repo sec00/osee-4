@@ -201,7 +201,7 @@ public abstract class TestScript extends OTERuntimeAnnotations implements ITimeo
       shouldPauseOnFail = OteProperties.isPauseOnFailEnabled();
       printFailToConsole = OteProperties.isPrintFailToConsoleEnabled();
       
-      for(TestCase tc:super.getTestCases()){
+      for(TestCase tc:getAnnotatedTestCases()){
          addTestCase(tc);
       }
    }

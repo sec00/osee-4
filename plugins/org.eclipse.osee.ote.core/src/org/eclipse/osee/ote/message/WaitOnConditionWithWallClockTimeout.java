@@ -1,6 +1,5 @@
 package org.eclipse.osee.ote.message;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -18,17 +17,14 @@ public class WaitOnConditionWithWallClockTimeout {
    private ReentrantLock lock;
    private Scheduler scheduler;
    private ICondition condition;
-//   private List<Message> messages;
    private Condition checkCondition;
    private SignalNewData signalCheck;
    private SignalTimeout timeout;
    private boolean maintain;
-   private Runnable runnable;
-   
+
    public WaitOnConditionWithWallClockTimeout(Scheduler scheduler, ICondition condition, boolean maintain){
       this.scheduler = scheduler;
       this.condition = condition;
-//      this.messages = messages;
       lock = new ReentrantLock();
       checkCondition = lock.newCondition();
       signalCheck = new SignalNewData(lock, checkCondition);
@@ -43,11 +39,8 @@ public class WaitOnConditionWithWallClockTimeout {
       OTETaskRegistration cancelTask = null;
       OTETaskRegistration cancelOtherTask = null;
       try{
-         //loop through messages and add the signal listener
          time = scheduler.getTime();
-//         for(Message msg:messages){
-            message.addListener(signalCheck);
-//         }
+         message.addListener(signalCheck);
          cancelTask = scheduler.scheduleWithDelay(timeout, timeoutInMs);
          cancelOtherTask = scheduler.scheduleWithDelayRealTime(timeout, wallClockTimeoutInMs);
          pass = condition.check();
@@ -60,9 +53,7 @@ public class WaitOnConditionWithWallClockTimeout {
          time = scheduler.getTime() - time;
       } catch (InterruptedException e) {
       } finally {
-//         for(Message msg:messages){
-            message.removeListener(signalCheck);
-//         }
+         message.removeListener(signalCheck);
          if(cancelTask != null){
             cancelTask.unregister();
          }
@@ -124,7 +115,6 @@ public class WaitOnConditionWithWallClockTimeout {
 
       @Override
       public void onInitListener() throws MessageSystemException {
-         // TODO Auto-generated method stub
 
       }
 

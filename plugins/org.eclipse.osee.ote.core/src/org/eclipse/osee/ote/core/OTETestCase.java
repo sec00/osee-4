@@ -8,5 +8,6 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OTETestCase {
-
+   int order() default Integer.MAX_VALUE;
+   String[] traceability() default {};
 }

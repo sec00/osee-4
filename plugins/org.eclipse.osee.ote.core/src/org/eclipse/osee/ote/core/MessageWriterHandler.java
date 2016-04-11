@@ -1,6 +1,5 @@
 package org.eclipse.osee.ote.core;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -22,12 +21,12 @@ public class MessageWriterHandler extends AbstractAnnotationHandler<MessageWrite
    }
 
    @Override
-   public void process(Annotation annotation, Object object) {
+   public void process(MessageWriter annotation, Object object) {
       
    }
 
    @Override
-   public void process(Annotation annotation, Object object, Method method) {
+   public void process(MessageWriter annotation, Object object, Method method) {
       
    }
    
