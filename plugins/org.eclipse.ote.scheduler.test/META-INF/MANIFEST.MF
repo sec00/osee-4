@@ -3,6 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Test
 Bundle-SymbolicName: org.eclipse.ote.scheduler.test
 Bundle-Version: 1.0.0.qualifier
-Fragment-Host: org.eclipse.ote.scheduler;bundle-version="0.23.0"
+Fragment-Host: org.eclipse.ote.scheduler;bundle-version="0.23.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.junit
