@@ -83,7 +83,6 @@ public class MessageSubscriptionService implements IOteMessageService, ITestConn
     * Monitors a set of channels for message updates and dispatches the updates to worker threads
     */
    private UpdateDispatcher dispatcher = null;
-//   private volatile IRemoteMessageService service;
 
    private volatile IOteClientService clientService;
 

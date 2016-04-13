@@ -138,20 +138,6 @@ public class EthernetUtil {
       return ipv4.contains(address) || ipv6.contains(address);
    }
    
-//   public static boolean isAvailable(String regex){
-//      for(InetAddress eth:ipv4){
-//         if(eth.toString().contains(regex)){
-//            return true;
-//         }
-//      }
-//      for(InetAddress eth:ipv6){
-//         if(eth.toString().contains(regex)){
-//            return true;
-//         }
-//      }
-//      return false;
-//   }
-   
    private static void updateAvailableInterfaces(){
       try {
          ipv4.clear();

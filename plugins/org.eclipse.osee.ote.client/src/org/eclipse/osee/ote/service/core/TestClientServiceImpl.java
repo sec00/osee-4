@@ -55,14 +55,8 @@ public class TestClientServiceImpl implements IOteClientService, IConnectorListe
 	private volatile boolean stopped = false;
 	private TestHostConnection testConnection;
 
-//	private final OteClientEndpointSend endpointSend;
-//	private final OteClientEndpointReceive endpointReceive;
-
 	public TestClientServiceImpl(IConnectionService connectionService) {
 		this.connectionService = connectionService;
-//		this.endpointReceive = endpointReceive;
-//		this.endpointSend = endpointSend;
-//		endpointSend.setTestClientService(this);
 	}
 
 	public void init() {

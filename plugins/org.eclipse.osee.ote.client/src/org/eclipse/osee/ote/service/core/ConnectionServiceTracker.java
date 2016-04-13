@@ -23,17 +23,11 @@ import org.osgi.util.tracker.ServiceTracker;
 
 public class ConnectionServiceTracker extends ServiceTracker {
 
-//   private final OteClientEndpointReceive endpointReceive = new OteClientEndpointReceive();
-//   private final OteClientEndpointSend endpointSend = new OteClientEndpointSend();
-//   private final MessagingGatewayBindTracker messagingGatewayTracker;
-
    private ServiceRegistration registration;
    private TestClientServiceImpl testClientService;
 
    public ConnectionServiceTracker(BundleContext context) {
       super(context, IConnectionService.class.getName(), null);
-//      messagingGatewayTracker = new MessagingGatewayBindTracker(context, endpointSend, endpointReceive);
-//      messagingGatewayTracker.open(true);
    }
 
    @Override
@@ -70,7 +64,6 @@ public class ConnectionServiceTracker extends ServiceTracker {
    @Override
    public void close() {
       shutdownClientService();
-//      messagingGatewayTracker.close();
       super.close();
    }
 

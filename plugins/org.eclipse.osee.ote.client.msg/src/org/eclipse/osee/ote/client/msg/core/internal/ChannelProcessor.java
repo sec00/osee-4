@@ -127,7 +127,6 @@ final public class ChannelProcessor {
 
          if (remaining < data.length) {
             Arrays.fill(data, remaining, data.length, (byte) 0);
-            // msg.getActiveDataSource().setCurrentLength(remaining);
          }
          buffer.get(data, 0, remaining);
          msgData.setCurrentLength(remaining);

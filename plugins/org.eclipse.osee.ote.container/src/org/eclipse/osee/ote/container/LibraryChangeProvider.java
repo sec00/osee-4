@@ -36,12 +36,6 @@ public class LibraryChangeProvider<T extends JarCollectionNature> {
    private void resetClasspath() {
       for (IUserLibListener listener : listeners) {
          listener.libraryChanged();
-         //      try {
-         //         this.oteClasspathContainer.javaProject.getPerProjectInfo().resetResolvedClasspath();
-         //      }
-         //      catch (JavaModelException ex) {
-         //         ex.printStackTrace();
-         //      }
       }
    }
 

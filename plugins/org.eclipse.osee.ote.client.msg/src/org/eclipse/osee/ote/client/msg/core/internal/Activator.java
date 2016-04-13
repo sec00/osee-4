@@ -26,8 +26,6 @@ public class Activator extends Plugin {
 
    private BundleContext context;
 
-//   private OteClientServiceTracker tracker;
-
    /**
     * The constructor
     */
@@ -39,29 +37,11 @@ public class Activator extends Plugin {
       super.start(context);
       this.context = context;
       plugin = this;
-
-//      ExtensionDefinedObjects<IMessageDbFactory> definedObjects =
-//         new ExtensionDefinedObjects<IMessageDbFactory>("org.eclipse.osee.ote.client.msg.dBFactory", "DatabaseFactory",
-//            "className");
-//      try {
-//         List<IMessageDbFactory> providers = definedObjects.getObjects();
-//         if (!providers.isEmpty()) {
-//            tracker = new OteClientServiceTracker(providers.get(0));
-//            tracker.open(true);
-//         } else {
-//            OseeLog.log(Activator.class, Level.WARNING,
-//               "No message database factory (IMessageDbFactory) found. Message Subscription Service not started");
-//         }
-//      } catch (Exception ex) {
-//         OseeLog.log(Activator.class, Level.SEVERE, "failed to process message database factory extensions", ex);
-//      }
-
    }
 
    @Override
    public void stop(BundleContext context) throws Exception {
       plugin = null;
-//      tracker.close();
       super.stop(context);
       this.context = null;
    }

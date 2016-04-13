@@ -132,15 +132,6 @@ public abstract class AbstractMessageDataBase {
    };
    private IMessageRequestor req;
    
-//	private final DataReader reader = new DataReader(null, null, true, null, new EntityFactory() {
-//
-//		@Override
-//		public boolean isEnabled() {
-//			return true;
-//		}
-//
-//	});
-
 	protected AbstractMessageDataBase(IMsgToolServiceClient service) {
 	   client = service;
 	   messageController = new MessageController(new ClassLocator() {
@@ -178,12 +169,6 @@ public abstract class AbstractMessageDataBase {
 		   } else {
 		      msg = req.getMessageWriter(name);
 		   }
-//			Class<? extends Message> msgClass = ExportClassLoader.getInstance().loadClass(name).asSubclass(Message.class);
-//			Message msg = createMessage(msgClass);
-			
-//			for (MessageData data : (Collection<MessageData>) msg.getAllData()) {
-//			   data.setReader(reader);
-//			}
 			msg.setMemSource(type);
 			instance = new MessageInstance(msg, mode, type);
 			referenceToMsgMap.put(reference, instance);
@@ -197,7 +182,6 @@ public abstract class AbstractMessageDataBase {
 
 	public MessageInstance acquireInstance(String name, MessageMode mode, String dataType) throws Exception {
 	   Message msg = req.getMessageReader(name);
-		//Set<DataType> available = msg.getAvailableMemTypes();
 		Set<DataType> available = msg.getAssociatedMessages().keySet();
 		DataType requestDataType = msg.getDefaultMessageData().getType();
 		for (DataType type : available) {
@@ -210,11 +194,6 @@ public abstract class AbstractMessageDataBase {
 		MessageInstance instance = referenceToMsgMap.get(reference);
 		if (instance == null) {
 			msg.setMemSource(requestDataType);
-//			for (ArrayList<MessageData> dataList : (Collection<ArrayList<MessageData>>) msg.getAllData()) {
-//				for (MessageData data : dataList) {
-//					data.setReader(reader);
-//				}
-//			}
 			instance = new MessageInstance(msg, mode, requestDataType);
 			referenceToMsgMap.put(reference, instance);
 		}
@@ -239,10 +218,6 @@ public abstract class AbstractMessageDataBase {
 		}
 
 	}
-
-//	protected abstract Message createMessage(Class<? extends Message> msgClass) throws Exception;
-
-//	protected abstract void destroyMessage(Message message) throws Exception;
 
 	public void attachToService(IMsgToolServiceClient client) {
 	   connected = true;
