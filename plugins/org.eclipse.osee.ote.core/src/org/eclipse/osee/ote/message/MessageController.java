@@ -672,8 +672,8 @@ public class MessageController implements IMessageManager {
       private Map<Class<? extends Message>, Message> writerLookup;
       
       public MessageCollection(){
-         readerLookup = new HashMap<Class<? extends Message>, Message>();
-         writerLookup = new HashMap<Class<? extends Message>, Message>();
+         readerLookup = new ConcurrentHashMap<Class<? extends Message>, Message>();
+         writerLookup = new ConcurrentHashMap<Class<? extends Message>, Message>();
       }
       
       public void add(Message message){
@@ -700,30 +700,42 @@ public class MessageController implements IMessageManager {
       }
       
       public Collection<Message> getAllReaders() {
-         return readerLookup.values();
+         ArrayList<Message> filterList = new ArrayList<Message>();
+         readerLookup.forEach((key, value) -> 
+         {
+            filterList.add(value);
+         });
+         return filterList;
       }
 
       public Collection<Message> getAllReaders(DataType type) {
          ArrayList<Message> filterList = new ArrayList<Message>();
-         for(Message msg:getAllReaders()){
-            if(msg.getActiveDataSource().getType().equals(type)){
-               filterList.add(msg);
+         readerLookup.forEach((key, value) -> 
+         {
+            if(value.getActiveDataSource().getType().equals(type)){
+               filterList.add(value);
             }
-         }
+         });
          return filterList;
       }
 
       public Collection<Message> getAllWriters() {
-         return writerLookup.values();
+         ArrayList<Message> filterList = new ArrayList<Message>();
+         writerLookup.forEach((key, value) -> 
+         {
+            filterList.add(value);
+         });
+         return filterList;
       }
 
       public Collection<Message> getAllWriters(DataType type) {
          ArrayList<Message> filterList = new ArrayList<Message>();
-         for(Message msg:getAllWriters()){
-            if(msg.getActiveDataSource().getType().equals(type)){
-               filterList.add(msg);
+         writerLookup.forEach((key, value) -> 
+         {
+            if(value.getActiveDataSource().getType().equals(type)){
+               filterList.add(value);
             }
-         }
+         });
          return filterList;
       }
 
@@ -751,7 +763,7 @@ public class MessageController implements IMessageManager {
       final CopyOnWriteNoIteratorList<IOSEEMessageListener> listeners = new CopyOnWriteNoIteratorList<>(IOSEEMessageListener.class);
       final CopyOnWriteNoIteratorList<IOSEEMessageListener> removablelisteners = new CopyOnWriteNoIteratorList<>(IOSEEMessageListener.class);
   
-      final ArrayList<IMessageScheduleChangeListener> schedulingChangeListeners = new ArrayList<IMessageScheduleChangeListener>(10);
+      final List<IMessageScheduleChangeListener> schedulingChangeListeners = new CopyOnWriteArrayList<IMessageScheduleChangeListener>();
       final List<IMemSourceChangeListener> preMemSourceChangeListeners = new CopyOnWriteArrayList<IMemSourceChangeListener>();
       final List<IMemSourceChangeListener> postMemSourceChangeListeners = new CopyOnWriteArrayList<IMemSourceChangeListener>();
       final List<IMessageDisposeListener> preMessageDisposeListeners = new CopyOnWriteArrayList<IMessageDisposeListener>();
