@@ -52,8 +52,8 @@ public class OTEFolderImpl implements OTEServerFolder{
       File oteStationParent = new File(OtePropertiesCore.oteServerFolder.getValue("undefined"));
       if (!oteStationParent.exists() || !oteStationParent.isDirectory()) {
          OseeLog.log(OTEFolderImpl.class, Level.WARNING, "ote server folder parent does not exist folder -" + oteStationParent.getAbsolutePath());
-         oteStationParent = new File(OtePropertiesCore.userHome.getValue(), "stations");
-         return new File(oteStationParent, OtePropertiesCore.oteStationName.getValue("unknown-station"));
+         oteStationParent = new File(OtePropertiesCore.userHome.getValue(), "OTESERVER");
+         return oteStationParent;
       }
       File stationsFolder = new File(oteStationParent, "stations");
       File stationFolder = new File(stationsFolder, OtePropertiesCore.oteStationName.getValue("unknown-station"));
