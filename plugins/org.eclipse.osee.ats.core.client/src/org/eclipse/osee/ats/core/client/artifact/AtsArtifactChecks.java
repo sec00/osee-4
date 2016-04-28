@@ -68,32 +68,44 @@ public class AtsArtifactChecks extends ArtifactCheck {
       IStatus result = Status.OK_STATUS;
 
       if (deletionChecksEnabled) {
+         Set<Artifact> allArtifacts = getAllArtifacts(artifacts, new HashSet<>());
+
          if (result.isOK()) {
-            result = checkActionableItems(isAtsAdmin, artifacts);
+            result = checkActionableItems(isAtsAdmin, allArtifacts);
          }
 
          if (result.isOK()) {
-            result = checkTeamDefinitions(isAtsAdmin, artifacts);
+            result = checkTeamDefinitions(isAtsAdmin, allArtifacts);
          }
 
          if (result.isOK()) {
-            result = checkAtsWorkDefinitions(isAtsAdmin, artifacts);
+            result = checkAtsWorkDefinitions(isAtsAdmin, allArtifacts);
          }
 
          if (result.isOK()) {
-            result = checkUsers(artifacts);
+            result = checkUsers(allArtifacts);
          }
 
          if (result.isOK()) {
-            result = checkActions(isAtsAdmin, artifacts);
+            result = checkActions(isAtsAdmin, allArtifacts);
          }
 
          if (result.isOK()) {
-            result = checkWorkPackages(isAtsAdmin, artifacts);
+            result = checkWorkPackages(isAtsAdmin, allArtifacts);
          }
       }
 
       return result;
+   }
+
+   // Get all artifacts and recurse down default hierarchy
+   private Set<Artifact> getAllArtifacts(Collection<Artifact> artifacts, Set<Artifact> allArtifacts) {
+      for (Artifact art : artifacts) {
+         if (art.isOnBranch(AtsUtilCore.getAtsBranch())) {
+            allArtifacts.addAll(art.getDescendants());
+         }
+      }
+      return allArtifacts;
    }
 
    private IStatus checkActions(boolean isAtsAdmin, Collection<Artifact> artifacts) {
