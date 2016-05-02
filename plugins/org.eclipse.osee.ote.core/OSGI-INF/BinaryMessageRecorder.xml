@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="start" deactivate="stop" immediate="true" name="ote.server.BinaryMessageRecorder">
+   <implementation class="org.eclipse.osee.ote.message.BinaryMessageRecorderComponent"/>
+   <service>
+      <provide interface="org.osgi.service.event.EventHandler"/>
+   </service>
+   <property name="event.topics" type="String" value="ote/server/binary_message_recorder/cmd/*"/>
+   <reference bind="setMessageManager" cardinality="1..1" interface="org.eclipse.osee.ote.message.interfaces.IMessageManager" name="ILbaMessageManager" policy="dynamic" unbind="unsetMessageManager"/>
+   <reference bind="setTestEnv" cardinality="1..1" interface="org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironmentAccessor" name="ITestEnvironmentAccessor" policy="dynamic" unbind="unsetTestEnv"/>
+</scr:component>

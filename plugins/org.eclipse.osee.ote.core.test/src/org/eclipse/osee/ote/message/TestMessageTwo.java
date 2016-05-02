@@ -14,7 +14,7 @@ public class TestMessageTwo extends Message {
    
    
    public TestMessageTwo() {
-      super(ID, "TestMessageTwo", new MessageData("TestMessageTwo", "TestMessageTwo", 16, 0, TestMessageDataType.eth2, null));
+      super(ID, "TestMessageTwo", new MessageData("TestMessageTwo", "TestMessageTwo", 16, 0, TestMessageDataType.eth2, TestMessageIOType.eth2));
       
       INT1 = new IntegerElement(this, "INT1", getDefaultMessageData(), 0, 0, 7);
       INT2 = new IntegerElement(this, "INT2", getDefaultMessageData(), 1, 0, 7);

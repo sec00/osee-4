@@ -237,23 +237,6 @@ public class MessageControllerTest {
       Assert.assertEquals(2, updateCounter.count);
    }
    
-   
-   
-   private static class BasicClassLocator implements ClassLocator {
-      
-      private ClassLoader loader;
-
-      public BasicClassLocator(ClassLoader loader) {
-         this.loader = loader;
-      }
-
-      @Override
-      public Class<?> findClass(String name) throws ClassNotFoundException {
-         return loader.loadClass(name);
-      }
-      
-   }
-   
    private static class MessageCreationListenerCounter implements IMessageCreationListener {
 
       int preCreate;
