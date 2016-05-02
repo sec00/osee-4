@@ -11,7 +11,6 @@
 package org.eclipse.osee.ote.ui.test.manager.actions;
 
 import java.util.logging.Level;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;

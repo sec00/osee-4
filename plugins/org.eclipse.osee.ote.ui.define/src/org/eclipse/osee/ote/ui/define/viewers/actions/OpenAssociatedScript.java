@@ -11,7 +11,6 @@
 package org.eclipse.osee.ote.ui.define.viewers.actions;
 
 import java.net.URL;
-
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StructuredViewer;

@@ -13,7 +13,6 @@ package org.eclipse.osee.ote.ui.test.manager.preferences.environment;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;

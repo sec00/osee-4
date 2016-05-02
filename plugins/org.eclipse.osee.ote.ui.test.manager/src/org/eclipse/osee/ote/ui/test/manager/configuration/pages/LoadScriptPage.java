@@ -14,9 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 import java.util.logging.Level;
-
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;

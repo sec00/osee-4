@@ -11,7 +11,6 @@
 package org.eclipse.osee.ote.ui.test.manager.operations;
 
 import java.util.List;
-
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.ote.ui.test.manager.core.TestManagerEditor;
 import org.eclipse.osee.ote.ui.test.manager.util.PluginUtil;

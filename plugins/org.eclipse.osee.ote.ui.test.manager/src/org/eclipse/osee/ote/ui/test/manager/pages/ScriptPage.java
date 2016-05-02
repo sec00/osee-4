@@ -14,7 +14,6 @@ import java.rmi.RemoteException;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
-
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
