@@ -10,12 +10,10 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.ui.test.manager.connection;
 
-import java.rmi.RemoteException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
-
 import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.logging.IHealthStatus;
 import org.eclipse.osee.framework.logging.OseeLog;
@@ -33,7 +31,6 @@ import org.eclipse.osee.ote.core.environment.status.TestComplete;
 import org.eclipse.osee.ote.core.environment.status.TestPointUpdate;
 import org.eclipse.osee.ote.core.environment.status.TestServerCommandComplete;
 import org.eclipse.osee.ote.core.environment.status.TestStart;
-import org.eclipse.osee.ote.core.framework.command.ITestCommandResult;
 import org.eclipse.osee.ote.core.framework.command.TestCommandStatus;
 import org.eclipse.osee.ote.ui.test.manager.core.TestManagerEditor;
 import org.eclipse.osee.ote.ui.test.manager.internal.TestManagerPlugin;

@@ -29,12 +29,12 @@ public class XScriptTableFactory extends XViewerFactory {
    private static String COLUMN_NAMESPACE = "xviewer.script.table";
    public static XViewerColumn RUN = new XViewerColumn(COLUMN_NAMESPACE + ".run", "Run", 42, XViewerAlign.Left, true,
       SortDataType.Boolean, false, null);
-   public static XViewerColumn TEST = new XViewerColumn(COLUMN_NAMESPACE + ".test", "Test", 275, XViewerAlign.Left,
-      true, SortDataType.String, false, null);
-   public static XViewerColumn STATUS = new XViewerColumn(COLUMN_NAMESPACE + ".status", "Status", 125,
-      XViewerAlign.Left, true, SortDataType.String, false, null);
-   public static XViewerColumn RESULT = new XViewerColumn(COLUMN_NAMESPACE + ".result", "Result", 125,
-      XViewerAlign.Left, true, SortDataType.String, false, null);
+   public static XViewerColumn TEST = new XViewerColumn(COLUMN_NAMESPACE + ".test", "Test", 275, XViewerAlign.Left, true,
+      SortDataType.String, false, null);
+   public static XViewerColumn STATUS = new XViewerColumn(COLUMN_NAMESPACE + ".status", "Status", 125, XViewerAlign.Left, true,
+      SortDataType.String, false, null);
+   public static XViewerColumn RESULT = new XViewerColumn(COLUMN_NAMESPACE + ".result", "Result", 125, XViewerAlign.Left, true,
+      SortDataType.String, false, null);
    public static XViewerColumn OUPUT_FILE = new XViewerColumn(COLUMN_NAMESPACE + ".outfile", "Output File", 70,
       XViewerAlign.Left, true, SortDataType.String, false, null);
    public static XViewerColumn TEST_LOCATION = new XViewerColumn(COLUMN_NAMESPACE + ".testlocation", "Test Location",

@@ -13,7 +13,6 @@ package org.eclipse.osee.ote.ui.test.manager.connection;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.logging.Level;
-
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.core.environment.status.IServiceStatusData;
 import org.eclipse.osee.ote.core.environment.status.msg.CommandAddedMessage;
