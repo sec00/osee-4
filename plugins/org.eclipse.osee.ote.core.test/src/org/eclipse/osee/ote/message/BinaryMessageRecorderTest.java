@@ -88,6 +88,12 @@ public class BinaryMessageRecorderTest {
          timer.step();
       }
       
+      try {
+         Thread.sleep(150);
+      } catch (InterruptedException e) {
+         e.printStackTrace();
+      }
+      
       Thread thread = new Thread(new Runnable(){
 
          @Override

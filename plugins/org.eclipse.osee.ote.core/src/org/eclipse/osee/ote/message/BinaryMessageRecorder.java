@@ -6,17 +6,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
 
-import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.core.environment.interfaces.ITimerControl;
-import org.eclipse.osee.ote.message.Message;
-import org.eclipse.osee.ote.message.MessageSystemException;
 import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.enums.DataType;
 import org.eclipse.osee.ote.message.listener.IOSEEMessageListener;
@@ -30,12 +26,15 @@ public class BinaryMessageRecorder implements Closeable{
 	
 	
 	public static BinaryMessageRecorder create(File file, ITimerControl timerControl) throws IOException{
-		return new BinaryMessageRecorder(file, timerControl);
+		return new BinaryMessageRecorder(file, timerControl, new BinaryMessageRecorderDataCache(100, 65536));
 	}
+	
+	public static BinaryMessageRecorder create(File file, ITimerControl timerControl, BinaryMessageRecorderDataCache cache) throws IOException{
+      return new BinaryMessageRecorder(file, timerControl, cache);
+   }
 	
 	private final class MessageListener implements IOSEEMessageListener {
 
-		private final ByteBuffer buffer;
 		private final Message message;
 		private final DataType type;
 		private final int id;
@@ -44,7 +43,6 @@ public class BinaryMessageRecorder implements Closeable{
 			this.message = message;
 			this.id = id;
 			this.type = message.getDefaultMessageData().getType(); 
-			buffer = ByteBuffer.allocateDirect(message.getDefaultMessageData().getDefaultDataByteSize() + 16);
 		}
 		@Override
 		public void onDataAvailable(MessageData data, DataType type)
@@ -52,26 +50,19 @@ public class BinaryMessageRecorder implements Closeable{
 			if (!this.type.equals(type)) {
 				return;
 			}
+			ByteBuffer buffer = cache.takeBufferForCopy(data.getMem().getData().length + 16);
 			buffer.clear();
 			buffer.putLong(timerControl.getEnvTime());
 			buffer.putInt(id);
 			buffer.putInt(data.getCurrentLength());
 			buffer.put(data.toByteArray(), 0, data.getCurrentLength());
 			buffer.flip();
-			try {
-				channel.write(buffer);
-				messageCounter.incrementAndGet();
-			} catch (ClosedChannelException e) {
-				// we do nothing since a close channel signifies we are done recording
-			} catch (IOException e) {
-				OseeLog.log(getClass(), Level.SEVERE, "Could not write message to channel: message=" + message.getName(), e);
-				stop();
-			}
+			cache.giveBufferForProcessing(buffer);
+			messageCounter.incrementAndGet();
 		}
 
 		@Override
 		public void onInitListener() throws MessageSystemException {
-			// TODO Auto-generated method stub
 			
 		}
 		
@@ -93,20 +84,24 @@ public class BinaryMessageRecorder implements Closeable{
 
 	private int idCounter = 1000;
 	
-	private boolean isStarted;
+	private volatile boolean isStarted;
 	
 	private final AtomicInteger messageCounter = new AtomicInteger(0);
 	private final File destinationFile;
    private long finalSize;
+   private BinaryMessageRecorderDataCache cache;
+   private Thread thread;
 	
 	@SuppressWarnings("resource")
-   private BinaryMessageRecorder(File destinationFile, ITimerControl timeControl) throws FileNotFoundException{
-		this.destinationFile = destinationFile;
-		this.channel = new FileOutputStream(destinationFile).getChannel();
-		this.timerControl = timeControl;
-	}
-	
-	public synchronized void addMessage(Message message) {
+   public BinaryMessageRecorder(File destinationFile, ITimerControl timeControl, BinaryMessageRecorderDataCache cache) throws FileNotFoundException {
+	   this.destinationFile = destinationFile;
+      this.channel = new FileOutputStream(destinationFile).getChannel();
+      this.timerControl = timeControl;
+      this.cache = cache;
+      
+   }
+
+   public synchronized void addMessage(Message message) {
 		if (isStarted) {
 			throw new IllegalStateException("Recording In Progress - Can't Messages");
 		}
@@ -133,6 +128,34 @@ public class BinaryMessageRecorder implements Closeable{
 			throw new IllegalStateException("Recording already started");
 		}
 		isStarted = true;
+		thread = new Thread(new Runnable(){
+		   @Override
+		   public void run() {
+		      ArrayList<ByteBuffer> dataToWrite = new ArrayList<ByteBuffer>();
+		      while(isStarted){
+		         cache.drainDataToProcess(dataToWrite);
+		         if(dataToWrite.size() > 0){
+		            for(int i = 0; i < dataToWrite.size(); i++){
+		               ByteBuffer buff = dataToWrite.get(i);
+		               try {
+                        channel.write(buff);
+                     } catch (IOException e) {
+                        e.printStackTrace();
+                     }
+		               cache.giveBufferBack(buff);
+		            }	
+		            dataToWrite.clear();
+		         } else {
+		            try {
+                     Thread.sleep(5);
+                  } catch (InterruptedException e) {
+                     e.printStackTrace();
+                  }
+		         }
+		      }
+		   }});
+		thread.setName("BinaryMessageRecorderOutput-" +versionId);
+		thread.start();
 		writeSections(versionId);
 		for (MessageListener listener : listeners) {
 			listener.start();
@@ -144,6 +167,24 @@ public class BinaryMessageRecorder implements Closeable{
 		for (MessageListener listener : listeners) {
 			listener.stop();
 		}		
+		isStarted = false;
+		try {
+         thread.join(1000);
+      } catch (InterruptedException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+		ArrayList<ByteBuffer> dataToWrite = new ArrayList<ByteBuffer>();
+		cache.drainDataToProcess(dataToWrite);
+		for(int i = 0; i < dataToWrite.size(); i++){
+		   ByteBuffer buff = dataToWrite.get(i);
+		   try {
+		      channel.write(buff);
+		   } catch (IOException e) {
+		      e.printStackTrace();
+		   }
+		   cache.giveBufferBack(buff);
+		}
 	}
 
 	@Override
