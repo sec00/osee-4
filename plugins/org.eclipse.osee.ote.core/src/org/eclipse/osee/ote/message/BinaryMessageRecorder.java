@@ -17,6 +17,12 @@ import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.enums.DataType;
 import org.eclipse.osee.ote.message.listener.IOSEEMessageListener;
 
+/**
+ * 
+ * 
+ * @author Andrew M. Finkbeiner
+ *
+ */
 public class BinaryMessageRecorder implements Closeable{
 
 	static final long FILE_TYPE_MARKER = 0xBADF00DFECEFACE0L;
@@ -38,13 +44,20 @@ public class BinaryMessageRecorder implements Closeable{
 		private final Message message;
 		private final DataType type;
 		private final int id;
+		private final BinaryRecorderFilterCallback binaryRecorderFilterCallback;
 
 		MessageListener(Message message, int id) {
-			this.message = message;
-			this.id = id;
-			this.type = message.getDefaultMessageData().getType(); 
+		   this(message, id, null);
 		}
-		@Override
+		
+		public MessageListener(Message message, int id, BinaryRecorderFilterCallback binaryRecorderFilterCallback) {
+		   this.message = message;
+         this.id = id;
+         this.type = message.getDefaultMessageData().getType(); 
+         this.binaryRecorderFilterCallback = binaryRecorderFilterCallback;
+      }
+		
+      @Override
 		public void onDataAvailable(MessageData data, DataType type)
 				throws MessageSystemException {
 			if (!this.type.equals(type)) {
@@ -59,6 +72,9 @@ public class BinaryMessageRecorder implements Closeable{
 			buffer.flip();
 			cache.giveBufferForProcessing(buffer);
 			messageCounter.incrementAndGet();
+			if(binaryRecorderFilterCallback != null){
+			   binaryRecorderFilterCallback.onDataAvailable(data, type);
+			}
 		}
 
 		@Override
@@ -250,5 +266,13 @@ public class BinaryMessageRecorder implements Closeable{
 	      return finalSize;
 	   }
 	}
+
+	public void addMessage(Message message, BinaryRecorderFilterCallback binaryRecorderFilterCallback) {
+	   if (isStarted) {
+	      throw new IllegalStateException("Recording In Progress - Can't Messages");
+	   }
+	   MessageListener listener = new MessageListener(message, idCounter++, binaryRecorderFilterCallback);
+	   listeners.add(listener);
+   }
 	
 }

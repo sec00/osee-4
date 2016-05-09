@@ -13,7 +13,7 @@ import java.util.Map;
 public class BinaryMessageDecoder {
    
    public static final long MAX_SECTION_SIZE = 26214400;//25mb
-   private static final long FRAME_LENGTH_MS = 20;
+   private static final long FRAME_LENGTH_MS = 0;
    private MappedByteBuffer buffer;
    private String versionId = "";
    private Map<Integer, String> idLookup;

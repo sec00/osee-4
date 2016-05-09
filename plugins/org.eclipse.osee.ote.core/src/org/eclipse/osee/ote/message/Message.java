@@ -199,7 +199,7 @@ public class Message implements Xmlizable, XmlizableStream {
 
    /**
     * Changes the rate a message is being published at. NOTE: This is only going to be allowed to be used on periodic
-    * message & users are not allowed to set rate to zero.
+    * message and users are not allowed to set rate to zero.
     * 
     * @param newRate - hz
     */
@@ -222,6 +222,7 @@ public class Message implements Xmlizable, XmlizableStream {
 
    /**
     * Changes the rate back to the default rate.
+    * 
     */
    public void changeRateToDefault(ITestEnvironmentMessageSystemAccessor accessor) {
       //      accessor.getMsgManager().changeMessageRate(this, defaultRate, rate);

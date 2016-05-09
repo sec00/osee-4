@@ -13,9 +13,6 @@ public interface Scheduler {
    /**
     * 
     * @param runnable
-    * @param mainThread - set this to true if this is the primary thread of execution.  In simulated
-    * mode this has special behavior where all other threads will only run when this thread has a wait
-    * it is essentially the thread that the simulated clock is locked to.  
     * @param msInTheFuture
     * @return
     */
