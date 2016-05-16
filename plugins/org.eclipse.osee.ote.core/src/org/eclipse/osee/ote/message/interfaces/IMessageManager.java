@@ -157,4 +157,6 @@ public interface IMessageManager {
 
    void clearRemovableListeners(Message message);
 
+   boolean containsListenerType(Message message, Class<? extends IOSEEMessageListener> listenerType);
+
 }

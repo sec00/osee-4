@@ -149,6 +149,15 @@ public class MessageController implements IMessageManager {
    }
    
    @Override
+   public boolean containsListenerType(Message message, Class<? extends IOSEEMessageListener> listenerType) {
+      MessageListenerContainer container = messageListeners.get(message);
+      if(container != null){
+         return container.containsListenerType(listenerType);
+      }
+      return false;
+   }
+   
+   @Override
    public IMessageRequestor createMessageRequestor(String name) {
       return new MessageRequestorImpl(name, this);
    }
@@ -779,6 +788,22 @@ public class MessageController implements IMessageManager {
             return removablelisteners.contains(listener);
          }
          return contains;
+      }
+      
+      public boolean containsListenerType(Class<? extends IOSEEMessageListener> listenerType) {
+         IOSEEMessageListener[] data = listeners.get();
+         for(int i = 0; i < data.length; i++){
+            if(data.getClass().getName().equals(listenerType.getName())){
+               return true;
+            }
+         }
+         data = removablelisteners.get();
+         for(int i = 0; i < data.length; i++){
+            if(data.getClass().getName().equals(listenerType.getName())){
+               return true;
+            }
+         }
+         return false;
       }
 
       public void addPostMemSourceChangeListener(IMemSourceChangeListener listener) {

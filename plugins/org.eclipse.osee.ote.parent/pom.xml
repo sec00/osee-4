@@ -355,7 +355,7 @@
          	  <failOnError>false</failOnError>
               <additionalparam>-Xdoclint:none</additionalparam>
         </configuration>
-        <executions>
+        <!-- <executions>
           <execution>
             <id>aggregate</id>
             <goals>
@@ -363,13 +363,13 @@
             </goals>
             <phase>site</phase>
             <configuration>
-              <!-- Specific configuration for the aggregate report -->
+        
               <failOnError>false</failOnError>
               <additionalparam>-Xdoclint:none</additionalparam>
             </configuration>
           </execution>
           
-        </executions>
+        </executions> -->
       </plugin>
 			</plugins>
 		</pluginManagement>

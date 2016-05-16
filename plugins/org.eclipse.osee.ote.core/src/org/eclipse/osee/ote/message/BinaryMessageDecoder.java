@@ -32,7 +32,7 @@ public class BinaryMessageDecoder {
       sectionSize = MAX_SECTION_SIZE;
    }
    
-   BinaryMessageDecoder(long sectionSize) {
+   public BinaryMessageDecoder(long sectionSize) {
       this();
       this.sectionSize = sectionSize;
    }

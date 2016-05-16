@@ -326,6 +326,13 @@ public class Message implements Xmlizable, XmlizableStream {
       }
       return false;
    }
+   
+   public boolean containsListenerType(Class<? extends IOSEEMessageListener> listenerType){
+      if(messageManager != null){
+         return messageManager.containsListenerType(this, listenerType);
+      }
+      return false;
+   }
 
    public void destroy() {
       turnOff();
