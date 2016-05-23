@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream.GetField;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,15 +50,31 @@ public class OTEFolderImpl implements OTEServerFolder{
    private File currentServerFolder; 
    
    private static File determineOteServerFolder() {
-      File oteStationParent = new File(OtePropertiesCore.oteServerFolder.getValue("undefined"));
-      if (!oteStationParent.exists() || !oteStationParent.isDirectory()) {
-         OseeLog.log(OTEFolderImpl.class, Level.WARNING, "ote server folder parent does not exist folder -" + oteStationParent.getAbsolutePath());
-         oteStationParent = new File(OtePropertiesCore.userHome.getValue(), "OTESERVER");
-         return oteStationParent;
+      String userHome = OtePropertiesCore.userHome.getValue();
+      if (userHome.equals("/root")){
+         userHome = "/home/mptest";
       }
-      File stationsFolder = new File(oteStationParent, "stations");
-      File stationFolder = new File(stationsFolder, OtePropertiesCore.oteStationName.getValue("unknown-station"));
-      return new File(stationFolder, OtePropertiesCore.userName.getValue());
+      File oteServerFolder = new File(userHome, "/OTESERVER");
+      try {
+         oteServerFolder = new File(oteServerFolder, java.net.InetAddress.getLocalHost().getHostName());
+      } catch (UnknownHostException ex) {
+       OseeLog.log(OTEFolderImpl.class, Level.WARNING, "Unknown host from java.net.InetAddress.getLocalHost() -");
+      }
+      oteServerFolder.setReadable(true);
+      oteServerFolder.setExecutable(true);
+      oteServerFolder.setWritable(true);
+      
+      return oteServerFolder;
+  
+//      File oteStationParent = new File(OtePropertiesCore.oteServerFolder.getValue("undefined"));
+//      if (!oteStationParent.exists() || !oteStationParent.isDirectory()) {
+//         OseeLog.log(OTEFolderImpl.class, Level.WARNING, "ote server folder parent does not exist folder -" + oteStationParent.getAbsolutePath());
+//         oteStationParent = new File(OtePropertiesCore.userHome.getValue(), "OTESERVER");
+//         return oteStationParent;
+//      }
+//      File stationsFolder = new File(oteStationParent, "stations");
+//      File stationFolder = new File(stationsFolder, OtePropertiesCore.oteStationName.getValue("unknown-station"));
+//      return new File(stationFolder, OtePropertiesCore.userName.getValue());
    }
    
    public OTEFolderImpl(){
