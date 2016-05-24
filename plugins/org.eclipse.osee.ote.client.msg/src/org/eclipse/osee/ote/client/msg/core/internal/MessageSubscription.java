@@ -138,6 +138,7 @@ public class MessageSubscription implements IMessageSubscription {
       } finally {
          doCancel();
          msgService.removeSubscription(this);
+         listeners.clear();
       }
    }
 
