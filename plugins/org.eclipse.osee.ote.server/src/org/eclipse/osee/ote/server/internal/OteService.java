@@ -12,17 +12,15 @@ package org.eclipse.osee.ote.server.internal;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Level;
-
-import net.jini.core.lookup.ServiceID;
-import net.jini.id.Uuid;
-import net.jini.id.UuidFactory;
 
 import org.eclipse.osee.framework.jdk.core.util.EnhancedProperties;
 import org.eclipse.osee.framework.logging.OseeLog;
@@ -42,6 +40,10 @@ import org.eclipse.osee.ote.io.OTEServerFolder;
 import org.eclipse.osee.ote.message.MessageSystemTestEnvironment;
 import org.eclipse.osee.ote.properties.OtePropertiesCore;
 import org.eclipse.osee.ote.server.PropertyParamter;
+
+import net.jini.core.lookup.ServiceID;
+import net.jini.id.Uuid;
+import net.jini.id.UuidFactory;
 
 public class OteService implements IHostTestEnvironment {
 
@@ -96,7 +98,14 @@ public class OteService implements IHostTestEnvironment {
          if(dir.exists() && dir.isDirectory()){
             try{
                Properties serverProperties = new Properties();
-               serverProperties.putAll(enhancedProperties.asMap());
+               for(Map.Entry<String,Serializable> entry:enhancedProperties.entrySet()){
+                  if(entry.getValue() instanceof String){
+                     serverProperties.put(entry.getKey(), entry.getValue());
+                  } else {
+                     serverProperties.put(entry.getKey(), entry.getValue().toString());
+                     OseeLog.logf(getClass(), Level.WARNING, "key[%s] has non string value [%s][%s]", entry.getKey(), entry.getValue().getClass(), entry.getValue().toString());
+                  }
+               }
                serverProperties.store(new FileOutputStream(new File(dir, "server.properties")), "");
                File running = new File(dir, ".running");
                running.createNewFile();

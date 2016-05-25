@@ -29,6 +29,8 @@ public class BinaryMessageRecorder implements Closeable{
 	static final int VERSION_SECTION_ID = 0xFEEDF00D;
 	static final int MESSAGE_MAP_SECTION_ID = 0xFEEDBEEF;
 	static final int MESSAGE_DATA_SECTION_ID = 0xCAFEF00D;
+   static final int START_ID = 1;
+   static final int END_ID = 2;
 	
 	
 	public static BinaryMessageRecorder create(File file, ITimerControl timerControl) throws IOException{
@@ -50,7 +52,7 @@ public class BinaryMessageRecorder implements Closeable{
 		   this(message, id, null);
 		}
 		
-		public MessageListener(Message message, int id, BinaryRecorderFilterCallback binaryRecorderFilterCallback) {
+      public MessageListener(Message message, int id, BinaryRecorderFilterCallback binaryRecorderFilterCallback) {
 		   this.message = message;
          this.id = id;
          this.type = message.getDefaultMessageData().getType(); 
@@ -63,14 +65,15 @@ public class BinaryMessageRecorder implements Closeable{
 			if (!this.type.equals(type)) {
 				return;
 			}
-			ByteBuffer buffer = cache.takeBufferForCopy(data.getMem().getData().length + 16);
-			buffer.clear();
-			buffer.putLong(timerControl.getEnvTime());
-			buffer.putInt(id);
-			buffer.putInt(data.getCurrentLength());
-			buffer.put(data.toByteArray(), 0, data.getCurrentLength());
-			buffer.flip();
-			cache.giveBufferForProcessing(buffer);
+			write(data, id);
+//			ByteBuffer buffer = cache.takeBufferForCopy(data.getMem().getData().length + 16);
+//			buffer.clear();
+//			buffer.putLong(timerControl.getEnvTime());
+//			buffer.putInt(id);
+//			buffer.putInt(data.getCurrentLength());
+//			buffer.put(data.toByteArray(), 0, data.getCurrentLength());
+//			buffer.flip();
+//			cache.giveBufferForProcessing(buffer);
 			messageCounter.incrementAndGet();
 			if(binaryRecorderFilterCallback != null){
 			   binaryRecorderFilterCallback.onDataAvailable(data, type);
@@ -92,11 +95,22 @@ public class BinaryMessageRecorder implements Closeable{
 		
 	}
 	
+	private void write(MessageData data, int id){
+	   ByteBuffer buffer = cache.takeBufferForCopy(data.getMem().getData().length + 16);
+      buffer.clear();
+      buffer.putLong(timerControl.getEnvTime());
+      buffer.putInt(id);
+      buffer.putInt(data.getCurrentLength());
+      buffer.put(data.toByteArray(), 0, data.getCurrentLength());
+      buffer.flip();
+      cache.giveBufferForProcessing(buffer);
+	}
+	
 	private final FileChannel channel;
 
 	private final ITimerControl timerControl;
 	
-	private final LinkedList<MessageListener> listeners = new LinkedList<BinaryMessageRecorder.MessageListener>();
+	private final LinkedList<MessageListener> listeners;
 
 	private int idCounter = 1000;
 	
@@ -107,6 +121,9 @@ public class BinaryMessageRecorder implements Closeable{
    private long finalSize;
    private BinaryMessageRecorderDataCache cache;
    private Thread thread;
+   
+   private BinaryRecordingStart start;
+   private BinaryRecordingEnd end;
 	
 	@SuppressWarnings("resource")
    public BinaryMessageRecorder(File destinationFile, ITimerControl timeControl, BinaryMessageRecorderDataCache cache) throws FileNotFoundException {
@@ -114,7 +131,10 @@ public class BinaryMessageRecorder implements Closeable{
       this.channel = new FileOutputStream(destinationFile).getChannel();
       this.timerControl = timeControl;
       this.cache = cache;
+      listeners = new LinkedList<BinaryMessageRecorder.MessageListener>();
       
+      start = new BinaryRecordingStart();
+      end = new BinaryRecordingEnd();
    }
 
    public synchronized void addMessage(Message message) {
@@ -140,6 +160,8 @@ public class BinaryMessageRecorder implements Closeable{
 	}
 
 	public synchronized void start(String versionId) throws IOException{
+//	   addMessage(start);
+//	   addMessage(end);
 		if (isStarted) {
 			throw new IllegalStateException("Recording already started");
 		}
@@ -173,6 +195,9 @@ public class BinaryMessageRecorder implements Closeable{
 		thread.setName("BinaryMessageRecorderOutput-" +versionId);
 		thread.start();
 		writeSections(versionId);
+		start.TIME.setValue(timerControl.getEnvTime());
+		write(start.getDefaultMessageData(), START_ID);
+		start.send();//notifyListeners(start.getDefaultMessageData(), start.getMemType());		
 		for (MessageListener listener : listeners) {
 			listener.start();
 		}		
@@ -183,6 +208,8 @@ public class BinaryMessageRecorder implements Closeable{
 		for (MessageListener listener : listeners) {
 			listener.stop();
 		}		
+		end.TIME.setValue(timerControl.getEnvTime());
+		write(end.getDefaultMessageData(), END_ID);
 		isStarted = false;
 		try {
          thread.join(1000);

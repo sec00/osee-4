@@ -28,6 +28,8 @@ public class BinaryMessageDecoder {
    
    public BinaryMessageDecoder() {
       idLookup = new HashMap<Integer, String>();
+      idLookup.put(BinaryMessageRecorder.START_ID, BinaryRecordingStart.class.getName());
+      idLookup.put(BinaryMessageRecorder.END_ID, BinaryRecordingEnd.class.getName());
       sectionData = new HashMap<Integer, SectionData>();
       sectionSize = MAX_SECTION_SIZE;
    }

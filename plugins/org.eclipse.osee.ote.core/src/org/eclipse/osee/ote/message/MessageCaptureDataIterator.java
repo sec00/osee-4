@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 /**
@@ -25,7 +24,7 @@ public class MessageCaptureDataIterator {
    private int currentFrame;
    private BinaryWorker worker;
    private MessageCaptureDataStripe myMessageCapture;
-   private HashMap<String, Message> messageMap;
+   private MessageCaptureMessageLookup messageLookup;
 
    /**
     * 
@@ -37,8 +36,8 @@ public class MessageCaptureDataIterator {
       decoder = new BinaryMessageDecoder();
       fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
       decoder.setInput(fileChannel);
-      messageMap = new HashMap<>();
-      myMessageCapture = new MessageCaptureDataStripe(messageMap);
+      messageLookup = new MessageCaptureMessageLookup();
+      myMessageCapture = new MessageCaptureDataStripe(messageLookup);
       numDataSections = decoder.getNumberOfDataSections();
       currentDataSection = 0;
       if(numDataSections > 0){
@@ -54,7 +53,7 @@ public class MessageCaptureDataIterator {
          try {
             clazz = classLocator.findClass(messageClass).asSubclass(Message.class);
             if(clazz != null){
-               messageMap.put(messageClass, (Message)clazz.newInstance());
+               messageLookup.put(messageClass, (Message)clazz.newInstance());
             }
          } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -108,6 +107,10 @@ public class MessageCaptureDataIterator {
       fileChannel.close();
    }
    
+   public MessageCaptureMessageLookup getMessageLookup(){
+      return messageLookup;
+   }
+   
    /**
     * Callback that actually copies the recorded data into the local instance of a message object.
     * 
@@ -124,9 +127,10 @@ public class MessageCaptureDataIterator {
       @Override
       public void play(long time, String messageName, ByteBuffer buffer, int length) {
          myMessageCapture.setTime(time);
-         Message message = messageMap.get(messageName);
+         Message message = messageLookup.get(messageName);
          if(message != null){
             message.setData(buffer, length);
+            message.setActivityCount(message.getActivityCount()+1);
          }
       }
       

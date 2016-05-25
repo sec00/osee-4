@@ -37,9 +37,6 @@ public class BinaryMessageRecorderDataCache {
    }
    
    public void giveBufferForProcessing(ByteBuffer buffer){
-      if(buffer.limit() > 33){
-         System.out.println("nope");
-      }
       dataToProcess.offer(buffer);
    }
    

@@ -2,9 +2,15 @@ package org.eclipse.osee.ote.message;
 
 import java.io.IOException;
 
+import org.eclipse.osee.ote.message.condition.EqualsCondition;
+import org.eclipse.osee.ote.message.condition.ICondition;
+import org.eclipse.osee.ote.message.elements.DiscreteElement;
+import org.eclipse.osee.ote.message.elements.Element;
+import org.eclipse.osee.ote.message.elements.IntegerElement;
 import org.eclipse.osee.ote.message.interfaces.IMessageManager;
 import org.eclipse.osee.ote.message.interfaces.IMessageRequestor;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -95,21 +101,58 @@ public class MessageCaptureTest {
       capture.stop();
       
       MessageCaptureDataIterator it = capture.getDataIterator();
-      int count = 0;
+//      int count = 0;
+//      while(it.hasNext()){
+//         MessageCaptureDataStripe stripe = it.next();
+//         System.out.printf("%d INT1[%d] INT2[%d]\n", stripe.getTime(), stripe.getLookup().getElement(msg1, msg1.INT1), stripe.getLookup().getElement(msg1, msg1.INT2));
+//      }
+//      it.close();
+      
+      boolean passed = false;
+      IntegerElement el = it.getMessageLookup().getElement(msg1, msg1.INT1);
+      ICondition condition = new EqualsCondition<>(el, 27);
       while(it.hasNext()){
          MessageCaptureDataStripe stripe = it.next();
-         System.out.printf("%d INT1[%d] INT2[%d]\n", stripe.getTime(), stripe.getElement(msg1, msg1.INT1), stripe.getElement(msg1, msg1.INT2));
+         if(condition.check()){
+            passed = true;
+            System.out.printf("%d time passed\n", stripe.getTime());
+            break;
+         }
+         System.out.printf("%d INT1[%d] INT2[%d]\n", stripe.getTime(), stripe.getLookup().getValue(msg1, msg1.INT1), stripe.getLookup().getValue(msg1, msg1.INT2));
       }
       it.close();
+      Assert.assertTrue(passed);
       
-//      SequenceChecker checker = new SequenceChecker();
-//      checker.add(new DataStripe().add(new IntegerElementCheck(msg1, msg1.INT1, 23)).add(new IntegerElementCheck(msg1, msg1.INT2, 34)));
-//      checker.add(new DataStripe().add(new IntegerElementCheck(msg1, msg1.INT1, 27)).add(new IntegerElementCheck(msg1, msg1.INT2, 32)));
-//      checker.add(new DataStripe().add(new IntegerElementCheck(msg1, msg1.INT1, 223)).add(new IntegerElementCheck(msg1, msg1.INT2, 67)));
-//      OTECheck.check(capture, checker);
-//      
-//      
-//      it = capture.getDataIterator();
+      
+      it = capture.getDataIterator();
+      Checker check = new CheckEqualsCondition<>(it.getMessageLookup(), msg1, msg1.INT1, 27, 0, 500);
+      while(it.hasNext()){
+         MessageCaptureDataStripe stripe = it.next();
+         check.check(stripe);
+      }
+      it.close();
+      Assert.assertTrue(check.passed());
+      
+      
+      it = capture.getDataIterator();
+      check = new CheckEqualsCondition<>(it.getMessageLookup(), msg1, msg1.INT1, 27, 250, 500);
+      while(it.hasNext()){
+         MessageCaptureDataStripe stripe = it.next();
+         check.check(stripe);
+      }
+      it.close();
+      Assert.assertFalse(check.passed());
+      
+
+      //at 245 we get the last transmit of the message of interest
+      it = capture.getDataIterator();
+      MessageCaptureChecker checker = new MessageCaptureChecker(it);
+      checker.add(new CheckEqualsCondition<>(it.getMessageLookup(), msg1, msg1.INT1, 27, 245, 500));
+      checker.check();
+      checker.close();
+      for(Checker ch:checker.get()){
+         Assert.assertTrue(ch.passed());
+      }
       
       
    }
