@@ -1466,4 +1466,8 @@ public abstract class DiscreteElement<T extends Comparable<T>> extends Element i
 
    abstract public T elementMask(T value);
 
+   public double getDouble() {
+      return 0;
+   }
+
 }

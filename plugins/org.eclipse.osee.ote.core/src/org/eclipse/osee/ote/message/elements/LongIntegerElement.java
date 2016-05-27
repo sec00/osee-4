@@ -188,5 +188,9 @@ public class LongIntegerElement extends NumericElement<Long> {
    public long getNumericBitValue() {
       return getValue();
    }
+   
+   public double getDouble(){
+      return getValue().doubleValue();      
+   }
 
 }

@@ -5,12 +5,24 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.osee.framework.plugin.core.util.ExportClassLoader;
 import org.eclipse.osee.ote.OTEApi;
-import org.eclipse.osee.ote.message.interfaces.IMessageManager;
+import org.eclipse.osee.ote.core.ServiceUtility;
 
 /**
  * This class will capture messages contained within the given {@link MessageCaptureFilter}'s.  This can be used from scripts to accomplish more complicated analysis of data.
- * 
+ * <pre> An example of using it:{@code  
+    MessageCapture capture = MessageCapture.createMessageCapture();      
+    capture.add(new MessageCaptureFilter(opStateReader));
+    capture.start();
+    // ... do something here ...
+    capture.stop();
+    MessageCaptureDataIterator it = capture.getDataIterator();
+    MessageCaptureChecker checker = new MessageCaptureChecker(it);
+    checker.add(new CheckEqualsCondition<>(msg1, msg1.INT1, 587, 0, 200));
+    checker.check();
+    checker.close();
+ * }</pre>
  * @author Andrew M. Finkbeiner
  *
  */
@@ -21,10 +33,15 @@ public class MessageCapture {
    private BinaryMessageRecorder recorder;
    private ClassLocator classLocator;
    
-   public MessageCapture(OTEApi ote, IMessageManager messageManager, ClassLocator classLocator) throws IOException{
+   public static MessageCapture createMessageCapture() throws IOException{
+      OTEApi oteApi = ServiceUtility.getService(OTEApi.class);
+      return new MessageCapture(oteApi, new BasicClassLocator(ExportClassLoader.getInstance()));
+   }
+   
+   public MessageCapture(OTEApi ote, ClassLocator classLocator) throws IOException{
       filters = new HashSet<>();
       this.classLocator = classLocator;
-      file = File.createTempFile("messageCapture", ".bin", ote.getServerFolder().getRootFolder());
+      file = File.createTempFile("messageCapture", ".bmr", ote.getServerFolder().getRootFolder());
       recorder = BinaryMessageRecorder.create(file, ote.getTestEnvironment().getTimerCtrl());
    }
    

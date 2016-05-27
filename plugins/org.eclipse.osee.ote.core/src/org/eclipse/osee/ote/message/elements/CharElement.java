@@ -515,4 +515,8 @@ public class CharElement extends DiscreteElement<Character> {
 	public Character elementMask(Character value) {
 		return value;
 	}
+	
+	public double getDouble(){
+	   return getValue().charValue();	   
+	}
 }

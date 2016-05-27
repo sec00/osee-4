@@ -13,6 +13,8 @@ public class MessageCaptureDataStripe {
     * A shared map that contains the local objects that are updated by the {@link MessageCaptureDataIterator}.
     */
    private MessageCaptureMessageLookup messageLookup;
+   private Message lastUpdatedMessage;
+   private boolean isInitialValue = false;
 
    public MessageCaptureDataStripe(MessageCaptureMessageLookup messageLookup) {
       this.messageLookup = messageLookup;
@@ -32,6 +34,27 @@ public class MessageCaptureDataStripe {
 
    public MessageCaptureMessageLookup getLookup(){
       return messageLookup;
+   }
+   
+   /**
+    * The message that was updated last or null if it is not a message available in the message lookup.
+    * 
+    * @return last message or null
+    */
+   public Message lastUpdate(){
+      return lastUpdatedMessage;
+   }
+   
+   void setLastUpdatedMessage(Message message){
+      lastUpdatedMessage = message;
+   }
+
+   void setIsInitialValue(boolean isInitialValue) {
+      this.isInitialValue = isInitialValue;
+   }
+   
+   public boolean isInitialValue(){
+      return isInitialValue;
    }
    
 }

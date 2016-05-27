@@ -44,7 +44,7 @@ public class MessageCaptureFilter {
    }
 
    /**
-    * This method will be called every time that a message that is part of this filter is update.  Override this method to signal that the recording can
+    * This method will be called every time that a message that is part of this filter is updated.  Override this method to signal that the recording can
     * stop for this filter.
     * 
     * @return true if this filter no longer needs to capture data.

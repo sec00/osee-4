@@ -42,7 +42,7 @@ public class MessageCheckerTest {
       TestMessageOne msg1Writer = req.getMessageWriter(TestMessageOne.class);
 
       MessageCaptureFilter filter = new MessageCaptureFilter(msg1);
-      MessageCapture capture = new MessageCapture(ote, messageManager, new BasicClassLocator(getClass().getClassLoader()));
+      MessageCapture capture = new MessageCapture(ote, new BasicClassLocator(getClass().getClassLoader()));
             
       capture.add(filter);
       
@@ -73,9 +73,9 @@ public class MessageCheckerTest {
       //at 245 we get the last transmit of the message of interest
       MessageCaptureDataIterator it = capture.getDataIterator();
       MessageCaptureChecker checker = new MessageCaptureChecker(it);
-      checker.add(new CheckEqualsCondition<>(it.getMessageLookup(), msg1, msg1.INT1, 223, 245, 500));
-      checker.add(new CheckEqualsCondition<>(it.getMessageLookup(), msg1, msg1.INT1, 23, 0, 200));
-      checker.add(new CheckEqualsCondition<>(it.getMessageLookup(), msg1, msg1.INT2, 32, 0, 200));
+      checker.add(new CheckEqualsCondition<>(msg1, msg1.INT1, 223, 245, 500));
+      checker.add(new CheckEqualsCondition<>(msg1, msg1.INT1, 23, 0, 200));
+      checker.add(new CheckEqualsCondition<>(msg1, msg1.INT2, 32, 0, 200));
       checker.check();
       checker.close();
       for(Checker ch:checker.get()){
@@ -85,9 +85,9 @@ public class MessageCheckerTest {
       
       it = capture.getDataIterator();
       checker = new MessageCaptureChecker(it);
-      checker.add(new CheckEqualsCondition<>(it.getMessageLookup(), msg1, msg1.INT1, 34, 245, 500));
-      checker.add(new CheckEqualsCondition<>(it.getMessageLookup(), msg1, msg1.INT1, 32, 0, 500));
-      checker.add(new CheckEqualsCondition<>(it.getMessageLookup(), msg1, msg1.INT2, 27, 0, 500));
+      checker.add(new CheckEqualsCondition<>(msg1, msg1.INT1, 34, 245, 500));
+      checker.add(new CheckEqualsCondition<>(msg1, msg1.INT1, 32, 501, 800));
+      checker.add(new CheckEqualsCondition<>(msg1, msg1.INT2, 27, 0, 500));
       checker.check();
       checker.close();
 //      checker.getLog();
@@ -95,6 +95,110 @@ public class MessageCheckerTest {
          Assert.assertFalse(ch.passed());
       }
       it.close();
+      
+      
+      
+   }
+   
+   @Test
+   public void testTransmissionCheckBeforeRecordingStarted() throws IOException, InterruptedException {
+      messageManager.registerWriter(new BasicWriter(TestMessageIOType.eth1, TestMessageDataType.eth1));
+      
+      TestMessageOne msg1 = req.getMessageReader(TestMessageOne.class);
+      TestMessageOne msg1Writer = req.getMessageWriter(TestMessageOne.class);
+
+      MessageCaptureFilter filter = new MessageCaptureFilter(msg1);
+      MessageCapture capture = new MessageCapture(ote, new BasicClassLocator(getClass().getClassLoader()));
+            
+      capture.add(filter);
+      
+      msg1Writer.INT1.setValue(587);
+      messageManager.publish(msg1Writer);
+      timer.step(100);
+      capture.start();
+      timer.step(100);
+      capture.stop();
+      
+      MessageCaptureDataIterator it = capture.getDataIterator();
+      MessageCaptureChecker checker = new MessageCaptureChecker(it);
+      checker.add(new CheckEqualsCondition<>(msg1, msg1.INT1, 587, 0, 200));
+      checker.check();
+      checker.close();
+      for(Checker ch:checker.get()){
+         Assert.assertTrue(ch.passed());
+      }
+      it.close();
+   }
+   
+   @Test
+   public void testTransmissionCheckBeforeCheckerTimeWindow() throws IOException, InterruptedException {
+      messageManager.registerWriter(new BasicWriter(TestMessageIOType.eth1, TestMessageDataType.eth1));
+      
+      TestMessageOne msg1 = req.getMessageReader(TestMessageOne.class);
+      TestMessageOne msg1Writer = req.getMessageWriter(TestMessageOne.class);
+
+      MessageCaptureFilter filter = new MessageCaptureFilter(msg1);
+      MessageCapture capture = new MessageCapture(ote, new BasicClassLocator(getClass().getClassLoader()));
+            
+      capture.add(filter);
+      
+      msg1Writer.INT1.setValue(583);
+      messageManager.publish(msg1Writer);
+      
+      timer.step(100);
+      capture.start();
+      timer.step(10);
+      msg1Writer.INT1.setValue(587);
+      messageManager.publish(msg1Writer);
+      timer.step(300);
+      capture.stop();
+      
+      MessageCaptureDataIterator it = capture.getDataIterator();
+      MessageCaptureChecker checker = new MessageCaptureChecker(it);
+      checker.add(new CheckEqualsCondition<>(msg1, msg1.INT1, 587, 150, 200));
+      checker.check();
+      checker.close();
+      for(Checker ch:checker.get()){
+         Assert.assertTrue(ch.passed());
+      }
+      it.close();     
+      
+   }
+   
+   @Test
+   public void testBeforeGoodToBad() throws IOException, InterruptedException {
+      messageManager.registerWriter(new BasicWriter(TestMessageIOType.eth1, TestMessageDataType.eth1));
+      
+      TestMessageOne msg1 = req.getMessageReader(TestMessageOne.class);
+      TestMessageOne msg1Writer = req.getMessageWriter(TestMessageOne.class);
+
+      MessageCaptureFilter filter = new MessageCaptureFilter(msg1);
+      MessageCapture capture = new MessageCapture(ote, new BasicClassLocator(getClass().getClassLoader()));
+            
+      capture.add(filter);
+      
+      msg1Writer.INT1.setValue(583);
+      messageManager.publish(msg1Writer);
+      timer.step(100);
+      capture.start();
+      timer.step(10);
+      msg1Writer.INT1.setValue(587);
+      messageManager.publish(msg1Writer);
+      timer.step(300);
+      msg1Writer.INT1.setValue(588);
+      messageManager.publish(msg1Writer);
+      timer.step(10);
+      capture.stop();
+      
+      MessageCaptureDataIterator it = capture.getDataIterator();
+      MessageCaptureChecker checker = new MessageCaptureChecker(it);
+      checker.add(new CheckEqualsCondition<>(msg1, msg1.INT1, 587, 150, 500));
+      checker.check();
+      checker.close();
+      for(Checker ch:checker.get()){
+         Assert.assertTrue(ch.passed());
+      }
+      it.close();     
       
    }
    

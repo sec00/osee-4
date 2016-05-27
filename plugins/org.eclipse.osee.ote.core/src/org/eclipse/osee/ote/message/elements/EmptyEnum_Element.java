@@ -131,5 +131,9 @@ public class EmptyEnum_Element extends DiscreteElement<EmptyEnum> {
    public EmptyEnum elementMask(EmptyEnum value) {
       return value;
    }
+   
+   public double getDouble(){
+      return getValue().getValue();      
+   }
 
 }

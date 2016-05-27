@@ -214,4 +214,7 @@ public class StringElement extends DiscreteElement<String> {
       return value;
    }
 
+   public double getDouble(){
+      return getValue().hashCode();      
+   }
 }

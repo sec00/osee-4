@@ -16,6 +16,10 @@ public class FakeTimer implements ITimerControl {
          step++;
       }
       
+      public void step(long time) {
+         step += time;
+      }
+      
       @Override
       public ICancelTimer setTimerFor(ITimeout objToNotify, int milliseconds) {
          return null;

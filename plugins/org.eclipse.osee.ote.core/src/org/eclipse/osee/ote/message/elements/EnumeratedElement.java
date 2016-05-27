@@ -190,4 +190,8 @@ public class EnumeratedElement<T extends Enum<T> & IEnumValue<T>> extends Discre
    public T elementMask(T value) {
       return value;
    }
+   
+   public double getDouble(){
+      return getValue().getIntValue();      
+   }
 }

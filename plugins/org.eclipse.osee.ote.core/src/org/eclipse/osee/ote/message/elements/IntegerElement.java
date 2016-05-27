@@ -239,4 +239,7 @@ public class IntegerElement extends NumericElement<Integer> {
       return getValue() & 0xFFFFFFFFL;
    }
 
+   public double getDouble(){
+      return getInt();      
+   }
 }

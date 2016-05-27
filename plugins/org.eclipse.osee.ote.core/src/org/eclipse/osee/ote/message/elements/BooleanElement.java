@@ -72,4 +72,11 @@ public class BooleanElement extends DiscreteElement<Boolean> {
       return value;
    }
 
+   public double getDouble(){
+      if(getValue().booleanValue()){
+         return 1.0;
+      } else {
+         return 0.0;
+      }
+   }
 }

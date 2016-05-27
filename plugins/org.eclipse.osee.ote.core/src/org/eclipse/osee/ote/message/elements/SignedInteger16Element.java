@@ -213,5 +213,9 @@ public class SignedInteger16Element extends NumericElement<Integer> {
    public long getNumericBitValue() {
       return getValue() & 0xFFFFFFFFL;
    }
+   
+   public double getDouble(){
+      return getInt();      
+   }
 
 }

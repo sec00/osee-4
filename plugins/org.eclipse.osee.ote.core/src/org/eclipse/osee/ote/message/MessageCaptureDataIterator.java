@@ -126,11 +126,28 @@ public class MessageCaptureDataIterator {
 
       @Override
       public void play(long time, String messageName, ByteBuffer buffer, int length) {
-         myMessageCapture.setTime(time);
-         Message message = messageLookup.get(messageName);
-         if(message != null){
-            message.setData(buffer, length);
-            message.setActivityCount(message.getActivityCount()+1);
+         if(time < 0){//this is for the initial value of the message when the recording started, it is not the result of an actual transmission
+            myMessageCapture.setTime(time);
+            myMessageCapture.setIsInitialValue(true);
+            Message message = messageLookup.get(messageName);
+            myMessageCapture.setLastUpdatedMessage(message);
+            if(message != null){
+               message.setData(buffer, length);
+               message.setActivityCount(-1);
+            }
+         } else {
+            myMessageCapture.setTime(time);
+            myMessageCapture.setIsInitialValue(false);
+            Message message = messageLookup.get(messageName);
+            myMessageCapture.setLastUpdatedMessage(message);
+            if(message != null){
+               message.setData(buffer, length);
+               if(message.getActivityCount() < 0){
+                  message.setActivityCount(1);
+               } else {
+                  message.setActivityCount(message.getActivityCount()+1);
+               }
+            }
          }
       }
       

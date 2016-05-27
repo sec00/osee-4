@@ -47,7 +47,7 @@ public class MessageCaptureTest {
       TestMessageOne msg1Writer = req.getMessageWriter(TestMessageOne.class);
 
       MessageCaptureFilter filter = new MessageCaptureFilter(msg1);
-      MessageCapture capture = new MessageCapture(ote, messageManager, new BasicClassLocator(getClass().getClassLoader()));
+      MessageCapture capture = new MessageCapture(ote, new BasicClassLocator(getClass().getClassLoader()));
             
       capture.add(filter);
       
@@ -72,7 +72,7 @@ public class MessageCaptureTest {
       TestMessageOne msg1Writer = req.getMessageWriter(TestMessageOne.class);
 
       MessageCaptureFilter filter = new MessageCaptureFilter(msg1);
-      MessageCapture capture = new MessageCapture(ote, messageManager, new BasicClassLocator(getClass().getClassLoader()));
+      MessageCapture capture = new MessageCapture(ote, new BasicClassLocator(getClass().getClassLoader()));
             
       capture.add(filter);
       
@@ -125,7 +125,8 @@ public class MessageCaptureTest {
       
       
       it = capture.getDataIterator();
-      Checker check = new CheckEqualsCondition<>(it.getMessageLookup(), msg1, msg1.INT1, 27, 0, 500);
+      Checker check = new CheckEqualsCondition<>(msg1, msg1.INT1, 27, 0, 500);
+      check.init(it.getMessageLookup());
       while(it.hasNext()){
          MessageCaptureDataStripe stripe = it.next();
          check.check(stripe);
@@ -135,7 +136,8 @@ public class MessageCaptureTest {
       
       
       it = capture.getDataIterator();
-      check = new CheckEqualsCondition<>(it.getMessageLookup(), msg1, msg1.INT1, 27, 250, 500);
+      check = new CheckEqualsCondition<>(msg1, msg1.INT1, 27, 250, 500);
+      check.init(it.getMessageLookup());
       while(it.hasNext()){
          MessageCaptureDataStripe stripe = it.next();
          check.check(stripe);
@@ -147,7 +149,7 @@ public class MessageCaptureTest {
       //at 245 we get the last transmit of the message of interest
       it = capture.getDataIterator();
       MessageCaptureChecker checker = new MessageCaptureChecker(it);
-      checker.add(new CheckEqualsCondition<>(it.getMessageLookup(), msg1, msg1.INT1, 27, 245, 500));
+      checker.add(new CheckEqualsCondition<>(msg1, msg1.INT1, 27, 245, 500));
       checker.check();
       checker.close();
       for(Checker ch:checker.get()){

@@ -10,12 +10,17 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.message.event;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
+import org.eclipse.osee.framework.logging.OseeLog;
+import org.eclipse.osee.framework.plugin.core.util.ExportClassLoader;
 import org.eclipse.osee.ote.core.ServiceUtility;
 import org.eclipse.osee.ote.endpoint.OteUdpEndpointSender;
 import org.osgi.framework.BundleContext;
@@ -31,6 +36,8 @@ public class OteEventMessageUtil {
 	public final static String BYTE_KEY_2 = "bytes";
 	
 	private static EventAdmin eventAdmin;
+	
+//	private static ExecutorService executor = Executors.newSingleThreadExecutor();
 	
 	private static EventAdmin getEventAdmin(){
 	   if(eventAdmin == null){
@@ -48,21 +55,71 @@ public class OteEventMessageUtil {
    }
 
    public static void sendEvent(OteEventMessage message, EventAdmin eventAdmin) {
-      message.getHeader().UUID_HIGH.setNoLog((long) 0x0);
-      message.getHeader().UUID_LOW.setNoLog((long) 0x0);
-      Map<String, Object> data = new HashMap<>();
-      data.put(BYTE_KEY, message.getData());
-      Event newevent = new Event(message.getHeader().TOPIC.getValue(), data);
-      eventAdmin.sendEvent(newevent);
+      if(isUIThread()){
+//         executor.submit(new Runnable() {
+//            @Override
+//            public void run() {
+//               message.getHeader().UUID_HIGH.setNoLog((long) 0x0);
+//               message.getHeader().UUID_LOW.setNoLog((long) 0x0);
+//               Map<String, Object> data = new HashMap<String, Object>();
+//               data.put(BYTE_KEY, message.getData());
+//               Event newevent = new Event(message.getHeader().TOPIC.getValue(), data);
+//               eventAdmin.postEvent(newevent);
+//            }
+//         });         
+         OseeLog.logf(OteEventMessageUtil.class, Level.SEVERE, "sending [%s] from the UI thread.", message.getHeader().TOPIC.getValue());
+      } //else {
+         message.getHeader().UUID_HIGH.setNoLog((long) 0x0);
+         message.getHeader().UUID_LOW.setNoLog((long) 0x0);
+         Map<String, Object> data = new HashMap<>();
+         data.put(BYTE_KEY, message.getData());
+         Event newevent = new Event(message.getHeader().TOPIC.getValue(), data);
+         eventAdmin.sendEvent(newevent);
+      //}
    }
    
    public static void postEvent(OteEventMessage message, EventAdmin eventAdmin) {
-      message.getHeader().UUID_HIGH.setNoLog((long) 0x0);
-      message.getHeader().UUID_LOW.setNoLog((long) 0x0);
-      Map<String, Object> data = new HashMap<>();
-      data.put(BYTE_KEY, message.getData());
-      Event newevent = new Event(message.getHeader().TOPIC.getValue(), data);
-      eventAdmin.postEvent(newevent);
+      if(isUIThread()){
+//         executor.submit(new Runnable() {
+//            @Override
+//            public void run() {
+//               message.getHeader().UUID_HIGH.setNoLog((long) 0x0);
+//               message.getHeader().UUID_LOW.setNoLog((long) 0x0);
+//               Map<String, Object> data = new HashMap<String, Object>();
+//               data.put(BYTE_KEY, message.getData());
+//               Event newevent = new Event(message.getHeader().TOPIC.getValue(), data);
+//               eventAdmin.postEvent(newevent);
+//            }
+//         });         
+         OseeLog.logf(OteEventMessageUtil.class, Level.SEVERE, "sending [%s] from the UI thread.", message.getHeader().TOPIC.getValue());
+      } //else {
+         message.getHeader().UUID_HIGH.setNoLog((long) 0x0);
+         message.getHeader().UUID_LOW.setNoLog((long) 0x0);
+         Map<String, Object> data = new HashMap<>();
+         data.put(BYTE_KEY, message.getData());
+         Event newevent = new Event(message.getHeader().TOPIC.getValue(), data);
+         eventAdmin.postEvent(newevent);
+      //}
+   }
+   
+   private static boolean isUIThread()
+   {
+      Object display = null;
+      ClassLoader loader = ExportClassLoader.getInstance();
+      try
+      {
+         Class displayClass = loader.loadClass("org.eclipse.swt.widgets.Display");
+         Field[] fields = displayClass.getDeclaredFields();
+
+         Method getDefaultMethod = displayClass.getDeclaredMethod("findDisplay", new Class[] { Thread.class });
+         display = getDefaultMethod.invoke(null, new Object[] { Thread.currentThread() });
+
+      }
+      catch(Exception e)
+      {
+         return false;
+      }
+      return (display != null);
    }
    
    public static void sendEvent(OteEventMessage message, OteUdpEndpointSender sender) throws InterruptedException {

@@ -30,6 +30,7 @@ public class EqualsCondition<T extends Comparable<T>> extends AbstractCondition 
    public EqualsCondition(DiscreteElement<T> element, boolean notEquals, T value) {
       this.element = element;
       this.value = element.elementMask(value);
+      this.actualValue = element.getValue();
       this.notEquals = notEquals;
    }
 
