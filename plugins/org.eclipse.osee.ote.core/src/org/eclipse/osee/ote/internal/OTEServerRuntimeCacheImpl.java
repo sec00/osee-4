@@ -42,7 +42,12 @@ public class OTEServerRuntimeCacheImpl implements OTEServerRuntimeCache  {
       if (!folder.isDirectory()) {
          OseeLog.log(getClass(), Level.SEVERE, "The JAR cache is not a directory! Path=" + folder.getAbsolutePath());
       }
-      clean();
+      new Thread(new Runnable(){
+
+         @Override
+         public void run() {
+            clean();
+         }}).start();
    }
    
    /**

@@ -36,59 +36,66 @@ public class OTEServerCreationComponent {
    }
    
    public void start() {
-      
-      final String oteServerFactoryClass = OtePropertiesCore.serverFactoryClass.getValue();
-      if (oteServerFactoryClass != null) {
-         try{
-            String outfileLocation = OtePropertiesCore.outfilesLocation.getValue();
-            if (outfileLocation == null) {
-               outfileLocation = OtePropertiesCore.javaIoTmpdir.getValue();
-            }
-            String title = OtePropertiesCore.serverTitle.getValue();
-            String name = OtePropertiesCore.userName.getValue();
-            String keepEnvAliveWithNoUsersStr = OtePropertiesCore.serverKeepalive.getValue();
-            boolean keepEnvAliveWithNoUsers = true;
-            if (keepEnvAliveWithNoUsersStr != null) {
-               keepEnvAliveWithNoUsers = Boolean.parseBoolean(keepEnvAliveWithNoUsersStr);
-            }
-            final TestEnvironmentServiceConfigImpl config =
-                  new TestEnvironmentServiceConfigImpl(keepEnvAliveWithNoUsers, title, name, outfileLocation, null);
-
-            String version = "unknown";
-            String comment = "";
-            Bundle bundle = FrameworkUtil.getBundle(OTEServerCreationComponent.class);
-            if(bundle != null){
-               BundleContext context = bundle.getBundleContext();
-               if(context != null){
-                  version = context.getBundle().getHeaders().get("Bundle-Version").toString();
-                  comment = context.getBundle().getHeaders().get("Bundle-Description").toString();
-               }
-            }
-            String station = "unknown";
-            station = EthernetUtil.getServerClientAddress().getHostName();
-            boolean useJiniLookup = OtePropertiesCore.useLookup.getValue() != null;
-            boolean isLocalConnector = false;
-
-            int index = oteServerFactoryClass.indexOf('.');
-            String type = oteServerFactoryClass.substring(index > 0 ? index + 1 : 0);
-            final PropertyParamter propertyParameter =
-                  new PropertyParamter(version, comment, station, type, useJiniLookup, isLocalConnector);
-
-            Thread th = new Thread(new Runnable(){
-               @Override
-               public void run(){
-                  try {
-                     oteServiceStart.start(new JiniServiceSideConnector(), config, propertyParameter, oteServerFactoryClass);
-                  } catch (Exception e) {
-                     e.printStackTrace();
+      new Thread(new Runnable() {
+         
+         @Override
+         public void run() {
+            // TODO Auto-generated method stub
+            final String oteServerFactoryClass = OtePropertiesCore.serverFactoryClass.getValue();
+            if (oteServerFactoryClass != null) {
+               try{
+                  String outfileLocation = OtePropertiesCore.outfilesLocation.getValue();
+                  if (outfileLocation == null) {
+                     outfileLocation = OtePropertiesCore.javaIoTmpdir.getValue();
                   }
+                  String title = OtePropertiesCore.serverTitle.getValue();
+                  String name = OtePropertiesCore.userName.getValue();
+                  String keepEnvAliveWithNoUsersStr = OtePropertiesCore.serverKeepalive.getValue();
+                  boolean keepEnvAliveWithNoUsers = true;
+                  if (keepEnvAliveWithNoUsersStr != null) {
+                     keepEnvAliveWithNoUsers = Boolean.parseBoolean(keepEnvAliveWithNoUsersStr);
+                  }
+                  final TestEnvironmentServiceConfigImpl config =
+                        new TestEnvironmentServiceConfigImpl(keepEnvAliveWithNoUsers, title, name, outfileLocation, null);
+
+                  String version = "unknown";
+                  String comment = "";
+                  Bundle bundle = FrameworkUtil.getBundle(OTEServerCreationComponent.class);
+                  if(bundle != null){
+                     BundleContext context = bundle.getBundleContext();
+                     if(context != null){
+                        version = context.getBundle().getHeaders().get("Bundle-Version").toString();
+                        comment = context.getBundle().getHeaders().get("Bundle-Description").toString();
+                     }
+                  }
+                  String station = "unknown";
+                  station = EthernetUtil.getServerClientAddress().getHostName();
+                  boolean useJiniLookup = OtePropertiesCore.useLookup.getValue() != null;
+                  boolean isLocalConnector = false;
+
+                  int index = oteServerFactoryClass.indexOf('.');
+                  String type = oteServerFactoryClass.substring(index > 0 ? index + 1 : 0);
+                  final PropertyParamter propertyParameter =
+                        new PropertyParamter(version, comment, station, type, useJiniLookup, isLocalConnector);
+
+                  Thread th = new Thread(new Runnable(){
+                     @Override
+                     public void run(){
+                        try {
+                           oteServiceStart.start(new JiniServiceSideConnector(), config, propertyParameter, oteServerFactoryClass);
+                        } catch (Exception e) {
+                           e.printStackTrace();
+                        }
+                     }
+                  });
+                  th.start();
+               } catch (Exception ex){
+                  OseeLog.log(getClass(), Level.SEVERE, ex);
                }
-            });
-            th.start();
-         } catch (Exception ex){
-            OseeLog.log(getClass(), Level.SEVERE, ex);
+            }
          }
-      }
+      }).start();
+      
    }
 
    public void stop() {

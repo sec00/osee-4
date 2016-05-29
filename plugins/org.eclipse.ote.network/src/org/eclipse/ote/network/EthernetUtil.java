@@ -5,8 +5,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -57,6 +55,7 @@ public class EthernetUtil {
                         localhost = local;
                      }
                   }
+                  updateAvailableInterfaces();
                   if(labInterfaceAvailable && !isLocalRange(getLocalhost()) && !determineIfTestInterfaceIsAvailable()){
                      System.out.println("moving from local to on a wan with no test interface so I am shutting down so we do not spam the network.  goodbye from EthernetUtil MONITOR");
                      System.exit(1);
@@ -79,7 +78,6 @@ public class EthernetUtil {
       boolean isAvailable = false;
       String testInterfaces = System.getProperty("ote.test.interfaces", "192.168.0.254,192.168.1.254");
       String[] interfaces = testInterfaces.split(",");
-      updateAvailableInterfaces();
       for(String eth:interfaces){
          InetAddress address;
          try {
@@ -143,15 +141,15 @@ public class EthernetUtil {
          ipv4.clear();
          ipv6.clear();
          Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-         ArrayList<NetworkInterface> networks = Collections.list(interfaces);
-         for(NetworkInterface eth:networks){
-            Enumeration<InetAddress> stuff = eth.getInetAddresses();
-            ArrayList<InetAddress> more = Collections.list(stuff);
-            for(InetAddress what:more){
-               if(what instanceof Inet4Address){
-                  ipv4.add(what);
+         while(interfaces.hasMoreElements()){
+            NetworkInterface net = interfaces.nextElement();
+            Enumeration<InetAddress> addresses = net.getInetAddresses();
+            while(addresses.hasMoreElements()){
+               InetAddress address = addresses.nextElement();
+               if(address instanceof Inet4Address){
+                  ipv4.add(address);
                } else {
-                  ipv6.add(what);
+                  ipv6.add(address);
                }
             }
          }

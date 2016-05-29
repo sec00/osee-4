@@ -43,7 +43,7 @@ public class MessageController implements IMessageManager {
    private final Map<IOType, MessagePublishingHandler> messagePublishingHandlers = new ConcurrentHashMap<IOType, MessagePublishingHandler>();
    private final Map<MessageId, MessageData> idToDataMap = new ConcurrentHashMap<MessageId, MessageData>(400);
    private final MessageCollection messageCollection;
-   private final MessageControllerConsoleCommands commands;
+   private MessageControllerConsoleCommands commands;
    private final MessagePublishingHandler defaultpublisher = new MessagePublishingHandlerDefault();
    private final PeriodicPublishMap periodicPublish;
    private final Set<DataType> availableDataTypes = new HashSet<>();
@@ -57,8 +57,13 @@ public class MessageController implements IMessageManager {
       this.messageCollection = new MessageCollection(); 
       this.mapper = new LegacyMessageMapperService(manualMapper);
       this.periodicPublish = new PeriodicPublishMap(this, timerControl);      
+      new Thread(new Runnable(){
+
+         @Override
+         public void run() {
+            commands = new MessageControllerConsoleCommands(MessageController.this);      
+         }}).start();
       
-      commands = new MessageControllerConsoleCommands(this);
       
       useSpecialMapping = Boolean.parseBoolean(System.getProperty("ote.signal.mapping", "false"));
    }

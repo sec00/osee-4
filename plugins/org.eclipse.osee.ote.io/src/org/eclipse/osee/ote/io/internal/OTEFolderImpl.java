@@ -88,8 +88,12 @@ public class OTEFolderImpl implements OTEServerFolder{
     * ds component method
     */
    public void start(){
-      cleanOldBatchFolders();
-      cleanOldServerFolders();
+      new Thread(new Runnable(){
+         @Override
+         public void run() {
+            cleanOldBatchFolders();
+            cleanOldServerFolders();
+         }}).start();
    }
    
    /**

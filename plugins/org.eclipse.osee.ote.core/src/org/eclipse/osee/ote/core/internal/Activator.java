@@ -51,24 +51,30 @@ public class Activator implements BundleActivator {
    public void start(BundleContext context) throws Exception {
       activator = this;
       bundleContext = context;
-      consoleCommandManager = new ConsoleCommandManager();
-      if (OteProperties.isOteCmdConsoleEnabled()) {
-         stdShell = new StandardShell(consoleCommandManager);
-         stdShell.start();
-      } else {
-         stdShell = null;
-      }
-      consoleCommandRegistration =
-         context.registerService(ICommandManager.class.getName(), consoleCommandManager, new Hashtable());
+      new Thread(new Runnable(){
 
-      serviceDependencyTracker = new ServiceDependencyTracker(bundleContext, new StatusBoardRegistrationHandler());
-      serviceDependencyTracker.open();
+         @Override
+         public void run() {
+            consoleCommandManager = new ConsoleCommandManager();
+            if (OteProperties.isOteCmdConsoleEnabled()) {
+               stdShell = new StandardShell(consoleCommandManager);
+               stdShell.start();
+            } else {
+               stdShell = null;
+            }
+            consoleCommandRegistration =
+               context.registerService(ICommandManager.class.getName(), consoleCommandManager, new Hashtable());
+
+            serviceDependencyTracker = new ServiceDependencyTracker(bundleContext, new StatusBoardRegistrationHandler());
+            serviceDependencyTracker.open();
+            
+            testEnvTracker = new ServiceTracker(context, TestEnvironmentInterface.class.getName(), null);
+            testEnvTracker.open(true);
+            
+            messageIoManagementStarter = new MessageIoManagementStarter(context);
+            messageIoManagementStarter.open(true);
+         }}).start();
       
-      testEnvTracker = new ServiceTracker(context, TestEnvironmentInterface.class.getName(), null);
-      testEnvTracker.open(true);
-      
-      messageIoManagementStarter = new MessageIoManagementStarter(context);
-      messageIoManagementStarter.open(true);
    }
 
    @Override

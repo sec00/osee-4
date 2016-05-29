@@ -23,8 +23,13 @@ public class Activator implements BundleActivator {
 
    @Override
    public void start(BundleContext context) throws Exception {
-      connectionServiceTracker = new ConnectionServiceTracker(context);
-      connectionServiceTracker.open(true);
+      new Thread(new Runnable() {
+         @Override
+         public void run() {
+            connectionServiceTracker = new ConnectionServiceTracker(context);
+            connectionServiceTracker.open(true);
+         }
+      }).start();
    }
 
    @Override

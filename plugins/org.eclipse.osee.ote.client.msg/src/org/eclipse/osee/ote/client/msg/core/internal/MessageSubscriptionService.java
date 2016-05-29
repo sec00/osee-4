@@ -87,7 +87,13 @@ public class MessageSubscriptionService implements IOteMessageService, ITestConn
    private volatile IOteClientService clientService;
 
    public void start(){
-	   clientService.addConnectionListener(this);
+      new Thread(new Runnable() {
+         
+         @Override
+         public void run() {
+            clientService.addConnectionListener(MessageSubscriptionService.this);
+         }
+      }).start();
    }
    
    public void stop(){

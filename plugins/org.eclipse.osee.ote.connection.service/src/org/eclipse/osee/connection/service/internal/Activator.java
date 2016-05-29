@@ -27,28 +27,35 @@ public class Activator implements BundleActivator {
 
    @Override
    public void start(BundleContext context) throws Exception {
-      service = new ConnectionServiceImpl();
+      
+      new Thread(new Runnable(){
 
-      // register the service
-      registration = context.registerService(IConnectionService.class.getName(), service, null);
+         @Override
+         public void run() {
+            service = new ConnectionServiceImpl();
 
-      // create a tracker and track the service
+            // register the service
+            registration = context.registerService(IConnectionService.class.getName(), service, null);
 
-      ExtensionDefinedObjects<IConnectorContributor> definedObjects =
-         new ExtensionDefinedObjects<IConnectorContributor>("org.eclipse.osee.connection.service.ext",
-            "ConnectorContribution", "className");
-      try {
-         List<IConnectorContributor> contributors = definedObjects.getObjects();
-         for (IConnectorContributor contributor : contributors) {
+            // create a tracker and track the service
+
+            ExtensionDefinedObjects<IConnectorContributor> definedObjects =
+               new ExtensionDefinedObjects<IConnectorContributor>("org.eclipse.osee.connection.service.ext",
+                  "ConnectorContribution", "className");
             try {
-               contributor.init();
-            } catch (Exception e) {
-               log(Level.SEVERE, "exception initializing connector contributor", e);
-            }
-         }
-      } catch (Exception ex) {
-         log(Level.SEVERE, "failed to process OTE runtime library provider extensions", ex);
-      }
+               List<IConnectorContributor> contributors = definedObjects.getObjects();
+               for (IConnectorContributor contributor : contributors) {
+                  try {
+                     contributor.init();
+                  } catch (Exception e) {
+                     log(Level.SEVERE, "exception initializing connector contributor", e);
+                  }
+               }
+            } catch (Exception ex) {
+               log(Level.SEVERE, "failed to process OTE runtime library provider extensions", ex);
+            }            
+         }}).start();
+
    }
 
    @Override
