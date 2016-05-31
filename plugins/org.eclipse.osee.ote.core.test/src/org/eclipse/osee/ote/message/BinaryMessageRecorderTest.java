@@ -25,7 +25,7 @@ public class BinaryMessageRecorderTest {
       tempFile = File.createTempFile("binrec", "test.bin");
       timer = new FakeTimer();
       messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null);
-      req = messageManager.createMessageRequestor("tests");
+      req = messageManager.createRequestor("tests");
       messageManager.registerWriter(new BasicWriter(TestMessageIOType.eth1, TestMessageDataType.eth1));
    }
 

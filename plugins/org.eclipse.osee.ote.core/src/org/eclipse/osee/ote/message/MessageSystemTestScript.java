@@ -40,8 +40,8 @@ public abstract class MessageSystemTestScript extends TestScript implements ITes
    }
 
    @Override
-   public IMessageManager getMsgManager() {
-      return msgSysEnvironment.getMsgManager();
+   public IMessageManager getMessageManager() {
+      return msgSysEnvironment.getMessageManager();
    }
 
    @Override

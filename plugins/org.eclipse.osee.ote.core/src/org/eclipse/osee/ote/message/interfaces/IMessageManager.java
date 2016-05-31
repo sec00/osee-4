@@ -12,6 +12,7 @@ package org.eclipse.osee.ote.message.interfaces;
 
 import java.nio.ByteBuffer;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.osee.ote.message.DestinationInfo;
@@ -50,7 +51,7 @@ public interface IMessageManager {
 
    void changeMessageRate(Message message, double newRate, double rate);
 
-   IMessageRequestor createMessageRequestor(String name);
+   IMessageRequestor createRequestor(String name);
 
    void destroy();
 
@@ -148,6 +149,10 @@ public interface IMessageManager {
    void addMessageListenerRemovable(Message message, IOSEEMessageListener listener);
 
    void removeMessageListenerRemovable(Message message, IOSEEMessageListener listener);
+   
+   List<IOSEEMessageListener> getMessageListeners(Message message);
+   
+   List<IOSEEMessageListener> getMessageListenersRemovable(Message message);
 
    boolean containsListener(Message message, IOSEEMessageListener listener);
    

@@ -64,7 +64,7 @@ public abstract class MessageSystemTestEnvironment extends TestEnvironment imple
    }
 
    @Override
-   public IMessageManager getMsgManager() {
+   public IMessageManager getMessageManager() {
       if(messageManager == null){
          messageManager = ServiceUtility.getService(IMessageManager.class, false);
       }

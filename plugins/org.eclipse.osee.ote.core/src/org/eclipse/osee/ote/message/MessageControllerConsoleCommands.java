@@ -142,7 +142,7 @@ public class MessageControllerConsoleCommands {
    }
 
    private void printListenerInfo(Message msg) {
-      MessageListenerContainer container = messageController.getMessageListeners(msg);
+      MessageListenerContainer container = messageController.getMessageListenersContainer(msg);
       
       IOSEEMessageListener[] listeners = container.listeners.get();
       if(listeners != null && listeners.length > 0){

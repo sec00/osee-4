@@ -21,7 +21,7 @@ public class MessageCheckerTest {
    @Before
    public void setUp() throws Exception {
       messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null);
-      req = messageManager.createMessageRequestor("tests");
+      req = messageManager.createRequestor("tests");
       
 //      messageManager.registerWriter(new BasicWriter(TestMessageIOType.eth2, TestMessageDataType.eth2));
       timer = new FakeTimer();

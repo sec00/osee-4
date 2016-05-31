@@ -24,7 +24,7 @@ public class MessageControllerTest {
    @Before
    public void setupTest(){
       messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null);
-      req = messageManager.createMessageRequestor("tests");
+      req = messageManager.createRequestor("tests");
    }
    
    @After
@@ -111,8 +111,8 @@ public class MessageControllerTest {
    
    @Test
    public void referenceCounting(){
-      IMessageRequestor req2 = messageManager.createMessageRequestor("tests");
-      IMessageRequestor req3 = messageManager.createMessageRequestor("tests");
+      IMessageRequestor req2 = messageManager.createRequestor("tests");
+      IMessageRequestor req3 = messageManager.createRequestor("tests");
       Assert.assertEquals(0, messageManager.getAllMessages().size());
       TestMessageOne msg1 = req.getMessageWriter(TestMessageOne.class);
       Assert.assertEquals(1, messageManager.getReferenceCount(msg1));

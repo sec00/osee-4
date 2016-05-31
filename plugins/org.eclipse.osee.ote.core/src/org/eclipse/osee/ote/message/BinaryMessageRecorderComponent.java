@@ -199,7 +199,7 @@ public class BinaryMessageRecorderComponent implements EventHandler{
 	
 	public void setMessageManager(IMessageManager manager) {
 		timerControl = ServiceUtility.getService(ITestEnvironmentAccessor.class).getTimerCtrl();
-		requestor = manager.createMessageRequestor("Binary Message Recorder");
+		requestor = manager.createRequestor("Binary Message Recorder");
 	}
 	
 	public void unsetMessageManager(IMessageManager manager) {

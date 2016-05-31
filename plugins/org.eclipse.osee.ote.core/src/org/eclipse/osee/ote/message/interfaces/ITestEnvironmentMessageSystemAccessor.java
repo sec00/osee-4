@@ -18,7 +18,7 @@ import org.eclipse.osee.ote.message.enums.DataType;
  * @author Andrew M. Finkbeiner
  */
 public interface ITestEnvironmentMessageSystemAccessor extends ITestEnvironmentAccessor {
-   IMessageManager getMsgManager();
+   IMessageManager getMessageManager();
 
    boolean isPhysicalTypeAvailable(DataType physicalType);
 

@@ -141,7 +141,7 @@ public abstract class AbstractMessageDataBase {
             return loader.loadClass(name);
          }
       }, fakeTimerControl, null);
-	   req = messageController.createMessageRequestor("messageDb");
+	   req = messageController.createRequestor("messageDb");
 	}
 
 	public MessageInstance findInstance(String name, MessageMode mode, DataType type) {

@@ -51,7 +51,7 @@ public class UnitTestSupport {
 
          @Override
          public void runOneCycle() throws InterruptedException, TestException {
-            accessor.getMsgManager().publish(msg);
+            accessor.getMessageManager().publish(msg);
          }
 
       });
@@ -479,12 +479,12 @@ public class UnitTestSupport {
 
    public <T extends Message> T getMessageReader(Class<? extends Message> class1) {
       
-      return (T)accessor.getMsgManager().createMessageRequestor("test").getMessageReader(class1);
+      return (T)accessor.getMessageManager().createRequestor("test").getMessageReader(class1);
    }
    
  public <T extends Message> T getMessageWriter(Class<? extends Message> class1) {
       
-      return (T)accessor.getMsgManager().createMessageRequestor("test").getMessageWriter(class1);
+      return (T)accessor.getMessageManager().createRequestor("test").getMessageWriter(class1);
    }
 
 public void setMasterTestThread() {

@@ -27,7 +27,7 @@ public class OTERuntimeAnnotations {
       testCases = new ArrayList<>();
       IMessageManager messageManager = ServiceUtility.getService(IMessageManager.class);
       if(messageManager != null){
-         req = messageManager.createMessageRequestor("Annotated_" + this.getClass().getName());
+         req = messageManager.createRequestor("Annotated_" + this.getClass().getName());
          annotationHandlers.put( MessageWriter.class, new MessageWriterHandler(req));
          annotationHandlers.put( MessageReader.class, new MessageReaderHandler(req));
       }

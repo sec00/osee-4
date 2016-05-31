@@ -45,8 +45,8 @@ public abstract class MessageSystemTestCase extends TestCase implements ITestAcc
    }
 
    @Override
-   public IMessageManager getMsgManager() {
-      return msgSysTestEnvironment.getMsgManager();
+   public IMessageManager getMessageManager() {
+      return msgSysTestEnvironment.getMessageManager();
    }
 
    @Override

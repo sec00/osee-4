@@ -82,13 +82,13 @@ public class MessageController implements IMessageManager {
    }
    
    public void addMessageListener(Message message, IOSEEMessageListener listener){
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.add(listener);
    }
    
    @Override
    public void addMessageListenerRemovable(Message message, IOSEEMessageListener listener) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.addRemovable(listener);
    }
    
@@ -103,12 +103,12 @@ public class MessageController implements IMessageManager {
    
    @Override
    public void addPostMemSourceChangeListener(Message message, IMemSourceChangeListener listener) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.addPostMemSourceChangeListener(listener);
    }
    
    public void addPostMessageDisposeListener(Message message, IMessageDisposeListener listener) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.addPostMessageDisposeListener(listener);
    }
    
@@ -119,16 +119,16 @@ public class MessageController implements IMessageManager {
 
    @Override
    public void addPreMemSourceChangeListener(Message message, IMemSourceChangeListener listener) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.addPreMemSourceChangeListener(listener);
    }
    public void addPreMessageDisposeListener(Message message, IMessageDisposeListener listener) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.addPreMessageDisposeListener(listener);
    }
    
    public void addSchedulingChangeListener(Message message, IMessageScheduleChangeListener listener) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.addSchedulingChangeListener(message, listener);
    }
  
@@ -163,7 +163,7 @@ public class MessageController implements IMessageManager {
    }
    
    @Override
-   public IMessageRequestor createMessageRequestor(String name) {
+   public IMessageRequestor createRequestor(String name) {
       return new MessageRequestorImpl(name, this);
    }
    
@@ -250,7 +250,7 @@ public class MessageController implements IMessageManager {
    }
 
    public void notifyPostDestroyListeners(Message message) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.notifyPostDestroyListeners(message);
    }
 
@@ -263,7 +263,7 @@ public class MessageController implements IMessageManager {
    }
 
    public void notifyPreDestroyListeners(Message message) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.notifyPreDestroyListeners(message);
    }
 
@@ -277,13 +277,13 @@ public class MessageController implements IMessageManager {
 
    @Override
    public void notifySchedulingChangeListeners(Message message, boolean isScheduled) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.notifySchedulingChangeListeners(isScheduled);
    }
 
    @Override
    public void notifySchedulingChangeListeners(Message message, double oldRate, double newRate) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.notifySchedulingChangeListeners(message, oldRate, newRate);
    }
 
@@ -352,7 +352,7 @@ public class MessageController implements IMessageManager {
    
    @Override
    public void removeMessageListenerRemovable(Message message, IOSEEMessageListener listener) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.removeRemovable(listener);
    }
    
@@ -367,28 +367,28 @@ public class MessageController implements IMessageManager {
 
    @Override
    public void removePostMemSourceChangeListener(Message message, IMemSourceChangeListener listener) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.removePostMemSourceChangeListener(listener);
    }
    
    public void removePostMessageDisposeListener(Message message, IMessageDisposeListener listener) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.removePostMessageDisposeListener(listener);
    }
 
    @Override
    public void removePreMemSourceChangeListener(Message message, IMemSourceChangeListener listener) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.removePreMemSourceChangeListener(listener);
    }
 
    public void removePreMessageDisposeListener(Message message, IMessageDisposeListener listener) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.removePreMessageDisposeListener(listener);
    }
 
    public void removeSchedulingChangeListener(Message message, IMessageScheduleChangeListener listener) {
-      MessageListenerContainer container = getMessageListeners(message);
+      MessageListenerContainer container = getMessageListenersContainer(message);
       container.removeSchedulingChangeListener(message, listener);
    }
 
@@ -571,7 +571,7 @@ public class MessageController implements IMessageManager {
       return idToDataMap.get(id);
    }
    
-   MessageListenerContainer getMessageListeners(Message message){
+   MessageListenerContainer getMessageListenersContainer(Message message){
       MessageListenerContainer container = messageListeners.get(message);
       if(container == null){
          container = new MessageListenerContainer();
@@ -1044,6 +1044,20 @@ public class MessageController implements IMessageManager {
       if(container != null){
          container.clearRemovable();
       }
+   }
+
+   @Override
+   public List<IOSEEMessageListener> getMessageListeners(Message message) {
+      List<IOSEEMessageListener> listeners = new ArrayList<>();
+      getMessageListenersContainer(message).listeners.fillCollection(listeners);
+      return listeners;
+   }
+
+   @Override
+   public List<IOSEEMessageListener> getMessageListenersRemovable(Message message) {
+      List<IOSEEMessageListener> listeners = new ArrayList<>();
+      getMessageListenersContainer(message).removablelisteners.fillCollection(listeners);
+      return listeners;
    }
 
 }

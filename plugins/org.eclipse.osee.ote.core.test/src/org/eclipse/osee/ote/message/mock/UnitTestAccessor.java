@@ -443,7 +443,7 @@ private static class BasicClassLocator implements ClassLocator {
    }
 
    @Override
-   public IMessageManager getMsgManager() {
+   public IMessageManager getMessageManager() {
       return msgManager;
    }
 

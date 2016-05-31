@@ -18,7 +18,7 @@ public class MessageTest {
    @Before
    public void setUp() throws Exception {
       messageManager = new MessageController(null, null, null);
-      req = messageManager.createMessageRequestor("tests");
+      req = messageManager.createRequestor("tests");
    }
 
    @After

@@ -52,6 +52,7 @@ import org.eclipse.osee.ote.message.interfaces.IMessageScheduleChangeListener;
 import org.eclipse.osee.ote.message.interfaces.ITestAccessor;
 import org.eclipse.osee.ote.message.interfaces.ITestEnvironmentMessageSystemAccessor;
 import org.eclipse.osee.ote.message.listener.IOSEEMessageListener;
+import org.eclipse.osee.ote.message.listener.MessageSystemListener;
 import org.eclipse.osee.ote.message.tool.MessageMode;
 import org.eclipse.ote.scheduler.Scheduler;
 import org.w3c.dom.Document;
@@ -66,8 +67,10 @@ public class Message implements Xmlizable, XmlizableStream {
    
    private final LinkedHashMap<String, Element> elementMap;
    //need to rework the waitforData notification to remove the listnerHandlers
-//   private final MessageSystemListener listenerHandler;
-//   private final MessageSystemListener removableListenerHandler;
+   @Deprecated
+   private final MessageSystemListener listenerHandler;
+   @Deprecated
+   private final MessageSystemListener removableListenerHandler;
    private final Set<DataType> memTypeActive = new HashSet<DataType>();
 
    @JsonProperty
@@ -96,7 +99,7 @@ public class Message implements Xmlizable, XmlizableStream {
       this.id = id;
       this.defaultMessageData = data;
       this.currentMemType = data.getType();
-//      listenerHandler = new MessageSystemListener(this);
+      listenerHandler = new MessageSystemListener(this);
       this.name = name;
       this.defaultByteSize = data.getDefaultDataByteSize();
       this.defaultOffset = 0;
@@ -106,12 +109,12 @@ public class Message implements Xmlizable, XmlizableStream {
       this.defaultRate = rate;
       this.isScheduledFromStart = false;
       GCHelper.getGCHelper().addRefWatch(this);
-//      this.removableListenerHandler = new MessageSystemListener(this);
+      this.removableListenerHandler = new MessageSystemListener(this);
       setMapper(new LegacyMessageMapperDefaultSingle());
    }
    
    public Message(String name, int defaultByteSize, int defaultOffset, boolean isScheduled, int phase, double rate) {
-//      listenerHandler = new MessageSystemListener(this);
+      listenerHandler = new MessageSystemListener(this);
       this.name = name;
       this.defaultByteSize = defaultByteSize;
       this.defaultOffset = defaultOffset;
@@ -121,7 +124,7 @@ public class Message implements Xmlizable, XmlizableStream {
       this.defaultRate = rate;
       this.isScheduledFromStart = isScheduled;
       GCHelper.getGCHelper().addRefWatch(this);
-//      this.removableListenerHandler = new MessageSystemListener(this);
+      this.removableListenerHandler = new MessageSystemListener(this);
    }
    
    public void addElement(Element element) {
@@ -239,7 +242,7 @@ public class Message implements Xmlizable, XmlizableStream {
     * @param milliseconds the amount to time (in milliseconds) to check
     * @return if the check passed
     */
-   public boolean checkForNoTransmissions(ITestAccessor accessor, int milliseconds) throws InterruptedException {
+   public boolean checkForNoTransmissions(ITestEnvironmentMessageSystemAccessor accessor, int milliseconds) throws InterruptedException {
       checkState();
       accessor.getLogger().methodCalledOnObject(accessor, getMessageName(),
          new MethodFormatter().add(milliseconds));
@@ -248,7 +251,7 @@ public class Message implements Xmlizable, XmlizableStream {
       CheckPoint passFail =
          new CheckPoint(this.name, Integer.toString(0), Integer.toString(result.getXmitCount()),
             result.isPassed(), result.getXmitCount(), result.getElapsedTime());
-      accessor.getLogger().testpoint(accessor, accessor.getTestScript(), accessor.getTestCase(), passFail);
+      accessor.getLogger().testpoint(accessor, accessor.getTestScript(), accessor.getTestScript().getTestCase(), passFail);
       accessor.getLogger().methodEnded(accessor);
       return passFail.isPass();
    }
@@ -560,9 +563,15 @@ public class Message implements Xmlizable, XmlizableStream {
       return mapper.getMessageData(this, currentMemType).getMsgHeader().getHeaderSize();
    }
 
-//   public MessageSystemListener getListener() {
-//      return listenerHandler;
-//   }
+   @Deprecated
+   public MessageSystemListener getListener() {
+      return listenerHandler;
+   }
+   
+   @Deprecated
+   public MessageSystemListener getRemoveableListener() {
+      return listenerHandler;
+   }
 
    /**
     * @return Returns size value.
@@ -702,7 +711,7 @@ public class Message implements Xmlizable, XmlizableStream {
     * 
     * @return Returns the regularUnscheduleCalled.
     */
-   public boolean isegularUnscheduleCalled() {
+   public boolean isRegularUnscheduleCalled() {
       return regularUnscheduleCalled;
    }
 
@@ -761,6 +770,12 @@ public class Message implements Xmlizable, XmlizableStream {
 //      this.removableListenerHandler.onDataAvailable(data, type);
    }
 
+   /**
+    * Remove a message listener if it exists.
+    * 
+    * @param listener
+    * @return true if a listener was removed
+    */
    public boolean removeListener(IOSEEMessageListener listener) {
       if(messageManager != null){
          return messageManager.removeMessageListener(this, listener);
@@ -1198,9 +1213,22 @@ public class Message implements Xmlizable, XmlizableStream {
    private Collection<Element> getLocalElements() {
       return elementMap.values();
    }
-
+   
    private void setSchedule(boolean newValue) {
       mapper.getMessageData(this, currentMemType).setScheduled(newValue);
+   }
+   
+   /**
+    * The ability to directly access the listeners is going away.
+    * 
+    * @return
+    */
+   @Deprecated
+   public List<IOSEEMessageListener> getListeners(){
+      if(messageManager != null){
+         return messageManager.getMessageListeners(this);
+      }
+      return new ArrayList<>();
    }
    
 }
