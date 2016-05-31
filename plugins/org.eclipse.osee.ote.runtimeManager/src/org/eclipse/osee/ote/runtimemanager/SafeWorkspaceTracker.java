@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.logging.Level;
+
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -49,8 +50,10 @@ import org.osgi.util.tracker.ServiceTracker;
 public class SafeWorkspaceTracker extends ServiceTracker implements OteBundleLocator {
 
    private JarChangeResourceListener<OteSystemLibsNature> systemLibResourceListener;
+   private JarChangeResourceListener<OteSystemLibsNature> precompiledResourceListener;
    private JarChangeResourceListener<OteUserLibsNature> userLibResourceListener;
    private LibJarListener<OteSystemLibsNature> systemLibListener;
+   private PrecompiledListener precompiledListener;
    private LibJarListener<OteUserLibsNature> userLibListener;
    private ProjectChangeResourceListener projectChangeResourceListener;
    private RuntimeBundleServer bundleServer;
@@ -66,13 +69,16 @@ public class SafeWorkspaceTracker extends ServiceTracker implements OteBundleLoc
    public Object addingService(ServiceReference reference) {
       this.systemLibListener = new LibJarListener<>();
       this.userLibListener = new LibJarListener<>();
+      this.precompiledListener = new PrecompiledListener();
       this.systemLibResourceListener =
          new JarChangeResourceListener<OteSystemLibsNature>(OteSystemLibsNature.NATURE_ID, systemLibListener);
       this.userLibResourceListener =
          new JarChangeResourceListener<OteUserLibsNature>(OteUserLibsNature.NATURE_ID, userLibListener);
+      this.precompiledResourceListener = new JarChangeResourceListener<>(OteSystemLibsNature.NATURE_ID, precompiledListener);
       this.projectChangeResourceListener = new ProjectChangeResourceListener();
       service = (SafeWorkspaceAccess) context.getService(reference);
       slowLoadingJars();
+      precompiledListener.runCheckInThread();
 
       return super.addingService(reference);
    }
@@ -98,6 +104,7 @@ public class SafeWorkspaceTracker extends ServiceTracker implements OteBundleLoc
          }
          workspace.addResourceChangeListener(systemLibResourceListener);
          workspace.addResourceChangeListener(userLibResourceListener);
+         workspace.addResourceChangeListener(precompiledResourceListener);
 
          SafeWorkspaceTracker.this.bundleServer = new RuntimeBundleServer(SafeWorkspaceTracker.this);
 
@@ -129,6 +136,7 @@ public class SafeWorkspaceTracker extends ServiceTracker implements OteBundleLoc
       if (workspace != null) {
          workspace.removeResourceChangeListener(systemLibResourceListener);
          workspace.removeResourceChangeListener(userLibResourceListener);
+         workspace.removeResourceChangeListener(precompiledResourceListener);
       }
       super.close();
    }
