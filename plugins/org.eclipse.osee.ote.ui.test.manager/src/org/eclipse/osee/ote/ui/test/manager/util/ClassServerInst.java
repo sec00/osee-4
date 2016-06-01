@@ -14,19 +14,24 @@ import java.io.File;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.framework.plugin.core.CorePreferences;
-import org.eclipse.osee.framework.ui.ws.AJavaProject;
 import org.eclipse.osee.framework.ui.ws.AWorkspace;
 import org.eclipse.osee.ote.classserver.ClassServer;
 import org.eclipse.osee.ote.classserver.PathResourceFinder;
@@ -131,7 +136,7 @@ public class ClassServerInst {
          try {
             description = project.getDescription();
             if (!project.getName().startsWith(".") && description.hasNature("org.eclipse.jdt.core.javanature")) {
-               List<File> fileList = AJavaProject.getJavaProjectProjectDependancies(JavaCore.create(project));
+               List<File> fileList = getJavaProjectProjectDependancies(JavaCore.create(project));
                for (File file : fileList) {
                   list.add(file.getAbsolutePath());
                }
@@ -143,4 +148,62 @@ public class ClassServerInst {
 
       return list.toArray(new String[list.size()]);
    }
+   
+   /* 
+    * START Code Duplicated from AJavaProject because of release dependencies
+    */   
+   private final Map<IJavaProject, IClasspathEntry[]> cachedPath =
+         new HashMap<IJavaProject, IClasspathEntry[]>();
+   
+   private IClasspathEntry[] localGetResolvedClasspath(IJavaProject javaProject) throws JavaModelException {
+      IClasspathEntry[] paths = cachedPath.get(javaProject);
+      if (paths == null) {
+         paths = javaProject.getResolvedClasspath(true);
+         cachedPath.put(javaProject, paths);
+      }
+      return paths;
+   }
+   
+   private ArrayList<File> getJavaProjectProjectDependancies(IJavaProject javaProject) {
+      ArrayList<File> urls = new ArrayList<File>();
+      try {
+         IClasspathEntry[] paths = localGetResolvedClasspath(javaProject);
+         for (int i = 0; i < paths.length; i++) {
+            if (paths[i].getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
+               if (paths[i].getPath().toFile().exists()) {
+                  //          urls.add(paths[i].getPath().toFile());
+               } else {
+                  File file = null;
+                  file = new File(AWorkspace.getWorkspacePath().concat(paths[i].getPath().toOSString()));
+                  if (file.exists()) {
+                     urls.add(file);
+                  }
+               }
+            } else if (paths[i].getEntryKind() == IClasspathEntry.CPE_PROJECT) {
+               urls.add(new File(AWorkspace.getWorkspacePath().concat(
+                  paths[i].getPath().toFile().getPath().concat(File.separator + "bin" + File.separator))));
+            } else if (paths[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+               File projectlocation = javaProject.getProject().getLocation().toFile();
+               File projecttricky = javaProject.getProject().getFullPath().toFile();
+               IPath output = paths[i].getOutputLocation();
+               File fileLocation;
+               if (output == null) {
+                  fileLocation = javaProject.getOutputLocation().toFile();
+               } else {
+                  fileLocation = paths[i].getOutputLocation().toFile();
+               }
+               String realLocation =
+                  fileLocation.toString().replace(projecttricky.toString(), projectlocation.toString());
+               urls.add(new File(realLocation));
+            }
+         }
+
+      } catch (JavaModelException ex) {
+         ex.printStackTrace();
+      }
+      return urls;
+   }
+   /* 
+    * STOP Code Duplicated from AJavaProject because of release dependencies
+    */
 }
