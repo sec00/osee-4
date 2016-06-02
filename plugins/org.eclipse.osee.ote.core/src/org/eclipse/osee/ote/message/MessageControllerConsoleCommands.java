@@ -17,6 +17,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,6 +25,7 @@ import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.felix.service.command.Descriptor;
 import org.apache.felix.service.command.Parameter;
+import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.core.CopyOnWriteNoIteratorList;
 import org.eclipse.osee.ote.core.ServiceUtility;
 import org.eclipse.osee.ote.message.MessageController.MessageListenerContainer;
@@ -213,5 +215,21 @@ public class MessageControllerConsoleCommands {
       reg.unregister();
    }
    
+   Object attribute;
+   @SuppressWarnings("unchecked")
+   public <T> T getAdapter(Class<T> type) {
+      if (type != null && type.isAssignableFrom(getClass())) {
+         return (T) this;
+      }
+
+      if (type.isInstance(attribute)) {
+         try {
+            return (T) attribute;
+         } catch (Exception ex) {
+            OseeLog.log(getClass(), Level.SEVERE, ex);
+         }
+      }
+      return null;
+   }
    
 }

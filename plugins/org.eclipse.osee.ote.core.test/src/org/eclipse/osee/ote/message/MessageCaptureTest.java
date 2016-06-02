@@ -131,6 +131,7 @@ public class MessageCaptureTest {
          MessageCaptureDataStripe stripe = it.next();
          check.check(stripe);
       }
+      check.complete(it.getMessageLookup());
       it.close();
       Assert.assertTrue(check.passed());
       
@@ -140,8 +141,13 @@ public class MessageCaptureTest {
       check.init(it.getMessageLookup());
       while(it.hasNext()){
          MessageCaptureDataStripe stripe = it.next();
+         System.out.printf("%d %d\n", stripe.getLookup().getValue(msg1, msg1.INT1), stripe.getTime());
+         if(stripe.getTime() == 250){
+            System.out.println("df");
+         }
          check.check(stripe);
       }
+      check.complete(it.getMessageLookup());
       it.close();
       Assert.assertFalse(check.passed());
       

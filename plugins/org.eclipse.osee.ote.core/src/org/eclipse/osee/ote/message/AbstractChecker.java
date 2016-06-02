@@ -82,6 +82,10 @@ public abstract class AbstractChecker<T extends Comparable<T>> implements Checke
       for(Double value:this.values){
          saveValues.add(value.doubleValue());
       }
+      List<String> infoValues = elementSave.getData().getInfo();
+      for(String value:this.infos){
+         infoValues.add(value);
+      }
       return elementSave;
    }
    
@@ -91,14 +95,9 @@ public abstract class AbstractChecker<T extends Comparable<T>> implements Checke
    
    
    /**
-    * Sets the element and message that are being checked.
+    * Set the element, message, and condition that are being checked.
     */
-   public void init(MessageCaptureMessageLookup lookup){
-//      if(element.getValue().compareTo(condition.getLastCheckValue()) != 0){
-//         System.out.printf("%s -> %s\n", condition.getLastCheckValue(), element.getValue());
-//      }
-//      lastCheckResult  = condition.check();
-   }
+   public abstract void init(MessageCaptureMessageLookup lookup);
    
    public void complete(MessageCaptureMessageLookup lookup){
       if(condition.getCheckCount() <= 0){
@@ -121,6 +120,9 @@ public abstract class AbstractChecker<T extends Comparable<T>> implements Checke
     */
    @Override
    public void check(MessageCaptureDataStripe stripe) {
+      if(passed){
+         return;
+      }
       if(isStartTimeMessage(stripe)){
          firstTime = false;
          this.baseTime = stripe.getTime();
@@ -136,9 +138,10 @@ public abstract class AbstractChecker<T extends Comparable<T>> implements Checke
          } else if (isAfterTime(stripe.getTime())){
             
          } else if(isInTimeRange(stripe.getTime())){ 
-            if(lastCheckResult){
+            if(stripe.getTime() > startTime && lastCheckResult){
                passed = true;
             } else { 
+               lastCheckResult = false;
                passed = condition.checkAndIncrement();  
                elapsedTime = stripe.getTime() - baseTime;
             } 
@@ -147,42 +150,6 @@ public abstract class AbstractChecker<T extends Comparable<T>> implements Checke
          infos.add(element.toString());
          times.add(stripe.getTime());
       }
-//      if(stripe.isInitialValue() && stripe.lastUpdate() == message){ //this is setting up the initial value of the checked element
-////         if(element.getValue().compareTo(condition.getLastCheckValue()) != 0){
-////            System.out.printf("check initial values %s -> %s\n", condition.getLastCheckValue(), element.getValue());
-////         }
-//         passed = condition.check();  
-//         elapsedTime = 0;//stripe.getTime() - baseTime;
-//         values.add(asDouble(condition.getLastCheckValue()));
-//         times.add(baseTime);
-//      }
-//      else if(isBeforeTime(stripe.getTime())){
-////         if(element.getValue().compareTo(condition.getLastCheckValue()) != 0){
-////            System.out.printf("%s -> %s\n", condition.getLastCheckValue(), element.getValue());
-////         }
-//         lastCheckResult = condition.check();
-//         elapsedTime = stripe.getTime() - baseTime;
-//      } else if (isAfterTime(stripe.getTime())){
-//         
-//      } else if(isInTimeRange(stripe.getTime())){ 
-//         if(lastCheckResult){
-//            passed = true;
-//         } else if(stripe.lastUpdate() == message){ 
-//            if(element.getValue().compareTo(condition.getLastCheckValue()) != 0){
-//               System.out.printf("%s -> %s\n", condition.getLastCheckValue(), element.getValue());
-//            }
-//            passed = condition.checkAndIncrement();  
-//            elapsedTime = stripe.getTime() - baseTime;
-//            values.add(asDouble(condition.getLastCheckValue()));
-//            times.add(stripe.getTime());
-//         } 
-//      } 
-//      
-//      if(stripe.lastUpdate() == message){
-//         values.add(element.getDouble());
-//         infos.add(element.toString());
-//         times.add(stripe.getTime());
-//      }
    }
    
    private boolean isStartTimeMessage(MessageCaptureDataStripe stripe) {

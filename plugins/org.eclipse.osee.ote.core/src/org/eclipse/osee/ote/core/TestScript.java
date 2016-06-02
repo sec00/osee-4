@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.core;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -179,6 +180,15 @@ public abstract class TestScript extends OTERuntimeAnnotations implements ITimeo
    private ITestRunListenerProvider listenerProvider;
    private boolean shouldPauseOnFail;
    private boolean printFailToConsole;
+   private File scriptDataDirectory;
+
+   public File getScriptDataDirectory() {
+      return scriptDataDirectory;
+   }
+
+   public void setScriptDataDirectory(File scriptDataDirectory) {
+      this.scriptDataDirectory = scriptDataDirectory;
+   }
 
    public TestScript(TestEnvironment environment, IUserSession callback, ScriptTypeEnum scriptType, boolean isBatchable) {
       constructed.incrementAndGet();

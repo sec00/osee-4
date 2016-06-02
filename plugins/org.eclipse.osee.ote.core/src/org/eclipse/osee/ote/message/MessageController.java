@@ -169,7 +169,9 @@ public class MessageController implements IMessageManager {
    
    @Override
    public void destroy() {
-      commands.dispose();
+      if(commands != null){
+         commands.dispose();
+      }
    }
    
    @SuppressWarnings("unchecked")
