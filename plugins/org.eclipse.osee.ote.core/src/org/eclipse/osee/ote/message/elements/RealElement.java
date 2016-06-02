@@ -27,20 +27,26 @@ public abstract class RealElement extends NumericElement<Double> {
       visitor.asRealElement(this);
    }
 
-   public RealElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public RealElement(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       this(message, elementName, messageData, byteOffset, msb, lsb, msb, lsb);
    }
 
-   public RealElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public RealElement(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb, originalLsb, originalMsb);
    }
 
-   public RealElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+   public RealElement(Message message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
       super(message, elementName, messageData, bitOffset, bitLength);
    }
 
    @Override
-   public RealElement switchMessages(Collection<? extends Message<?, ?, ?>> messages) {
+   public RealElement findElementInMessages(Collection<? extends Message> messages) {
+      return (RealElement) super.findElementInMessages(messages);
+   }
+   
+   @Override
+   @Deprecated
+   public RealElement switchMessages(Collection<? extends Message<?,?,?>> messages) {
       return (RealElement) super.switchMessages(messages);
    }
 

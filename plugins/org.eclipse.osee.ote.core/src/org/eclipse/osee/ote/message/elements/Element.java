@@ -27,8 +27,8 @@ import org.eclipse.osee.ote.message.enums.DataType;
  * @author Andrew M. Finkbeiner
  */
 public abstract class Element implements ITimeout {
-//   protected final Message<?, ?, ?> msg;
-   private final WeakReference<Message<?, ?, ?>> msg;
+//   protected final Message msg;
+   private final WeakReference<Message> msg;
    protected String elementName;
    private volatile boolean timedOut;
    private final List<Object> elementPath;
@@ -42,7 +42,7 @@ public abstract class Element implements ITimeout {
    protected final int originalLsb;
    private String elementPathAsString;
 
-   public Element(Message<?, ?, ?> msg, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalMsb, int originalLsb) {
+   public Element(Message msg, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalMsb, int originalLsb) {
       this.msg = new WeakReference<>(msg);
       this.elementName = elementName;
       this.messageData = messageData;
@@ -55,13 +55,13 @@ public abstract class Element implements ITimeout {
       fullName = (msg != null ? msg.getName() : messageData.getName()) + "." + this.elementName;
    }
 
-   public Element(Message<?, ?, ?> msg, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+   public Element(Message msg, String elementName, MessageData messageData, int bitOffset, int bitLength) {
       this(msg, elementName, messageData, bitOffset / 8, 0, 0, 0, 0);
       this.msb = bitOffset % 8;
       this.lsb = msb + bitLength - 1;
    }
 
-   public Element(Message<?, ?, ?> msg, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public Element(Message msg, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       this(msg, elementName, messageData, byteOffset, msb, lsb, msb, lsb);
    }
 
@@ -113,7 +113,7 @@ public abstract class Element implements ITimeout {
    /**
     * @return Returns the msg.
     */
-   public Message<?, ?, ?> getMessage() {
+   public Message getMessage() {
       return msg.get();
    }
 
@@ -188,8 +188,21 @@ public abstract class Element implements ITimeout {
     * @return An element of one of the messages passed with the same name as this element or this element if no match is
     * found.
     */
-   public Element switchMessages(Collection<? extends Message<?, ?, ?>> messages) {
-      for (Message<?, ?, ?> currentMessage : messages) {
+   @SuppressWarnings("rawtypes")
+   public Element findElementInMessages(Collection<? extends Message> messages) {
+      for (Message currentMessage : messages) {
+         //         System.out.println("SwitchMessages" + currentMessage.getMessageName());
+         Element el = currentMessage.getElement(this.getElementPath());
+         if (el != null && currentMessage.isValidElement(this, el)) {
+            return el;
+         }
+      }
+      return this.getNonMappingElement();
+   }
+   
+   @Deprecated
+   public Element switchMessages(Collection<? extends Message<?,?,?>> messages) {
+      for (Message currentMessage : messages) {
          //         System.out.println("SwitchMessages" + currentMessage.getMessageName());
          Element el = currentMessage.getElement(this.getElementPath());
          if (el != null && currentMessage.isValidElement(this, el)) {

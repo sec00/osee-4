@@ -26,14 +26,14 @@ public class RecordMap<T extends RecordElement> extends RecordElement {
    private final HashMap<Integer, T> records;
    private IRecordFactory factory;
 
-   public RecordMap(Message<?, ?, ?> message, MessageData messageData, String elementName, int numberOfRecords, IRecordFactory factory) {
+   public RecordMap(Message message, MessageData messageData, String elementName, int numberOfRecords, IRecordFactory factory) {
       super(message, elementName, 1, messageData, 0, factory.getBitLength());
       NUMBER_OF_RECORDS = numberOfRecords;
       records = new HashMap<>(numberOfRecords);
       this.factory = factory;
    }
 
-   public RecordMap(Message<?, ?, ?> message, MessageData messageData, int firstRecordByteOffset, int recordByteSize, int numberOfRecords) {
+   public RecordMap(Message message, MessageData messageData, int firstRecordByteOffset, int recordByteSize, int numberOfRecords) {
       super(message, "", 1, messageData, 0, 0);
       NUMBER_OF_RECORDS = numberOfRecords;
       records = new HashMap<>(numberOfRecords);
@@ -79,7 +79,7 @@ public class RecordMap<T extends RecordElement> extends RecordElement {
       return messageData;
    }
 
-   public RecordMap<T> switchRecordMapMessages(Collection<? extends Message<?, ?, ?>> messages) {
+   public RecordMap<T> switchRecordMapMessages(Collection<? extends Message<?,?,?>> messages) {
       for (RecordElement element : this.records.values()) {
          element.switchMessages(messages);
       }
@@ -95,8 +95,18 @@ public class RecordMap<T extends RecordElement> extends RecordElement {
    //	      return this;
    //   }
 
+   
    @Override
-   public RecordMap<T> switchMessages(Collection<? extends Message<?, ?, ?>> messages) {
+   public RecordMap<T> findElementInMessages(Collection<? extends Message> messages) {
+      for (RecordElement element : this.records.values()) {
+         element.findElementInMessages(messages);
+      }
+      return this;
+   }
+   
+   @Override
+   @Deprecated
+   public RecordMap<T> switchMessages(Collection<? extends Message<?,?,?>> messages) {
       for (RecordElement element : this.records.values()) {
          element.switchMessages(messages);
       }

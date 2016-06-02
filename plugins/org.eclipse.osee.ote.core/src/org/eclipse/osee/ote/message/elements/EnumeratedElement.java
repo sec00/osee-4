@@ -27,14 +27,14 @@ public class EnumeratedElement<T extends Enum<T> & IEnumValue<T>> extends Discre
    private final Class<T> clazz;
    private final T[] values;
 
-   public EnumeratedElement(Message<?, ?, ?> msg, String elementName, Class<T> clazz, MessageData messageData, int byteOffset, int msb, int lsb, int originalMsb, int originalLsb) {
+   public EnumeratedElement(Message msg, String elementName, Class<T> clazz, MessageData messageData, int byteOffset, int msb, int lsb, int originalMsb, int originalLsb) {
       super(msg, elementName, messageData, byteOffset, msb, lsb, originalLsb, originalMsb);
       this.clazz = clazz;
 
       values = clazz.getEnumConstants();
    }
 
-   public EnumeratedElement(Message<?, ?, ?> msg, String elementName, Class<T> clazz, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public EnumeratedElement(Message msg, String elementName, Class<T> clazz, MessageData messageData, int byteOffset, int msb, int lsb) {
       this(msg, elementName, clazz, messageData, byteOffset, msb, lsb, msb, lsb);
    }
 
@@ -50,7 +50,7 @@ public class EnumeratedElement<T extends Enum<T> & IEnumValue<T>> extends Discre
       return undefined;
    }
 
-   public EnumeratedElement(Message<?, ?, ?> message, String elementName, Class<T> clazz, MessageData messageData, int bitOffset, int bitLength) {
+   public EnumeratedElement(Message message, String elementName, Class<T> clazz, MessageData messageData, int bitOffset, int bitLength) {
       super(message, elementName, messageData, bitOffset, bitLength);
       this.clazz = clazz;
 
@@ -109,9 +109,15 @@ public class EnumeratedElement<T extends Enum<T> & IEnumValue<T>> extends Discre
 
    }
 
+   @SuppressWarnings({ "unchecked", "rawtypes" })
+   @Override
+   public EnumeratedElement<T> findElementInMessages(Collection<? extends Message> messages) {
+      return (EnumeratedElement<T>) super.findElementInMessages(messages);
+   }
+   
    @Override
    @SuppressWarnings("unchecked")
-   public EnumeratedElement<T> switchMessages(Collection<? extends Message<?, ?, ?>> messages) {
+   public EnumeratedElement<T> switchMessages(Collection<? extends Message<?,?,?>> messages) {
       return (EnumeratedElement<T>) super.switchMessages(messages);
    }
 

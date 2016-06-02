@@ -35,20 +35,26 @@ public class StringElement extends DiscreteElement<String> {
       visitor.asStringElement(this);
    }
 
-   public StringElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public StringElement(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       this(message, elementName, messageData, byteOffset, msb, lsb, msb, lsb);
    }
 
-   public StringElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+   public StringElement(Message message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
       super(message, elementName, messageData, bitOffset, bitLength);
    }
 
-   public StringElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public StringElement(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb, originalLsb, originalMsb);
    }
 
    @Override
-   public StringElement switchMessages(Collection<? extends Message<?, ?, ?>> messages) {
+   public StringElement findElementInMessages(Collection<? extends Message> messages) {
+      return (StringElement) super.findElementInMessages(messages);
+   }
+   
+   @Override
+   @Deprecated
+   public StringElement switchMessages(Collection<? extends Message<?,?,?>> messages) {
       return (StringElement) super.switchMessages(messages);
    }
 

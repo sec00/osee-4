@@ -31,24 +31,24 @@ public class NonMappingFixedPointElement extends FixedPointElement {
       }
    }
 
-   public NonMappingFixedPointElement(Message<?, ?, ?> message, String elementName, MessageData messageData, double resolution, boolean signed, int byteOffset, int msb, int lsb) {
+   public NonMappingFixedPointElement(Message message, String elementName, MessageData messageData, double resolution, boolean signed, int byteOffset, int msb, int lsb) {
       super(message, elementName, messageData, resolution, signed, byteOffset, msb, lsb);
    }
 
-   public NonMappingFixedPointElement(Message<?, ?, ?> message, String elementName, MessageData messageData, double resolution, double minVal, boolean signed, int byteOffset, int msb, int lsb) {
+   public NonMappingFixedPointElement(Message message, String elementName, MessageData messageData, double resolution, double minVal, boolean signed, int byteOffset, int msb, int lsb) {
       super(message, elementName, messageData, resolution, minVal, signed, byteOffset, msb, lsb);
    }
 
-   public NonMappingFixedPointElement(Message<?, ?, ?> message, String elementName, MessageData messageData, double resolution, boolean signed, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public NonMappingFixedPointElement(Message message, String elementName, MessageData messageData, double resolution, boolean signed, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       super(message, elementName, messageData, resolution, signed, byteOffset, msb, lsb, originalLsb, originalMsb);
    }
 
-   public NonMappingFixedPointElement(Message<?, ?, ?> message, String elementName, MessageData messageData, double resolution, double minVal, boolean signed, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public NonMappingFixedPointElement(Message message, String elementName, MessageData messageData, double resolution, double minVal, boolean signed, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       super(message, elementName, messageData, resolution, minVal, signed, byteOffset, msb, lsb, originalLsb,
          originalMsb);
    }
 
-   public NonMappingFixedPointElement(Message<?, ?, ?> message, String elementName, MessageData messageData, double resolution, double minVal, boolean signed, int bitOffset, int bitLength) {
+   public NonMappingFixedPointElement(Message message, String elementName, MessageData messageData, double resolution, double minVal, boolean signed, int bitOffset, int bitLength) {
       super(message, elementName, messageData, resolution, minVal, signed, bitOffset, bitLength);
    }
 
