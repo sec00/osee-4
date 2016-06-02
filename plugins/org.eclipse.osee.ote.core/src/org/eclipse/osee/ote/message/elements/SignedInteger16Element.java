@@ -29,20 +29,25 @@ public class SignedInteger16Element extends NumericElement<Integer> {
       visitor.asSignedInteger16Element(this);
    }
 
-   public SignedInteger16Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public SignedInteger16Element(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       this(message, elementName, messageData, byteOffset, msb, lsb, msb, lsb);
    }
 
-   public SignedInteger16Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+   public SignedInteger16Element(Message message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
       super(message, elementName, messageData, bitOffset, bitLength);
    }
 
-   public SignedInteger16Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public SignedInteger16Element(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb, originalLsb, originalMsb);
    }
 
    @Override
-   public SignedInteger16Element switchMessages(Collection<? extends Message<?, ?, ?>> messages) {
+   public SignedInteger16Element findElementInMessages(Collection<? extends Message> messages) {
+      return (SignedInteger16Element) super.findElementInMessages(messages);
+   }
+   
+   @Override
+   public SignedInteger16Element switchMessages(Collection<? extends Message<?,?,?>> messages) {
       return (SignedInteger16Element) super.switchMessages(messages);
    }
 

@@ -31,15 +31,15 @@ public class NonMappingFloat64Element extends Float64Element {
       }
    }
 
-   public NonMappingFloat64Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public NonMappingFloat64Element(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb);
    }
 
-   public NonMappingFloat64Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public NonMappingFloat64Element(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb, originalLsb, originalMsb);
    }
 
-   public NonMappingFloat64Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+   public NonMappingFloat64Element(Message message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
       super(message, elementName, messageData, bitOffset, bitLength);
    }
 

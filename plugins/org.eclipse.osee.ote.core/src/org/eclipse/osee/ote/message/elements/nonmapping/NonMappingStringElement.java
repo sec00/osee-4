@@ -33,15 +33,15 @@ public class NonMappingStringElement extends StringElement {
       }
    }
 
-   public NonMappingStringElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public NonMappingStringElement(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb);
    }
 
-   public NonMappingStringElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+   public NonMappingStringElement(Message message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
       super(message, elementName, messageData, bitOffset, bitLength);
    }
 
-   public NonMappingStringElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public NonMappingStringElement(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb, originalLsb, originalMsb);
    }
 

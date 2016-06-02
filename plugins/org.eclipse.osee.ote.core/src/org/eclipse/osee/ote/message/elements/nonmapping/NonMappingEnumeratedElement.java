@@ -33,15 +33,15 @@ public class NonMappingEnumeratedElement<T extends Enum<T> & IEnumValue<T>> exte
       }
    }
 
-   public NonMappingEnumeratedElement(Message<?, ?, ?> msg, String elementName, Class<T> clazz, MessageData messageData, int byteOffset, int msb, int lsb, int originalMsb, int originalLsb) {
+   public NonMappingEnumeratedElement(Message msg, String elementName, Class<T> clazz, MessageData messageData, int byteOffset, int msb, int lsb, int originalMsb, int originalLsb) {
       super(msg, elementName, clazz, messageData, byteOffset, msb, lsb, originalMsb, originalLsb);
    }
 
-   public NonMappingEnumeratedElement(Message<?, ?, ?> msg, String elementName, Class<T> clazz, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public NonMappingEnumeratedElement(Message msg, String elementName, Class<T> clazz, MessageData messageData, int byteOffset, int msb, int lsb) {
       super(msg, elementName, clazz, messageData, byteOffset, msb, lsb);
    }
 
-   public NonMappingEnumeratedElement(Message<?, ?, ?> message, String elementName, Class<T> clazz, MessageData messageData, int bitOffset, int bitLength) {
+   public NonMappingEnumeratedElement(Message message, String elementName, Class<T> clazz, MessageData messageData, int bitOffset, int bitLength) {
       super(message, elementName, clazz, messageData, bitOffset, bitLength);
    }
 

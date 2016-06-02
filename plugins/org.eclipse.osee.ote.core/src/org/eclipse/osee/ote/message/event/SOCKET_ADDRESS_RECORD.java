@@ -17,7 +17,7 @@ public class SOCKET_ADDRESS_RECORD extends ArrayElement{
    private final ArrayElement ipaddress;
    private final IntegerElement port;
    
-   public SOCKET_ADDRESS_RECORD(Message<?, ?, ?> msg, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public SOCKET_ADDRESS_RECORD(Message msg, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       super(msg, elementName, messageData, byteOffset, msb, lsb);
       
       type = new EnumeratedElement<>(msg, "type", ADDRESS_TYPE.class, messageData, byteOffset, 0, 7);

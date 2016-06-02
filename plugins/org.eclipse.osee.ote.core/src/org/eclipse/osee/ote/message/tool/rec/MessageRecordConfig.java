@@ -16,14 +16,14 @@ import org.eclipse.osee.ote.message.elements.Element;
 import org.eclipse.osee.ote.message.enums.DataType;
 
 public class MessageRecordConfig {
-   private final Message<?, ?, ?> msg;
+   private final Message msg;
    private final Element[] headerElements;
    private final Element[] bodyElements;
    private final DataType type;
    private final boolean headerDump;
    private final boolean bodyDump;
 
-   public MessageRecordConfig(final Message<?, ?, ?> msg, final DataType type, final boolean headerDump, final Element[] headerElements, final boolean bodyDump, final Element[] bodyElements) {
+   public MessageRecordConfig(final Message msg, final DataType type, final boolean headerDump, final Element[] headerElements, final boolean bodyDump, final Element[] bodyElements) {
       this.msg = msg;
       this.headerElements = headerElements;
       this.bodyElements = bodyElements;
@@ -32,7 +32,7 @@ public class MessageRecordConfig {
       this.bodyDump = bodyDump;
    }
 
-   public MessageRecordConfig(final Message<?, ?, ?> msg, final DataType type, Element[] hdrElements) {
+   public MessageRecordConfig(final Message msg, final DataType type, Element[] hdrElements) {
       this.msg = msg;
       this.headerElements = hdrElements;
       Collection<Element> elements = msg.getElements();
@@ -76,7 +76,7 @@ public class MessageRecordConfig {
       return headerDump;
    }
 
-   public Message<?, ?, ?> getMsg() {
+   public Message getMsg() {
       return msg;
    }
 

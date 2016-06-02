@@ -23,15 +23,15 @@ import org.eclipse.osee.ote.message.interfaces.ITestAccessor;
  */
 public class Float64Element extends RealElement {
 
-   public Float64Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public Float64Element(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       this(message, elementName, messageData, byteOffset, msb, lsb, msb, lsb);
    }
 
-   public Float64Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public Float64Element(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb, originalLsb, originalMsb);
    }
 
-   public Float64Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+   public Float64Element(Message message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
       super(message, elementName, messageData, bitOffset, bitLength);
    }
 

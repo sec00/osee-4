@@ -25,15 +25,15 @@ import org.eclipse.osee.ote.message.interfaces.ITestAccessor;
  */
 public class BiSci16Element extends LongIntegerElement {
 
-   public BiSci16Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public BiSci16Element(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       this(message, elementName, messageData, byteOffset, msb, lsb, msb, lsb);
    }
 
-   public BiSci16Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+   public BiSci16Element(Message message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
       super(message, elementName, messageData, bitOffset, bitLength);
    }
 
-   public BiSci16Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public BiSci16Element(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb, originalLsb, originalMsb);
    }
 

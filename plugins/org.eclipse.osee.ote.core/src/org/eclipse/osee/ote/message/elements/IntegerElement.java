@@ -30,20 +30,26 @@ public class IntegerElement extends NumericElement<Integer> {
       visitor.asIntegerElement(this);
    }
 
-   public IntegerElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public IntegerElement(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       this(message, elementName, messageData, byteOffset, msb, lsb, msb, lsb);
    }
 
-   public IntegerElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+   public IntegerElement(Message message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
       super(message, elementName, messageData, bitOffset, bitLength);
    }
 
-   public IntegerElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public IntegerElement(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb, originalLsb, originalMsb);
    }
 
    @Override
-   public IntegerElement switchMessages(Collection<? extends Message<?, ?, ?>> messages) {
+   public IntegerElement findElementInMessages(Collection<? extends Message> messages) {
+      return (IntegerElement) super.findElementInMessages(messages);
+   }
+   
+   @Override
+   @Deprecated
+   public IntegerElement switchMessages(Collection<? extends Message<?,?,?>> messages) {
       return (IntegerElement) super.switchMessages(messages);
    }
 

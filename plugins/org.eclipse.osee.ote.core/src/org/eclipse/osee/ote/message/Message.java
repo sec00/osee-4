@@ -1037,7 +1037,7 @@ public abstract class Message<S extends ITestEnvironmentMessageSystemAccessor, T
       return true;
    }
 
-   private void notifyPostMemSourceChangeListeners(DataType old, DataType newtype, Message<?, ?, ?> message) {
+   private void notifyPostMemSourceChangeListeners(DataType old, DataType newtype, Message message) {
       checkState();
       for (IMemSourceChangeListener listener : postMemSourceChangeListeners) {
          try {
@@ -1048,7 +1048,7 @@ public abstract class Message<S extends ITestEnvironmentMessageSystemAccessor, T
       }
    }
 
-   private void notifyPreMemSourceChangeListeners(DataType old, DataType newtype, Message<?, ?, ?> message) {
+   private void notifyPreMemSourceChangeListeners(DataType old, DataType newtype, Message message) {
       checkState();
       for (IMemSourceChangeListener listener : preMemSourceChangeListeners) {
          listener.onChange(old, newtype, message);

@@ -34,20 +34,27 @@ import org.eclipse.osee.ote.message.listener.MessageSystemListener;
  */
 public class CharElement extends DiscreteElement<Character> {
 
-	public CharElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+	public CharElement(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
 		this(message, elementName, messageData, byteOffset, msb, lsb, msb, lsb);
 	}
 
-	public CharElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+	public CharElement(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
 		super(message, elementName, messageData, byteOffset, msb, lsb, originalLsb, originalMsb);
 	}
 
-	public CharElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+	public CharElement(Message message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
 		super(message, elementName, messageData, bitOffset, bitLength);
 	}
 
+	@SuppressWarnings("rawtypes")
+   @Override
+	public CharElement findElementInMessages(Collection<? extends Message> messages) {
+	   return (CharElement) super.findElementInMessages(messages);
+	}
+	
 	@Override
-	public CharElement switchMessages(Collection<? extends Message<?, ?, ?>> messages) {
+	@Deprecated
+	public CharElement switchMessages(Collection<? extends Message<?,?,?>> messages) {
 		return (CharElement) super.switchMessages(messages);
 	}
 

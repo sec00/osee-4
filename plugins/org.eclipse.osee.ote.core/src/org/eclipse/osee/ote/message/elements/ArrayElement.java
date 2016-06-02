@@ -18,15 +18,15 @@ import org.eclipse.osee.ote.message.data.MessageData;
 
 public class ArrayElement extends Element {
 
-   public ArrayElement(Message<?, ?, ?> msg, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalMsb, int originalLsb) {
+   public ArrayElement(Message msg, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalMsb, int originalLsb) {
       super(msg, elementName, messageData, byteOffset, msb, lsb, originalMsb, originalLsb);
    }
 
-   public ArrayElement(Message<?, ?, ?> msg, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+   public ArrayElement(Message msg, String elementName, MessageData messageData, int bitOffset, int bitLength) {
       super(msg, elementName, messageData, bitOffset, bitLength);
    }
 
-   public ArrayElement(Message<?, ?, ?> msg, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public ArrayElement(Message msg, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       super(msg, elementName, messageData, byteOffset, msb, lsb);
    }
 
@@ -80,7 +80,13 @@ public class ArrayElement extends Element {
    }
 
    @Override
-   public ArrayElement switchMessages(Collection<? extends Message<?, ?, ?>> messages) {
+   public ArrayElement findElementInMessages(Collection<? extends Message> messages) {
+      return (ArrayElement) super.findElementInMessages(messages);
+   }
+   
+   @Override
+   @Deprecated
+   public ArrayElement switchMessages(Collection<? extends Message<?,?,?>> messages) {
       return (ArrayElement) super.switchMessages(messages);
    }
 

@@ -31,15 +31,15 @@ public abstract class DiscreteElement<T extends Comparable<T>> extends Element i
 
    private static final String FOR_2_PULSES = " FOR 2 PULSES";
 
-   public DiscreteElement(Message<?, ?, ?> msg, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalMsb, int originalLsb) {
+   public DiscreteElement(Message msg, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalMsb, int originalLsb) {
       super(msg, elementName, messageData, byteOffset, msb, lsb, originalMsb, originalLsb);
    }
 
-   public DiscreteElement(Message<?, ?, ?> msg, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public DiscreteElement(Message msg, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       super(msg, elementName, messageData, byteOffset, msb, lsb);
    }
 
-   public DiscreteElement(Message<?, ?, ?> msg, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+   public DiscreteElement(Message msg, String elementName, MessageData messageData, int bitOffset, int bitLength) {
       super(msg, elementName, messageData, bitOffset, bitLength);
    }
 

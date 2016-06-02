@@ -11,6 +11,7 @@
 package org.eclipse.osee.ote.message.elements;
 
 import java.util.Collection;
+
 import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironmentAccessor;
 import org.eclipse.osee.ote.core.testPoint.CheckGroup;
 import org.eclipse.osee.ote.message.Message;
@@ -30,20 +31,26 @@ public class LongIntegerElement extends NumericElement<Long> {
       visitor.asLongIntegerElement(this);
    }
 
-   public LongIntegerElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public LongIntegerElement(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       this(message, elementName, messageData, byteOffset, msb, lsb, msb, lsb);
    }
 
-   public LongIntegerElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+   public LongIntegerElement(Message message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
       super(message, elementName, messageData, bitOffset, bitLength);
    }
 
-   public LongIntegerElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public LongIntegerElement(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb, originalLsb, originalMsb);
+   }
+   
+   @Override
+   public LongIntegerElement findElementInMessages(Collection<? extends Message> messages) {
+      return (LongIntegerElement) super.findElementInMessages(messages);
    }
 
    @Override
-   public LongIntegerElement switchMessages(Collection<? extends Message<?, ?, ?>> messages) {
+   @Deprecated
+   public LongIntegerElement switchMessages(Collection<? extends Message<?,?,?>> messages) {
       return (LongIntegerElement) super.switchMessages(messages);
    }
 

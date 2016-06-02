@@ -46,7 +46,7 @@ public class MessageSystemListener implements IOSEEMessageReaderListener, IOSEEM
    private volatile boolean isTimedOut = false;
    private int masterMessageCount = 0;
    //	private final Message message;
-   private final WeakReference<Message<?, ?, ?>> message;
+   private final WeakReference<Message> message;
    private static final Benchmark tbm = new Benchmark("Total Message System Listener", 2500);
 
    
@@ -80,7 +80,7 @@ public class MessageSystemListener implements IOSEEMessageReaderListener, IOSEEM
     * This class takes in a message in the constructor so that it can tell the message to update when it recieves new
     * data.
     */
-   public MessageSystemListener(Message<?, ?, ?> msg) {
+   public MessageSystemListener(Message msg) {
       super();
       this.message = new WeakReference<>(msg);
    }

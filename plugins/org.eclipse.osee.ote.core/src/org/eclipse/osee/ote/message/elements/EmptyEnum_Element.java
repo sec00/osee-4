@@ -24,15 +24,15 @@ import org.eclipse.osee.ote.message.interfaces.ITestAccessor;
  */
 public class EmptyEnum_Element extends DiscreteElement<EmptyEnum> {
 
-   public EmptyEnum_Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public EmptyEnum_Element(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       this(message, elementName, messageData, byteOffset, msb, lsb, msb, lsb);
    }
 
-   public EmptyEnum_Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public EmptyEnum_Element(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb, originalLsb, originalMsb);
    }
 
-   public EmptyEnum_Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+   public EmptyEnum_Element(Message message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
       super(message, elementName, messageData, bitOffset, bitLength);
    }
 
@@ -67,7 +67,13 @@ public class EmptyEnum_Element extends DiscreteElement<EmptyEnum> {
    }
 
    @Override
-   public EmptyEnum_Element switchMessages(Collection<? extends Message<?, ?, ?>> messages) {
+   @Deprecated
+   public EmptyEnum_Element findElementInMessages(Collection<? extends Message> messages) {
+      return (EmptyEnum_Element) super.findElementInMessages(messages);
+   }
+   
+   @Override
+   public EmptyEnum_Element switchMessages(Collection<? extends Message<?,?,?>> messages) {
       return (EmptyEnum_Element) super.switchMessages(messages);
    }
 

@@ -27,7 +27,7 @@ public class NonMappingRecordElement extends RecordElement {
       }
    }
 
-   public NonMappingRecordElement(Message<?, ?, ?> message, String elementName, int index, MessageData messageData, int firstRecordBitOffset, int recordBitSize) {
+   public NonMappingRecordElement(Message message, String elementName, int index, MessageData messageData, int firstRecordBitOffset, int recordBitSize) {
       super(message, elementName, index, messageData, firstRecordBitOffset, recordBitSize);
    }
 
@@ -35,7 +35,7 @@ public class NonMappingRecordElement extends RecordElement {
       super(message, elementName, offset, messageData, firstRecordByteOffset, recordByteSize);
    }
 
-   public NonMappingRecordElement(Message<?, ?, ?> message, String elementName, MessageData messageData, int firstRecordByteOffset, int recordByteSize) {
+   public NonMappingRecordElement(Message message, String elementName, MessageData messageData, int firstRecordByteOffset, int recordByteSize) {
       super(message, elementName, messageData, firstRecordByteOffset, recordByteSize);
    }
 

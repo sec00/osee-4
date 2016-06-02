@@ -35,15 +35,15 @@ public class NonMappingSignedInteger16Element extends IntegerElement {
       }
    }
 
-   public NonMappingSignedInteger16Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
+   public NonMappingSignedInteger16Element(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb);
    }
 
-   public NonMappingSignedInteger16Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
+   public NonMappingSignedInteger16Element(Message message, String elementName, MessageData messageData, int bitOffset, int bitLength) {
       super(message, elementName, messageData, bitOffset, bitLength);
    }
 
-   public NonMappingSignedInteger16Element(Message<?, ?, ?> message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public NonMappingSignedInteger16Element(Message message, String elementName, MessageData messageData, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb, originalLsb, originalMsb);
    }
 

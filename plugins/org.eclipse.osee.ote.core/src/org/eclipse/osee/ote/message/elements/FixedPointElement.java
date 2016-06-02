@@ -32,26 +32,26 @@ public class FixedPointElement extends RealElement {
    private final boolean signed;
    private final double offset;
 
-   public FixedPointElement(Message<?, ?, ?> message, String elementName, MessageData messageData, double resolution, boolean signed, int byteOffset, int msb, int lsb) {
+   public FixedPointElement(Message message, String elementName, MessageData messageData, double resolution, boolean signed, int byteOffset, int msb, int lsb) {
       this(message, elementName, messageData, resolution, 0, signed, byteOffset, msb, lsb, msb, lsb);
    }
 
-   public FixedPointElement(Message<?, ?, ?> message, String elementName, MessageData messageData, double resolution, double offset, boolean signed, int byteOffset, int msb, int lsb) {
+   public FixedPointElement(Message message, String elementName, MessageData messageData, double resolution, double offset, boolean signed, int byteOffset, int msb, int lsb) {
       this(message, elementName, messageData, resolution, offset, signed, byteOffset, msb, lsb, msb, lsb);
    }
 
-   public FixedPointElement(Message<?, ?, ?> message, String elementName, MessageData messageData, double resolution, boolean signed, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public FixedPointElement(Message message, String elementName, MessageData messageData, double resolution, boolean signed, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       this(message, elementName, messageData, resolution, 0, signed, byteOffset, msb, lsb, originalLsb, originalMsb);
    }
 
-   public FixedPointElement(Message<?, ?, ?> message, String elementName, MessageData messageData, double resolution, double offset, boolean signed, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
+   public FixedPointElement(Message message, String elementName, MessageData messageData, double resolution, double offset, boolean signed, int byteOffset, int msb, int lsb, int originalLsb, int originalMsb) {
       super(message, elementName, messageData, byteOffset, msb, lsb, originalLsb, originalMsb);
       this.resolution = resolution;
       this.signed = signed;
       this.offset = offset;
    }
 
-   public FixedPointElement(Message<?, ?, ?> message, String elementName, MessageData messageData, double resolution, double offset, boolean signed, int bitOffset, int bitLength) {
+   public FixedPointElement(Message message, String elementName, MessageData messageData, double resolution, double offset, boolean signed, int bitOffset, int bitLength) {
       super(message, elementName, messageData, bitOffset, bitLength);
       this.resolution = resolution;
       this.signed = signed;
