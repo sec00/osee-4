@@ -44,12 +44,6 @@ public abstract class RealElement extends NumericElement<Double> {
       return (RealElement) super.findElementInMessages(messages);
    }
    
-   @Override
-   @Deprecated
-   public RealElement switchMessages(Collection<? extends Message<?,?,?>> messages) {
-      return (RealElement) super.switchMessages(messages);
-   }
-
    public void setValue(Float value) {
       setValue(value.doubleValue());
    }

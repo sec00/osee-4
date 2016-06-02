@@ -115,12 +115,6 @@ public class EnumeratedElement<T extends Enum<T> & IEnumValue<T>> extends Discre
       return (EnumeratedElement<T>) super.findElementInMessages(messages);
    }
    
-   @Override
-   @SuppressWarnings("unchecked")
-   public EnumeratedElement<T> switchMessages(Collection<? extends Message<?,?,?>> messages) {
-      return (EnumeratedElement<T>) super.switchMessages(messages);
-   }
-
    protected T toEnum(int intValue) {
       final T val = getValue(intValue);
       if (val != null) {

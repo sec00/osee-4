@@ -79,11 +79,6 @@ public class EnumeratedElementGroup extends EnumeratedElement implements Element
 	}
 
 	@Override
-	public EnumeratedElement switchMessages(Collection messages) {
-		return this;
-	}
-
-	@Override
 	protected Enum toEnum(int intValue) {
 		return super.toEnum(intValue);
 	}

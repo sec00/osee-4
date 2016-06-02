@@ -49,12 +49,6 @@ public class CharElement extends DiscreteElement<Character> {
 	   return (CharElement) super.findElementInMessages(messages);
 	}
 	
-	@Override
-	@Deprecated
-	public CharElement switchMessages(Collection<? extends Message<?,?,?>> messages) {
-		return (CharElement) super.switchMessages(messages);
-	}
-
 	/**
 	 * Checks that this element correctly forwards a message sent from cause with the value passed.
 	 * 

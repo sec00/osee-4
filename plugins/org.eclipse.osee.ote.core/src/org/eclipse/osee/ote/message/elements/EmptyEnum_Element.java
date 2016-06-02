@@ -72,11 +72,6 @@ public class EmptyEnum_Element extends DiscreteElement<EmptyEnum> {
       return (EmptyEnum_Element) super.findElementInMessages(messages);
    }
    
-   @Override
-   public EmptyEnum_Element switchMessages(Collection<? extends Message<?,?,?>> messages) {
-      return (EmptyEnum_Element) super.switchMessages(messages);
-   }
-
    /**
     * Sets the element to the "value" passed and immediately sends the message that contains it.
     * 

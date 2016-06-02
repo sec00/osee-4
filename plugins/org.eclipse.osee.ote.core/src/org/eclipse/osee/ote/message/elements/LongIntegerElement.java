@@ -49,12 +49,6 @@ public class LongIntegerElement extends NumericElement<Long> {
    }
 
    @Override
-   @Deprecated
-   public LongIntegerElement switchMessages(Collection<? extends Message<?,?,?>> messages) {
-      return (LongIntegerElement) super.switchMessages(messages);
-   }
-
-   @Override
    public String toString(Long obj) {
       long value = elementMask(obj);
       return value + "(0x" + Long.toHexString(value).toUpperCase() + ")";

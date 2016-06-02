@@ -89,12 +89,6 @@ public class IntegerElementGroup extends IntegerElement implements ElementGroup<
 		return this;
 	}
 
-	@SuppressWarnings("rawtypes")
-   @Override
-	public IntegerElement switchMessages(Collection messages) {
-		return this;
-	}
-
    @Override
    public void setElementList(List<IntegerElement> elements) {
       this.elements = elements;

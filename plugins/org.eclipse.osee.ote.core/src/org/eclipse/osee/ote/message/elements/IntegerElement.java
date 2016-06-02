@@ -48,12 +48,6 @@ public class IntegerElement extends NumericElement<Integer> {
    }
    
    @Override
-   @Deprecated
-   public IntegerElement switchMessages(Collection<? extends Message<?,?,?>> messages) {
-      return (IntegerElement) super.switchMessages(messages);
-   }
-
-   @Override
    public String toString(Integer obj) {
       int value = elementMask(obj);
       return value + "(0x" + Integer.toHexString(value).toUpperCase() + ")";

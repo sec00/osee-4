@@ -47,11 +47,6 @@ public class SignedInteger16Element extends NumericElement<Integer> {
    }
    
    @Override
-   public SignedInteger16Element switchMessages(Collection<? extends Message<?,?,?>> messages) {
-      return (SignedInteger16Element) super.switchMessages(messages);
-   }
-
-   @Override
    public String toString(Integer obj) {
       return obj + "(0x" + Integer.toHexString(obj).toUpperCase() + ")";
    }

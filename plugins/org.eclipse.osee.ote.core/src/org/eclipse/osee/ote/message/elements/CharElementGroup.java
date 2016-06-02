@@ -28,14 +28,6 @@ public class CharElementGroup extends CharElement implements ElementGroup<CharEl
       this.elements = elements;
    }
 
-   /* (non-Javadoc)
-    * @see org.eclipse.osee.ote.message.elements.CharElement#switchMessages(java.util.Collection)
-    */
-   @Override
-   public CharElement switchMessages(Collection<? extends Message> messages) {
-      return this;
-   }
-
    @Override
    public void checkForwarding(ITestAccessor accessor, CharElement cause, Character value) throws InterruptedException {
       elements.get(0).checkForwarding(accessor, cause, value);

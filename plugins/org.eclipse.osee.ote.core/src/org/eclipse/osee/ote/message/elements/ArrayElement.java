@@ -84,10 +84,4 @@ public class ArrayElement extends Element {
       return (ArrayElement) super.findElementInMessages(messages);
    }
    
-   @Override
-   @Deprecated
-   public ArrayElement switchMessages(Collection<? extends Message<?,?,?>> messages) {
-      return (ArrayElement) super.switchMessages(messages);
-   }
-
 }

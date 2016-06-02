@@ -79,23 +79,6 @@ public class RecordMap<T extends RecordElement> extends RecordElement {
       return messageData;
    }
 
-   public RecordMap<T> switchRecordMapMessages(Collection<? extends Message<?,?,?>> messages) {
-      for (RecordElement element : this.records.values()) {
-         element.switchMessages(messages);
-      }
-
-      return this;
-   }
-
-   //   public <U extends Message<? extends ITestEnvironmentMessageSystemAccessor, ? extends MessageData, U>> RecordMap<T> switchMessages(Collection<U> messages) {
-   //	      for (RecordElement element : this.records.values()) {
-   //	         element.switchMessages(messages);
-   //	      }
-   //
-   //	      return this;
-   //   }
-
-   
    @Override
    public RecordMap<T> findElementInMessages(Collection<? extends Message> messages) {
       for (RecordElement element : this.records.values()) {
@@ -104,15 +87,6 @@ public class RecordMap<T extends RecordElement> extends RecordElement {
       return this;
    }
    
-   @Override
-   @Deprecated
-   public RecordMap<T> switchMessages(Collection<? extends Message<?,?,?>> messages) {
-      for (RecordElement element : this.records.values()) {
-         element.switchMessages(messages);
-      }
-      return this;
-   }
-
    @Override
    public void visit(IElementVisitor visitor) {
       visitor.asRecordMap(this);

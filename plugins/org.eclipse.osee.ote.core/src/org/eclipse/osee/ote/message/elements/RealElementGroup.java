@@ -123,12 +123,6 @@ public class RealElementGroup extends RealElement implements ElementGroup<RealEl
 		return this;
 	}
 
-	@SuppressWarnings("rawtypes")
-   @Override
-	public RealElement switchMessages(Collection messages) {
-		return this;
-	}
-
    @Override
    public void setElementList(List<RealElement> elements) {
       this.elements = elements;
