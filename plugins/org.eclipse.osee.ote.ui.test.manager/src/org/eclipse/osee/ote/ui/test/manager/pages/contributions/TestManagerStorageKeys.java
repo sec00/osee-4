@@ -18,6 +18,7 @@ public class TestManagerStorageKeys {
 
    public static final String BATCH_MODE_ENABLED_KEY = "is.batch.mode.enabled";
    public static final String KEEP_OLD_OUTFILE_COPIES_ENABLED_KEY = "is.keep.old.outfile.copies.enabled";
+   public static final String SAVE_SCRIPT_DATA_FILE_ENABLED_KEY = "is.save.script.data.file.enabled";
    public static final String ABORT_ON_FAIL_KEY = "is.abort.mode.enabled";
    public static final String PAUSE_ON_FAIL_KEY = "is.pause.mode.enabled";
    public static final String PRINT_FAIL_TO_CONSOLE = "is.print.fail.enabled";

@@ -1,7 +1,10 @@
 package org.eclipse.osee.ote.message;
 
+import java.io.File;
+
 import org.eclipse.osee.ote.core.testPoint.CheckGroup;
 import org.eclipse.osee.ote.message.interfaces.ITestAccessor;
+import org.eclipse.osee.ote.message.save.ElementSave;
 
 public interface Checker {
 
@@ -34,6 +37,8 @@ public interface Checker {
    public void logToOutfile(ITestAccessor accessor, CheckGroup checkGroup);
    
    public void logToOutfile(ITestAccessor accessor);
+   
+   public ElementSave getElementSave();
    
    boolean passed();
 

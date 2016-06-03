@@ -109,4 +109,16 @@ public class OTEServerFolderForTest implements OTEServerFolder {
 
    }
 
+   @Override
+   public void setTestDataFolder(File testDataFolder) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   @Override
+   public File getTestDataFolder() {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
 }

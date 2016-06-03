@@ -40,7 +40,7 @@ public interface OTEStatusBoard {
 
    public void onTestServerCommandFinished(TestEnvironment env, ICommandHandle handle);
 
-   public void onTestComplete(String className, String serverOutfilePath, String clientOutfilePath, CommandEndedStatusEnum status, List<IHealthStatus> healthStatus);
+   public void onTestComplete(String className, String serverOutfilePath, String clientOutfilePath, String serverDataFilePath, CommandEndedStatusEnum status, List<IHealthStatus> healthStatus);
 
    public void onTestStart(String className, String serverOutfilePath, String clientOutfilePath);
 }

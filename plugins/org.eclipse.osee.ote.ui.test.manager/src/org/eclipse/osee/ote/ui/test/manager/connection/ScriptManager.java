@@ -216,7 +216,7 @@ public abstract class ScriptManager implements Runnable {
       if (task.getScriptModel() != null) {
          Job job =
             new StoreOutfileJob(connectedEnv, testManager, this, task, testComplete.getClientOutfilePath(),
-               testComplete.getServerOutfilePath(), isValidRun);
+               testComplete.getServerOutfilePath(),testComplete.getServerDataFilePath(), isValidRun);
          StoreOutfileJob.scheduleJob(job);
       }
    }

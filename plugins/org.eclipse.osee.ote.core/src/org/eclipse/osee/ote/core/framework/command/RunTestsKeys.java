@@ -11,6 +11,7 @@ public enum RunTestsKeys {
    version_lastModificationDate,
    version_modifiedFlag,
    serverOutfilePath,
+   serverOutfileDataPath,
    executableOutputPath,
    executableDebug,
    testClass,

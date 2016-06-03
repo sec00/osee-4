@@ -73,7 +73,7 @@ public abstract class AbstractChecker<T extends Comparable<T>> implements Checke
    
    public ElementSave getElementSave(){
       ElementSave elementSave = new ElementSave();
-      elementSave.setPath(ElementPath.decode(element.getElementPathAsString()).encode());
+      elementSave.setPath(new ElementPath(element.getElementPath()).encode());
       List<Double> saveTime = elementSave.getData().getTime();
       for(Long value:this.times){
          saveTime.add(value.doubleValue());

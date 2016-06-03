@@ -222,9 +222,9 @@ private EventAdmin eventAdmin;
    }
 
    @Override
-   public void onTestComplete(String className, String serverOutfilePath, String clientOutfilePath, CommandEndedStatusEnum status, List<IHealthStatus> healthStatus) {
+   public void onTestComplete(String className, String serverOutfilePath, String clientOutfilePath, String serverDataFilePath, CommandEndedStatusEnum status, List<IHealthStatus> healthStatus) {
 	   try {
-		   TestCompleteMessage msg = new TestCompleteMessage(new TestComplete(className, serverOutfilePath, clientOutfilePath, status, healthStatus));
+		   TestCompleteMessage msg = new TestCompleteMessage(new TestComplete(className, serverOutfilePath, clientOutfilePath, serverDataFilePath,  status, healthStatus));
 		   notifyListeners(msg);
 	   } catch (IOException e) {
 		   OseeLog.log(StatusBoard.class, Level.SEVERE, e);

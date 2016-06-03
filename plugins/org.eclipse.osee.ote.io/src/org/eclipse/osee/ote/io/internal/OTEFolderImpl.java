@@ -48,7 +48,8 @@ public class OTEFolderImpl implements OTEServerFolder{
 
    private static SimpleDateFormat format = new SimpleDateFormat("yyyy_MM_dd___kk_mm_ss");
    
-   private File currentServerFolder; 
+   private File currentServerFolder;
+   private File testDataFolder; 
    
    private static File determineOteServerFolder() {
       String userHome = OtePropertiesCore.userHome.getValue();
@@ -325,6 +326,22 @@ public class OTEFolderImpl implements OTEServerFolder{
       if(file.exists()){
          file.delete();
       }
+   }
+   
+   public void setTestDataFolder(File testDataFolder){
+      this.testDataFolder = testDataFolder;
+   }
+   
+   public File getTestDataFolder(){
+      if(testDataFolder == null){
+         getBatchesFolder();
+         try {
+            testDataFolder  = File.createTempFile("testData", "", getBatchesFolder());
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
+      }
+      return testDataFolder;
    }
 
 }

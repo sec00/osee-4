@@ -103,5 +103,9 @@ public interface OTEServerFolder {
    public List<File> getRunningServerFolders();
 
    public void removeServerRunningFile(File serverFolder);
+   
+   public void setTestDataFolder(File testDataFolder);
+   
+   public File getTestDataFolder();
 
 }

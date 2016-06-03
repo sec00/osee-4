@@ -1,11 +1,10 @@
 package org.eclipse.osee.ote.message;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.osee.ote.message.condition.EqualsCondition;
 import org.eclipse.osee.ote.message.condition.ICondition;
-import org.eclipse.osee.ote.message.elements.DiscreteElement;
-import org.eclipse.osee.ote.message.elements.Element;
 import org.eclipse.osee.ote.message.elements.IntegerElement;
 import org.eclipse.osee.ote.message.interfaces.IMessageManager;
 import org.eclipse.osee.ote.message.interfaces.IMessageRequestor;
@@ -47,7 +46,7 @@ public class MessageCaptureTest {
       TestMessageOne msg1Writer = req.getMessageWriter(TestMessageOne.class);
 
       MessageCaptureFilter filter = new MessageCaptureFilter(msg1);
-      MessageCapture capture = new MessageCapture(ote, new BasicClassLocator(getClass().getClassLoader()));
+      MessageCapture capture = new MessageCapture(new File(System.getProperty("user.dir")), timer, new BasicClassLocator(getClass().getClassLoader()));
             
       capture.add(filter);
       
@@ -72,7 +71,7 @@ public class MessageCaptureTest {
       TestMessageOne msg1Writer = req.getMessageWriter(TestMessageOne.class);
 
       MessageCaptureFilter filter = new MessageCaptureFilter(msg1);
-      MessageCapture capture = new MessageCapture(ote, new BasicClassLocator(getClass().getClassLoader()));
+      MessageCapture capture = new MessageCapture(new File(System.getProperty("user.dir")), timer, new BasicClassLocator(getClass().getClassLoader()));
             
       capture.add(filter);
       

@@ -24,10 +24,13 @@ public class TestComplete implements Serializable, IServiceStatusData {
    private final String serverOutfilePath;
    private final String clientOutfilePath;
    private final List<IHealthStatus> healthStatus;
+   private final String serverDataFilePath;
 
-   public TestComplete(String className, String serverOutfilePath, String clientOutfilePath, CommandEndedStatusEnum status, List<IHealthStatus> healthStatus) {
+
+   public TestComplete(String className, String serverOutfilePath, String clientOutfilePath, String serverDataFilePath, CommandEndedStatusEnum status, List<IHealthStatus> healthStatus) {
       this.className = className;
       this.serverOutfilePath = serverOutfilePath;
+      this.serverDataFilePath = serverDataFilePath;
       this.clientOutfilePath = clientOutfilePath;
       this.status = status;
       this.healthStatus = healthStatus;
@@ -58,4 +61,7 @@ public class TestComplete implements Serializable, IServiceStatusData {
       return this.healthStatus;
    }
 
+   public String getServerDataFilePath() {
+      return serverDataFilePath;
+   }
 }

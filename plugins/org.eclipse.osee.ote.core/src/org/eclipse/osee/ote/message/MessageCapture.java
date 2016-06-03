@@ -8,6 +8,7 @@ import java.util.Set;
 import org.eclipse.osee.framework.plugin.core.util.ExportClassLoader;
 import org.eclipse.osee.ote.OTEApi;
 import org.eclipse.osee.ote.core.ServiceUtility;
+import org.eclipse.osee.ote.core.environment.interfaces.ITimerControl;
 
 /**
  * This class will capture messages contained within the given {@link MessageCaptureFilter}'s.  This can be used from scripts to accomplish more complicated analysis of data.
@@ -35,14 +36,15 @@ public class MessageCapture {
    
    public static MessageCapture createMessageCapture() throws IOException{
       OTEApi oteApi = ServiceUtility.getService(OTEApi.class);
-      return new MessageCapture(oteApi, new BasicClassLocator(ExportClassLoader.getInstance()));
+      return new MessageCapture(oteApi.getServerFolder().getTestDataFolder(), oteApi.getTestEnvironment().getTimerCtrl(), new BasicClassLocator(ExportClassLoader.getInstance()));
    }
    
-   public MessageCapture(OTEApi ote, ClassLocator classLocator) throws IOException{
+   public MessageCapture(File outputFolder, ITimerControl timerControl, ClassLocator classLocator) throws IOException{
       filters = new HashSet<>();
       this.classLocator = classLocator;
-      file = File.createTempFile("messageCapture", ".bmr", ote.getServerFolder().getRootFolder());
-      recorder = BinaryMessageRecorder.create(file, ote.getTestEnvironment().getTimerCtrl());
+      outputFolder.mkdirs();
+      file = File.createTempFile("messageCapture", ".bmr", outputFolder);
+      recorder = BinaryMessageRecorder.create(file, timerControl);
    }
    
    /**

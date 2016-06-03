@@ -133,7 +133,8 @@ public class RunTests implements ITestServerCommand, Serializable {
          if (cancelAll) {
             statusBoard.onTestComplete(store.get(RunTestsKeys.testClass.name()),
                store.get(RunTestsKeys.serverOutfilePath.name()),
-               store.get(RunTestsKeys.clientOutfilePath.name()), CommandEndedStatusEnum.ABORTED,
+               store.get(RunTestsKeys.clientOutfilePath.name()), 
+               store.get(RunTestsKeys.serverOutfileDataPath.name()),CommandEndedStatusEnum.ABORTED,
                new ArrayList<IHealthStatus>());
             retVal = TestCommandResult.CANCEL;
             continue;
@@ -151,7 +152,7 @@ public class RunTests implements ITestServerCommand, Serializable {
          }
 
          statusBoard.onTestComplete(store.get(RunTestsKeys.testClass.name()),
-            store.get(RunTestsKeys.serverOutfilePath.name()), store.get(RunTestsKeys.clientOutfilePath.name()),
+            store.get(RunTestsKeys.serverOutfilePath.name()), store.get(RunTestsKeys.clientOutfilePath.name()), store.get(RunTestsKeys.serverOutfileDataPath.name()),
             status, runResults.getStatus());
          batchLog.flush();
          

@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ScriptExecutionOptionsPanel extends Composite {
    private Button saveOutputCheck;
+   private Button saveDataCheck;
    private Button batchModeCheck;
    private Button abortScriptOnFirstFail;
    private Button pauseScriptOnFail;
@@ -41,6 +42,10 @@ public class ScriptExecutionOptionsPanel extends Composite {
       saveOutputCheck.setText("Keep copies of old Output Files");
       saveOutputCheck.setToolTipText("Select to save existing output filename\n" + "to file \"<output>.[num].tmo\" for each succssive run.\n" + "De-select overwrites output file.\n\n" + "     eg. myScript.tmo = current output\n" + "         myScript.1.tmo = oldest output file\n" + "         myScript.2.tmo = output before current");
 
+      saveDataCheck = new Button(parent, SWT.CHECK);
+      saveDataCheck.setText("Save script data files");
+      saveDataCheck.setToolTipText("Select to save additional data files from a script run to the workspace, such as MessageCapture recordings.");
+      
       batchModeCheck = new Button(parent, SWT.CHECK);
       batchModeCheck.setText("Run in batch mode");
       batchModeCheck.setToolTipText("If any prompts exist, they are skipped if this option is selected.");
@@ -96,5 +101,13 @@ public class ScriptExecutionOptionsPanel extends Composite {
    
    public void setPrintFailToConsole(boolean isEnabled){
       printFailToConsole.setSelection(isEnabled);
+   }
+
+   public void setSaveScriptDataFileEnabled(boolean isEnabled) {
+      saveDataCheck.setSelection(isEnabled);
+   }
+
+   public boolean isSaveScriptDataFileEnabled() {
+      return saveDataCheck.getSelection();
    }
 }

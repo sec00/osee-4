@@ -47,8 +47,9 @@ public class StoreOutfileJob extends Job {
    private final String clientOutfilePath;
 
    private final String serverOutfilePath;
+   private String serverDataFilePath;
 
-   public StoreOutfileJob(ITestEnvironment env, TestManagerEditor testManagerEditor, ScriptManager userEnvironment, ScriptTask scriptTask, String clientOutfilePath, String serverOutfilePath, boolean isValidRun) {
+   public StoreOutfileJob(ITestEnvironment env, TestManagerEditor testManagerEditor, ScriptManager userEnvironment, ScriptTask scriptTask, String clientOutfilePath, String serverOutfilePath, String serverDataFilePath, boolean isValidRun) {
       super("Store: " + scriptTask.getName());
       this.env = env;
       this.scriptTask = scriptTask;
@@ -57,6 +58,7 @@ public class StoreOutfileJob extends Job {
       this.isValidRun = isValidRun;
       this.clientOutfilePath = clientOutfilePath;
       this.serverOutfilePath = serverOutfilePath;
+      this.serverDataFilePath = serverDataFilePath;
    }
 
    public static void scheduleJob(Job job) {
@@ -115,25 +117,43 @@ public class StoreOutfileJob extends Job {
    private boolean isKeepSavedOutfileEnabled() {
       return testManagerEditor.getPropertyStore().getBoolean(TestManagerStorageKeys.KEEP_OLD_OUTFILE_COPIES_ENABLED_KEY);
    }
+   
+   private boolean isSaveScriptDataFileEnabled() {
+      return testManagerEditor.getPropertyStore().getBoolean(TestManagerStorageKeys.SAVE_SCRIPT_DATA_FILE_ENABLED_KEY);
+   }
 
    private void storeOutfile(ScriptTask scriptTask) throws Exception {
+      File output = new File(clientOutfilePath);
       if (clientOutfilePath.equals(serverOutfilePath) != true) {
          // the paths are different so we need to copy the file
          byte[] outBytes = env.getScriptOutfile(serverOutfilePath);
          if (outBytes != null && outBytes.length > 0) {
-
             if (isKeepSavedOutfileEnabled()) {
-               moveOutputToNextAvailableSpot(scriptTask);
+               output = findNextDestination(output);
             }
-            // else {
-            // task.getScriptModel().getOutputModel().getIFile().delete(true, null);
-            // }
-            IFile file = AIFile.constructIFile(clientOutfilePath);
+            IFile file = AIFile.constructIFile(output.getAbsolutePath());
             if (file != null) {
                AIFile.writeToFile(file, new ByteArrayInputStream(outBytes));
                MarkerPlugin.addMarkers(file);
             } else {
-               Lib.writeBytesToFile(outBytes, new File(clientOutfilePath));
+               Lib.writeBytesToFile(outBytes, output);
+            }
+         }
+      }
+      if(isSaveScriptDataFileEnabled()){
+         byte[] dataBytes = env.getScriptOutfile(serverDataFilePath);
+         String outputPath = output.getAbsolutePath();
+         if (dataBytes != null && dataBytes.length > 0) {
+            int index = outputPath.lastIndexOf(".");
+            String clientDataPath = outputPath;
+            if(index != -1){
+               clientDataPath = outputPath.substring(0, index) + ".zip";
+            }
+            IFile file = AIFile.constructIFile(clientDataPath);
+            if (file != null) {
+               AIFile.writeToFile(file, new ByteArrayInputStream(dataBytes));
+            } else {
+               Lib.writeBytesToFile(dataBytes, new File(clientDataPath));
             }
          }
       }
@@ -163,5 +183,28 @@ public class StoreOutfileJob extends Job {
             OseeLog.log(TestManagerPlugin.class, Level.SEVERE, "Failed to move output file to next available spot", e2);
          }
       }
+   }
+   
+   private File findNextDestination(File destinationFile) {
+      File returnVal = destinationFile;
+      if (destinationFile != null && destinationFile.exists() && destinationFile.isFile() && destinationFile.canRead()) {
+         int index = destinationFile.getAbsolutePath().lastIndexOf(".");
+         String extension = "";
+         String fileWithoutExtension = destinationFile.getAbsolutePath();
+         if(index != -1 && index < destinationFile.getAbsolutePath().length()){
+            extension = destinationFile.getAbsolutePath().substring(index+1);
+            fileWithoutExtension = destinationFile.getAbsolutePath().substring(0, index);
+         }
+         int fileNum = 1;
+         returnVal = new File(String.format("%s.%d.%s", fileWithoutExtension, fileNum, extension));
+         if (returnVal.exists()) {
+            while (returnVal.exists()) {
+               fileNum++;
+               returnVal = new File(String.format("%s.%d.%s", fileWithoutExtension, fileNum, extension));
+            }
+         }
+
+      }
+      return returnVal;
    }
 }

@@ -1,5 +1,6 @@
 package org.eclipse.osee.ote.message;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.osee.ote.message.interfaces.IMessageManager;
@@ -42,7 +43,7 @@ public class MessageCheckerTest {
       TestMessageOne msg1Writer = req.getMessageWriter(TestMessageOne.class);
 
       MessageCaptureFilter filter = new MessageCaptureFilter(msg1);
-      MessageCapture capture = new MessageCapture(ote, new BasicClassLocator(getClass().getClassLoader()));
+      MessageCapture capture = new MessageCapture(new File(System.getProperty("user.dir")), timer, new BasicClassLocator(getClass().getClassLoader()));
             
       capture.add(filter);
       
@@ -95,6 +96,12 @@ public class MessageCheckerTest {
          Assert.assertFalse(ch.passed());
       }
       it.close();
+      File saveFile = File.createTempFile("checker", ".json", new File(System.getProperty("user.dir")));
+      checker.saveData(saveFile);
+      Assert.assertTrue(saveFile.exists());
+      System.out.println(saveFile.getAbsolutePath());
+      saveFile.delete();
+//      checker.saveData();
       
       
       
@@ -108,7 +115,7 @@ public class MessageCheckerTest {
       TestMessageOne msg1Writer = req.getMessageWriter(TestMessageOne.class);
 
       MessageCaptureFilter filter = new MessageCaptureFilter(msg1);
-      MessageCapture capture = new MessageCapture(ote, new BasicClassLocator(getClass().getClassLoader()));
+      MessageCapture capture = new MessageCapture(new File(System.getProperty("user.dir")), timer, new BasicClassLocator(getClass().getClassLoader()));
             
       capture.add(filter);
       
@@ -138,7 +145,7 @@ public class MessageCheckerTest {
       TestMessageOne msg1Writer = req.getMessageWriter(TestMessageOne.class);
 
       MessageCaptureFilter filter = new MessageCaptureFilter(msg1);
-      MessageCapture capture = new MessageCapture(ote, new BasicClassLocator(getClass().getClassLoader()));
+      MessageCapture capture = new MessageCapture(new File(System.getProperty("user.dir")), timer, new BasicClassLocator(getClass().getClassLoader()));
             
       capture.add(filter);
       
@@ -173,7 +180,7 @@ public class MessageCheckerTest {
       TestMessageOne msg1Writer = req.getMessageWriter(TestMessageOne.class);
 
       MessageCaptureFilter filter = new MessageCaptureFilter(msg1);
-      MessageCapture capture = new MessageCapture(ote, new BasicClassLocator(getClass().getClassLoader()));
+      MessageCapture capture = new MessageCapture(new File(System.getProperty("user.dir")), timer, new BasicClassLocator(getClass().getClassLoader()));
             
       capture.add(filter);
       
