@@ -74,7 +74,7 @@ public class SafeWorkspaceTracker extends ServiceTracker implements OteBundleLoc
          new JarChangeResourceListener<OteSystemLibsNature>(OteSystemLibsNature.NATURE_ID, systemLibListener);
       this.userLibResourceListener =
          new JarChangeResourceListener<OteUserLibsNature>(OteUserLibsNature.NATURE_ID, userLibListener);
-      this.precompiledResourceListener = new JarChangeResourceListener<>(OteSystemLibsNature.NATURE_ID, precompiledListener);
+      this.precompiledResourceListener = new JarChangeResourceListener<OteSystemLibsNature>(OteSystemLibsNature.NATURE_ID, precompiledListener);
       this.projectChangeResourceListener = new ProjectChangeResourceListener();
       service = (SafeWorkspaceAccess) context.getService(reference);
       slowLoadingJars();
