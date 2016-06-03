@@ -127,7 +127,7 @@ public class PrecompiledListener implements IJarChangeListener<OteSystemLibsNatu
 				
 				if(!clientStr.equals(precompileStr)) {
 					message = String.format(
-						"OTE IDE / Precompilde Libraries version mismatch!\nOTE[%s] != Precompiled[%s]\nPlease get the version that matches [%s].",
+						"OTE IDE / Precompiled Libraries version mismatch!\nOTE[%s] != Precompiled[%s]\nPlease get the version that matches [%s].",
 						clientStr, precompileStr, clientStr);
 				} else {
 					message = null;
