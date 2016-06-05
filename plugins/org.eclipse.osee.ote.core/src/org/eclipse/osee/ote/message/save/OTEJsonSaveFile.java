@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Level;
 
 import org.codehaus.jackson.JsonParseException;
@@ -45,6 +46,22 @@ public class OTEJsonSaveFile {
             }
          }
       }
+      return config;
+   }
+   
+   /**
+    * Load a JSON representation of an ElementSaveFile into a {@link ElementSaveFile} object.
+    * 
+    * @param file
+    * @return
+    * @throws JsonParseException
+    * @throws JsonMappingException
+    * @throws IOException
+    */
+   public static ElementSaveFile loadSaveFile(InputStream stream) throws JsonParseException, JsonMappingException, IOException{
+      ElementSaveFile config = null;
+      ObjectMapper mapper = new ObjectMapper();
+      config = mapper.readValue(stream, ElementSaveFile.class);
       return config;
    }
    

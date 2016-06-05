@@ -1,7 +1,5 @@
 package org.eclipse.osee.ote.message;
 
-import java.io.File;
-
 import org.eclipse.osee.ote.core.testPoint.CheckGroup;
 import org.eclipse.osee.ote.message.interfaces.ITestAccessor;
 import org.eclipse.osee.ote.message.save.ElementSave;

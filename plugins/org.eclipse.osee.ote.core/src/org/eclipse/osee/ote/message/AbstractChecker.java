@@ -120,6 +120,11 @@ public abstract class AbstractChecker<T extends Comparable<T>> implements Checke
     */
    @Override
    public void check(MessageCaptureDataStripe stripe) {
+      if(stripe.lastUpdate() == message){
+         values.add(element.getDouble());
+         infos.add(element.toString());
+         times.add(stripe.getTime());
+      }
       if(passed){
          return;
       }
@@ -146,9 +151,6 @@ public abstract class AbstractChecker<T extends Comparable<T>> implements Checke
                elapsedTime = stripe.getTime() - baseTime;
             } 
          } 
-         values.add(element.getDouble());
-         infos.add(element.toString());
-         times.add(stripe.getTime());
       }
    }
    
