@@ -120,8 +120,18 @@ public class FileOrDirectorySelectionPanel extends Composite {
    }
 
    private boolean isValidFile(String text) {
+      boolean valid = false;
       File file = new File(text);
-      return file.exists() && file.canWrite();
+      if(file.exists()){
+         if(isDirectory){
+            valid = file.isDirectory();
+         } else {
+            valid = true;
+         }
+      } else {
+         valid = Strings.isValid(text);
+      }
+      return valid;
    }
 
    public boolean isValid() {
@@ -146,7 +156,15 @@ public class FileOrDirectorySelectionPanel extends Composite {
    }
 
    public String getSelected() {
-      return textField != null && textField.isDisposed() != true ? textField.getText() : "";
+      String text = textField != null && textField.isDisposed() != true ? textField.getText() : "";
+      File outfileDir = new File(text);
+      if(outfileDir.exists() && outfileDir.isDirectory()){
+         return text;
+      } else if (Strings.isValid(textField.getText().trim())) {
+         return text;
+      } else {
+         return "";
+      }
    }
 
    public void setSelected(String value) {

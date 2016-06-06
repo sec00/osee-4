@@ -12,8 +12,10 @@ package org.eclipse.osee.ote.ui.test.manager.jobs;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -29,7 +31,6 @@ import org.eclipse.osee.ote.ui.markers.MarkerPlugin;
 import org.eclipse.osee.ote.ui.test.manager.connection.ScriptManager;
 import org.eclipse.osee.ote.ui.test.manager.core.TestManagerEditor;
 import org.eclipse.osee.ote.ui.test.manager.internal.TestManagerPlugin;
-import org.eclipse.osee.ote.ui.test.manager.models.OutputModel;
 import org.eclipse.osee.ote.ui.test.manager.pages.contributions.TestManagerStorageKeys;
 import org.eclipse.osee.ote.ui.test.manager.pages.scriptTable.ScriptTask;
 
@@ -38,6 +39,9 @@ import org.eclipse.osee.ote.ui.test.manager.pages.scriptTable.ScriptTask;
  */
 public class StoreOutfileJob extends Job {
 
+   private static final Matcher matcher = Pattern.compile("(.*?)(\\.\\d+\\.tmo|\\.tmo)").matcher("");
+   
+   
    private final ScriptManager userEnvironment;
    private final ScriptTask scriptTask;
    private final boolean isValidRun;
@@ -138,6 +142,7 @@ public class StoreOutfileJob extends Job {
             } else {
                Lib.writeBytesToFile(outBytes, output);
             }
+            scriptTask.getScriptModel().setOutfile(output.getAbsolutePath());
          }
       }
       if(isSaveScriptDataFileEnabled()){
@@ -159,48 +164,21 @@ public class StoreOutfileJob extends Job {
       }
    }
 
-   private void moveOutputToNextAvailableSpot(ScriptTask task) {
-      OutputModel outputModel = task.getScriptModel().getOutputModel();
-      File oldFile = outputModel.getFile();
-      if (oldFile != null && oldFile.exists() && oldFile.isFile() && oldFile.canRead()) {
-         String outputExtension = "." + outputModel.getFileExtension();
-         String extensionRegex = "\\" + outputExtension + "\\b";//escape the . and should be the end of the string (word b
-         int fileNum = 1;
-         File destFile =
-            new File(
-               oldFile.getAbsoluteFile().toString().replaceFirst(extensionRegex, "." + fileNum + outputExtension));
-         if (destFile.exists()) {
-            while (destFile.exists()) {
-               fileNum++;
-               destFile =
-                  new File(oldFile.getAbsoluteFile().toString().replaceFirst(extensionRegex,
-                     "." + fileNum + outputExtension));
-            }
-         }
-         try {
-            Lib.copyFile(oldFile, destFile);
-         } catch (IOException e2) {
-            OseeLog.log(TestManagerPlugin.class, Level.SEVERE, "Failed to move output file to next available spot", e2);
-         }
-      }
-   }
-   
    private File findNextDestination(File destinationFile) {
       File returnVal = destinationFile;
       if (destinationFile != null && destinationFile.exists() && destinationFile.isFile() && destinationFile.canRead()) {
-         int index = destinationFile.getAbsolutePath().lastIndexOf(".");
-         String extension = "";
-         String fileWithoutExtension = destinationFile.getAbsolutePath();
-         if(index != -1 && index < destinationFile.getAbsolutePath().length()){
-            extension = destinationFile.getAbsolutePath().substring(index+1);
-            fileWithoutExtension = destinationFile.getAbsolutePath().substring(0, index);
+         String fileName = destinationFile.getName();
+         String path = destinationFile.getParent();
+         matcher.reset(destinationFile.getName());
+         if(matcher.matches()){
+            fileName = matcher.group(1);
          }
          int fileNum = 1;
-         returnVal = new File(String.format("%s.%d.%s", fileWithoutExtension, fileNum, extension));
+         returnVal = new File(String.format("%s%s%s.%d.tmo", path, File.separator, fileName, fileNum));
          if (returnVal.exists()) {
             while (returnVal.exists()) {
                fileNum++;
-               returnVal = new File(String.format("%s.%d.%s", fileWithoutExtension, fileNum, extension));
+               returnVal = new File(String.format("%s%s%s.%d.tmo", path, File.separator, fileName, fileNum));
             }
          }
 

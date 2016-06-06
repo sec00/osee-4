@@ -11,6 +11,8 @@
 package org.eclipse.osee.ote.ui.test.manager.models;
 
 import java.io.File;
+import java.io.FilenameFilter;
+
 import org.eclipse.core.filebuffers.manipulation.ContainerCreator;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -101,51 +103,64 @@ public class ScriptModel extends FileModel {
       javaFileData.name = temp == null ? new File(getRawFilename()).getName() : temp;
       javaFileData.classPath = "";
       alternateOutputDir = alternateOutputDir.trim();
-      if (!Strings.isValid(alternateOutputDir)) {
-         javaFileData.outFile = javaFileData.absoluteFilePath.replaceFirst(".java$", ".tmo");
-         if (!javaFileData.outFile.endsWith(".tmo")) {
-            javaFileData.outFile += ".tmo";
-         }
-      } else {
-         try {
-            File dir = new File(alternateOutputDir);
-            if (dir.exists() && dir.isDirectory()) {
-               javaFileData.outFile = alternateOutputDir;
-            } else {
-               if (getIFile() != null) {
-                  IProject project = getIFile().getProject();
-                  IFolder folder = project.getFolder(alternateOutputDir);
-                  if (!folder.exists()) {
-                     ContainerCreator containerCreator =
+     
+      
+      File javaFile = new File(javaFileData.absoluteFilePath);
+      File outfileFolder = javaFile.getParentFile();
+      if (Strings.isValid(alternateOutputDir)) {
+         outfileFolder = new File(alternateOutputDir);
+         if(!outfileFolder.getAbsolutePath().equals(alternateOutputDir)){//then it's a project relative path
+            if (getIFile() != null) {
+               IProject project = getIFile().getProject();
+               IFolder folder = project.getFolder(alternateOutputDir);
+               if (!folder.exists()) {
+                  ContainerCreator containerCreator =
                         new ContainerCreator(folder.getWorkspace(), folder.getFullPath());
+                  try {
                      containerCreator.createContainer(new NullProgressMonitor());
+                  } catch (CoreException e) {
+                     // TODO Auto-generated catch block
+                     e.printStackTrace();
                   }
-                  javaFileData.outFile = folder.getLocation().toFile().getAbsolutePath();
-               }
-            }
-
-            javaFileData.outFile += File.separator;
-            javaFileData.outFile += getName();
-            javaFileData.outFile = javaFileData.outFile.replaceFirst(".java$", ".tmo");
-            if (!javaFileData.outFile.endsWith(".tmo")) {
-               javaFileData.outFile += ".tmo";
-            }
-         } catch (CoreException ex) {
-            ex.printStackTrace();
-            javaFileData.outFile = javaFileData.absoluteFilePath.replaceFirst(".java$", ".tmo");
-            if (!javaFileData.outFile.endsWith(".tmo")) {
-               javaFileData.outFile += ".tmo";
+               } 
+               outfileFolder = folder.getLocation().toFile();
             }
          }
       }
-      //		outputModel = new OutputModel(javaFileData.outFile);
-
-      //		OseeLog.log(TestManagerPlugin.class, Level.FINE, "javaFileData.absoluteJavaPath *"+ javaFileData.absoluteFilePath + "*");
-      //	   OseeLog.log(TestManagerPlugin.class, Level.FINE, "javaFileData.className *" + javaFileData.name + "*");
-      //	   OseeLog.log(TestManagerPlugin.class, Level.FINE, "javaFileData.classPath *" + javaFileData.classPath + "*");
-      //		OseeLog.log(TestManagerPlugin.class, Level.FINE, "javaFileData.outFile *" + javaFileData.outFile+ "*");
-
+      if(!outfileFolder.exists()) {
+         outfileFolder.mkdirs();
+      } else if (outfileFolder.exists() && !outfileFolder.isDirectory()){
+         outfileFolder = javaFile.getParentFile();
+      }
+      String name = javaFile.getName();
+      int index = name.lastIndexOf(".java");
+      if(index > 0){
+         name = name.substring(0, index+1);
+      }
+      final String className = name;      
+      File[] possibleOutfiles = outfileFolder.listFiles(new FilenameFilter() {
+         @Override
+         public boolean accept(File dir, String name) {
+            if (name.startsWith(className) && name.endsWith(".tmo")){
+               return true;
+            }
+            return false;
+         }
+      });
+      javaFileData.outFile = new File(outfileFolder, name + "tmo").getAbsolutePath(); 
+      long lastModified = 0;
+      for(File outfile:possibleOutfiles){
+         if(outfile.lastModified() > lastModified){
+            lastModified = outfile.lastModified();
+            javaFileData.outFile = outfile.getAbsolutePath();
+         }
+      }
+      
       return javaFileData;
+   }
+   
+   public void setOutfile(String path){
+      javaFileData.outFile = path;
    }
 
    public TestFileData updateScriptModelInfo(String alternateOutputDir) {
