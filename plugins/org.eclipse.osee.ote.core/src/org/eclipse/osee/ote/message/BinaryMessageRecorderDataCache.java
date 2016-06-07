@@ -10,8 +10,8 @@ public class BinaryMessageRecorderDataCache {
    private final ArrayBlockingQueue<ByteBuffer> availableByteBuffers;
 
    public BinaryMessageRecorderDataCache(int byteBufferCount, int byteBufferSize){
-      dataToProcess = new ArrayBlockingQueue<ByteBuffer>(byteBufferCount);
-      availableByteBuffers = new ArrayBlockingQueue<ByteBuffer>(byteBufferCount);
+      dataToProcess = new ArrayBlockingQueue<ByteBuffer>(byteBufferCount*100);
+      availableByteBuffers = new ArrayBlockingQueue<ByteBuffer>(byteBufferCount * 4);
       for(int i = 0; i < byteBufferCount;i++){
          availableByteBuffers.offer(ByteBuffer.allocate(byteBufferSize));
       }
@@ -37,7 +37,9 @@ public class BinaryMessageRecorderDataCache {
    }
    
    public void giveBufferForProcessing(ByteBuffer buffer){
-      dataToProcess.offer(buffer);
+      if(!dataToProcess.offer(buffer)){
+         throw new IllegalStateException("Data to process queue is full we are dropping recording packets.");
+      }
    }
    
    public void drainDataToProcess(List<ByteBuffer> data){

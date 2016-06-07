@@ -47,7 +47,7 @@ public class BinaryMessageRecorderTest {
          messageManager.publish(msg);
          timer.step();
       }
-      
+     
       recorder.close();
       
       Assert.assertTrue(recorder.getCurrentFileSize() > msg.getDefaultByteSize()*100);
@@ -56,7 +56,7 @@ public class BinaryMessageRecorderTest {
       BinaryMessageDecoder decoder = new BinaryMessageDecoder();
       decoder.setInput(file);
       int numDataSections = decoder.getNumberOfDataSections();
-      MyBinaryWorker worker = new MyBinaryWorker();
+      MyBinaryWorker worker = new MyBinaryWorker(TestMessageOne.class.getName());
       for(int i = 0; i < numDataSections; i++){
          int frames = decoder.transitionToSection(i);
          for(int j = 0; j < frames; j++) {
@@ -108,7 +108,6 @@ public class BinaryMessageRecorderTest {
       } catch (InterruptedException e) {
          e.printStackTrace();
       }
-//      recorder.close();
       
       Assert.assertTrue(recorder.getCurrentFileSize() > msg.getDefaultByteSize()*100);
       
@@ -117,7 +116,7 @@ public class BinaryMessageRecorderTest {
       decoder.setInput(file);
       int numDataSections = decoder.getNumberOfDataSections();
       System.out.printf("%d data sections\n", numDataSections);
-      MyBinaryWorker worker = new MyBinaryWorker();
+      MyBinaryWorker worker = new MyBinaryWorker(TestMessageOne.class.getName());
       for(int i = 0; i < numDataSections; i++){
          int frames = decoder.transitionToSection(i);
          System.out.printf("framecount[%d][%d]\n", numDataSections, frames);
@@ -134,7 +133,12 @@ public class BinaryMessageRecorderTest {
 
       int playcount = 0;
       int scancount = 0;
+      private String className;
       
+      public MyBinaryWorker(String name) {
+         this.className = name;
+      }
+
       @Override
       public void scan(long time, String messageName, ByteBuffer buffer, int length) {
          scancount++;
@@ -142,7 +146,9 @@ public class BinaryMessageRecorderTest {
 
       @Override
       public void play(long time, String messageName, ByteBuffer buffer, int length) {
-         playcount++;
+         if(time > -1 && className.equals(messageName)){
+            playcount++;
+         } 
       }
       
    }
