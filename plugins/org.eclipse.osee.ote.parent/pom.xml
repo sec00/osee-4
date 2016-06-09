@@ -37,7 +37,6 @@
 		<module>../../plugins/org.eclipse.osee.ote.messaging.dds</module>
 		<module>../../plugins/org.eclipse.osee.ote.runtimeManager</module>
 		<module>../../plugins/org.eclipse.osee.ote.server</module>
-		<module>../../plugins/org.eclipse.osee.ote.help.ui</module>
 		<module>../../plugins/org.eclipse.osee.ote.ui</module>
 		<module>../../plugins/org.eclipse.osee.ote.ui.builder</module>
 		<module>../../plugins/org.eclipse.osee.ote.ui.markers</module>
@@ -97,7 +96,7 @@
 		<eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
 		<itemis-site>http://download.itemis.com/updates/releases/${xtext-version}</itemis-site>
 
-		<osee-create-help-docs>true</osee-create-help-docs>
+		<osee-create-help-docs>false</osee-create-help-docs>
 
 		<osee-application-server-launch-ant>../../plugins/org.eclipse.osee.parent/tools/osee-application-server.xml</osee-application-server-launch-ant>
 
@@ -473,17 +472,7 @@
 				</repository>
 			</repositories>
 		</profile>
-		<profile>
-			<id>ote-help-test</id>
-			<activation>
-				<property>
-					<name>!skip-help-tests</name>
-				</property>
-			</activation>
-			<modules>
-				<module>../../plugins/org.eclipse.osee.ote.help.ui.test</module>
-			</modules>
-		</profile>
+		
 	</profiles>
 
 </project>
