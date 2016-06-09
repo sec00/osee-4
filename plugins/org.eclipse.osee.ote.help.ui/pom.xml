@@ -47,7 +47,7 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
-
+<!-- 
 					<execution>
 						<id>help-build</id>
 						<phase>generate-sources</phase>
@@ -85,6 +85,7 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
+					 -->
 				</executions>
 			</plugin>
 		</plugins>
