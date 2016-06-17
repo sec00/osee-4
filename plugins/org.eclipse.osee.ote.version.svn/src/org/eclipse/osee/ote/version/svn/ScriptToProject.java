@@ -11,7 +11,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.team.svn.core.utility.SVNUtility;
 
 public class ScriptToProject {
@@ -27,22 +30,27 @@ public class ScriptToProject {
    public void add(File scriptFile) {
       String scriptName = scriptFile.getName();
       IProject scriptProject = null;
-
+      IFile iFile = null;
+      IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(org.eclipse.core.filesystem.URIUtil.toURI(scriptFile.getAbsolutePath()));
+      if(files.length > 0){
+         iFile = files[0];                     
+      }
       for(IProject project:workspaceProjects){
          String projectName = project.getName();
-         if(scriptFile.toString().contains(projectName)){
+         if(iFile.toString().contains(projectName)){
             scriptProject = project;
          }
       }
+      if(scriptProject != null){
+         URI scriptProjectLocationUri = scriptProject.getLocationURI();
+         File scriptProjectFile = new File(scriptProjectLocationUri);
 
-      URI scriptProjectLocationUri = scriptProject.getLocationURI();
-      File scriptProjectFile = new File(scriptProjectLocationUri);
-
-      if (isSvn(scriptProjectFile)) {
-         String scriptProjectLocation = scriptProjectFile.getAbsolutePath();
-         addScriptListValue(scriptProjectLocation, scriptName);
-         scriptNameToScriptFileMap.put(scriptName, scriptFile);
-      } 
+         if (isSvn(scriptProjectFile)) {
+            String scriptProjectLocation = scriptProjectFile.getAbsolutePath();
+            addScriptListValue(scriptProjectLocation, scriptName);
+            scriptNameToScriptFileMap.put(scriptName, scriptFile);
+         } 
+      }
    }
 
    public Set<String> getProjectsSet() {
