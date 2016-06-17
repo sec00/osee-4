@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -36,6 +37,7 @@ import org.eclipse.osee.ote.ui.test.manager.configuration.ILoadConfig;
 import org.eclipse.osee.ote.ui.test.manager.configuration.ISaveConfig;
 import org.eclipse.osee.ote.ui.test.manager.core.TestManagerEditor;
 import org.eclipse.osee.ote.ui.test.manager.internal.TestManagerPlugin;
+import org.eclipse.osee.ote.ui.test.manager.models.OutputModel;
 import org.eclipse.osee.ote.ui.test.manager.models.OutputModelJob;
 import org.eclipse.osee.ote.ui.test.manager.pages.scriptTable.xscript.XScriptTable;
 import org.eclipse.osee.ote.ui.test.manager.pages.scriptTable.xscript.XScriptTableContentProvider;
@@ -440,8 +442,10 @@ public class ScriptTableViewer {
                ScriptTask newTask = new ScriptTask(files[i], testManagerEditor.getAlternateOutputDir());
                if (!taskList.contains(newTask)) {
                   //                  newTask.computeExists();
-                  if (newTask.getScriptModel().getOutputModel() != null) {
-                     if (newTask.getScriptModel().getOutputModel().getIFile() != null) {
+                  OutputModel outputModel = newTask.getScriptModel().getOutputModel();
+                  if (outputModel != null) {
+                     IFile outputIFile = outputModel.getIFile();
+                     if (outputIFile != null && outputIFile.exists()) {
                         MarkerPlugin.addMarkers(newTask.getScriptModel().getOutputModel().getIFile());
                      }
                   }
