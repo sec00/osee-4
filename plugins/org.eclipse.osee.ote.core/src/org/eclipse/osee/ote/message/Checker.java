@@ -4,6 +4,12 @@ import org.eclipse.osee.ote.core.testPoint.CheckGroup;
 import org.eclipse.osee.ote.message.interfaces.ITestAccessor;
 import org.eclipse.osee.ote.message.save.ElementSave;
 
+/**
+ * This is the interface that is used by {@link MessageCaptureChecker} to do checks on recorded data. 
+ * 
+ * @author Andrew M. Finkbeiner
+ *
+ */
 public interface Checker {
 
    /**

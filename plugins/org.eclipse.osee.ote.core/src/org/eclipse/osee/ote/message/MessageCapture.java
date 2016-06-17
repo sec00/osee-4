@@ -13,17 +13,24 @@ import org.eclipse.osee.ote.core.environment.interfaces.ITimerControl;
 /**
  * This class will capture messages contained within the given {@link MessageCaptureFilter}'s.  This can be used from scripts to accomplish more complicated analysis of data.
  * <pre> An example of using it:{@code  
-    MessageCapture capture = MessageCapture.createMessageCapture();      
-    capture.add(new MessageCaptureFilter(opStateReader));
-    capture.start();
-    // ... do something here ...
-    capture.stop();
-    MessageCaptureDataIterator it = capture.getDataIterator();
-    MessageCaptureChecker checker = new MessageCaptureChecker(it);
-    checker.add(new CheckEqualsCondition<>(msg1, msg1.INT1, 587, 0, 200));
-    checker.check();
-    checker.close();
- * }</pre>
+ 
+      MessageCapture capture = MessageCapture.createMessageCapture();      
+      capture.add(new {@link MessageCaptureFilter}(messageOneReader));
+
+      capture.start();
+      //do work here ...
+      capture.stop();
+      
+      {@link MessageCaptureDataIterator} it = capture.getDataIterator();
+      {@link MessageCaptureChecker} checker = new MessageCaptureChecker(it);
+      checker.add(new {@link CheckEqualsCondition}<>(messageOneReader, messageOneReader.element1, SOME_ENUM.value1, 0, 60000));
+      checker.add(new CheckEqualsCondition<>(messageOneReader, messageOneReader.element2, SOME_ENUM.value2, 0, 60000));
+      checker.add(new {@link CheckPulseCondition}<>(messageOneReader, messageOneReader.element3, SOME_ENUM.state2,  SOME_ENUM.state3, 1, 0, 60000));
+      checker.check();
+      checker.close();
+      checker.logToOutfile(this);
+      checker.saveData(environment);
+ }</pre>
  * @author Andrew M. Finkbeiner
  *
  */
