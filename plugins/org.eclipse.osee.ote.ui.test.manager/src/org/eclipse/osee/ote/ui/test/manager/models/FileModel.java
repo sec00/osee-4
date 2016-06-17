@@ -13,6 +13,7 @@ package org.eclipse.osee.ote.ui.test.manager.models;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -55,13 +56,19 @@ public class FileModel {
    }
 
    /**
-    * @return Returns the iFile.
+    * @return Returns the iFile for the given local data {@link #rawFilename}.  You may still have to check if the file actually exists.
     */
    public IFile getIFile() {
       if (iFile == null) {
          if (path.equals("")) {
             if (!rawFilename.equals("")) {
                iFile = AWorkspace.getIFile(rawFilename);
+               if(iFile == null){
+                  IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(org.eclipse.core.filesystem.URIUtil.toURI(rawFilename));
+                  if(files.length > 0){
+                     iFile = files[0];                     
+                  }
+               }
             }
          }
       }
@@ -98,6 +105,12 @@ public class FileModel {
    public String getWorkspaceRelativePath() {
       IWorkspace ws = ResourcesPlugin.getWorkspace();
       IFile ifile = ws.getRoot().getFileForLocation(new Path(rawFilename));
+      if(ifile == null){
+         IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(org.eclipse.core.filesystem.URIUtil.toURI(rawFilename));
+         if(files.length > 0){
+            ifile = files[0];
+         }
+      }
       if (!ifile.exists()) {
          return null;
       } else {
