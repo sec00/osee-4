@@ -319,4 +319,13 @@ public class OTEBundleLoader implements IRuntimeLibraryManager{
        return versions;
    }
 
+   @Override
+   public ClassLoader getClassLoader() {
+      if (scriptClassLoader == null) {
+         return ExportClassLoader.getInstance();
+      } else {
+         return scriptClassLoader;
+      }
+   }
+
 }
