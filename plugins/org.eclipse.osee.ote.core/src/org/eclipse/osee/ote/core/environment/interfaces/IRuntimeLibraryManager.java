@@ -22,6 +22,8 @@ import org.eclipse.osee.ote.OTEStatusCallback;
  *
  */
 public interface IRuntimeLibraryManager extends XmlizableStream {
+   
+   ClassLoader getClassLoader();
 
    Class<?> loadFromScriptClassLoader(String path) throws ClassNotFoundException;
 
