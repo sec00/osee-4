@@ -47,8 +47,6 @@ public abstract class AbstractInteractivePrompt<T> extends AbstractRemotePrompt 
                   doPrompt();
                } catch (Exception e) {
                   OseeLog.log(TestEnvironment.class, Level.SEVERE, "exception while performing prompt", e);
-                  // the thread that activated the prompt will be waiting on the script object's notifyAll() to
-                  // be called. If an exception occurs this may not happen so we should do it here
                   endPrompt(null, new Exception("exception while performing prompt", e));
                }
             }
@@ -60,14 +58,8 @@ public abstract class AbstractInteractivePrompt<T> extends AbstractRemotePrompt 
    }
 
    protected void endPrompt(T response, Exception exception) {
-
-//      script.getTestEnvironment().getScriptCtrl().setExecutionUnitPause(false);
-//      script.getTestEnvironment().getScriptCtrl().setScriptPause(false);
-//      synchronized (script) {
-         this.response = response;
-         this.exception = exception;
-//         script.notifyAll();
-//      }
+      this.response = response;
+      this.exception = exception;
       waiting = false;
    }
 
@@ -78,25 +70,10 @@ public abstract class AbstractInteractivePrompt<T> extends AbstractRemotePrompt 
    }
 
    protected T waitForResponse(TestScript script, boolean executionUnitPause) throws InterruptedException, Exception {
-      
       while(waiting){
          script.testWaitNoLog(500);
       }
-//      synchronized (script) {
-//         script.testWait(milliseconds);
-//         script.getTestEnvironment().getScriptCtrl().setScriptPause(true);
-//         script.getTestEnvironment().getScriptCtrl().setExecutionUnitPause(executionUnitPause);
-//         script.getTestEnvironment().getScriptCtrl().unlock();
-//         try {
-//            script.wait();
-//         } catch (InterruptedException e) {
-//            terminatePrompt();
-//            throw new InterruptedException();
-//         } finally {
-//            script.getTestEnvironment().getScriptCtrl().lock();
-//         }
-         return response;
-//      }
+      return response;
    }
 
    /**
