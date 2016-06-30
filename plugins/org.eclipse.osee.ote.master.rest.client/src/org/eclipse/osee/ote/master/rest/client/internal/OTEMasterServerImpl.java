@@ -22,22 +22,16 @@ public class OTEMasterServerImpl implements OTEMasterServer {
    private ExecutorService executor;
 
    public void start(Map<String, Object> props) {
-      new Thread(new Runnable(){
-
+      executor = Executors.newCachedThreadPool(new ThreadFactory() {
          @Override
-         public void run() {
-            executor = Executors.newCachedThreadPool(new ThreadFactory() {
-               @Override
-               public Thread newThread(Runnable arg0) {
-                  Thread th = new Thread(arg0);
-                  th.setName("OTE Master Client " + th.getId());
-                  th.setDaemon(false);
-                  return th;
-               }
-            });
-            update(props);
-         }}).start();
-    
+         public Thread newThread(Runnable arg0) {
+            Thread th = new Thread(arg0);
+            th.setName("OTE Master Client " + th.getId());
+            th.setDaemon(false);
+            return th;
+         }
+      });
+      update(props);
    }
 
    public void stop() {

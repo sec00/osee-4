@@ -30,4 +30,11 @@ public interface Scheduler {
 
    public void pauseSimulated(boolean b);
    
+   /**
+    * Call this function to not do any pause of execution in the simulated scheduled.  In general if there is no wait in the system then the system will not continue to 
+    * run tasks. 
+    * @param pause
+    */
+   public void setNoPause(boolean pause);
+   
 }

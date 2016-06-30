@@ -36,11 +36,11 @@ public class SchedulerImpl implements Scheduler {
 //   private ConcurrentLinkedQueue<OTETask> newTasks;
    private Thread mainTimer;
    
-   Runnable busyDelay = () -> {  };
-   Runnable yieldDelay = () -> { Thread.yield(); };
-   Runnable sleepDelay = () -> { try{ Thread.sleep(0, 1); } catch (Throwable th){} };
-   protected boolean noPause = false;
-   protected boolean doTasksHaveAnyMainThreadWaits = false;
+   private Runnable busyDelay = () -> {  };
+   private Runnable yieldDelay = () -> { Thread.yield(); };
+   private Runnable sleepDelay = () -> { try{ Thread.sleep(0, 1); } catch (Throwable th){} };
+   private volatile boolean noPause = false;
+   private boolean doTasksHaveAnyMainThreadWaits = false;
    private Thread mainThread;
    
    private SchedulerImpl wallClockScheduler;
@@ -517,5 +517,16 @@ public class SchedulerImpl implements Scheduler {
       // TODO Auto-generated method stub
       this.pauseSimulated = pause;
    }
+   
+   /**
+    * Call this function to not do any pause of execution in the simulated scheduled.  In general if there is no wait in the system then the system will not continue to 
+    * run tasks. 
+    * @param pause
+    */
+   public void setNoPause(boolean noPause){
+      this.noPause = noPause;
+   }
 
+   
+   
 }
