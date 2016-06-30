@@ -64,8 +64,8 @@ public abstract class AbstractInteractivePrompt<T> extends AbstractRemotePrompt 
 //      script.getTestEnvironment().getScriptCtrl().setExecutionUnitPause(false);
 //      script.getTestEnvironment().getScriptCtrl().setScriptPause(false);
 //      synchronized (script) {
-//         this.response = response;
-//         this.exception = exception;
+         this.response = response;
+         this.exception = exception;
 //         script.notifyAll();
 //      }
       waiting = false;
