@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IMember;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -23,23 +24,35 @@ import org.eclipse.osee.framework.ui.ws.AWorkspace;
 import org.eclipse.osee.ote.ui.test.manager.operations.AddIFileToTestManager;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.PlatformUI;
 
 public class AddToTestManagerPopupAction implements IWorkbenchWindowActionDelegate {
 
    public static String[] getSelection() {
-      StructuredSelection sel = AWorkspace.getSelection();
-      Iterator<?> i = sel.iterator();
       List<String> selection = new ArrayList<>();
-
+      ISelection sel1 = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getSelection();
+      if(sel1 instanceof StructuredSelection){
+      Iterator<?> i = ((StructuredSelection)sel1).iterator();
+      
       while (i.hasNext()) {
          Object obj = i.next();
          if (obj instanceof IResource) {
             IResource resource = (IResource) obj;
-            selection.add(resource.getLocation().toOSString());
+            if (resource != null) {
+               selection.add(resource.getLocation().toOSString());
+            }
          } else if (obj instanceof ICompilationUnit) {
             ICompilationUnit resource = (ICompilationUnit) obj;
-            selection.add(resource.getResource().getLocation().toOSString());
+            if (resource != null) {
+            	selection.add(resource.getResource().getLocation().toOSString());
+            }
+         } else if (obj instanceof IMember){
+            ICompilationUnit resource = ((IMember) obj).getCompilationUnit();
+            if (resource != null) {
+               selection.add(resource.getResource().getLocation().toOSString());
+            }
          }
+      }
       }
       return selection.toArray(new String[0]);
    }

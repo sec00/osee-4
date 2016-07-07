@@ -36,8 +36,9 @@
             name="OSEE Test"/>
    </extension>
    <extension point="org.eclipse.ui.popupMenus">
-      <objectContribution objectClass="org.eclipse.jdt.core.ICompilationUnit"
-            nameFilter="*" id="org.eclipse.osee.ote.ui.menucontribution">
+      <objectContribution  adaptable="true"
+            objectClass="org.eclipse.core.resources.IFile"
+            nameFilter="*.java" id="org.eclipse.osee.ote.ui.menucontribution">
          <menu
                label="OTE"
                path="additions"
