@@ -33,9 +33,21 @@
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
-      <objectContribution
-            objectClass="org.eclipse.jdt.core.ICompilationUnit"
-            nameFilter="*"
+         <objectContribution  adaptable="true"
+            objectClass="org.eclipse.core.resources.IFile"
+            nameFilter="*.java" id="org.eclipse.osee.ote.ui.menucontribution">
+         <menu
+               label="OTE"
+               path="additions"
+               id="org.eclipse.osee.ote.ui">               
+            <separator
+                  name="placeholder">
+            </separator>
+         </menu>
+      </objectContribution>
+      <objectContribution adaptable="true"
+            objectClass="org.eclipse.core.resources.IFile"
+            nameFilter="*.java"
             id="org.eclipse.osee.ote.ui.test.manager.contribution1">
          <action
                enablesFor="+"

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -50,11 +51,13 @@ import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.part.ResourceTransfer;
 
 public class ScriptTableViewer {
 
@@ -275,14 +278,37 @@ public class ScriptTableViewer {
 
    private void attachDragDropListener() {
       final FileTransfer fileTransfer = FileTransfer.getInstance();
-      final Transfer types[] = new Transfer[] {fileTransfer};
+      final TextTransfer textTransfer = TextTransfer.getInstance();
+      final ResourceTransfer resourceTransfer = ResourceTransfer.getInstance();
+      
+      final Transfer types[] = new Transfer[] {fileTransfer, textTransfer, resourceTransfer};
       // Add Drag/Drop to Table
       DropTargetListener scriptDropTargetListener = new DropTargetAdapter() {
          @Override
          public void drop(DropTargetEvent event) {
             if (fileTransfer.isSupportedType(event.currentDataType)) {
                processDroppedFiles((String[]) event.data);
+            } else if(textTransfer.isSupportedType(event.currentDataType)) {
+               processDroppedFiles((String[]) event.data);
+            } else if(resourceTransfer.isSupportedType(event.currentDataType)){
+               IResource[] resources = (IResource[])event.data;
+               String[] asStrings = new String[resources.length];
+               for(int i = 0; i < resources.length; i++) {
+                  asStrings[i] = resources[i].getLocation().toOSString();
+               }
+               processDroppedFiles(asStrings);
             }
+         }
+         @Override
+         public void dropAccept( DropTargetEvent event )
+         {
+             event.detail = DND.DROP_COPY;
+         }
+         
+         @Override
+         public void dragEnter( DropTargetEvent event )
+         {
+             event.detail = DND.DROP_COPY;
          }
       };
       // Setup drag/drop of files
