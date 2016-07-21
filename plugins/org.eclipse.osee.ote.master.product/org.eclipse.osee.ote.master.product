@@ -7,12 +7,15 @@
    </configIni>
 
    <launcherArgs>
-      <programArgs>-console</programArgs>
+      <programArgs>-console
+      </programArgs>
       <vmArgs>-Dorg.osgi.service.http.port=8008
 -Ddequinox.ds.debug=true
 -Ddequinox.ds.print=true
--Dcm.config.uri=&quot;etc/ote.server.config.json&quot;</vmArgs>
-      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+-Dcm.config.uri=&quot;etc/ote.server.config.json&quot;
+      </vmArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
+      </vmArgsMac>
    </launcherArgs>
 
    <windowImages/>
@@ -25,6 +28,7 @@
    </launcher>
 
    <vm>
+      <windows include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8</windows>
    </vm>
 
    <plugins>
@@ -35,6 +39,8 @@
       <feature id="org.eclipse.osee.x.core.feature"/>
       <feature id="org.eclipse.osee.ote.master.feature"/>
       <feature id="org.eclipse.osee.ote.server.external.feature"/>
+      <feature id="org.eclipse.osee.core.feature"/>
+      <feature id="org.eclipse.osee.x.server.external.feature"/>
    </features>
 
    <configurations>
@@ -42,6 +48,7 @@
       <plugin id="org.eclipse.equinox.cm" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.http.jetty" autoStart="true" startLevel="0" />
    </configurations>
 
 </product>
