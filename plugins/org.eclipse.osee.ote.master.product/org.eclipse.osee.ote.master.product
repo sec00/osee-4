@@ -40,7 +40,6 @@
       <feature id="org.eclipse.osee.ote.master.feature"/>
       <feature id="org.eclipse.osee.ote.server.external.feature"/>
       <feature id="org.eclipse.osee.core.feature"/>
-      <feature id="org.eclipse.osee.x.server.external.feature"/>
    </features>
 
    <configurations>
