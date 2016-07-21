@@ -366,7 +366,11 @@ public class Message implements Xmlizable, XmlizableStream {
    }
 
    public MessageData getActiveDataSource() {
-      return mapper.getMessageData(this, currentMemType);
+      if(mapper != null){
+         return mapper.getMessageData(this, currentMemType);
+      } else {
+         return getDefaultMessageData();
+      }
    }
 
    public MessageData getActiveDataSource(DataType type) {
