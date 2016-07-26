@@ -13,7 +13,6 @@ package org.eclipse.osee.framework.ui.skynet.widgets.xBranch;
 import java.util.List;
 import java.util.logging.Level;
 import org.eclipse.osee.framework.core.data.IOseeBranch;
-import org.eclipse.osee.framework.core.model.Branch;
 import org.eclipse.osee.framework.core.model.TransactionRecord;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.logging.OseeLog;
@@ -45,10 +44,10 @@ public class BranchViewImageHandler {
          element = ((List<?>) element).get(0);
       }
 
-      if (element instanceof Branch && columnIndex == 0) {
+      if (element instanceof IOseeBranch && columnIndex == 0) {
          try {
             checkImages();
-            IOseeBranch branch = (Branch) element;
+            IOseeBranch branch = (IOseeBranch) element;
             boolean favorite = UserManager.getUser().isFavoriteBranch(branch);
             boolean isChangeManaged = BranchManager.isChangeManaged(branch);
             boolean isSystemBranch = BranchManager.getType(branch).isSystemRootBranch();
