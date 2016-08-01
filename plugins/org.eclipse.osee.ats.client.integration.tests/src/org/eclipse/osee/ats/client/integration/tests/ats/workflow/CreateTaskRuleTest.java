@@ -104,7 +104,7 @@ public class CreateTaskRuleTest {
 
       // Update/Create? TeamWorkflow with rule for testing create task rule
       AddRuleData setRuleData = new AddRuleData();
-      setRuleData.setConfigItemUuid(configObjectToken.getUuid());
+      setRuleData.setConfigItemUuid(configObjectToken.getId());
       setRuleData.setRuleName(TEST_CREATE_TASK_RULE);
       AtsClientService.getRuleEp().addRuleToConfig(setRuleData);
 
