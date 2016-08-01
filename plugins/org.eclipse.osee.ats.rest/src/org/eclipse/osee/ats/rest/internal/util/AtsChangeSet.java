@@ -83,7 +83,7 @@ public class AtsChangeSet extends AbstractAtsChangeSet {
          return (ArtifactReadable) user.getStoreObject();
       }
       return orcsApi.getQueryFactory().fromBranch(AtsUtilCore.getAtsBranch()).andUuid(
-         user.getUuid()).getResults().getExactlyOne();
+         user.getId()).getResults().getExactlyOne();
    }
 
    @Override

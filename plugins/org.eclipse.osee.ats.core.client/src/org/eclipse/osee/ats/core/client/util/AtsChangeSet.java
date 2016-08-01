@@ -166,7 +166,7 @@ public class AtsChangeSet extends AbstractAtsChangeSet {
             art = getArtifact(storeObject);
          }
          if (art == null) {
-            art = AtsArtifactQuery.getArtifactFromId(atsObject.getUuid());
+            art = AtsArtifactQuery.getArtifactFromId(atsObject.getId());
          }
       }
       return art;

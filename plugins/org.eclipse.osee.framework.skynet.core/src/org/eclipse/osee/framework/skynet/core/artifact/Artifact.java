@@ -59,7 +59,6 @@ import org.eclipse.osee.framework.core.model.type.RelationType;
 import org.eclipse.osee.framework.core.operation.Operations;
 import org.eclipse.osee.framework.jdk.core.type.FullyNamedIdentity;
 import org.eclipse.osee.framework.jdk.core.type.HashCollection;
-import org.eclipse.osee.framework.jdk.core.type.Id;
 import org.eclipse.osee.framework.jdk.core.type.OseeArgumentException;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.OseeStateException;
@@ -91,7 +90,7 @@ import org.eclipse.osee.framework.skynet.core.types.IArtifact;
  * @author Ryan D. Brooks
  */
 
-public class Artifact extends FullyNamedIdentity<String> implements IArtifact, Adaptable, IBasicGuidArtifact, Id {
+public class Artifact extends FullyNamedIdentity<String> implements IArtifact, Adaptable, IBasicGuidArtifact {
    public static final String UNNAMED = "Unnamed";
    public static final String BEFORE_GUID_STRING = "/BeforeGUID/PrePend";
    public static final String AFTER_GUID_STRING = "/AfterGUID";
@@ -112,13 +111,17 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
    private boolean useBackingData;
    private IArtifactType artifactTypeToken;
 
-   public Artifact(String guid, BranchId branch, IArtifactType artifactType) throws OseeCoreException {
+   public Artifact(String guid, BranchId branch, IArtifactType artifactType) {
       super(GUID.checkOrCreate(guid), "");
       this.artifactTypeToken = artifactType;
       objectEditState = EditState.NO_CHANGE;
       internalSetModType(ModificationType.NEW, false);
 
       this.branch = branch;
+   }
+
+   public Artifact(BranchId branch, IArtifactType artifactType) {
+      this(null, branch, artifactType);
    }
 
    public final boolean isInDb() {
