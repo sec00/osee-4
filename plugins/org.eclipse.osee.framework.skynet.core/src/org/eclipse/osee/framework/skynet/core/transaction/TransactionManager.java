@@ -46,8 +46,7 @@ public final class TransactionManager {
    private static final String SELECT_TRANSACTIONS =
       "SELECT * FROM osee_tx_details WHERE branch_id = ? ORDER BY transaction_id DESC";
 
-   private static final String SELECT_COMMIT_TRANSACTIONS =
-      "SELECT transaction_id FROM osee_tx_details WHERE commit_art_id = ?";
+   private static final String SELECT_COMMIT_TRANSACTIONS = "SELECT * FROM osee_tx_details WHERE commit_art_id = ?";
 
    private static final String UPDATE_TRANSACTION_COMMENTS =
       "UPDATE osee_tx_details SET osee_comment = ? WHERE transaction_id = ?";
