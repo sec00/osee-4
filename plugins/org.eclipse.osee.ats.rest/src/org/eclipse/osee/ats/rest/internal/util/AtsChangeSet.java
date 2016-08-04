@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.ats.rest.internal.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -91,7 +92,7 @@ public class AtsChangeSet extends AbstractAtsChangeSet {
       if (objects.isEmpty() && deleteObjects.isEmpty() && execptionIfEmpty) {
          throw new OseeArgumentException("objects/deleteObjects cannot be empty");
       }
-      for (Object obj : objects) {
+      for (Object obj : new ArrayList<>(objects)) {
          if (obj instanceof IAtsWorkItem) {
             IAtsWorkItem workItem = (IAtsWorkItem) obj;
             IAtsStateManager stateMgr = workItem.getStateMgr();
