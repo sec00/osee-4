@@ -46,6 +46,21 @@ public class OteUdpEndpointInlineSender implements OteEndpointSender {
          throw new OTEException(e);
       }
    }
+   
+   @Override
+   public void send(ByteBuffer buffer) {
+      try {
+         DatagramChannel channel = DatagramChannel.open();
+         if (channel.socket().getSendBufferSize() < SEND_BUFFER_SIZE) {
+            channel.socket().setSendBufferSize(SEND_BUFFER_SIZE);
+         }
+         channel.socket().setReuseAddress(true);
+         channel.configureBlocking(true);
+         channel.send(buffer, address);
+      } catch (IOException e) {
+         throw new OTEException(e);
+      }
+   }
 
    @Override
    public void stop() {
@@ -66,5 +81,7 @@ public class OteUdpEndpointInlineSender implements OteEndpointSender {
    public void start() {
       //not needed
    }
+
+
 
 }

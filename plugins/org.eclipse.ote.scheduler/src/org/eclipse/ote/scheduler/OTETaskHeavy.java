@@ -7,8 +7,8 @@ public class OTETaskHeavy extends OTETask {
    private Stopwatch[] stopwatches;
    private int count = 1;
    
-   public OTETaskHeavy(Runnable runnable, int period){
-      super(runnable, period);
+   public OTETaskHeavy(Runnable runnable, int period, int weight){
+      super(runnable, period, weight);
       result = new OTETaskResult();
       if(period == 6 ){
          stopwatches = new Stopwatch[5];
@@ -19,8 +19,8 @@ public class OTETaskHeavy extends OTETask {
       stopwatch = new Stopwatch(runnable.getClass().getSimpleName());
    }
    
-   public OTETaskHeavy(Runnable runnable, long time) {
-      super(runnable, time);
+   public OTETaskHeavy(Runnable runnable, long time, int weight) {
+      super(runnable, time, weight);
       result = new OTETaskResult();
       stopwatch = new Stopwatch(runnable.toString());
    }

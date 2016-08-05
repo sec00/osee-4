@@ -35,6 +35,7 @@ public class NodePool<T extends Comparable<T>> {
       return newNode;
    }
 
+   @SuppressWarnings({ "rawtypes", "unchecked" })
    public void pushNode(Node node) {
       poolLock.lock();
       try{

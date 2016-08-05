@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.ote.core.environment.interfaces;
 
+import java.nio.ByteBuffer;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.UUID;
@@ -29,5 +30,7 @@ public interface IHostTestEnvironment extends Remote {
    void disconnect(UUID sessionId) throws RemoteException;
    
    public String getHttpURL() throws RemoteException;
+   
+   public void send(ByteBuffer buffer) throws RemoteException;
    
 }

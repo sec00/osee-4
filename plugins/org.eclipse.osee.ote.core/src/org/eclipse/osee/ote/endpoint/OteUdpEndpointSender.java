@@ -1,6 +1,7 @@
 package org.eclipse.osee.ote.endpoint;
 
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -81,6 +82,27 @@ public class OteUdpEndpointSender implements OteEndpointSender {
       }
 
    }
+   
+   public void send(ByteBuffer buffer) {
+      if(debug){
+         System.out.printf("[%s] sending: [%s] to [%s] [%d]\n", new Date(), "ByteBuffer", address.toString(), buffer.remaining());
+      }
+      AddressBuffer obj = buffers.getObject();
+      obj.getBuffer().clear();
+      obj.getBuffer().put(buffer);
+      obj.getBuffer().flip();
+      obj.setAddress(address);
+      try {
+         if (!thread.isAlive()) {
+            // our thread has sat idle for too long and self terminated go ahead and start a new one
+            start();
+         }
+         toSend.put(obj);
+      } catch (InterruptedException e) {
+         throw new OTEException(e);
+      }
+      
+   }
 
    @Override
    public boolean isClosed() {
@@ -91,5 +113,7 @@ public class OteUdpEndpointSender implements OteEndpointSender {
    public void setDebug(boolean debug){
       this.debug = debug;
    }
+
+   
 
 }

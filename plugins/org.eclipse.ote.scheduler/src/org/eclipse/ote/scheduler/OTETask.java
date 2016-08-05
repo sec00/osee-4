@@ -11,18 +11,21 @@ public class OTETask implements Callable<OTETaskResult>, Comparable<OTETask>{
    private volatile boolean complete = false;
    private volatile boolean canceled = false;
    private boolean isMainThread = false;
+   private int weight = 0;
    
-   public OTETask(Runnable runnable, int period){
+   public OTETask(Runnable runnable, int period, int weight){
       isScheduled = true;
       this.r = runnable;
       this.period = period;
+      this.weight  = weight;
    }
    
-   public OTETask(Runnable runnable, long time) {
+   public OTETask(Runnable runnable, long time, int weight) {
       isScheduled = false;
       this.time = time;
       this.r = runnable;
       this.period = 0;
+      this.weight  = weight;
    }
 
    public long getTime() {
@@ -80,7 +83,14 @@ public class OTETask implements Callable<OTETaskResult>, Comparable<OTETask>{
          } else if (periodDelta < 0){
             return -1;
          } else {
-            return hashCode() - o.hashCode();
+            int weightDelta = weight - o.weight;
+            if(weightDelta > 0){
+               return 1;
+            } else if (weightDelta < 0){
+               return -1;
+            } else {
+               return hashCode() - o.hashCode();
+            }
          }
       }
    }

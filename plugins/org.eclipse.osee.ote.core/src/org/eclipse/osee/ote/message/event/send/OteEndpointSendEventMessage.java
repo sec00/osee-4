@@ -11,6 +11,7 @@
 package org.eclipse.osee.ote.message.event.send;
 
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -44,6 +45,13 @@ public class OteEndpointSendEventMessage {
    public void asynchSend(OteEventMessage message) {
       updateHeaderInfo(message);
       endpoint.getOteEndpointThreadedSender(destination).send(message);
+   }
+   
+   /**
+    * sends a message and returns immediately
+    */
+   public void asynchSend(ByteBuffer buffer) {
+      endpoint.getOteEndpointThreadedSender(destination).send(buffer);
    }
 
    /**

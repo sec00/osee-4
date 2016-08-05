@@ -13,6 +13,7 @@ package org.eclipse.osee.ote.server.internal;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Date;
@@ -36,6 +37,7 @@ import org.eclipse.osee.ote.core.environment.TestEnvironmentConfig;
 import org.eclipse.osee.ote.core.environment.interfaces.IHostTestEnvironment;
 import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironment;
 import org.eclipse.osee.ote.endpoint.OteUdpEndpoint;
+import org.eclipse.osee.ote.endpoint.OteUdpEndpointInlineSender;
 import org.eclipse.osee.ote.io.OTEServerFolder;
 import org.eclipse.osee.ote.message.MessageSystemTestEnvironment;
 import org.eclipse.osee.ote.properties.OtePropertiesCore;
@@ -55,13 +57,17 @@ public class OteService implements IHostTestEnvironment {
 //   private final IRuntimeLibraryManager runtimeLibraryManager;
 //   private RegisteredServiceReference registeredServiceReference;
    private OTESessionManager oteSessions;
+   private OteUdpEndpoint receiver;
+   private OteUdpEndpointInlineSender sender;
    
    
    public OteService(EnvironmentCreationParameter environmentCreation, OTESessionManager oteSessions, PropertyParamter parameterObject, EnhancedProperties properties, OteUdpEndpoint receiver) {
 //      this.runtimeLibraryManager = runtimeLibraryManager;
       this.environmentCreation = environmentCreation;
       this.oteSessions = oteSessions;
+      this.receiver = receiver;
       
+      sender = receiver.getOteEndpointInlineSender(receiver.getLocalEndpoint());
       Uuid uuid = UuidFactory.generate();
       Long lsb = Long.valueOf(uuid.getLeastSignificantBits());
       Long msb = Long.valueOf(uuid.getMostSignificantBits());
@@ -209,6 +215,11 @@ public class OteService implements IHostTestEnvironment {
    @Override
    public String getHttpURL() throws RemoteException {
       return (String)enhancedProperties.getProperty("appServerURI");
+   }
+
+   @Override
+   public void send(ByteBuffer buffer) {
+      sender.send(buffer);
    }
    
 }

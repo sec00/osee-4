@@ -6,8 +6,11 @@
 package org.eclipse.osee.ote.message;
 
 import org.eclipse.osee.framework.jdk.core.type.CompositeKeyHashMap;
+import org.eclipse.osee.ote.core.ServiceUtility;
 import org.eclipse.osee.ote.core.environment.interfaces.ITimerControl;
 import org.eclipse.osee.ote.message.interfaces.IMessageManager;
+import org.eclipse.osee.ote.message.timer.EnvTaskWrapper;
+import org.eclipse.ote.scheduler.Scheduler;
 
 /**
  * This is a helper class that stores the periodic publish tasks in a map based on the rate and phase of a message.
@@ -39,7 +42,12 @@ public class PeriodicPublishMap {
       PeriodicPublishTask task = ratePhaseMap.get(rate, phase);
       if(task == null){
          task = new PeriodicPublishTask(messageManager, rate, phase);
-         timerControl.addTask(task, null);
+         Scheduler scheduler = ServiceUtility.getService(Scheduler.class);
+         if(scheduler != null){
+            scheduler.scheduleAtFixedRate(new EnvTaskWrapper(task), task.getHzRate(), Integer.MAX_VALUE);
+         } else {
+            timerControl.addTask(task, null);
+         }
          ratePhaseMap.put(rate, phase, task);
       }
       return task;

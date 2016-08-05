@@ -72,6 +72,7 @@ public class WaitOnCondition {
          time = scheduler.getTime() - time;
       } catch (InterruptedException e) {
       } finally {
+         signalCheck.disable();
          for(Message msg:messages){
             msg.removeListener(signalCheck);
          }
@@ -119,6 +120,7 @@ public class WaitOnCondition {
       private ReentrantLock lock;
       private Condition condition;
       private ICondition check;
+      private volatile boolean ignore = false;
 
       SignalNewData(ReentrantLock lock, Condition condition, ICondition check){
          this.lock = lock;
@@ -126,13 +128,19 @@ public class WaitOnCondition {
          this.check = check;
       }
 
+      public void disable() {
+         this.ignore  = true;
+      }
+
       @Override
       public void onDataAvailable(MessageData data, DataType type) throws MessageSystemException {
          lock.lock();
          try{
-            scheduler.pauseSimulated(true);
-            check.increment();
-            condition.signal();
+            if(!ignore){
+               scheduler.pauseSimulated(true);
+               check.increment();
+               condition.signal();
+            }
 //            System.out.println(getClass().getSimpleName() + " SignalNewData - " + scheduler.getTime());
          } finally {
             lock.unlock();

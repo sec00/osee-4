@@ -121,6 +121,7 @@ public class OteEndpointReceiveRunnable implements Runnable {
          for (EndpointDataProcessor processor : dataProcessors) {
             if (processor.getTypeId() == typeId) {
                try {
+                  buffer.position(2);
                   processor.processBuffer(buffer);
                } catch (Throwable th) {
                   th.printStackTrace();

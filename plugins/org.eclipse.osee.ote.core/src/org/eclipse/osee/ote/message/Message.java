@@ -858,6 +858,7 @@ public class Message implements Xmlizable, XmlizableStream {
          setSchedule(true);
          regularUnscheduleCalled = false;
          if(messageManager != null){
+            messageManager.schedulePublish(this);
             messageManager.notifySchedulingChangeListeners(this, true);
          }
       }
@@ -1029,6 +1030,7 @@ public class Message implements Xmlizable, XmlizableStream {
       setSchedule(false);
       regularUnscheduleCalled = true;
       if(messageManager != null){
+         messageManager.unschedulePublish(this);
          messageManager.notifySchedulingChangeListeners(this, false);
       }
    }

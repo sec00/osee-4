@@ -5,6 +5,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -376,6 +377,15 @@ public class OTETestEnvironmentClient {
          OteEndpointSendEventMessage sendit = new OteEndpointSendEventMessage(service, destinationAddress);
          sendit.asynchSend(req);
       } catch (IOException e) {
+         e.printStackTrace();
+      } 
+   }
+
+   public void send(ByteBuffer buffer) {
+      try {
+         OteEndpointSendEventMessage sendit = new OteEndpointSendEventMessage(service, destinationAddress);
+         sendit.asynchSend(buffer);
+      } catch (Throwable e) {
          e.printStackTrace();
       } 
    }

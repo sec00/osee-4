@@ -9,6 +9,15 @@ public interface Scheduler {
 
    public long getTime();
    
+
+   /**
+    * 
+    * @param task
+    * @param hzRate
+    * @param weight a value to determine sorting within a frame
+    * @return
+    */
+   public OTETaskRegistration scheduleAtFixedRate(Runnable task, double hzRate, int weight);
    public OTETaskRegistration scheduleAtFixedRate(Runnable runnable, double d);
    /**
     * 
@@ -36,5 +45,6 @@ public interface Scheduler {
     * @param pause
     */
    public void setNoPause(boolean pause);
+
    
 }
