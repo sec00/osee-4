@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import org.eclipse.osee.framework.core.data.Adaptable;
+import org.eclipse.osee.framework.core.data.ArtifactTypeId;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IArtifactToken;
 import org.eclipse.osee.framework.core.data.IArtifactType;
@@ -109,11 +110,11 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
    private ModificationType lastValidModType;
    private EditState objectEditState;
    private boolean useBackingData;
-   private IArtifactType artifactTypeToken;
+   private ArtifactTypeId artifactTypeId;
 
-   public Artifact(String guid, BranchId branch, IArtifactType artifactType) {
+   public Artifact(String guid, BranchId branch, ArtifactTypeId artifactTypeId) {
       super(GUID.checkOrCreate(guid), "");
-      this.artifactTypeToken = artifactType;
+      this.artifactTypeId = artifactTypeId;
       objectEditState = EditState.NO_CHANGE;
       internalSetModType(ModificationType.NEW, false);
 
@@ -477,6 +478,9 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
    }
 
    public final boolean isAttributeTypeValid(IAttributeType attributeType) throws OseeCoreException {
+      if (attributeType.equals(CoreAttributeTypes.Name)) {
+         return true;
+      }
       return getArtifactType().isValidAttributeType(attributeType, BranchManager.getBranch(branch));
    }
 
@@ -1358,11 +1362,12 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
     */
    @Override
    public final ArtifactType getArtifactType() {
-      return ArtifactTypeManager.getType(getArtifactTypeToken());
+      return ArtifactTypeManager.getType(getArtifactTypeId());
    }
 
-   public final IArtifactType getArtifactTypeToken() {
-      return artifactTypeToken;
+   @Override
+   public final ArtifactTypeId getArtifactTypeId() {
+      return artifactTypeId;
    }
 
    public final String getVersionedName() {
@@ -1501,9 +1506,9 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
    /**
     * Changes the artifact type.
     */
-   public final void setArtifactType(IArtifactType artifactTypeToken) throws OseeCoreException {
-      if (!this.artifactTypeToken.equals(artifactTypeToken)) {
-         this.artifactTypeToken = artifactTypeToken;
+   public final void setArtifactType(ArtifactTypeId artifactTypeId) {
+      if (!this.artifactTypeId.equals(artifactTypeId)) {
+         this.artifactTypeId = artifactTypeId;
          objectEditState = EditState.ARTIFACT_TYPE_MODIFIED;
          if (isInDb()) {
             internalSetModType(ModificationType.MODIFIED, false);
