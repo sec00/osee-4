@@ -102,12 +102,12 @@ public class SafetyWorkflowEventHandler implements EventHandler {
    private ArtifactReadable getAssociatedWorkflowArt(BranchId branchId) {
       ArtifactReadable toReturn = null;
       BranchReadable branch = queryFactory.branchQuery().andIds(branchId).getResults().getExactlyOne();
-      ArtifactId workflowUuid = branch.getAssociatedArtifact();
+      ArtifactId workflowId = branch.getAssociatedArtifact();
       try {
-         toReturn = atsServer.getQuery().andUuid(workflowUuid.getId()).andIsOfType(
+         toReturn = atsServer.getQuery().andId(workflowId).andIsOfType(
             AtsArtifactTypes.TeamWorkflow).getResults().getExactlyOne();
       } catch (Exception ex) {
-         throw new OseeCoreException(ex, "Exception in getAssociatedWorkflowArt: %s", workflowUuid);
+         throw new OseeCoreException(ex, "Exception in getAssociatedWorkflowArt: %s", workflowId);
       }
       return toReturn;
    }
@@ -115,7 +115,7 @@ public class SafetyWorkflowEventHandler implements EventHandler {
    private IAtsTeamWorkflow getSafetyWorkflow(ArtifactReadable workflowArt) {
       Conditions.checkNotNull(workflowArt, "work flow artifact");
       IAtsTeamWorkflow safetyWorkflow = null;
-      ArtifactReadable safetyActionableItemArt = atsServer.getArtifact(AtsArtifactToken.SafetyActionableItem.getId());
+      ArtifactReadable safetyActionableItemArt = atsServer.getArtifact(AtsArtifactToken.SafetyActionableItem);
       IAtsTeamWorkflow teamWf = atsServer.getWorkItemFactory().getTeamWf(workflowArt);
       IAtsActionableItem actionableItem = atsServer.getConfigItemFactory().getActionableItem(safetyActionableItemArt);
       for (IAtsTeamWorkflow sibling : atsServer.getActionFactory().getSiblingTeamWorkflows(teamWf)) {
