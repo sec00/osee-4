@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IArtifactToken;
 import org.eclipse.osee.framework.core.data.IArtifactType;
@@ -102,6 +103,10 @@ public class ArtifactQuery {
 
    public static Artifact getArtifactFromId(long artId, BranchId branch) throws OseeCoreException {
       return getArtifactFromId(new Long(artId).intValue(), branch, EXCLUDE_DELETED);
+   }
+
+   public static Artifact getArtifactFromId(ArtifactId artId, BranchId branch) {
+      return getArtifactFromId(artId.getId(), branch);
    }
 
    /**
