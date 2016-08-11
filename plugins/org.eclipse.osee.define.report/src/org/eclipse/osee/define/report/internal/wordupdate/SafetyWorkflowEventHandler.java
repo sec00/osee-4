@@ -24,6 +24,7 @@ import org.eclipse.osee.ats.api.workflow.IAtsTeamWorkflow;
 import org.eclipse.osee.ats.api.workflow.NewActionAdapter;
 import org.eclipse.osee.ats.core.users.AtsCoreUsers;
 import org.eclipse.osee.ats.rest.IAtsServer;
+import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.jdk.core.type.OseeArgumentException;
@@ -101,9 +102,9 @@ public class SafetyWorkflowEventHandler implements EventHandler {
    private ArtifactReadable getAssociatedWorkflowArt(BranchId branchId) {
       ArtifactReadable toReturn = null;
       BranchReadable branch = queryFactory.branchQuery().andIds(branchId).getResults().getExactlyOne();
-      long workflowUuid = branch.getAssociatedArtifactId();
+      ArtifactId workflowUuid = branch.getAssociatedArtifact();
       try {
-         toReturn = atsServer.getQuery().andUuid(workflowUuid).andIsOfType(
+         toReturn = atsServer.getQuery().andUuid(workflowUuid.getId()).andIsOfType(
             AtsArtifactTypes.TeamWorkflow).getResults().getExactlyOne();
       } catch (Exception ex) {
          throw new OseeCoreException(ex, "Exception in getAssociatedWorkflowArt: %s", workflowUuid);
@@ -129,13 +130,13 @@ public class SafetyWorkflowEventHandler implements EventHandler {
    private IAtsTeamWorkflow createSafetyAction(IAtsTeamWorkflow teamWf, ArtifactReadable userArt) {
       IAtsTeamWorkflow teamWorkflow = null;
       try {
-         IAtsActionableItem ai = atsServer.getCache().getByUuid(AtsArtifactToken.SafetyActionableItem.getId(),
-            IAtsActionableItem.class);
+         IAtsActionableItem ai =
+            atsServer.getCache().getByUuid(AtsArtifactToken.SafetyActionableItem.getId(), IAtsActionableItem.class);
          if (ai == null) {
             throw new OseeCoreException("Safety Actionable Item not configured");
          }
-         IAtsTeamDefinition teamDef = atsServer.getCache().getByUuid(
-            AtsArtifactToken.SafetyTeamDefinition.getId(), IAtsTeamDefinition.class);
+         IAtsTeamDefinition teamDef =
+            atsServer.getCache().getByUuid(AtsArtifactToken.SafetyTeamDefinition.getId(), IAtsTeamDefinition.class);
          if (teamDef == null) {
             throw new OseeCoreException("Safety Team Definition not configured");
          }
