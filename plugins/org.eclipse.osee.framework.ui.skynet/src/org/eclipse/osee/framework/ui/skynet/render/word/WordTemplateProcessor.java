@@ -95,13 +95,6 @@ public class WordTemplateProcessor {
       Pattern.compile("<((\\w+:)?(" + ARTIFACT + "))>(.*?)</\\1>|" + INSERT_LINK,
          Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
 
-   //The following REGEX are to be used once the Whole Word Content xml no longer contains custom xml tags
-   //NOTE: will have to have new tag for extension processor to know where to insert link
-   private static final Pattern headerPattern = Pattern.compile("<\\w+:?wordDocument.*?<\\w+:?body>",
-      Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
-   private static final Pattern footerPattern = Pattern.compile("<\\w+:?sectPr.*?<\\/w+:?wordDocument>",
-      Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
-
    private static final Program wordApp = Program.findProgram("doc");
    public static final String ATTRIBUTE_NAME = "AttributeName";
    public static final String ALL_ATTRIBUTES = "AllAttributes";
@@ -585,7 +578,8 @@ public class WordTemplateProcessor {
          for (Artifact artifact : allArtifacts) {
 
             String classification = null;
-            if (overrideClassification != null && ITemplateRenderer.DataRightsClassification.isValid(overrideClassification)) {
+            if (overrideClassification != null && ITemplateRenderer.DataRightsClassification.isValid(
+               overrideClassification)) {
                classification = overrideClassification;
             } else {
                classification = artifact.getSoleAttributeValueAsString(CoreAttributeTypes.DataRightsClassification, "");
@@ -636,11 +630,6 @@ public class WordTemplateProcessor {
       boolean templateOnly = renderer.getBooleanOption("TEMPLATE ONLY");
       if (templateOnly && !attributeType.equals(WordTemplateContent)) {
          return;
-      }
-
-      // Create a wordTemplateContent for new guys when opening them for edit.
-      if (attributeType.equals(WordTemplateContent) && presentationType == PresentationType.SPECIALIZED_EDIT) {
-         artifact.getOrInitializeSoleAttributeValue(attributeType);
       }
 
       /**
