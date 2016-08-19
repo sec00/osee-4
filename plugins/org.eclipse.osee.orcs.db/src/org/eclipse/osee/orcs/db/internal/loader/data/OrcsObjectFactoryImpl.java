@@ -50,7 +50,7 @@ public class OrcsObjectFactoryImpl implements OrcsObjectFactory {
    }
 
    @Override
-   public VersionData createVersion(Long branchId, TransactionId txId, long gamma, boolean historical) {
+   public VersionData createVersion(BranchId branchId, TransactionId txId, long gamma, boolean historical) {
       return createVersion(branchId, txId, gamma, historical, TransactionId.SENTINEL);
    }
 
@@ -58,7 +58,7 @@ public class OrcsObjectFactoryImpl implements OrcsObjectFactory {
    public VersionData createDefaultVersionData() {
       // @formatter:off
       return createVersion(
-         BranchId.SENTINEL.getId(),
+         BranchId.SENTINEL,
          TransactionId.SENTINEL,
          RelationalConstants.GAMMA_SENTINEL,
          RelationalConstants.IS_HISTORICAL_DEFAULT,
@@ -70,7 +70,7 @@ public class OrcsObjectFactoryImpl implements OrcsObjectFactory {
    public VersionData createCopy(VersionData other) {
       // @formatter:off
       return createVersion(
-         other.getBranchId(),
+         other.getBranch(),
          other.getTransactionId(),
          other.getGammaId(),
          other.isHistorical(),
@@ -78,9 +78,9 @@ public class OrcsObjectFactoryImpl implements OrcsObjectFactory {
       // @formatter:on
    }
 
-   private VersionData createVersion(Long branchId, TransactionId txId, long gamma, boolean historical, TransactionId stripeId) {
+   private VersionData createVersion(BranchId branchId, TransactionId txId, long gamma, boolean historical, TransactionId stripeId) {
       VersionData version = new VersionDataImpl();
-      version.setBranchId(branchId);
+      version.setBranch(branchId);
       version.setTransactionId(txId);
       version.setGammaId(gamma);
       version.setHistorical(historical);
@@ -212,12 +212,12 @@ public class OrcsObjectFactoryImpl implements OrcsObjectFactory {
    }
 
    @Override
-   public TxOrcsData createTxData(Long localId, TransactionDetailsType type, Date date, String comment, Long branchId, ArtifactId author, ArtifactId commitArt) {
+   public TxOrcsData createTxData(Long localId, TransactionDetailsType type, Date date, String comment, BranchId branch, ArtifactId author, ArtifactId commitArt) {
       TxOrcsData data = new TransactionDataImpl(localId);
       data.setTxType(type);
       data.setDate(date);
       data.setComment(comment);
-      data.setBranchId(branchId);
+      data.setBranch(branch);
       data.setAuthor(author);
       data.setCommitArt(commitArt);
       return data;
@@ -225,8 +225,8 @@ public class OrcsObjectFactoryImpl implements OrcsObjectFactory {
 
    @Override
    public TxOrcsData createCopy(TxOrcsData source) {
-      return createTxData(source.getId(), source.getTxType(), source.getDate(), source.getComment(),
-         source.getBranchId(), source.getAuthor(), source.getCommitArt());
+      return createTxData(source.getId(), source.getTxType(), source.getDate(), source.getComment(), source.getBranch(),
+         source.getAuthor(), source.getCommitArt());
    }
 
    @Override
@@ -239,7 +239,7 @@ public class OrcsObjectFactoryImpl implements OrcsObjectFactory {
       data.setElement1(element1);
       data.setElement2(element2);
       data.getVersion().setGammaId(Lib.generateUuid());
-      data.getVersion().setBranchId(branchId.getId());
+      data.getVersion().setBranch(branchId);
       return data;
    }
 
@@ -254,7 +254,7 @@ public class OrcsObjectFactoryImpl implements OrcsObjectFactory {
       data.setElement2(e2);
       data.setElement3(e3);
       data.getVersion().setGammaId(Lib.generateUuid());
-      data.getVersion().setBranchId(branchId.getId());
+      data.getVersion().setBranch(branchId);
       return data;
    }
 
@@ -270,7 +270,7 @@ public class OrcsObjectFactoryImpl implements OrcsObjectFactory {
       data.setElement3(e3);
       data.setElement4(e4);
       data.getVersion().setGammaId(Lib.generateUuid());
-      data.getVersion().setBranchId(branchId.getId());
+      data.getVersion().setBranch(branchId);
       return data;
    }
 
