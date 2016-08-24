@@ -45,9 +45,9 @@ public class RelationChangeWorker implements IChangeWorker {
 
    private RelationLink setRelationLink() throws OseeCoreException {
       if (link == null) {
-         link = RelationManager.getOrCreate(change.getArtId(), change.getBArtId(), artifact.getBranch(),
-            change.getRelationType(), change.getRelLinkId(), (int) change.getGamma(), change.getRationale(),
-            change.getModificationType());
+         link = RelationManager.getOrCreate(change.getArtId().getId().intValue(), change.getBArtId().getId().intValue(),
+            artifact.getBranch(), change.getRelationType(), change.getRelLinkId().getId().intValue(),
+            change.getGamma().getId().intValue(), change.getRationale(), change.getModificationType());
       }
       return link;
    }
@@ -58,7 +58,7 @@ public class RelationChangeWorker implements IChangeWorker {
       setRelationLink();
 
       if (change.isBaseline()) {
-         link.replaceWithVersion((int) change.getBaselineGamma());
+         link.replaceWithVersion(change.getBaselineGamma().getId().intValue());
 
          Artifact otherSideCurrent =
             ArtifactQuery.getArtifactFromId(link.getArtifactOnOtherSide(artifact).getArtId(), artifact.getBranch());
