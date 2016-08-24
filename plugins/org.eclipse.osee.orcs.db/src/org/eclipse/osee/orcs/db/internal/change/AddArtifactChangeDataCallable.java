@@ -15,6 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.osee.executor.admin.CancellableCallable;
+import org.eclipse.osee.framework.core.data.ArtifactId;
+import org.eclipse.osee.framework.core.data.ArtifactTypeId;
+import org.eclipse.osee.framework.core.data.GammaId;
 import org.eclipse.osee.framework.core.enums.ModificationType;
 import org.eclipse.osee.framework.core.model.change.ChangeItem;
 import org.eclipse.osee.framework.core.model.change.ChangeItemUtil;
@@ -29,7 +32,7 @@ public class AddArtifactChangeDataCallable extends CancellableCallable<List<Chan
 
    @Override
    public List<ChangeItem> call() throws Exception {
-      Map<Integer, ChangeItem> artifactChanges = new HashMap<>();
+      Map<ArtifactId, ChangeItem> artifactChanges = new HashMap<>();
       for (ChangeItem item : changeItems) {
          if (item.getChangeType().isArtifactChange()) {
             artifactChanges.put(item.getArtId(), item);
@@ -37,17 +40,18 @@ public class AddArtifactChangeDataCallable extends CancellableCallable<List<Chan
       }
 
       List<ChangeItem> attrItems = new ArrayList<>();
-      Map<Integer, ChangeItem> syntheticArtifactChanges = new HashMap<>();
+      Map<ArtifactId, ChangeItem> syntheticArtifactChanges = new HashMap<>();
 
       for (ChangeItem item : changeItems) {
          if (item.getChangeType().isAttributeChange()) {
             ChangeItem attributeChange = item;
-            Integer artIdToCheck = attributeChange.getArtId();
+            ArtifactId artIdToCheck = attributeChange.getArtId();
             ChangeItem artifactChange = artifactChanges.get(artIdToCheck);
             if (artifactChange == null) {
                artifactChange = syntheticArtifactChanges.get(artIdToCheck);
                if (artifactChange == null) {
-                  artifactChange = ChangeItemUtil.newArtifactChange(artIdToCheck, -1, -1, null, null);
+                  artifactChange = ChangeItemUtil.newArtifactChange(artIdToCheck, ArtifactTypeId.valueOf(-1),
+                     GammaId.valueOf(-1), null, null);
                   syntheticArtifactChanges.put(artIdToCheck, artifactChange);
                   artifactChange.setSynthetic(true);
                }
