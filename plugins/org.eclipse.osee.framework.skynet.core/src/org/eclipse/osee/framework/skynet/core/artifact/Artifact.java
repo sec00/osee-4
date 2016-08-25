@@ -1154,7 +1154,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
          return;
       }
 
-      ArtifactQuery.reloadArtifactFromId(getArtId(), getBranch());
+      ArtifactQuery.reloadArtifactFromId(this, getBranch());
    }
 
    void prepareForReload() {
@@ -1725,11 +1725,6 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
          // do nothing
       }
       return artifact;
-   }
-
-   @Override
-   public Long getUuid() {
-      return getId();
    }
 
    @Override
