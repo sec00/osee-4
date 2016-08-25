@@ -139,7 +139,8 @@ public class ArtifactQuery {
             }
          }
       } else {
-         artifact = new ArtifactQueryBuilder(artId, branch, allowDeleted, ALL).getOrCheckArtifact(queryType);
+         artifact = new ArtifactQueryBuilder(ArtifactId.valueOf(artId), branch, allowDeleted, ALL).getOrCheckArtifact(
+            queryType);
       }
       return artifact;
    }
@@ -244,14 +245,9 @@ public class ArtifactQuery {
       return null;
    }
 
-   public static List<Integer> selectArtifactIdsFromTypeAndName(IArtifactType artifactType, String artifactName, BranchId branch, QueryOption... options) throws OseeCoreException {
+   public static List<ArtifactId> selectArtifactIdsFromTypeAndName(IArtifactType artifactType, String artifactName, BranchId branch, QueryOption... options) throws OseeCoreException {
       return queryFromTypeAndAttribute(artifactType, CoreAttributeTypes.Name, artifactName, branch,
          options).selectArtifacts(2);
-   }
-
-   public static List<Integer> selectArtifactIdsFromTypeAndAttribute(IArtifactType artifactType, IAttributeType attributeType, String attributeValue, BranchId branch, QueryOption... options) throws OseeCoreException {
-      return queryFromTypeAndAttribute(artifactType, attributeType, attributeValue, branch, options).selectArtifacts(
-         10000);
    }
 
    /**
@@ -278,6 +274,15 @@ public class ArtifactQuery {
     * @return a collection of the artifacts found or an empty collection if none are found
     */
    public static List<Artifact> getArtifactListFromIds(Collection<Integer> artifactIds, BranchId branch) throws OseeCoreException {
+      return ArtifactLoader.loadArtifactIds(artifactIds, branch, LoadLevel.ALL, INCLUDE_CACHE, INCLUDE_DELETED);
+   }
+
+   /**
+    * search for un-deleted artifacts with any of the given artifact ids
+    *
+    * @return a collection of the artifacts found or an empty collection if none are found
+    */
+   public static List<Artifact> getArtifactListFrom(Collection<ArtifactId> artifactIds, BranchId branch) throws OseeCoreException {
       return ArtifactLoader.loadArtifacts(artifactIds, branch, LoadLevel.ALL, INCLUDE_CACHE, INCLUDE_DELETED);
    }
 
@@ -287,7 +292,7 @@ public class ArtifactQuery {
     * @return a collection of the artifacts found or an empty collection if none are found
     */
    public static List<Artifact> getArtifactListFromIds(Collection<Integer> artifactIds, BranchId branch, DeletionFlag allowDeleted) throws OseeCoreException {
-      return ArtifactLoader.loadArtifacts(artifactIds, branch, LoadLevel.ALL, INCLUDE_CACHE, allowDeleted);
+      return ArtifactLoader.loadArtifactIds(artifactIds, branch, LoadLevel.ALL, INCLUDE_CACHE, allowDeleted);
    }
 
    /**
@@ -312,7 +317,8 @@ public class ArtifactQuery {
    }
 
    public static Artifact getHistoricalArtifactFromId(int artifactId, TransactionToken transactionId, DeletionFlag allowDeleted) throws OseeCoreException {
-      return new ArtifactQueryBuilder(artifactId, transactionId, allowDeleted, ALL).getOrCheckArtifact(QueryType.GET);
+      return new ArtifactQueryBuilder(ArtifactId.valueOf(artifactId), transactionId, allowDeleted,
+         ALL).getOrCheckArtifact(QueryType.GET);
    }
 
    public static Artifact getHistoricalArtifactFromId(String guid, TransactionToken transactionId, DeletionFlag allowDeleted) throws OseeCoreException {
@@ -320,7 +326,7 @@ public class ArtifactQuery {
          QueryType.GET);
    }
 
-   public static Artifact checkHistoricalArtifactFromId(int artifactId, TransactionToken transactionId, DeletionFlag allowDeleted) throws OseeCoreException {
+   public static Artifact checkHistoricalArtifactFromId(Artifact artifactId, TransactionToken transactionId, DeletionFlag allowDeleted) throws OseeCoreException {
       return new ArtifactQueryBuilder(artifactId, transactionId, allowDeleted, ALL).getOrCheckArtifact(QueryType.CHECK);
    }
 
@@ -381,14 +387,6 @@ public class ArtifactQuery {
 
    public static List<Artifact> getArtifactListFromBranch(BranchId branch, DeletionFlag allowDeleted) throws OseeCoreException {
       return new ArtifactQueryBuilder(branch, ALL, allowDeleted).getArtifacts(10000, null);
-   }
-
-   public static List<Integer> selectArtifactListFromType(IArtifactType artifactTypeToken, BranchId branch, DeletionFlag allowDeleted) throws OseeCoreException {
-      return new ArtifactQueryBuilder(artifactTypeToken, branch, ALL, allowDeleted).selectArtifacts(10000);
-   }
-
-   public static List<Integer> selectArtifactListFromBranch(BranchId branch, DeletionFlag allowDeleted) throws OseeCoreException {
-      return new ArtifactQueryBuilder(branch, ALL, allowDeleted).selectArtifacts(10000);
    }
 
    public static List<Artifact> getArtifactListFromBranch(BranchId branch, LoadLevel loadLevel, DeletionFlag allowDeleted) throws OseeCoreException {
@@ -458,7 +456,7 @@ public class ArtifactQuery {
     */
    public static List<Artifact> getRelatedArtifactList(Artifact artifact, IRelationType relationType, RelationSide relationSide) throws OseeCoreException {
       return new ArtifactQueryBuilder(artifact.getBranch(), ALL, EXCLUDE_DELETED,
-         new RelationCriteria(artifact.getArtId(), relationType, relationSide)).getArtifacts(1000, null);
+         new RelationCriteria(artifact, relationType, relationSide)).getArtifacts(1000, null);
    }
 
    /**
@@ -582,7 +580,7 @@ public class ArtifactQuery {
       return queryBuilder.getMatches();
    }
 
-   public static Artifact reloadArtifactFromId(int artId, BranchId branch) throws OseeCoreException {
+   public static Artifact reloadArtifactFromId(ArtifactId artId, BranchId branch) throws OseeCoreException {
       ArtifactQueryBuilder query = new ArtifactQueryBuilder(artId, branch, INCLUDE_DELETED, ALL);
       Artifact artifact = query.reloadArtifact();
       OseeEventManager.kickLocalArtifactReloadEvent(query, Collections.singleton(artifact));
@@ -694,7 +692,7 @@ public class ArtifactQuery {
          DeletionFlag deletionFlag =
             searchParameters.isIncludeDeleted() ? DeletionFlag.INCLUDE_DELETED : DeletionFlag.EXCLUDE_DELETED;
 
-         List<Integer> ids = result.getIds();
+         List<ArtifactId> ids = result.getIds();
          ResultSet<Artifact> toReturn;
          if (ids != null && !ids.isEmpty()) {
             List<Artifact> loadedArtifacts =
@@ -721,20 +719,20 @@ public class ArtifactQuery {
          DeletionFlag deletionFlag =
             searchParameters.isIncludeDeleted() ? DeletionFlag.INCLUDE_DELETED : DeletionFlag.EXCLUDE_DELETED;
 
-         Map<Integer, Artifact> artIdToArtifact = new HashMap<>();
+         Map<Long, Artifact> artIdToArtifact = new HashMap<>();
 
          List<Artifact> loadedArtifacts =
             ArtifactLoader.loadArtifacts(result.getIds(), branch, LoadLevel.ALL, INCLUDE_CACHE, deletionFlag, tx);
 
          for (Artifact art : loadedArtifacts) {
-            artIdToArtifact.put(art.getArtId(), art);
+            artIdToArtifact.put(art.getId(), art);
          }
 
          Map<Artifact, ArtifactMatch> matches = new HashMap<>();
          for (SearchMatch match : result.getSearchMatches()) {
-            int artId = match.getArtId();
+            ArtifactId artId = match.getArtId();
             int attrId = match.getAttrId();
-            Artifact art = artIdToArtifact.get(artId);
+            Artifact art = artIdToArtifact.get(artId.getId());
 
             if (art != null) {
                ArtifactMatch toAddTo = matches.get(art);
