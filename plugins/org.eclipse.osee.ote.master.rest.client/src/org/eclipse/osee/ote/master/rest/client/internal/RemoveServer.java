@@ -28,11 +28,11 @@ public class RemoveServer implements Callable<OTEMasterServerResult> {
       try {
          URI targetUri  =
                UriBuilder.fromUri(uri).path(OTEMasterServerImpl.CONTEXT_NAME).path(OTEMasterServerImpl.CONTEXT_SERVERS).path(server.getUUID().toString()).build();
-//         if(HttpUtil.canConnect(targetUri)){
+         if(HttpUtil.canConnect(targetUri)){
             webClientProvider.target(targetUri).request().method(HttpMethod.DELETE);
-//         } else {
-//            result.setSuccess(false);   
-//         }
+         } else {
+            result.setSuccess(false);   
+         }
       } catch (Throwable th) {
          result.setSuccess(false);
          result.setThrowable(th);
