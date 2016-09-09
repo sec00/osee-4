@@ -437,17 +437,9 @@ public class AccessControlService implements IAccessControlService {
             PermissionEnum groupPermission = accessControlListCache.get(groupPermissionId, accessObject);
 
             if (groupPermission != null) {
-               if (userPermission == null) {
-                  userPermission = groupPermission;
-               }
-
                if (groupPermission.getRank() > userPermission.getRank()) {
                   userPermission = groupPermission;
                }
-            }
-
-            if (userPermission == null) {
-               userPermission = PermissionEnum.DENY;
             }
          }
       }
