@@ -43,6 +43,8 @@ public class OTEFolderImpl implements OTEServerFolder{
    private static File BATCHES = new File(OTESERVER, "batches");
    private static File JARCACHE = new File(OTESERVER, "runtimeCache");
    private static File SERVERS = new File(OTESERVER, "servers");
+   private static File MISCFILES = new File(OTESERVER, "miscFiles");
+
    private static SimpleDateFormat format = new SimpleDateFormat("yyyy_MM_dd___kk_mm_ss");
    
    private File currentServerFolder; 
@@ -189,6 +191,11 @@ public class OTEFolderImpl implements OTEServerFolder{
    @Override
    public File getCacheFolder(){
       return JARCACHE;
+   }
+
+   @Override
+   public File getMiscFiles() {
+      return MISCFILES;
    }
    
    @Override
