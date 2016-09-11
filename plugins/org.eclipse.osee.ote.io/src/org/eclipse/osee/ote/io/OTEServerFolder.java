@@ -31,7 +31,14 @@ public interface OTEServerFolder {
    public File getBatchesFolder();
    
    public File getCacheFolder();
-   
+
+   /**
+    * This is the root folder for miscellaneous files that might want to be stored.
+    * 
+    * @return
+    */
+   public File getMiscFiles();
+
    /**
     * This is the batch log file that contains all LEVEL.SEVERE and above log events that happened during 
     * a batch.
