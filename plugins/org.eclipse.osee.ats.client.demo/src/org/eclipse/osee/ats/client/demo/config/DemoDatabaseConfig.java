@@ -36,7 +36,7 @@ import org.eclipse.osee.ats.demo.api.DemoProgram;
 import org.eclipse.osee.ats.demo.api.DemoSubsystems;
 import org.eclipse.osee.ats.demo.api.DemoUsers;
 import org.eclipse.osee.framework.core.data.BranchId;
-import org.eclipse.osee.framework.core.data.IArtifactToken;
+import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.enums.CoreArtifactTypes;
 import org.eclipse.osee.framework.core.exception.OseeWrappedException;
 import org.eclipse.osee.framework.database.init.IDbInitializationTask;
@@ -295,7 +295,7 @@ public class DemoDatabaseConfig implements IDbInitializationTask {
       insertionActivityArt.addRelation(AtsRelationTypes.InsertionActivityToWorkPackage_WorkPackage, workPackageArt);
    }
 
-   private Artifact createWorkPackage(IArtifactToken workPackageToken, String activityId) throws OseeCoreException {
+   private Artifact createWorkPackage(ArtifactToken workPackageToken, String activityId) throws OseeCoreException {
       Artifact workPkg1 = ArtifactTypeManager.addArtifact(workPackageToken, AtsUtilCore.getAtsBranch());
       char charAt = workPackageToken.getName().charAt(workPackageToken.getName().length() - 1);
       workPkg1.addAttributeFromString(AtsAttributeTypes.WorkPackageId, "WP_0" + charAt);
