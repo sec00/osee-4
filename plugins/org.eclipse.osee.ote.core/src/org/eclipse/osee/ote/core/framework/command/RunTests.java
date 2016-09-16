@@ -219,8 +219,7 @@ public class RunTests implements ITestServerCommand, Serializable {
    }
 
    private String getTestType(){
-      IPropertyStore props = scripts.get(0);
-      return props.get("FormalTestType");
+      return global.get("FormalTestType");
    }
    
    private boolean isFolderToKeep(String testType) {

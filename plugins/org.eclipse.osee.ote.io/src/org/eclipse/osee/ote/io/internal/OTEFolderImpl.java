@@ -104,18 +104,21 @@ public class OTEFolderImpl implements OTEServerFolder{
    @Override
    public void cleanOldBatchFolders(){
       Date dateBefore = new Date(new Date().getTime() -(DAYS * 24 * 3600 * 1000));
+      Date dateNoMatterwhat = new Date(new Date().getTime() -(28L * 24L * 3600L * 1000L));//4 weeks
       if(BATCHES.exists()){
          File[] files = BATCHES.listFiles();
          if(files != null){
             for(File file:files){
                if(file.isDirectory()){
                   boolean olderFileOrUnknown = true;
+                  boolean removeNoMatterWhat = false;
                   try {
                      Date fileDate = format.parse(file.getName());
                      if(fileDate == null){
                         OseeLog.log(getClass(), Level.WARNING, "Failed to parse a date from the Dir name "+ file.getAbsolutePath());
                      } else {
                         olderFileOrUnknown = fileDate.before(dateBefore);
+                        removeNoMatterWhat = fileDate.before(dateNoMatterwhat);
                      }
                   } catch (ParseException e) {
                      int index = file.getName().lastIndexOf("__");
@@ -126,6 +129,7 @@ public class OTEFolderImpl implements OTEServerFolder{
                               OseeLog.log(getClass(), Level.WARNING, "Failed to parse a date from the Dir name "+ file.getAbsolutePath());
                            } else {
                               olderFileOrUnknown = fileDate.before(dateBefore);
+                              removeNoMatterWhat = fileDate.before(dateNoMatterwhat);
                            }
                         } catch (ParseException e2){
                            OseeLog.log(getClass(), Level.SEVERE, e2);
@@ -136,7 +140,7 @@ public class OTEFolderImpl implements OTEServerFolder{
                   }
                   File delete = new File(file, DELETE_MARKER);
                   boolean deleteFolder = delete.exists();
-                  if(deleteFolder && olderFileOrUnknown){
+                  if((deleteFolder && olderFileOrUnknown) || removeNoMatterWhat){
                      File[] toDelete = file.listFiles();
                      for(File f:toDelete){
                         f.delete();
@@ -176,6 +180,7 @@ public class OTEFolderImpl implements OTEServerFolder{
                               OseeLog.log(getClass(), Level.WARNING, "Failed to parse a date from the Dir name "+ file.getAbsolutePath());
                            } else {
                               olderFileOrUnknown = fileDate.before(dateBefore);
+                              removeNoMatterWhat = fileDate.before(dateNoMatterwhat);
                            }
                         } catch (ParseException e2){
                            OseeLog.log(getClass(), Level.SEVERE, e2);
