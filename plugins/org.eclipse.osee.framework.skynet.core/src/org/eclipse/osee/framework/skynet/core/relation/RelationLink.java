@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.HasBranch;
 import org.eclipse.osee.framework.core.data.IRelationType;
+import org.eclipse.osee.framework.core.data.RelationTypeToken;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.DeletionFlag;
 import org.eclipse.osee.framework.core.enums.ModificationType;
@@ -51,7 +52,7 @@ public class RelationLink implements HasBranch {
    private int relationId;
    private int gammaId;
    private String rationale;
-   private final RelationType relationType;
+   private final RelationTypeToken relationType;
    private boolean dirty;
    private final int aArtifactId;
    private final int bArtifactId;
@@ -64,7 +65,7 @@ public class RelationLink implements HasBranch {
    private final ArtifactLinker artifactLinker;
    private boolean useBackingData;
 
-   public RelationLink(ArtifactLinker artifactLinker, int aArtifactId, int bArtifactId, BranchId branch, RelationType relationType, int relationId, int gammaId, String rationale, ModificationType modificationType) {
+   public RelationLink(ArtifactLinker artifactLinker, int aArtifactId, int bArtifactId, BranchId branch, RelationTypeToken relationType, int relationId, int gammaId, String rationale, ModificationType modificationType) {
       this.artifactLinker = artifactLinker;
       this.relationType = relationType;
       this.relationId = relationId;
@@ -247,12 +248,8 @@ public class RelationLink implements HasBranch {
       return relationType.equals(oseeType);
    }
 
-   public RelationType getRelationType() {
+   public RelationTypeToken getRelationType() {
       return relationType;
-   }
-
-   public String getSideNameFor(Artifact artifact) {
-      return relationType.getSideName(getSide(artifact));
    }
 
    public String getSidePhrasingFor(Artifact artifact) throws OseeCoreException {
@@ -275,7 +272,7 @@ public class RelationLink implements HasBranch {
       if (isOtherArtifact) {
          side = side.oppositeSide();
       }
-      return "has (" + getRelationType().getMultiplicity().asLimitLabel(side) + ")";
+      return "has (" + RelationTypeManager.getType(relationType).getMultiplicity().asLimitLabel(side) + ")";
    }
 
    @Override
@@ -386,8 +383,10 @@ public class RelationLink implements HasBranch {
       RelationOrderData leftData = factory.createRelationOrderData(aArtifact);
       RelationOrderData rightData = factory.createRelationOrderData(bArtifact);
 
-      RelationSorter leftSorter = leftData.getCurrentSorterGuid(getRelationType(), getSide(aArtifact));
-      RelationSorter rightSorter = rightData.getCurrentSorterGuid(getRelationType(), getSide(bArtifact));
+      RelationType relType = RelationTypeManager.getType(relationType);
+
+      RelationSorter leftSorter = leftData.getCurrentSorterGuid(relType, getSide(aArtifact));
+      RelationSorter rightSorter = rightData.getCurrentSorterGuid(relType, getSide(bArtifact));
 
       return rightSorter.equals(USER_DEFINED) && leftSorter.equals(USER_DEFINED);
    }
@@ -399,5 +398,4 @@ public class RelationLink implements HasBranch {
    public boolean isUseBackingData() {
       return useBackingData;
    }
-
 }
