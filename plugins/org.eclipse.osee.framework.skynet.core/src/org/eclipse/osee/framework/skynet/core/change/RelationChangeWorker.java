@@ -14,11 +14,11 @@ import static org.eclipse.osee.framework.core.enums.RelationSorter.USER_DEFINED;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import org.eclipse.osee.framework.core.data.IRelationType;
+import org.eclipse.osee.framework.core.data.RelationTypeToken;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.DeletionFlag;
-import org.eclipse.osee.framework.core.enums.RelationSorter;
 import org.eclipse.osee.framework.core.enums.RelationSide;
+import org.eclipse.osee.framework.core.enums.RelationSorter;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.Pair;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -97,7 +97,7 @@ public class RelationChangeWorker implements IChangeWorker {
 
                List<String> guids = new ArrayList<>();
 
-               for (Entry<Pair<IRelationType, RelationSide>, Pair<RelationSorter, List<String>>> relationOrderGuidData : relationOrderData.entrySet()) {
+               for (Entry<Pair<RelationTypeToken, RelationSide>, Pair<RelationSorter, List<String>>> relationOrderGuidData : relationOrderData.entrySet()) {
                   guids.addAll(relationOrderGuidData.getValue().getSecond());
                }
                guids.add(artifact.getGuid());
