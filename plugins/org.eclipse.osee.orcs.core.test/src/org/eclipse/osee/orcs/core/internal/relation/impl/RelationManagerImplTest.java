@@ -366,7 +366,7 @@ public class RelationManagerImplTest {
 
       verify(resolver).resolve(session, graph, relations, SIDE_A);
 
-      IRelationTypeSide typeSide = TokenFactory.createRelationTypeSide(SIDE_A, TYPE_1.getGuid(), TYPE_1.getName());
+      IRelationTypeSide typeSide = TokenFactory.createRelationTypeSide(SIDE_A, TYPE_1.getId(), TYPE_1.getName());
       verify(orderManager1).sort(typeSide, nodes);
    }
 
@@ -537,8 +537,8 @@ public class RelationManagerImplTest {
       verify(container2).getRelation(node1, TYPE_1, node2, INCLUDE_DELETED);
       verify(relationFactory).createRelation(node1, TYPE_1, node2);
       verify(orderManager1).setOrder(eq(typeSide), eq(LEXICOGRAPHICAL_ASC), sortedListCaptor.capture());
-      verify(container1).add(TYPE_1.getGuid(), relation1);
-      verify(container2).add(TYPE_1.getGuid(), relation1);
+      verify(container1).add(TYPE_1.getId(), relation1);
+      verify(container2).add(TYPE_1.getId(), relation1);
    }
 
    @Test
@@ -565,8 +565,8 @@ public class RelationManagerImplTest {
       verify(relationFactory).createRelation(node1, TYPE_1, node2);
       verify(orderManager1).getSorterId(typeSide);
       verify(orderManager1).setOrder(eq(typeSide), eq(UNORDERED), sortedListCaptor.capture());
-      verify(container1).add(TYPE_1.getGuid(), relation1);
-      verify(container2).add(TYPE_1.getGuid(), relation1);
+      verify(container1).add(TYPE_1.getId(), relation1);
+      verify(container2).add(TYPE_1.getId(), relation1);
    }
 
    @Test
@@ -592,8 +592,8 @@ public class RelationManagerImplTest {
 
       verify(container1).getRelation(node1, TYPE_1, node2, INCLUDE_DELETED);
       verify(container2).getRelation(node1, TYPE_1, node2, INCLUDE_DELETED);
-      verify(container1).add(TYPE_1.getGuid(), relation1);
-      verify(container2).add(TYPE_1.getGuid(), relation1);
+      verify(container1).add(TYPE_1.getId(), relation1);
+      verify(container2).add(TYPE_1.getId(), relation1);
 
       verify(resolver).resolve(session, graph, toOrder, SIDE_B);
 
@@ -631,8 +631,8 @@ public class RelationManagerImplTest {
       verify(container2).getRelation(node1, DEFAULT_HIERARCHY, node2, INCLUDE_DELETED);
       verify(orderManager1).getSorterId(Default_Hierarchical__Child);
       verify(orderManager1).setOrder(eq(Default_Hierarchical__Child), eq(UNORDERED), sortedListCaptor.capture());
-      verify(container1).add(DEFAULT_HIERARCHY.getGuid(), relation1);
-      verify(container2).add(DEFAULT_HIERARCHY.getGuid(), relation1);
+      verify(container1).add(DEFAULT_HIERARCHY.getId(), relation1);
+      verify(container2).add(DEFAULT_HIERARCHY.getId(), relation1);
    }
 
    @Test
@@ -657,8 +657,8 @@ public class RelationManagerImplTest {
 
       verify(orderManager1).getSorterId(Default_Hierarchical__Child);
       verify(orderManager1).setOrder(eq(Default_Hierarchical__Child), eq(UNORDERED), sortedListCaptor.capture());
-      verify(container1).add(DEFAULT_HIERARCHY.getGuid(), relation1);
-      verify(container2).add(DEFAULT_HIERARCHY.getGuid(), relation1);
+      verify(container1).add(DEFAULT_HIERARCHY.getId(), relation1);
+      verify(container2).add(DEFAULT_HIERARCHY.getId(), relation1);
    }
 
    @Test
@@ -680,8 +680,8 @@ public class RelationManagerImplTest {
 
       verify(orderManager1).getSorterId(Default_Hierarchical__Child);
       verify(orderManager1).setOrder(eq(Default_Hierarchical__Child), eq(UNORDERED), sortedListCaptor.capture());
-      verify(container1, times(1)).add(DEFAULT_HIERARCHY.getGuid(), relation1);
-      verify(container2, times(0)).add(DEFAULT_HIERARCHY.getGuid(), relation1);
+      verify(container1, times(1)).add(DEFAULT_HIERARCHY.getId(), relation1);
+      verify(container2, times(0)).add(DEFAULT_HIERARCHY.getId(), relation1);
 
       verify(relation1).unDelete();
    }
@@ -705,7 +705,7 @@ public class RelationManagerImplTest {
 
       verify(orderManager1).getSorterId(Default_Hierarchical__Child);
 
-      verify(container1, times(0)).remove(DEFAULT_HIERARCHY.getGuid(), relation1);
+      verify(container1, times(0)).remove(DEFAULT_HIERARCHY.getId(), relation1);
 
       verify(resolver).resolve(session, graph, relations, SIDE_B);
 
