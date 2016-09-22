@@ -25,7 +25,7 @@ import org.eclipse.osee.ats.api.workflow.IAtsTeamWorkflow;
 import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.IAttributeType;
-import org.eclipse.osee.framework.core.data.IRelationTypeSide;
+import org.eclipse.osee.framework.core.data.RelationTypeSide;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.util.Conditions;
 
@@ -142,17 +142,17 @@ public abstract class AbstractAtsChangeSet implements IAtsChangeSet {
    }
 
    @Override
-   public void unrelate(IAtsObject atsObject, IRelationTypeSide relationSide, IAtsObject atsObjec2) {
+   public void unrelate(IAtsObject atsObject, RelationTypeSide relationSide, IAtsObject atsObjec2) {
       unrelate(atsObject.getStoreObject(), relationSide, atsObjec2.getStoreObject());
    }
 
    @Override
-   public void unrelate(ArtifactId artifact, IRelationTypeSide relationSide, IAtsObject atsObject) {
+   public void unrelate(ArtifactId artifact, RelationTypeSide relationSide, IAtsObject atsObject) {
       unrelate(artifact, relationSide, atsObject.getStoreObject());
    }
 
    @Override
-   public void unrelate(IAtsObject atsObject, IRelationTypeSide relationSide, ArtifactId artifact) {
+   public void unrelate(IAtsObject atsObject, RelationTypeSide relationSide, ArtifactId artifact) {
       unrelate(atsObject.getStoreObject(), relationSide, artifact);
    }
 
