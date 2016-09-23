@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import org.eclipse.osee.framework.core.data.BranchId;
-import org.eclipse.osee.framework.core.data.IRelationSorterId;
+import org.eclipse.osee.framework.core.data.RelationSorter;
 import org.eclipse.osee.framework.core.data.IRelationType;
 import org.eclipse.osee.framework.core.data.IRelationTypeSide;
 import org.eclipse.osee.framework.core.enums.DeletionFlag;
@@ -513,7 +513,7 @@ public class RelationManager {
       addRelation(RelationOrderBaseTypes.PREEXISTING, relationType, artifactA, artifactB, rationale);
    }
 
-   public static void addRelation(IRelationSorterId sorterId, IRelationType relationTypeToken, Artifact artifactA, Artifact artifactB, String rationale) throws OseeCoreException {
+   public static void addRelation(RelationSorter sorterId, IRelationType relationTypeToken, Artifact artifactA, Artifact artifactB, String rationale) throws OseeCoreException {
       Conditions.checkExpressionFailOnTrue(artifactA.equals(artifactB), "Not valid to relate artifact [%s] to itself",
          artifactA);
       RelationLink relation = relationCache.getLoadedRelation(artifactA, artifactA.getArtId(), artifactB.getArtId(),
@@ -555,7 +555,7 @@ public class RelationManager {
       return relationSorterProvider;
    }
 
-   public static List<IRelationSorterId> getRelationOrderTypes() {
+   public static List<RelationSorter> getRelationOrderTypes() {
       return relationSorterProvider.getAllRelationOrderIds();
    }
 
@@ -567,7 +567,7 @@ public class RelationManager {
       return relationOrderFactory.createRelationOrderData(artifact);
    }
 
-   public static void setRelationOrder(IArtifact artifact, IRelationType relationType, RelationSide side, IRelationSorterId orderId, List<Artifact> relatives) throws OseeCoreException {
+   public static void setRelationOrder(IArtifact artifact, IRelationType relationType, RelationSide side, RelationSorter orderId, List<Artifact> relatives) throws OseeCoreException {
       RelationTypeSideSorter sorter = createTypeSideSorter(artifact, relationType, side);
       sorter.setOrder(relatives, orderId);
    }
