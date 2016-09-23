@@ -13,6 +13,7 @@ package org.eclipse.osee.framework.skynet.core.change;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import org.eclipse.osee.framework.core.data.RelationSorter;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.DeletionFlag;
 import org.eclipse.osee.framework.core.enums.RelationOrderBaseTypes;
@@ -94,7 +95,7 @@ public class RelationChangeWorker implements IChangeWorker {
 
                List<String> guids = new ArrayList<>();
 
-               for (Entry<Pair<String, String>, Pair<String, List<String>>> relationOrderGuidData : relationOrderData.entrySet()) {
+               for (Entry<Pair<String, String>, Pair<RelationSorter, List<String>>> relationOrderGuidData : relationOrderData.entrySet()) {
                   guids.addAll(relationOrderGuidData.getValue().getSecond());
                }
                guids.add(artifact.getGuid());
