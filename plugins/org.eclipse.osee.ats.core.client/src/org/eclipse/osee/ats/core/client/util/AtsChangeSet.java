@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.ats.core.client.util;
 
+import static org.eclipse.osee.framework.core.enums.RelationSorter.PREEXISTING;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,7 +39,6 @@ import org.eclipse.osee.framework.core.data.IArtifactType;
 import org.eclipse.osee.framework.core.data.IAttributeType;
 import org.eclipse.osee.framework.core.data.IRelationTypeSide;
 import org.eclipse.osee.framework.core.data.TransactionId;
-import org.eclipse.osee.framework.core.enums.RelationOrderBaseTypes;
 import org.eclipse.osee.framework.jdk.core.type.OseeArgumentException;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.OseeStateException;
@@ -313,7 +313,7 @@ public class AtsChangeSet extends AbstractAtsChangeSet {
             add(art);
          }
       }
-      artifact.setRelations(RelationOrderBaseTypes.PREEXISTING, relationSide, artifacts);
+      artifact.setRelations(PREEXISTING, relationSide, artifacts);
       add(artifact);
    }
 

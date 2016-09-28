@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.skynet.core.change;
 
+import static org.eclipse.osee.framework.core.enums.RelationSorter.USER_DEFINED;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import org.eclipse.osee.framework.core.data.RelationSorter;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.DeletionFlag;
-import org.eclipse.osee.framework.core.enums.RelationOrderBaseTypes;
+import org.eclipse.osee.framework.core.enums.RelationSorter;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.Pair;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -100,8 +100,7 @@ public class RelationChangeWorker implements IChangeWorker {
                }
                guids.add(artifact.getGuid());
 
-               relationOrderData.addOrderList(link.getRelationType(), link.getSide(artifact),
-                  RelationOrderBaseTypes.USER_DEFINED, guids);
+               relationOrderData.addOrderList(link.getRelationType(), link.getSide(artifact), USER_DEFINED, guids);
                setRelationOrder(otherSideCurrent, relationOrderData);
             }
             otherSideCurrent.persist("Replace With Baseline Version resolved by appending");
