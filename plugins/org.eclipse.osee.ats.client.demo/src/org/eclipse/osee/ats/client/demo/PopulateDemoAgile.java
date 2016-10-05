@@ -12,16 +12,23 @@ package org.eclipse.osee.ats.client.demo;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import javax.ws.rs.core.Response;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.osee.ats.api.IAtsWorkItem;
 import org.eclipse.osee.ats.api.agile.AgileEndpointApi;
+import org.eclipse.osee.ats.api.agile.IAgileSprint;
 import org.eclipse.osee.ats.api.agile.JaxAgileItem;
 import org.eclipse.osee.ats.api.agile.JaxNewAgileBacklog;
 import org.eclipse.osee.ats.api.agile.JaxNewAgileFeatureGroup;
 import org.eclipse.osee.ats.api.agile.JaxNewAgileSprint;
 import org.eclipse.osee.ats.api.agile.JaxNewAgileTeam;
+import org.eclipse.osee.ats.api.config.JaxAtsObject;
+import org.eclipse.osee.ats.api.data.AtsAttributeTypes;
+import org.eclipse.osee.ats.api.data.AtsRelationTypes;
 import org.eclipse.osee.ats.api.workflow.WorkItemType;
 import org.eclipse.osee.ats.api.workflow.transition.IAtsTransitionManager;
 import org.eclipse.osee.ats.api.workflow.transition.TransitionOption;
@@ -34,11 +41,14 @@ import org.eclipse.osee.ats.core.client.util.AtsUtilClient;
 import org.eclipse.osee.ats.core.workflow.state.TeamState;
 import org.eclipse.osee.ats.core.workflow.transition.TransitionFactory;
 import org.eclipse.osee.ats.core.workflow.transition.TransitionHelper;
+import org.eclipse.osee.ats.demo.api.DemoArtifactToken;
 import org.eclipse.osee.ats.demo.api.DemoArtifactTypes;
 import org.eclipse.osee.ats.util.AtsUtil;
 import org.eclipse.osee.framework.jdk.core.type.OseeStateException;
+import org.eclipse.osee.framework.jdk.core.util.Conditions;
 import org.eclipse.osee.framework.jdk.core.util.GUID;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
+import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.framework.logging.SevereLoggingMonitor;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -99,6 +109,13 @@ public class PopulateDemoAgile {
       JaxNewAgileTeam newTeam = newJaxAgileTeam(teamUuid, teamGuid);
       Response response = agile.createTeam(newTeam);
       Assert.isTrue(Response.Status.CREATED.getStatusCode() == response.getStatus());
+
+      // Assigne ATS Team to Agile Team
+      Artifact sawCodeArt = AtsClientService.get().getArtifact(DemoArtifactToken.SAW_Code);
+      Conditions.assertNotNull(sawCodeArt, "sawCodeArt");
+      Artifact agileTeam = AtsClientService.get().getArtifact(newTeam.getUuid());
+      agileTeam.addRelation(AtsRelationTypes.AgileTeamToAtsTeam_AtsTeam, sawCodeArt);
+      agileTeam.persist("Assigne ATS Team to Agile Team");
 
       // Create Backlog
       JaxNewAgileBacklog backlog = newBacklog(teamUuid);
@@ -178,6 +195,101 @@ public class PopulateDemoAgile {
          Assert.isTrue(Response.Status.CREATED.getStatusCode() == response.getStatus());
       }
 
+      setupSprint2ForBurndown(secondSprintUuid);
+   }
+
+   private void setupSprint2ForBurndown(long secondSprintUuid) {
+
+      // Transition First Sprint to completed
+      IAtsWorkItem sprint = AtsClientService.get().getQueryService().createQuery(WorkItemType.WorkItem).andUuids(
+         secondSprintUuid).getItems().iterator().next();
+      AtsChangeSet changes = new AtsChangeSet("Setup Sprint 2 for Burndown");
+
+      long oneDay = 24 * 60 * 60 * 1000;
+      Date now = new Date();
+      Date startDate = new Date(now.getTime() - (oneDay * 5));
+      Date holiday1 = new Date(now.getTime() + (oneDay * 3));
+      Date holiday2 = new Date(now.getTime() + (oneDay * 4));
+      Date endDate = new Date(now.getTime() + (oneDay * 25));
+      changes.setSoleAttributeValue(sprint, AtsAttributeTypes.StartDate, startDate);
+      changes.setSoleAttributeValue(sprint, AtsAttributeTypes.EndDate, endDate);
+      changes.setSoleAttributeValue(sprint, AtsAttributeTypes.UnPlannedPoints, 45);
+      changes.setSoleAttributeValue(sprint, AtsAttributeTypes.PlannedPoints, 200);
+      changes.addAttribute(sprint, AtsAttributeTypes.Holiday, holiday1);
+      changes.addAttribute(sprint, AtsAttributeTypes.Holiday, holiday2);
+      // set sprint data on sprint items
+      Artifact agileTeamArt =
+         ((Artifact) sprint.getStoreObject()).getRelatedArtifact(AtsRelationTypes.AgileTeamToSprint_AgileTeam);
+      changes.execute();
+
+      setSprintItemData(agileTeamArt.getUuid(), (IAgileSprint) sprint);
+   }
+
+   private void setSprintItemData(Long teamUuid, IAgileSprint sprint) {
+      List<SprintItemData> datas = new LinkedList<>();
+      datas.add(
+         new SprintItemData("Sprint Order", "Title", "Points", "Unplanned Work", "Feature Group", "CreatedDate"));
+      datas.add(
+         new SprintItemData("1", "Button W doesn't work on Situation Page", "8", " ", "Communications", "10/03/2016"));
+      datas.add(new SprintItemData("2", "Can't load Diagram Tree", "4", "Unplanned Work", "Framework", "10/03/2016"));
+      datas.add(new SprintItemData("3", "Can't see the Graph View", "8", "Unplanned Work", "Framework", "10/03/2016"));
+      datas.add(new SprintItemData("4", "Problem in Diagram Tree", "40", " ", "Framework", "10/03/2016"));
+      datas.add(new SprintItemData("5", "Problem with the Graph View", "8", " ", "Communications", "10/03/2016"));
+      datas.add(new SprintItemData("6", "SAW (committed) Reqt Changes for Diagram View", "2", "Unplanned Work",
+         "Framework", "10/03/2016"));
+      datas.add(
+         new SprintItemData("7", "SAW (committed) Reqt Changes for Diagram View", "8", " ", "Framework", "10/03/2016"));
+      datas.add(
+         new SprintItemData("8", "SAW (committed) Reqt Changes for Diagram View", "16", " ", "UI", "10/03/2016"));
+      datas.add(new SprintItemData("9", "SAW (no-branch) Even More Requirement Changes for Diagram View", "32", " ",
+         "Communications", "10/03/2016"));
+      datas.add(new SprintItemData("10", "SAW (no-branch) Even More Requirement Changes for Diagram View", "40", " ",
+         "Documentation", "10/03/2016"));
+      datas.add(new SprintItemData("11", "SAW (no-branch) Even More Requirement Changes for Diagram View", "8", " ",
+         "Documentation", "10/03/2016"));
+      datas.add(new SprintItemData("12", "SAW (uncommitted) More Reqt Changes for Diagram View", "1", " ",
+         "Communications", "10/03/2016"));
+      datas.add(new SprintItemData("13", "SAW (uncommitted) More Reqt Changes for Diagram View", "6", " ",
+         "Documentation", "10/03/2016"));
+      datas.add(new SprintItemData("14", "SAW (uncommitted) More Reqt Changes for Diagram View", "32", " ",
+         "Communications", "10/03/2016"));
+      datas.add(new SprintItemData("15", "SAW (uncommitted-conflicted) More Requirement Changes for Diagram View", "1",
+         " ", "Communications", "10/03/2016"));
+      datas.add(new SprintItemData("16", "Workaround for Graph View for SAW_Bld_2", "1", "Unplanned Work",
+         "Communications", "10/03/2016"));
+      datas.add(new SprintItemData("17", "Workaround for Graph View for SAW_Bld_3", "2", "Unplanned Work",
+         "Communications", "10/03/2016"));
+
+      int x = 1;
+      for (JaxAtsObject jaxWorkItem : AtsClientService.getAgile().getSprintItemsAsJax(teamUuid,
+         sprint.getId()).getAtsObjects()) {
+         SprintItemData data = getSprintData(datas, x++, jaxWorkItem);
+         String featureGroupName = data.getFeature();
+         if (Strings.isValid(featureGroupName)) {
+            AtsClientService.getAgile().addFeatureGroup(jaxWorkItem.getUuid(), featureGroupName);
+         }
+         String unPlannedStr = data.getUnPlanned();
+         boolean unPlanned = false;
+         if (Strings.isValid(unPlannedStr)) {
+            if (unPlannedStr.toLowerCase().contains("un")) {
+               unPlanned = true;
+            }
+         }
+         AtsClientService.getAgile().setUnPlanned(jaxWorkItem.getUuid(), unPlanned);
+         String points = data.getPoints();
+         if (Strings.isValid(points)) {
+            AtsClientService.getAgile().setPoints(jaxWorkItem.getUuid(), points);
+         }
+      }
+   }
+
+   private SprintItemData getSprintData(List<SprintItemData> datas, int i, JaxAtsObject workItem) {
+      for (SprintItemData data : datas) {
+         if (data.getOrder().equals(String.valueOf(i)) && data.getTitle().equals(workItem.getName())) {
+            return data;
+         }
+      }
+      return null;
    }
 
    private JaxNewAgileBacklog newBacklog(long teamUuid) {
