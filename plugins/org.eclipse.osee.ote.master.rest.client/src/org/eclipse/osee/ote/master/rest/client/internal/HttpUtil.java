@@ -21,7 +21,7 @@ public class HttpUtil {
             return true;
          }
       } catch (Throwable th){
-         if(!failedConnections.contains(failedConnections)){
+         if(!failedConnections.contains(targetUri)){
             failedConnections.add(targetUri);
             OseeLog.log(HttpUtil.class, Level.INFO, String.format("Unable to connect to [%s]", targetUri));
          }

@@ -42,7 +42,7 @@ public class PeriodicPublishMap {
       PeriodicPublishTask task = ratePhaseMap.get(rate, phase);
       if(task == null){
          task = new PeriodicPublishTask(messageManager, rate, phase);
-         Scheduler scheduler = ServiceUtility.getService(Scheduler.class);
+         Scheduler scheduler = ServiceUtility.getService(Scheduler.class, false);
          if(scheduler != null){
             scheduler.scheduleAtFixedRate(new EnvTaskWrapper(task), task.getHzRate(), Integer.MAX_VALUE);
          } else {

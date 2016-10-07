@@ -2,10 +2,14 @@ package org.eclipse.osee.ote.master.rest.client.internal;
 
 import java.net.URI;
 import java.util.concurrent.Callable;
+
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import org.eclipse.osee.jaxrs.client.JaxRsClient;
+import org.eclipse.osee.jaxrs.client.JaxRsWebTarget;
 import org.eclipse.osee.ote.master.rest.client.OTEMasterServerAvailableNodes;
+import org.eclipse.osee.ote.master.rest.client.OTEMasterServerResult;
 import org.eclipse.osee.ote.master.rest.model.OTEServer;
 
 public class GetAvailableServers implements Callable<OTEMasterServerAvailableNodes> {
@@ -25,10 +29,14 @@ public class GetAvailableServers implements Callable<OTEMasterServerAvailableNod
 
       OTEMasterServerAvailableNodes result = new OTEMasterServerAvailableNodes();
       try {
-         OTEServer[] servers =
-            webClientProvider.target(targetUri).request(MediaType.APPLICATION_XML).get(OTEServer[].class);
-         result.setServers(servers);
-         result.setSuccess(true);
+         if(HttpUtil.canConnect(targetUri)){
+            OTEServer[] servers =
+                  webClientProvider.target(targetUri).request(MediaType.APPLICATION_XML).get(OTEServer[].class);
+            result.setServers(servers);
+            result.setSuccess(true);
+         } else {
+            result.setSuccess(false);
+         }
       } catch (Throwable th) {
          result.setSuccess(false);
          result.setThrowable(th);
