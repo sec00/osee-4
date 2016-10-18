@@ -12,6 +12,7 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
+import org.eclipse.osee.framework.jdk.core.util.io.StringOutputStream;
 import org.eclipse.osee.framework.logging.OseeLog;
 
 /**
@@ -66,6 +67,22 @@ public class OTEJsonSaveFile {
    }
    
    /**
+    * Load a JSON representation of an ElementSaveFile into a {@link ElementSaveFile} object.
+    * 
+    * @param file
+    * @return
+    * @throws JsonParseException
+    * @throws JsonMappingException
+    * @throws IOException
+    */
+   public static ElementSaveFile loadSaveFile(String saveFile) throws JsonParseException, JsonMappingException, IOException{
+      ElementSaveFile config = null;
+      ObjectMapper mapper = new ObjectMapper();
+      config = mapper.readValue(saveFile, ElementSaveFile.class);
+      return config;
+   }
+   
+   /**
     * Write a {@link ElementSaveFile} object to the filesystem as JSON.
     * 
     * @param file
@@ -91,6 +108,35 @@ public class OTEJsonSaveFile {
             }
          }
       }
+   }
+   
+   /**
+    * Write a {@link ElementSaveFile} object to the filesystem as JSON.
+    * 
+    * @param file
+    * @param data
+    * @throws FileNotFoundException
+    */
+   public static String writeSaveFile(ElementSaveFile data) {
+      StringOutputStream os = null;
+      try {
+         os = new StringOutputStream();
+         ObjectMapper mapper = new ObjectMapper();
+         try{
+            mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+            mapper.writeValue(os, data);
+         } catch (Exception ex){
+            OseeLog.log(OTEJsonSaveFile.class, Level.SEVERE, ex);
+         }
+      } finally {
+         if (os != null) {
+            os.close();
+         }
+      }
+      if(os != null){
+         return os.toString();
+      }
+      return "";
    }
    
    public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException{

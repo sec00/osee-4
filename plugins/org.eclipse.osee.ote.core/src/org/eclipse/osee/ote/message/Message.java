@@ -547,9 +547,12 @@ public class Message implements Xmlizable, XmlizableStream {
     * @return the number of bytes in the header
     */
    public int getHeaderSize() {
-      final IMessageHeader hdr =  mapper.getMessageData(this, currentMemType).getMsgHeader();
-      if (hdr != null) {
-         return hdr.getHeaderSize();
+      MessageData data = mapper.getMessageData(this, currentMemType);
+      if (data != null){
+         final IMessageHeader hdr =  data.getMsgHeader();
+         if (hdr != null) {
+            return hdr.getHeaderSize();
+         }
       }
       return 0;
    }
