@@ -14,6 +14,7 @@ import static org.eclipse.osee.framework.core.enums.RelationSide.SIDE_A;
 import static org.eclipse.osee.framework.core.enums.RelationSide.SIDE_B;
 import static org.eclipse.osee.framework.core.enums.RelationSorter.USER_DEFINED;
 import java.util.logging.Level;
+import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.HasBranch;
 import org.eclipse.osee.framework.core.data.IRelationType;
@@ -46,6 +47,8 @@ public class RelationLink implements HasBranch {
    private boolean dirty;
    private final int aArtifactId;
    private final int bArtifactId;
+   private final ArtifactToken artifactA;
+   private final ArtifactToken artifactB;
    private final BranchId branch;
    private ModificationType modificationType;
 
@@ -54,14 +57,16 @@ public class RelationLink implements HasBranch {
 
    private boolean useBackingData;
 
-   public RelationLink(int aArtifactId, int bArtifactId, BranchId branch, RelationTypeToken relationType, int relationId, int gammaId, String rationale, ModificationType modificationType) {
+   public RelationLink(ArtifactToken artifactA, ArtifactToken artifactB, BranchId branch, RelationTypeToken relationType, int relationId, int gammaId, String rationale, ModificationType modificationType) {
       this.relationType = relationType;
       this.relationId = relationId;
       this.gammaId = gammaId;
       this.rationale = rationale == null ? "" : rationale;
       this.dirty = false;
-      this.aArtifactId = aArtifactId;
-      this.bArtifactId = bArtifactId;
+      this.aArtifactId = artifactA.getId().intValue();
+      this.artifactA = artifactA;
+      this.bArtifactId = artifactB.getId().intValue();
+      this.artifactB = artifactB;
       this.branch = branch;
       internalSetModType(modificationType, false, false);
    }
@@ -107,8 +112,8 @@ public class RelationLink implements HasBranch {
       return bArtifactId;
    }
 
-   public int getArtifactId(RelationSide relationSide) {
-      return relationSide == RelationSide.SIDE_A ? aArtifactId : bArtifactId;
+   public ArtifactToken getArtifactId(RelationSide relationSide) {
+      return relationSide == RelationSide.SIDE_A ? artifactA : artifactB;
    }
 
    public boolean isDeleted() {
@@ -192,7 +197,7 @@ public class RelationLink implements HasBranch {
    }
 
    public Artifact getArtifact(RelationSide relationSide) throws OseeCoreException {
-      return ArtifactQuery.getArtifactFromId(getArtifactId(relationSide), branch, DeletionFlag.INCLUDE_DELETED);
+      return ArtifactQuery.getArtifactFromToken(getArtifactId(relationSide), DeletionFlag.INCLUDE_DELETED);
    }
 
    public Artifact getArtifactOnOtherSide(Artifact artifact) throws OseeCoreException {
@@ -280,8 +285,8 @@ public class RelationLink implements HasBranch {
 
    private void setDirtyFlag(boolean dirty) {
       this.dirty = dirty;
-      ArtifactCache.updateCachedArtifact(aArtifactId, branch.getId());
-      ArtifactCache.updateCachedArtifact(bArtifactId, branch.getId());
+      ArtifactCache.updateCachedArtifact(artifactA);
+      ArtifactCache.updateCachedArtifact(artifactB);
    }
 
    public void internalSetRelationId(int relationId) {
