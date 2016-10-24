@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import org.eclipse.osee.ats.api.data.AtsAttributeTypes;
 import org.eclipse.osee.ats.internal.AtsClientService;
+import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.AttributeTypeId;
 import org.eclipse.osee.framework.jdk.core.type.Id;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
@@ -37,14 +38,10 @@ public class CommonArtifactReferenceAttributeAdapter implements AttributeAdapter
    }
 
    @Override
-   public Artifact adapt(Attribute<?> attribute, Id identity) throws OseeCoreException {
-      Artifact resultArtifact = AtsClientService.get().getArtifact(identity.getId());
-      if (resultArtifact == null) {
-         if (identity.isValid()) {
-            resultArtifact = ArtifactQuery.getArtifactFromId(identity.getId(), AtsClientService.get().getAtsBranch());
-         }
+   public Artifact adapt(Attribute<?> attribute, Id id) throws OseeCoreException {
+      if (id.isValid()) {
+         return ArtifactQuery.getArtifactFromId(ArtifactId.valueOf(id), AtsClientService.get().getAtsBranch());
       }
-      return resultArtifact;
+      return null;
    }
-
 }

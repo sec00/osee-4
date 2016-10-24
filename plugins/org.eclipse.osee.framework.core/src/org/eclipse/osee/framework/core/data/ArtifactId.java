@@ -32,6 +32,10 @@ public interface ArtifactId extends Identity<String>, Id {
       return valueOf(Long.valueOf(id));
    }
 
+   public static ArtifactId valueOf(Id id) {
+      return valueOf(id.getId());
+   }
+
    public static ArtifactId valueOf(long id) {
       final class ArtifactIdImpl extends BaseId implements ArtifactId, Comparable<ArtifactId> {
          public ArtifactIdImpl(Long artId) {
