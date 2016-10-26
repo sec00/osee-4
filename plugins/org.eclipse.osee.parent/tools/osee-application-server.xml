@@ -107,6 +107,10 @@
 		<waitfor maxwait="20" maxwaitunit="second" checkevery="1" checkeveryunit="second" >
 			<http url="http://127.0.0.1:${xserver-port}/orcs/datastore/info" />
 		</waitfor>
+		
+	   <post to="http://127.0.0.1:${xserver-port}/osee/console?cmd=osee&amp;args=server_status" verbose="true" wantresponse="true" property="statusOutput"/>
+	   <echo message="${statusOutput}" />
+		
 	</target>
 
 	<target name="stopServer">
