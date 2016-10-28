@@ -136,7 +136,7 @@ public class WasIsCompareEditorAction extends Action {
       URI uri =
          UriBuilder.fromUri(appServer).path("orcs").path("branch").path(String.valueOf(artifact.getBranchId())).path(
             "artifact").path(artifact.getUuid().toString()).path("attribute").path(String.valueOf(attrId)).path(
-               String.valueOf(transactionId)).build();
+               "version").path(String.valueOf(transactionId)).path("text").build();
       try {
          return JaxRsClient.newClient().target(uri).request(MediaType.TEXT_PLAIN).get(String.class);
       } catch (Exception ex) {
