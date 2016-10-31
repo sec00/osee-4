@@ -44,7 +44,6 @@ import org.eclipse.osee.framework.skynet.core.artifact.ArtifactURL;
 import org.eclipse.osee.framework.skynet.core.httpRequests.HttpWordUpdateRequest;
 import org.eclipse.osee.framework.skynet.core.linking.LinkType;
 import org.eclipse.osee.framework.skynet.core.linking.OseeLinkBuilder;
-import org.eclipse.osee.framework.skynet.core.types.IArtifact;
 import org.eclipse.osee.framework.skynet.core.word.WordUtil;
 import org.eclipse.osee.framework.ui.skynet.MenuCmdDef;
 import org.eclipse.osee.framework.ui.skynet.render.compare.IComparator;
@@ -129,11 +128,10 @@ public class WordTemplateRenderer extends WordRenderer implements ITemplateRende
    }
 
    @Override
-   public int getApplicabilityRating(PresentationType presentationType, IArtifact artifact, Object... objects) throws OseeCoreException {
+   public int getApplicabilityRating(PresentationType presentationType, Artifact artifact, Object... objects) throws OseeCoreException {
       int rating = NO_MATCH;
-      Artifact aArtifact = artifact.getFullArtifact();
       if (!presentationType.matches(PresentationType.GENERALIZED_EDIT, PresentationType.GENERAL_REQUESTED)) {
-         if (aArtifact.isAttributeTypeValid(CoreAttributeTypes.WordTemplateContent)) {
+         if (artifact.isAttributeTypeValid(CoreAttributeTypes.WordTemplateContent)) {
             rating = PRESENTATION_SUBTYPE_MATCH;
          } else if (presentationType.matches(PresentationType.PREVIEW, PresentationType.DIFF)) {
             rating = BASE_MATCH;

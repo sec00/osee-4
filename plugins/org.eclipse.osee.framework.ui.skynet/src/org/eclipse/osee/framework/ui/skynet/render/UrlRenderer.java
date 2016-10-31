@@ -18,7 +18,6 @@ import static org.eclipse.osee.framework.core.enums.PresentationType.PRODUCE_ATT
 import org.eclipse.osee.framework.core.enums.PresentationType;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
-import org.eclipse.osee.framework.skynet.core.types.IArtifact;
 
 /**
  * @author Ryan D. Brooks
@@ -31,10 +30,9 @@ public class UrlRenderer extends DefaultArtifactRenderer {
    }
 
    @Override
-   public int getApplicabilityRating(PresentationType presentationType, IArtifact artifact, Object... objects) throws OseeCoreException {
-      Artifact aArtifact = artifact.getFullArtifact();
+   public int getApplicabilityRating(PresentationType presentationType, Artifact artifact, Object... objects) throws OseeCoreException {
       if (!presentationType.matches(GENERALIZED_EDIT, GENERAL_REQUESTED,
-         PRODUCE_ATTRIBUTE) && aArtifact.isAttributeTypeValid(ContentUrl)) {
+         PRODUCE_ATTRIBUTE) && artifact.isAttributeTypeValid(ContentUrl)) {
          return SUBTYPE_TYPE_MATCH;
       }
       return NO_MATCH;
