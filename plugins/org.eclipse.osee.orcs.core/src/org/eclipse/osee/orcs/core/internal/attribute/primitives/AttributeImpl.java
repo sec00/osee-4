@@ -266,14 +266,6 @@ public abstract class AttributeImpl<T> implements Comparable<AttributeImpl<T>>, 
       return getGammaId() > 0;
    }
 
-   /**
-    * @return Returns the attrId.
-    */
-   @Override
-   public Integer getLocalId() {
-      return getOrcsData().getLocalId();
-   }
-
    @Override
    public long getGammaId() {
       return getOrcsData().getVersion().getGammaId().getId();
@@ -331,5 +323,10 @@ public abstract class AttributeImpl<T> implements Comparable<AttributeImpl<T>>, 
          return getId().equals(obj);
       }
       return false;
+   }
+
+   @Override
+   public int hashCode() {
+      return getId().hashCode();
    }
 }

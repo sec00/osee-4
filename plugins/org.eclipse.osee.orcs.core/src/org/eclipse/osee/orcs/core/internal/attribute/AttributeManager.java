@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import org.eclipse.osee.framework.core.data.AttributeTypeId;
+import org.eclipse.osee.framework.core.data.AttributeId;
 import org.eclipse.osee.framework.core.enums.DeletionFlag;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 
@@ -78,7 +79,7 @@ public interface AttributeManager extends AttributeContainer {
 
    <T> List<Attribute<T>> getAttributes(AttributeTypeId attributeType, DeletionFlag deletionFlag) throws OseeCoreException;
 
-   Attribute<Object> getAttributeById(Integer attributeId) throws OseeCoreException;
+   Attribute<Object> getAttributeById(AttributeId attributeId);
 
-   Attribute<Object> getAttributeById(Integer attributeId, DeletionFlag includeDeleted) throws OseeCoreException;
+   Attribute<Object> getAttributeById(AttributeId attributeId, DeletionFlag includeDeleted);
 }
