@@ -70,10 +70,6 @@ public class OrcsStorageImpl implements Storage {
       this.orcsApi = orcsApi;
    }
 
-   private ArtifactReadable getDispoUser() throws OseeCoreException {
-      return getQuery().fromBranch(COMMON).andId(SystemUser.OseeSystem).getResults().getExactlyOne();
-   }
-
    private QueryFactory getQuery() {
       return orcsApi.getQueryFactory();
    }
@@ -108,7 +104,7 @@ public class OrcsStorageImpl implements Storage {
 
    @Override
    public void storeTypes(IResource resource) {
-      TransactionBuilder tx = getTxFactory().createTransaction(COMMON, getDispoUser(), "Initialize Dispo Types");
+      TransactionBuilder tx = getTxFactory().createTransaction(COMMON, SystemUser.OseeSystem, "Initialize Dispo Types");
       ArtifactId artifactId = tx.createArtifact(DISPO_ARTIFACT);
       InputStream stream = null;
       try {
@@ -129,12 +125,6 @@ public class OrcsStorageImpl implements Storage {
    @Override
    public ArtifactReadable findUser(String userId) {
       return getQuery().fromBranch(COMMON).andGuid(userId).getResults().getExactlyOne();
-   }
-
-   @Override
-   public ArtifactReadable findUnassignedUser() {
-      return getQuery().fromBranch(COMMON).andNameEquals("UnAssigned").andTypeEquals(
-         CoreArtifactTypes.User).getResults().getExactlyOne();
    }
 
    @Override
@@ -549,7 +539,7 @@ public class OrcsStorageImpl implements Storage {
             newRerpotArt.getAttributes(CoreAttributeTypes.GeneralStringData).getExactlyOne();
 
          toReturn = String.format("/orcs/branch/%s/artifact/%s/attribute/%s/version/%s", branch, newRerpotArt.getGuid(),
-            contentsAsAttribute.getLocalId(), commit.getId());
+            contentsAsAttribute.getId(), commit.getId());
       }
       return toReturn;
 
