@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Set;
+import java.util.logging.Level;
 
+import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.OTEException;
 import org.eclipse.osee.ote.core.ServiceUtility;
 import org.eclipse.osee.ote.message.commands.RecordCommand;
@@ -54,9 +56,10 @@ public class MessageServiceSupport {
       SerializedSubscriptionDetailsMessage resp = new SerializedSubscriptionDetailsMessage();
       try{
          SerializedSubscribeToMessage cmd = new SerializedSubscribeToMessage(subscribeToMessage);
-         resp = get().synchSendAndResponse(resp, cmd, 10000);
+         resp = get().synchSendAndResponse(resp, cmd, 2000);
          if(resp == null){
-            throw new OTEException("Timed out waiting for message response");
+            OseeLog.log(MessageServiceSupport.class, Level.WARNING, String.format("Timeout getting message subscription [%s]", subscribeToMessage.getMessage()));
+            return null;
          } 
          SubscriptionDetails details = resp.getObject();
          return details;

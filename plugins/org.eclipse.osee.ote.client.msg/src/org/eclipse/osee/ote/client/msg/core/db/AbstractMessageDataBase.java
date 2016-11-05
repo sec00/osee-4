@@ -13,6 +13,10 @@ package org.eclipse.osee.ote.client.msg.core.db;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import org.eclipse.osee.framework.logging.OseeLog;
@@ -46,6 +50,8 @@ public abstract class AbstractMessageDataBase {
 	private IMsgToolServiceClient client;
 	private volatile boolean connected = false;
 	private MessageController messageController;
+	
+	ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
 	
 	ITimerControl fakeTimerControl = new ITimerControl() {
       
@@ -142,9 +148,20 @@ public abstract class AbstractMessageDataBase {
          }
       }, fakeTimerControl, null);
 	   req = messageController.createRequestor("messageDb");
+	   
+	   timer.scheduleWithFixedDelay(new Runnable(){
+         @Override
+         public void run() {
+            try{
+            resubscriber();
+            } catch (Throwable th){
+               th.printStackTrace();
+            }
+         }
+	   }, 30, 30, TimeUnit.SECONDS);
 	}
 
-	public MessageInstance findInstance(String name, MessageMode mode, DataType type) {
+	public synchronized MessageInstance findInstance(String name, MessageMode mode, DataType type) {
 		MessageReference reference = new MessageReference(type, mode, name);
 		return referenceToMsgMap.get(reference);
 	}
@@ -153,7 +170,7 @@ public abstract class AbstractMessageDataBase {
 		return acquireInstance(name, MessageMode.READER, (DataType) null);
 	}
 
-	public MessageInstance acquireInstance(String name, MessageMode mode, DataType type) throws Exception {
+	public synchronized MessageInstance acquireInstance(String name, MessageMode mode, DataType type) throws Exception {
 		if (type == null) {
 		   type = messageController.getMessageClass(name).newInstance().getDefaultMessageData().getType();
 		}
@@ -219,7 +236,7 @@ public abstract class AbstractMessageDataBase {
 
 	}
 
-	public void attachToService(IMsgToolServiceClient client) {
+	public synchronized void attachToService(IMsgToolServiceClient client) {
 	   connected = true;
 		this.client = client;
 		for (MessageInstance instance : referenceToMsgMap.values()) {
@@ -231,8 +248,23 @@ public abstract class AbstractMessageDataBase {
 			}
 		}
 	}
+	
+	public synchronized void resubscriber(){
+	   if(connected && client != null){
+	      for (MessageInstance instance : referenceToMsgMap.values()) {
+	         try {
+	            if(!instance.isConnected() && instance.isSupported()){
+	               doInstanceAttach(instance);
+	            }
+	         } catch (Exception e) {
+	            OseeLog.log(AbstractMessageDataBase.class, Level.SEVERE,
+	                  "could not attach instance for " + instance.toString(), e);
+	         }
+	      }
+	   }
+	}
 
-	public void detachService() {
+	public synchronized void detachService() {
 		for (MessageInstance instance : referenceToMsgMap.values()) {
 			doInstanceDetach(instance);
 		}

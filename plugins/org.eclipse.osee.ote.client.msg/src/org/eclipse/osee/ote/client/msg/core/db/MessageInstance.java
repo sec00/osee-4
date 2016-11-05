@@ -65,28 +65,35 @@ public class MessageInstance {
       SubscriptionDetails details;
       if(address == null){
          details = null;
+         supported = false;
+         return null;
       } else {
          details = MessageServiceSupport.subscribeToMessage(new SubscribeToMessage(msg.getClass().getName(), type, mode,
                client.getAddressByType(msg.getClass().getName(), type), client.getTestSessionKey()));
-      }
-      if (details == null) {
-         supported = false;
-         return null;
-      }
-      supported = true;
-      msg.setData(details.getCurrentData());
-      connected = true;
-      //determine types for message
-      Set<? extends DataType> envSet = MessageServiceSupport.getAvailablePhysicalTypes();
-      Set<DataType> available = msg.getAssociatedMessages().keySet();
-      for(DataType type : available.toArray(new DataType[available.size()])){
-         if(envSet.contains(type)){
-            availableTypes.add(type);
+         if (details == null){//timed out request
+            supported = true;
+            connected = false;
+            return null;      
+         } else if (details.getAvailableMemTypes().isEmpty()) {
+            supported = false;
+            return null;
+         } else {
+            supported = true;
+            msg.setData(details.getCurrentData());
+            connected = true;
+            //determine types for message
+            Set<? extends DataType> envSet = MessageServiceSupport.getAvailablePhysicalTypes();
+            Set<DataType> available = msg.getAssociatedMessages().keySet();
+            for(DataType type : available.toArray(new DataType[available.size()])){
+               if(envSet.contains(type)){
+                  availableTypes.add(type);
+               }
+            }
+            
+            serverSubscriptionKey = details.getKey();
+            return serverSubscriptionKey.getId();
          }
       }
-      
-      serverSubscriptionKey = details.getKey();
-      return serverSubscriptionKey.getId();
    }
 
    public void detachService(IMsgToolServiceClient client) throws Exception {
@@ -129,6 +136,10 @@ public class MessageInstance {
 
    public boolean isSupported() {
       return supported;
+   }
+   
+   public boolean isConnected() {
+      return connected;
    }
 
    @Override
