@@ -24,8 +24,7 @@ public class MessageControllerTest {
    
    @Before
    public void setupTest(){
-      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null,Arrays.asList(TestMessageDataType.eth1, TestMessageDataType.eth2, TestMessageDataType.eth3));
-      req = messageManager.createRequestor("tests");
+      
    }
    
    @After
@@ -36,6 +35,9 @@ public class MessageControllerTest {
    
    @Test
    public void basicSetup(){
+      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null,Arrays.asList(TestMessageDataType.eth1, TestMessageDataType.eth2, TestMessageDataType.eth3));
+      req = messageManager.createRequestor("tests");
+      
       Assert.assertEquals(0, messageManager.getAllMessages().size());
       Assert.assertEquals(0, messageManager.getAllReaders().size());
       Assert.assertEquals(0, messageManager.getAllWriters().size());
@@ -43,6 +45,9 @@ public class MessageControllerTest {
    
    @Test
    public void messageChecks(){
+      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null,Arrays.asList(TestMessageDataType.eth1, TestMessageDataType.eth2, TestMessageDataType.eth3));
+      req = messageManager.createRequestor("tests");
+      
       MessageValidator validator = new MessageValidator();
       StringBuilder sb = new StringBuilder();
       boolean result;
@@ -57,6 +62,8 @@ public class MessageControllerTest {
    
    @Test
    public void basicCreation(){
+      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null,Arrays.asList(TestMessageDataType.eth1, TestMessageDataType.eth2, TestMessageDataType.eth3));
+      req = messageManager.createRequestor("tests");
       
       Message messageReader = req.getMessageReader(TestMessageOne.class);
       Assert.assertNotNull(messageReader);
@@ -74,6 +81,8 @@ public class MessageControllerTest {
    
    @Test
    public void basicMapping(){
+      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null,Arrays.asList(TestMessageDataType.eth1, TestMessageDataType.eth2, TestMessageDataType.eth3));
+      req = messageManager.createRequestor("tests");
       
       messageManager.registerWriter(new BasicWriter(TestMessageIOType.eth1, TestMessageDataType.eth1));
       messageManager.registerWriter(new BasicWriter(TestMessageIOType.eth2, TestMessageDataType.eth2));
@@ -112,6 +121,9 @@ public class MessageControllerTest {
    
    @Test
    public void referenceCounting(){
+      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null,Arrays.asList(TestMessageDataType.eth1));
+      req = messageManager.createRequestor("tests");
+      
       IMessageRequestor req2 = messageManager.createRequestor("tests");
       IMessageRequestor req3 = messageManager.createRequestor("tests");
       Assert.assertEquals(0, messageManager.getAllMessages().size());
@@ -147,6 +159,9 @@ public class MessageControllerTest {
    
    @Test
    public void getFromString(){
+      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null,Arrays.asList(TestMessageDataType.eth1, TestMessageDataType.eth2, TestMessageDataType.eth3));
+      req = messageManager.createRequestor("tests");
+      
       TestMessageOne one = (TestMessageOne)req.getMessageReader(TestMessageOne.class.getName());
       TestMessageOne two = (TestMessageOne)req.getMessageWriter(TestMessageOne.class.getName());
       Assert.assertNotNull(one);
@@ -163,6 +178,9 @@ public class MessageControllerTest {
    
    @Test
    public void noElementMapping(){
+      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null,Arrays.asList(TestMessageDataType.eth1, TestMessageDataType.eth2, TestMessageDataType.eth3));
+      req = messageManager.createRequestor("tests");
+      
       messageManager.registerWriter(new BasicWriter(TestMessageIOType.eth1, TestMessageDataType.eth1));
       messageManager.registerWriter(new BasicWriter(TestMessageIOType.eth2, TestMessageDataType.eth2));
       messageManager.registerWriter(new BasicWriter(TestMessageIOType.eth3, TestMessageDataType.eth3));
@@ -182,6 +200,9 @@ public class MessageControllerTest {
    
    @Test
    public void creationListeners(){
+      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null,Arrays.asList(TestMessageDataType.eth1));
+      req = messageManager.createRequestor("tests");
+      
       MessageCreationListenerCounter counter = new MessageCreationListenerCounter();
       messageManager.addInstanceRequestListener(counter);
       messageManager.addPostCreateMessageListener(counter);
@@ -224,6 +245,9 @@ public class MessageControllerTest {
    
    @Test
    public void messageReceiving(){
+      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null,Arrays.asList(TestMessageDataType.eth1, TestMessageDataType.eth2, TestMessageDataType.eth3));
+      req = messageManager.createRequestor("tests");
+      
       TestMessageOne one = req.getMessageReader(TestMessageOne.class);
       UpdateCounter updateCounter = new UpdateCounter();
       one.addListener(updateCounter);
