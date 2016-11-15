@@ -873,7 +873,7 @@ public class Message implements Xmlizable, XmlizableStream {
     */
    public void send() throws MessageSystemException {
       if(messageManager != null){
-         messageManager.publish(this);
+         messageManager.publish(this, getMemType());
       } else {
          OseeLog.log(getClass(), Level.WARNING, String.format("Unable to send [%s] because message manager has not been set", getName()));
       }
@@ -884,7 +884,11 @@ public class Message implements Xmlizable, XmlizableStream {
       if (!isTurnedOff) {
          Message[] messages = mapper.getMessages(this, type).get();
          for(int i = 0; i < messages.length; i++){
-            messages[i].send();
+            if(messageManager != null){
+               messageManager.publish(this, type);
+            } else {
+               OseeLog.log(getClass(), Level.WARNING, String.format("Unable to send [%s] because message manager has not been set", getName()));
+            }
          }
       } else {
          OseeLog.log(MessageSystemTestEnvironment.class, Level.WARNING,
@@ -894,7 +898,7 @@ public class Message implements Xmlizable, XmlizableStream {
 
    public void send(PublishInfo info) throws MessageSystemException {
       if(messageManager != null){
-         messageManager.publish(this, info);
+         messageManager.publish(this, this.getMemType(), info);
       } else {
          OseeLog.log(getClass(), Level.WARNING, String.format("Unable to send [%s] because message manager has not been set", getName()));
       }

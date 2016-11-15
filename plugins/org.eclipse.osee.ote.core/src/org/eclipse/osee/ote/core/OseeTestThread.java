@@ -58,7 +58,7 @@ public abstract class OseeTestThread {
    public OseeTestThread(String name, boolean isDaemon, ThreadGroup group, TestEnvironment env) {
       GCHelper.getGCHelper().addRefWatch(this);
       this.env = new WeakReference<>(env);
-      thread = new Thread(group, name) {
+      thread = new Thread(name) {
 
          @Override
          public void run() {

@@ -32,7 +32,7 @@ public class PeriodicPublishTask extends EnvironmentTask implements IMessageDisp
             Message msg = msgs[i];
             if (msg != null && !msg.isDestroyed()) {
                try{
-                  messageManager.publish(msg);
+                  messageManager.publish(msg, msg.getMemType());
                } catch (Throwable th){
                   System.out.println(msg.getName());
                   th.printStackTrace();

@@ -291,8 +291,13 @@ public class MessageController implements IMessageManager {
 
    @Override
    public void publish(Message msg) {
+      publish(msg, msg.getMemType());
+   }
+   
+   @Override
+   public void publish(Message msg, DataType type) {
       if(!msg.isTurnedOff() && !msg.isDestroyed()){
-         CopyOnWriteNoIteratorList<Message> container = mapper.getMessages(msg, msg.getMemType());
+         CopyOnWriteNoIteratorList<Message> container = mapper.getMessages(msg, type);
          if(container != null){
             Message[] messages = container.get();
             for(int i = 0; i < messages.length; i++){
@@ -308,9 +313,9 @@ public class MessageController implements IMessageManager {
    }
 
    @Override
-   public void publish(Message msg, PublishInfo info) {
+   public void publish(Message msg,  DataType type, PublishInfo info) {
       if(!msg.isTurnedOff() && !msg.isDestroyed()){
-         Message[] messages = mapper.getMessages(msg, msg.getMemType()).get();
+         Message[] messages = mapper.getMessages(msg, type).get();
          for(int i = 0; i < messages.length; i++){
             MessagePublishingHandler publisher = messagePublishingHandlers.get(messages[i].getDefaultMessageData().getIOType());
             if(publisher != null){
@@ -1061,5 +1066,7 @@ public class MessageController implements IMessageManager {
       getMessageListenersContainer(message).removablelisteners.fillCollection(listeners);
       return listeners;
    }
+
+
 
 }

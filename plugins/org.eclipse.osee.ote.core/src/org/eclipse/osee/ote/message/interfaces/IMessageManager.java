@@ -87,7 +87,9 @@ public interface IMessageManager {
 
    void publish(Message msg);
    
-   void publish(Message msg, PublishInfo info);
+   void publish(Message msg, DataType type);
+   
+   void publish(Message msg, DataType type, PublishInfo info);
    
    void publishMessages(boolean publish);
    
