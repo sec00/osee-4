@@ -146,7 +146,7 @@ public abstract class AbstractMessageDataBase {
          public Class<?> findClass(String name) throws ClassNotFoundException {
             return loader.loadClass(name);
          }
-      }, fakeTimerControl, null);
+      }, fakeTimerControl, null, null);
 	   req = messageController.createRequestor("messageDb");
 	   
 	   timer.scheduleWithFixedDelay(new Runnable(){

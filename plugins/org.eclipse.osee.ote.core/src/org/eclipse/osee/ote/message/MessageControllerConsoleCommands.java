@@ -70,7 +70,7 @@ public class MessageControllerConsoleCommands {
       }
       System.out.println("Available MessageDataReceivers");
       for(MessageDataReceiver entry: messageController.getMessageDataReceivers()){
-         System.out.printf("\t%-20s  %-50s %s\n", entry.getDataType().name(), entry.getClass(),entry.toString());
+         System.out.printf("\t%-20s  %-50s %s\n", entry.getIOType().name(), entry.getClass(),entry.toString());
       }
    }	
    

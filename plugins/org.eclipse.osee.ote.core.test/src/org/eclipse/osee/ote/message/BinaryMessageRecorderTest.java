@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 
 import org.eclipse.osee.ote.message.interfaces.IMessageManager;
 import org.eclipse.osee.ote.message.interfaces.IMessageRequestor;
@@ -12,6 +13,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
 public class BinaryMessageRecorderTest {
 
@@ -24,7 +27,7 @@ public class BinaryMessageRecorderTest {
    public void setUp() throws Exception {
       tempFile = File.createTempFile("binrec", "test.bin");
       timer = new FakeTimer();
-      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null);
+      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null, Arrays.asList(TestMessageDataType.eth1));
       req = messageManager.createRequestor("tests");
       messageManager.registerWriter(new BasicWriter(TestMessageIOType.eth1, TestMessageDataType.eth1));
    }

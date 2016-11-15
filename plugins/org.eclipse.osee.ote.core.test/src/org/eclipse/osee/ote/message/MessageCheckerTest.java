@@ -2,6 +2,7 @@ package org.eclipse.osee.ote.message;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.eclipse.osee.ote.message.interfaces.IMessageManager;
 import org.eclipse.osee.ote.message.interfaces.IMessageRequestor;
@@ -21,7 +22,7 @@ public class MessageCheckerTest {
    
    @Before
    public void setUp() throws Exception {
-      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null);
+      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null, Arrays.asList(TestMessageDataType.eth1));
       req = messageManager.createRequestor("tests");
       
 //      messageManager.registerWriter(new BasicWriter(TestMessageIOType.eth2, TestMessageDataType.eth2));

@@ -11,6 +11,7 @@
 package org.eclipse.osee.ote.message.mock;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Filter;
@@ -437,7 +438,7 @@ private static class BasicClassLocator implements ClassLocator {
          e.printStackTrace();
       }
       
-      msgManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), timerCtrl, null);
+      msgManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), timerCtrl, null, Arrays.asList(TestMessageDataType.eth1, TestMessageDataType.eth2, TestMessageDataType.eth3));
       msgManager.registerWriter(new BasicWriter(TestMessageIOType.eth1, TestMessageDataType.eth1));
       
    }

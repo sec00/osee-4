@@ -36,9 +36,4 @@ public class BasicWriter implements MessageDataWriter {
          
       }
 
-      @Override
-      public DataType getDataType() {
-         return dataType;
-      }
-      
    }

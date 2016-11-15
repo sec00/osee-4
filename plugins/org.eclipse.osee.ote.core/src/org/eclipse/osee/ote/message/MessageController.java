@@ -48,11 +48,10 @@ public class MessageController implements IMessageManager {
    private final PeriodicPublishMap periodicPublish;
    private final Set<DataType> availableDataTypes = new HashSet<>();
    private final Set<Integer> printIdMessage = new HashSet<>();
-   
 
  
    //ITimerControl should become Scheduler
-   public MessageController(ClassLocator classLocator, ITimerControl timerControl, ManualMapper manualMapper){
+   public MessageController(ClassLocator classLocator, ITimerControl timerControl, ManualMapper manualMapper, Collection<? extends DataType> set){
       this.classLocator = classLocator;
       this.messageCollection = new MessageCollection(); 
       this.mapper = new LegacyMessageMapperService(manualMapper);
@@ -66,6 +65,9 @@ public class MessageController implements IMessageManager {
       
       
       useSpecialMapping = Boolean.parseBoolean(System.getProperty("ote.signal.mapping", "false"));
+      if(set != null){
+         availableDataTypes.addAll(set);
+      } 
    }
    
    public void addMessageRemoveHandler(MessageRemoveHandler messageRemoveHandler) {
@@ -346,7 +348,7 @@ public class MessageController implements IMessageManager {
          list.add(writer);
       }
       //TODO fix this, we should have this as part of the ENV configuration... or io configuration
-      availableDataTypes.add(writer.getDataType());
+//      availableDataTypes.add(writer.getDataType());
    }
    
    public boolean removeMessageListener(Message message, IOSEEMessageListener listener){

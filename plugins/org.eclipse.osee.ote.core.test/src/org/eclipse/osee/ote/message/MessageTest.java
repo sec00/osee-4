@@ -1,5 +1,6 @@
 package org.eclipse.osee.ote.message;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.eclipse.osee.ote.message.data.MessageData;
@@ -17,7 +18,7 @@ public class MessageTest {
 
    @Before
    public void setUp() throws Exception {
-      messageManager = new MessageController(null, null, null);
+      messageManager = new MessageController(null, null, null,Arrays.asList(TestMessageDataType.eth1, TestMessageDataType.eth2, TestMessageDataType.eth3));
       req = messageManager.createRequestor("tests");
    }
 

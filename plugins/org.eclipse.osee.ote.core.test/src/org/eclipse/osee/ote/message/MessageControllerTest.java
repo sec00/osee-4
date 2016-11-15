@@ -2,6 +2,7 @@ package org.eclipse.osee.ote.message;
 
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import org.eclipse.osee.ote.message.data.MessageData;
 import org.eclipse.osee.ote.message.elements.IntegerElement;
@@ -23,7 +24,7 @@ public class MessageControllerTest {
    
    @Before
    public void setupTest(){
-      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null);
+      messageManager = new MessageController(new BasicClassLocator(this.getClass().getClassLoader()), null, null,Arrays.asList(TestMessageDataType.eth1, TestMessageDataType.eth2, TestMessageDataType.eth3));
       req = messageManager.createRequestor("tests");
    }
    
