@@ -15,11 +15,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.osee.framework.core.data.Adaptable;
 import org.eclipse.osee.framework.jdk.core.util.xml.Jaxp;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.ui.test.manager.internal.TestManagerPlugin;
@@ -31,7 +32,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class TestManagerInput implements IEditorInput, Adaptable {
+public class TestManagerInput implements IEditorInput {
    private final HashMap<String, String> keyValue;
 
    public TestManagerInput() {
@@ -143,5 +144,11 @@ public class TestManagerInput implements IEditorInput, Adaptable {
       }
 
       Jaxp.writeXmlDocument(document, getFile(), Jaxp.getPrettyFormat());
+   }
+
+   @Override
+   public <T> T getAdapter(Class<T> adapter) {
+      // TODO Auto-generated method stub
+      return null;
    }
 }
