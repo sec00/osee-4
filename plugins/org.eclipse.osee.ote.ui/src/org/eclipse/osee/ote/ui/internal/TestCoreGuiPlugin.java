@@ -135,7 +135,7 @@ public class TestCoreGuiPlugin implements BundleActivator {
       try {
          return (IWorkbenchUserService) workbenchUserServiceTracker.waitForService(3000);
       } catch (InterruptedException ex) {
-         throw OseeCoreException.wrap(ex);
+         throw new OseeCoreException(ex);
       }
    }
 
