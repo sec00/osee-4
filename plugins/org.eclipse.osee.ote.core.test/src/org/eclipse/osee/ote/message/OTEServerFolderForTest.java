@@ -121,4 +121,10 @@ public class OTEServerFolderForTest implements OTEServerFolder {
       return null;
    }
 
+   @Override
+   public File getMiscFiles() {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
 }
