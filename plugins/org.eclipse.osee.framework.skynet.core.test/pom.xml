@@ -21,8 +21,9 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
-					<testSuite>org.eclipse.osee.framework.skynet.core.test</testSuite>
-					<testClass>org.eclipse.osee.framework.skynet.core.AllSkynetCoreJunitTestSuite</testClass>
+				<skipTests>true</skipTests>
+<!-- 					<testSuite>org.eclipse.osee.framework.skynet.core.test</testSuite> -->
+<!-- 					<testClass>org.eclipse.osee.framework.skynet.core.AllSkynetCoreJunitTestSuite</testClass> -->
 				</configuration>
 			</plugin>
 		</plugins>

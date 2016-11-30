@@ -37,7 +37,7 @@
 						<osee.is.in.db.init>true</osee.is.in.db.init>
 						<osee.application.server>http://localhost:${osee-server-port}</osee.application.server>
 						<org.eclipse.swt.browser.DefaultType>webkit</org.eclipse.swt.browser.DefaultType>
-<!-- 						<org.eclipse.swt.browser.UseWebKitGTK>true</org.eclipse.swt.browser.UseWebKitGTK> -->
+						<org.eclipse.swt.browser.UseWebKitGTK>true</org.eclipse.swt.browser.UseWebKitGTK>
 					</systemProperties>
 					<redirectTestOutputToFile>false</redirectTestOutputToFile>
 				</configuration>
@@ -83,8 +83,8 @@
 						<version>${tycho-version}</version>
 						<configuration>
 							<debugPort>${int-test-debug-port}</debugPort>
-							<!-- <systemProperties combine.children="append"> <equinox.ds.debug>true</equinox.ds.debug> 
-								</systemProperties> -->
+							<systemProperties combine.children="append"> <equinox.ds.debug>true</equinox.ds.debug> 
+								</systemProperties>
 						</configuration>
 					</plugin>
 				</plugins>

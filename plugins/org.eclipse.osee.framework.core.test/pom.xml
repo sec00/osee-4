@@ -21,8 +21,9 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
-					<testSuite>org.eclipse.osee.framework.core.test</testSuite>
-					<testClass>org.eclipse.osee.framework.core.FrameworkCoreTestSuite</testClass>
+				<skipTests>true</skipTests>
+<!-- 					<testSuite>org.eclipse.osee.framework.core.test</testSuite> -->
+<!-- 					<testClass>org.eclipse.osee.framework.core.FrameworkCoreTestSuite</testClass> -->
 				</configuration>
 			</plugin>
 		</plugins>
