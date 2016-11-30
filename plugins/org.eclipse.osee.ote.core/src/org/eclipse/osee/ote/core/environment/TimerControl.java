@@ -67,6 +67,7 @@ public abstract class TimerControl implements ITimerControl {
 
    @Override
    public ICancelTimer setTimerFor(ITimeout objToNotify, int milliseconds) {
+      objToNotify.setTimeout(false);
       OTETaskRegistration reg = scheduler.scheduleWithDelay(new NotifyAfterTimeout(objToNotify), milliseconds);
       return new CancelTimerFromReg(reg);
    }
