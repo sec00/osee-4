@@ -6,5 +6,7 @@
    <service>
       <provide interface="org.eclipse.osee.ote.client.msg.IOteMessageService"/>
       <provide interface="org.eclipse.osee.ote.message.interfaces.IMsgToolServiceClient"/>
+      <provide interface="org.osgi.service.event.EventHandler"/>
    </service>
+   <property name="event.topics" type="String" value="ote/message/recordingComplete"/>
 </scr:component>

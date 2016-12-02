@@ -44,16 +44,19 @@ import org.eclipse.osee.ote.message.tool.IFileTransferHandle;
 import org.eclipse.osee.ote.message.tool.MessageMode;
 import org.eclipse.osee.ote.message.tool.TransferConfig;
 import org.eclipse.osee.ote.message.tool.UdpFileTransferHandler;
+import org.eclipse.osee.ote.remote.messages.RECORDING_COMPLETE;
 import org.eclipse.osee.ote.service.ConnectionEvent;
 import org.eclipse.osee.ote.service.IOteClientService;
 import org.eclipse.osee.ote.service.ITestConnectionListener;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 
 /**
  * @author Ken J. Aguilar
  */
-public class MessageSubscriptionService implements IOteMessageService, ITestConnectionListener, IMsgToolServiceClient {
+public class MessageSubscriptionService implements IOteMessageService, ITestConnectionListener, IMsgToolServiceClient, EventHandler {
 
    /** * Static Fields ** */
    private static final int MAX_CONCURRENT_WORKER_THREADS = Math.min(Runtime.getRuntime().availableProcessors() + 1, 4);
@@ -329,14 +332,28 @@ public class MessageSubscriptionService implements IOteMessageService, ITestConn
 
    @Override
    public synchronized void stopRecording() throws RemoteException, IOException {
-      try {
-         MessageServiceSupport.stopRecording();
-      } finally {
+      MessageServiceSupport.stopRecording();
+   }
+   
+   /* (non-Javadoc)
+    * @see org.osgi.service.event.EventHandler#handleEvent(org.osgi.service.event.Event)
+    */
+   @Override
+   public void handleEvent(Event event) {
+      if(event.getTopic().equals(RECORDING_COMPLETE.TOPIC)) {
+
          if (fileTransferHandler != null && fileTransferHandler.hasActiveTransfers()) {
-            fileTransferHandler.stopAllTransfers();
+            try {
+               fileTransferHandler.stopAllTransfers();
+            }
+            catch (IOException ex) {
+               System.err.println(ex.getMessage());
+               ex.printStackTrace(System.err);
+            }
          }
          fileTransferHandler = null;
       }
+      
    }
 
    public AbstractMessageDataBase getMsgDatabase() {
