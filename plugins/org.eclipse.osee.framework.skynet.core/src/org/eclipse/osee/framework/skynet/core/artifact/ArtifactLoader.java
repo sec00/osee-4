@@ -223,11 +223,14 @@ public final class ArtifactLoader {
 
          int previousArtId = -1;
          long previousBranchId = -1;
+         Long previousViewId = -1L;
          while (chStmt.next()) {
             int artId = chStmt.getInt("id2");
             long branchUuid = chStmt.getLong("branch_id");
+            Long viewId = chStmt.getLong("id4");
+
             // assumption: sql is returning rows ordered by branch_id, art_id, transaction_id in descending order
-            if (previousArtId != artId || previousBranchId != branchUuid) {
+            if (previousArtId != artId || previousBranchId != branchUuid || !previousViewId.equals(viewId)) {
                // assumption: sql is returning unwanted deleted artifacts only in the historical case
                if (!historical || allowDeleted == DeletionFlag.INCLUDE_DELETED || ModificationType.getMod(
                   chStmt.getInt("mod_type")) != ModificationType.DELETED) {
@@ -237,6 +240,7 @@ public final class ArtifactLoader {
             }
             previousArtId = artId;
             previousBranchId = branchUuid;
+            previousViewId = viewId;
          }
       } catch (OseeDataStoreException ex) {
          OseeLog.logf(Activator.class, Level.SEVERE, ex, "%s - %s", sqlKey, sql == null ? "SQL unknown" : sql);
@@ -262,7 +266,7 @@ public final class ArtifactLoader {
          Id4JoinQuery joinQuery = JoinUtility.createId4JoinQuery();
          for (Pair<ArtifactId, BranchId> pair : toLoad) {
             joinQuery.add(BranchId.valueOf(pair.getSecond().getId()), ArtifactId.valueOf(pair.getFirst().getId()),
-               TransactionId.valueOf(transactionId.getId()), ArtifactId.SENTINEL);
+               TransactionId.valueOf(transactionId.getId()), pair.getSecond().getView());
          }
          loadArtifacts(artifacts, joinQuery, loadLevel, null, reload, transactionId, allowDeleted, isArchived);
       }
@@ -326,7 +330,8 @@ public final class ArtifactLoader {
     */
    private static Artifact retrieveShallowArtifact(JdbcStatement chStmt, LoadType reload, boolean historical, boolean isArchived) throws OseeCoreException {
       ArtifactId artifactId = ArtifactId.valueOf(chStmt.getLong("id2"));
-      BranchId branch = BranchId.valueOf(chStmt.getLong("branch_id"));
+      BranchId branch = BranchId.create(chStmt.getLong("branch_id"), ArtifactId.valueOf(chStmt.getLong("id4")));
+
       TransactionToken transactionId = TransactionToken.SENTINEL;
       if (historical) {
          transactionId = TransactionToken.valueOf(chStmt.getLong("stripe_transaction_id"), branch);
@@ -353,7 +358,8 @@ public final class ArtifactLoader {
       Id4JoinQuery joinQuery = JoinUtility.createId4JoinQuery();
 
       try {
-         joinQuery.add(BranchId.valueOf(artifact.getBranchId()), ArtifactId.valueOf(artifact.getId()));
+         joinQuery.add(BranchId.valueOf(artifact.getBranchId()), ArtifactId.valueOf(artifact.getId()),
+            TransactionId.SENTINEL, artifact.getBranch().getView());
          joinQuery.store();
 
          List<Artifact> artifacts = new ArrayList<>(1);
