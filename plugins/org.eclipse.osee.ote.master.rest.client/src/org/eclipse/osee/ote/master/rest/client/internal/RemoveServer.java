@@ -3,7 +3,6 @@ package org.eclipse.osee.ote.master.rest.client.internal;
 import java.net.URI;
 import java.util.concurrent.Callable;
 
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.UriBuilder;
 
 import org.eclipse.osee.jaxrs.client.JaxRsClient;
@@ -26,10 +25,12 @@ public class RemoveServer implements Callable<OTEMasterServerResult> {
    public OTEMasterServerResult call() throws Exception {
       OTEMasterServerResult result = new OTEMasterServerResult();
       try {
+         URI mainTarget  =
+               UriBuilder.fromUri(uri).path(OTEMasterServerImpl.CONTEXT_NAME).path(OTEMasterServerImpl.CONTEXT_SERVERS).build();
          URI targetUri  =
                UriBuilder.fromUri(uri).path(OTEMasterServerImpl.CONTEXT_NAME).path(OTEMasterServerImpl.CONTEXT_SERVERS).path(server.getUUID().toString()).build();
-         if(HttpUtil.canConnect(targetUri)){
-            webClientProvider.target(targetUri).request().method(HttpMethod.DELETE);
+         if(HttpUtil.canConnect(mainTarget)){
+            webClientProvider.target(targetUri).request().delete();
          } else {
             result.setSuccess(false);   
          }
