@@ -30,9 +30,11 @@ import org.eclipse.osee.connection.service.IConnectorListener;
 import org.eclipse.osee.connection.service.IServiceConnector;
 import org.eclipse.osee.framework.jdk.core.util.EnhancedProperties;
 import org.eclipse.osee.ote.core.OSEEPerson1_4;
+import org.eclipse.osee.ote.core.ServiceUtility;
 import org.eclipse.osee.ote.core.environment.TestEnvironmentConfig;
 import org.eclipse.osee.ote.core.environment.interfaces.IHostTestEnvironment;
 import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironment;
+import org.eclipse.osee.ote.endpoint.OteUdpEndpoint;
 import org.eclipse.osee.ote.service.Activator;
 import org.eclipse.osee.ote.service.ConnectionEvent;
 import org.eclipse.osee.ote.service.IEnvironmentConfigurer;
@@ -366,6 +368,10 @@ public class TestClientServiceImpl implements IOteClientService, IConnectorListe
 		if (testConnection != null && testConnection.getId().equals(id)) {
 			testConnection = null;
 			listenerNotifier.notifyConnectionLost(connector);
+			OteUdpEndpoint endpoint = ServiceUtility.getService(OteUdpEndpoint.class);
+			if(endpoint != null){
+			   endpoint.removeBroadcast(null);
+			}
 		}
 	}
 
