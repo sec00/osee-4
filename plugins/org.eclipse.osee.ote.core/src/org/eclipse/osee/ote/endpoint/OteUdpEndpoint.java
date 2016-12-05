@@ -17,7 +17,7 @@ public interface OteUdpEndpoint {
 
    public void removeBroadcast(OteUdpEndpointSender sender);
    
-//   public void clearBroadcast();
+   public void clearBroadcast();
 
    public CopyOnWriteNoIteratorList<OteUdpEndpointSender> getBroadcastSenders();
 

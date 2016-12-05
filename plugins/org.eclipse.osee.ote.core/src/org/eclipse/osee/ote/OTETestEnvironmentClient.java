@@ -142,7 +142,7 @@ public class OTETestEnvironmentClient {
             ser.getHeader().RESPONSE_TOPIC.setValue(SerializedOTEJobStatus.EVENT);
 
             OteEndpointSendEventMessage sendit = new OteEndpointSendEventMessage(service, destinationAddress);
-            service.removeBroadcast(null);
+            service.clearBroadcast();
             service.addBroadcast(service.getOteEndpointSender(destinationAddress));//so we can communicate via console before connect
             WaitForCompletion completion = new WaitForCompletion(monitor);
             final OteEventMessageFuture<SerializedConfigurationAndResponse, SerializedOTEJobStatus> asynchSendAndResponse = sendit.asynchSendAndMultipleResponse(SerializedOTEJobStatus.class, ser, completion,  1000 * 60 * 10);

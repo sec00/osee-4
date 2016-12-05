@@ -140,9 +140,9 @@ public class EndpointComponent implements OteUdpEndpoint {
       }
    }
    
-//   @Override
-//   public void clearBroadcast() {
-//      broadcastThreaded.clear();
-//   }
+   @Override
+   public void clearBroadcast() {
+      broadcastThreaded.clear();
+   }
 
 }

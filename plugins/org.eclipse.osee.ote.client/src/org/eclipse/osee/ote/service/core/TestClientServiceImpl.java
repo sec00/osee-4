@@ -364,7 +364,7 @@ public class TestClientServiceImpl implements IOteClientService, IConnectorListe
 			listenerNotifier.notifyConnectionLost(connector);
 			OteUdpEndpoint endpoint = ServiceUtility.getService(OteUdpEndpoint.class);
 			if(endpoint != null){
-			   endpoint.removeBroadcast(null);
+			   endpoint.clearBroadcast();
 			}
 		}
 	}
