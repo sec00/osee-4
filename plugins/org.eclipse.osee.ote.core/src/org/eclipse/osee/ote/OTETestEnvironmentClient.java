@@ -142,6 +142,7 @@ public class OTETestEnvironmentClient {
             ser.getHeader().RESPONSE_TOPIC.setValue(SerializedOTEJobStatus.EVENT);
 
             OteEndpointSendEventMessage sendit = new OteEndpointSendEventMessage(service, destinationAddress);
+            service.removeBroadcast(null);
             service.addBroadcast(service.getOteEndpointSender(destinationAddress));//so we can communicate via console before connect
             WaitForCompletion completion = new WaitForCompletion(monitor);
             final OteEventMessageFuture<SerializedConfigurationAndResponse, SerializedOTEJobStatus> asynchSendAndResponse = sendit.asynchSendAndMultipleResponse(SerializedOTEJobStatus.class, ser, completion,  1000 * 60 * 10);
@@ -376,6 +377,9 @@ public class OTETestEnvironmentClient {
          SerializedDisconnectRemoteTestEnvironment req = new SerializedDisconnectRemoteTestEnvironment(new DisconnectRemoteTestEnvironment(sessionId));
          OteEndpointSendEventMessage sendit = new OteEndpointSendEventMessage(service, destinationAddress);
          sendit.asynchSend(req);
+         if(service != null){
+            service.removeBroadcast(service.getOteEndpointSender(destinationAddress));
+         }
       } catch (IOException e) {
          e.printStackTrace();
       } 
@@ -389,7 +393,6 @@ public class OTETestEnvironmentClient {
          e.printStackTrace();
       } 
    }
-   
    
 
 }

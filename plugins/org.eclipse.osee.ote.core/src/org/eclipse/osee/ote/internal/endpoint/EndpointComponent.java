@@ -133,7 +133,16 @@ public class EndpointComponent implements OteUdpEndpoint {
 
    @Override
    public void removeBroadcast(OteUdpEndpointSender sender) {
-      broadcastThreaded.remove(sender);
+      if(sender == null){
+         broadcastThreaded.clear();
+      } else {
+         broadcastThreaded.remove(sender);
+      }
    }
+   
+//   @Override
+//   public void clearBroadcast() {
+//      broadcastThreaded.clear();
+//   }
 
 }
