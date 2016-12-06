@@ -13,6 +13,14 @@ class SignalNotify implements Runnable {
       this.wakeUp = wakeUp;
    }
 
+   public ReentrantLock getLock(){
+      return lock;
+   }
+   
+   public Condition getCondition(){
+      return wakeUp;
+   }
+   
    @Override
    public void run() {
       lock.lock();

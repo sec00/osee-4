@@ -2,6 +2,7 @@ package org.eclipse.ote.scheduler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,6 +23,7 @@ public class SchedulerImpl implements Scheduler {
    
    private SortedLinkedListCopyOnWrite<OTETask> tasks = new SortedLinkedListCopyOnWrite<OTETask>();
    private SortedLinkedListCopyOnWrite<OTETask> simulatedEnvNotifyTasks = new SortedLinkedListCopyOnWrite<OTETask>();
+   private ObjectPool<SignalNotify> signalNotifyPool;
  
    private ExecutorService pool;
    private boolean isTimeSimulated;
@@ -74,6 +76,20 @@ public class SchedulerImpl implements Scheduler {
             return th;
          }
       });
+      
+      signalNotifyPool = new ObjectPool<>(new Create<SignalNotify>() {
+         @Override
+         public SignalNotify create() {
+            ReentrantLock lock = new ReentrantLock();
+            Condition wakeUp = lock.newCondition();
+            return new SignalNotify(lock, wakeUp);
+         }
+      }, new Initialize<SignalNotify>() {
+         @Override
+         public void initialize(SignalNotify obj) {
+            
+         }});
+      
       this.isTimeSimulated = isTimeSimulated;
    }
    
@@ -349,13 +365,12 @@ public class SchedulerImpl implements Scheduler {
          return;
       }
       long time = getTime() + milliseconds;
-      ReentrantLock lock = new ReentrantLock();
-      Condition wakeUp = lock.newCondition();
-      lock.lock();
+      SignalNotify signalNotify = signalNotifyPool.get();
+      signalNotify.getLock().lock();
       try{
-         scheduleWithDelay(new SignalNotify(lock, wakeUp), milliseconds);
+         scheduleWithDelay(signalNotify, milliseconds);
          while(getTime() < time){
-            wakeUp.await(1000, TimeUnit.MILLISECONDS);
+            signalNotify.getCondition().await(1000, TimeUnit.MILLISECONDS);
             if(Thread.interrupted() || ignoreWaits){
                break;
             }
@@ -363,7 +378,8 @@ public class SchedulerImpl implements Scheduler {
       } catch (InterruptedException e) {
          e.printStackTrace();
       } finally {
-         lock.unlock();
+         signalNotify.getLock().unlock();
+         signalNotifyPool.push(signalNotify);
       }
    }
    
