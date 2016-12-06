@@ -18,6 +18,7 @@ import java.util.logging.Level;
 
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.core.ServiceUtility;
+import org.eclipse.osee.ote.core.environment.TestEnvironmentInterface;
 import org.eclipse.osee.ote.core.environment.interfaces.ITestEnvironmentAccessor;
 import org.eclipse.osee.ote.core.environment.interfaces.ITimerControl;
 import org.eclipse.osee.ote.filetransfer.TcpFileTransfer;
@@ -198,7 +199,7 @@ public class BinaryMessageRecorderComponent implements EventHandler{
 	}
 	
 	public void setMessageManager(IMessageManager manager) {
-		timerControl = ServiceUtility.getService(ITestEnvironmentAccessor.class).getTimerCtrl();
+//		timerControl = ServiceUtility.getService(ITestEnvironmentAccessor.class).getTimerCtrl();
 		requestor = manager.createRequestor("Binary Message Recorder");
 	}
 	
@@ -210,11 +211,11 @@ public class BinaryMessageRecorderComponent implements EventHandler{
 
 	}
 
-	public void setTestEnv(ITestEnvironmentAccessor env) {
+	public void setTestEnv(TestEnvironmentInterface env) {
       timerControl = env.getTimerCtrl();
    }
 	
-	public void unsetTestEnv(ITestEnvironmentAccessor env) {
+	public void unsetTestEnv(TestEnvironmentInterface env) {
    }
 	
 }

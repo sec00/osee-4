@@ -1401,7 +1401,6 @@ public abstract class DiscreteElement<T extends Comparable<T>> extends Element i
       set(accessor, value1);
       accessor.setTimerFor(this, milliseconds);
       wait();
-      accessor.getScriptCtrl().lock();
       set(accessor, value2);
 
       accessor.getLogger().methodEnded(accessor);

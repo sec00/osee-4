@@ -22,11 +22,6 @@ public class ScriptControl implements IScriptControl {
    }
 
    @Override
-   public boolean isLocked() {
-      return false;
-   }
-
-   @Override
    public boolean isExecutionUnitPaused() {
       return isOfpPaused;
    }
@@ -39,10 +34,6 @@ public class ScriptControl implements IScriptControl {
    @Override
    public boolean isScriptReady() {
       return isScriptReady;
-   }
-
-   @Override
-   public void lock() {
    }
 
    @Override
@@ -65,17 +56,4 @@ public class ScriptControl implements IScriptControl {
       return isScriptPaused() && !isExecutionUnitPaused();
    }
 
-   @Override
-   public void unlock() {
-   }
-
-   @Override
-   public boolean hasLock() {
-      return false;
-   }
-
-   @Override
-   public boolean isHeldByCurrentThread() {
-      return false;
-   }
 }

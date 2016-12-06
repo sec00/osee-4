@@ -34,7 +34,6 @@ public class OfpDebugPrompt extends ScriptPausePromptImpl {
       synchronized (script) {
          script.getTestEnvironment().getScriptCtrl().setScriptPause(true);
          script.getTestEnvironment().getScriptCtrl().setExecutionUnitPause(executionUnitPause);
-         script.getTestEnvironment().getScriptCtrl().unlock();
          script.wait();
          if (exception != null) {
             throw exception;

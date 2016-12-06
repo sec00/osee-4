@@ -58,9 +58,6 @@ public class CycleCountDown implements ICancelTimer {
    @Override
    public void cancelTimer() {
       this.completed = true;
-      if (this.scriptLock != null) {
-         this.scriptLock.lock();
-      }
    }
   
 }

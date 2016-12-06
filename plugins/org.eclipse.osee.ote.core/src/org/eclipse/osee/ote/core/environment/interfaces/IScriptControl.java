@@ -18,10 +18,6 @@ public interface IScriptControl {
 
    boolean isScriptReady();
 
-   boolean isLocked();
-
-   void lock();
-
    void setExecutionUnitPause(boolean pause);
 
    void setScriptPause(boolean pause);
@@ -30,9 +26,4 @@ public interface IScriptControl {
 
    boolean shouldStep();
 
-   void unlock();
-
-   boolean hasLock();
-
-   boolean isHeldByCurrentThread();
 }

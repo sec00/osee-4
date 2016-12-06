@@ -102,9 +102,6 @@ public class TestRunThread extends OseeTestThread {
       } finally {
          Thread.interrupted();//clear the interrupted flag so that cleanup can occur without exception
          rb.append(listenerProvider.notifyPostRun(dataProvider.createOnPostRun(propertyStore, test)));
-         if (getEnvironment().getScriptCtrl().isLocked()) {
-            getEnvironment().getScriptCtrl().unlock();
-         }
          getEnvironment().getScheduler().setMainThread(null);
       }
    }
