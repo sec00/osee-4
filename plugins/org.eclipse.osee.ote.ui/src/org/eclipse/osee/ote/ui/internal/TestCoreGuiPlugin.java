@@ -42,7 +42,7 @@ public class TestCoreGuiPlugin implements BundleActivator {
    private OteConsoleServiceImpl oteConsoleService;
    private BundleContext context;
 
-   protected OteServerConsole oteServerConsole;
+//   protected OteServerConsole oteServerConsole;
 
    @Override
    public void start(final BundleContext context) throws Exception {
@@ -81,7 +81,7 @@ public class TestCoreGuiPlugin implements BundleActivator {
          @Override
          public Object addingService(ServiceReference reference) {
             oteConsoleService = new OteConsoleServiceImpl();
-            oteServerConsole = new OteServerConsole();
+//            oteServerConsole = new OteServerConsole();
             oteConsoleServiceRegistration =
                context.registerService(IOteConsoleService.class.getName(), oteConsoleService, null);
             if (System.getProperty("NO_OTE_REMOTE_CONSOLE") == null) {
