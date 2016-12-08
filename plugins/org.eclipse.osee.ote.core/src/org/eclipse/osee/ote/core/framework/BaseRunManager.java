@@ -11,9 +11,10 @@
 package org.eclipse.osee.ote.core.framework;
 
 import java.util.logging.Level;
-
 import org.eclipse.osee.framework.jdk.core.type.IPropertyStore;
+import org.eclipse.osee.framework.jdk.core.util.Conditions;
 import org.eclipse.osee.framework.logging.BaseStatus;
+import org.eclipse.osee.framework.logging.IHealthStatus;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.core.TestScript;
 import org.eclipse.osee.ote.core.environment.TestEnvironment;
@@ -61,8 +62,8 @@ public class BaseRunManager implements IRunManager {
             rb.append(testRunManager.initialize(env, propertyStore));
             if (rb.isReturnStatusOK()) {
                try {
-                  rb.append(lifecycleListenerProvider.notifyPostInstantiation(propertyStore, testRunManager.getTest(),
-                        env));
+                  rb.append(
+                     lifecycleListenerProvider.notifyPostInstantiation(propertyStore, testRunManager.getTest(), env));
                } catch (Throwable th) {
                   MethodResultImpl result = new MethodResultImpl(ReturnCode.ERROR);
                   result.addStatus(new BaseStatus(this.getClass().getName(), Level.SEVERE, th));
@@ -75,6 +76,21 @@ public class BaseRunManager implements IRunManager {
                      MethodResultImpl result = new MethodResultImpl(ReturnCode.ERROR);
                      result.addStatus(new BaseStatus(this.getClass().getName(), Level.SEVERE, th));
                      rb.append(result);
+                  }
+               } else {
+                  TestScript test = testRunManager.getTest();
+                  boolean aborted = false;
+                  if (Conditions.hasValues(rb.get().getStatus())) {
+                     for (IHealthStatus hs : rb.get().getStatus()) {
+                        if (hs.getException() != null) {
+                           test.abortDueToThrowable(hs.getException());
+                           aborted = true;
+                           break;
+                        }
+                     }
+                  }
+                  if (!aborted) {
+                     test.abort();
                   }
                }
             }
