@@ -30,6 +30,7 @@ import org.eclipse.osee.framework.core.data.Adaptable;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.ArtifactTypeId;
 import org.eclipse.osee.framework.core.data.AttributeId;
+import org.eclipse.osee.framework.core.data.AttributeTypeId;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IArtifactType;
 import org.eclipse.osee.framework.core.data.IAttributeType;
@@ -96,9 +97,8 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
    public static final String UNNAMED = "Unnamed";
    public static final String BEFORE_GUID_STRING = "/BeforeGUID/PrePend";
    public static final String AFTER_GUID_STRING = "/AfterGUID";
-
-   private final HashCollection<IAttributeType, Attribute<?>> attributes =
-      new HashCollection<IAttributeType, Attribute<?>>(false, LinkedList.class, 12);
+   private final HashCollection<AttributeTypeId, Attribute<?>> attributes =
+      new HashCollection<>(false, LinkedList.class, 12);
    private final Set<DefaultBasicUuidRelationReorder> relationOrderRecords =
       new HashSet<DefaultBasicUuidRelationReorder>();
    private final BranchId branch;
@@ -294,20 +294,20 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
       return ancestors;
    }
 
-   public final Attribute<?> getAttributeById(AttributeId attrUuid, boolean includeDeleted) {
-      return getAttributeById(attrUuid.getId(), includeDeleted);
+   public final Attribute<?> getAttributeById(long attributeId, boolean includeDeleted) {
+      return getAttributeById(AttributeId.valueOf(attributeId), includeDeleted);
    }
 
-   public final Attribute<?> getAttributeById(long attrUuid, boolean includeDeleted) throws OseeCoreException {
+   public final Attribute<?> getAttributeById(AttributeId attributeId, boolean includeDeleted) {
       for (Attribute<?> attribute : getAttributes(includeDeleted)) {
-         if (attribute.getId() == attrUuid) {
+         if (attributeId.equals(attribute)) {
             return attribute;
          }
       }
       return null;
    }
 
-   public final List<Integer> getAttributeIds(IAttributeType attributeType) throws OseeCoreException {
+   public final List<Integer> getAttributeIds(AttributeTypeId attributeType) throws OseeCoreException {
       List<Integer> items = new ArrayList<>();
       List<Attribute<Object>> data = getAttributes(attributeType);
       for (Attribute<Object> attribute : data) {
@@ -499,7 +499,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
    /**
     * The use of this method is discouraged since it directly returns Attributes.
     */
-   public final <T> List<Attribute<T>> getAttributes(IAttributeType attributeType, Object value) throws OseeCoreException {
+   public final <T> List<Attribute<T>> getAttributes(AttributeTypeId attributeType, Object value) throws OseeCoreException {
       List<Attribute<?>> filteredList = new ArrayList<>();
       for (Attribute<?> attribute : getAttributes(attributeType)) {
          if (attribute.getValue().equals(value)) {
@@ -514,7 +514,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
     *
     * @return attributes All attributes of the specified type name including deleted and artifact deleted
     */
-   public final List<Attribute<?>> getAllAttributesIncludingHardDeleted(IAttributeType attributeType) throws OseeCoreException {
+   public final List<Attribute<?>> getAllAttributesIncludingHardDeleted(AttributeTypeId attributeType) throws OseeCoreException {
       return getAttributesByModificationType(attributeType, ModificationType.getAllModTypes());
    }
 
@@ -539,7 +539,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
     * The use of this method is discouraged since it directly returns Attributes.
     */
    @Deprecated
-   public final <T> List<Attribute<T>> getAttributes(IAttributeType attributeType) throws OseeCoreException {
+   public final <T> List<Attribute<T>> getAttributes(AttributeTypeId attributeType) throws OseeCoreException {
       return Collections.castAll(
          getAttributesByModificationType(attributeType, ModificationType.getAllNotHardDeletedTypes()));
    }
@@ -549,7 +549,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
       return filterByModificationType(attributes.getValues(), allowedModTypes);
    }
 
-   private List<Attribute<?>> getAttributesByModificationType(IAttributeType attributeType, Set<ModificationType> allowedModTypes) throws OseeCoreException {
+   private List<Attribute<?>> getAttributesByModificationType(AttributeTypeId attributeType, Set<ModificationType> allowedModTypes) throws OseeCoreException {
       ensureAttributesLoaded();
       return filterByModificationType(attributes.getValues(attributeType), allowedModTypes);
    }
@@ -576,7 +576,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
    /**
     * Deletes all attributes of the given type, if any
     */
-   public final void deleteAttributes(IAttributeType attributeType) throws OseeCoreException {
+   public final void deleteAttributes(AttributeTypeId attributeType) throws OseeCoreException {
       for (Attribute<?> attribute : getAttributes(attributeType)) {
          attribute.delete();
       }
@@ -597,7 +597,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
       return getArtifactType().getAttributeTypes(BranchManager.getBranch(branch));
    }
 
-   public final <T> Attribute<T> getSoleAttribute(IAttributeType attributeType) throws OseeCoreException {
+   public final <T> Attribute<T> getSoleAttribute(AttributeTypeId attributeType) throws OseeCoreException {
       ensureAttributesLoaded();
       List<Attribute<T>> soleAttributes = getAttributes(attributeType);
       if (soleAttributes.isEmpty()) {
@@ -645,7 +645,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
                attributeType, getArtifactTypeName());
          }
          throw new AttributeDoesNotExist("Attribute of type [%s] could not be found on artifact [%s] on branch [%s]",
-            attributeType.getName(), getGuid(), getBranchId());
+            attributeType, this, getBranchId());
       } else if (soleAttributes.size() > 1) {
          throw new MultipleAttributesExist(
             "Attribute [%s] must have exactly one instance.  It currently has %d for artifact [%s]", attributeType,
@@ -664,7 +664,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
     * @throws MultipleAttributesExist if multiple attribute instances exist
     */
 
-   public final String getSoleAttributeValueAsString(IAttributeType attributeType, String defaultReturnValue) throws OseeCoreException, MultipleAttributesExist {
+   public final String getSoleAttributeValueAsString(AttributeTypeId attributeType, String defaultReturnValue) throws OseeCoreException, MultipleAttributesExist {
 
       String toReturn = null;
       Object value = getSoleAttributeValue(attributeType, defaultReturnValue);
@@ -697,7 +697,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
     *
     * @throws MultipleAttributesExist if multiple attribute instances exist
     */
-   public final <T> T getSoleAttributeValue(IAttributeType attributeType, T defaultReturnValue) throws OseeCoreException {
+   public final <T> T getSoleAttributeValue(AttributeTypeId attributeType, T defaultReturnValue) throws OseeCoreException {
       List<Attribute<T>> soleAttributes = getAttributes(attributeType);
       if (soleAttributes.size() == 1) {
          T value = soleAttributes.iterator().next().getValue();
@@ -720,7 +720,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
     * Delete attribute if exactly one exists. Does nothing if attribute does not exist and throw MultipleAttributesExist
     * is more than one instance of the attribute type exsits for this artifact
     */
-   public final void deleteSoleAttribute(IAttributeType attributeType) throws OseeCoreException {
+   public final void deleteSoleAttribute(AttributeTypeId attributeType) throws OseeCoreException {
       Attribute<?> attribute = getSoleAttribute(attributeType);
       if (attribute != null) {
          deleteAttribute(attribute);
@@ -730,7 +730,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
    /**
     * Deletes the first attribute found of the given type and value
     */
-   public final void deleteAttribute(IAttributeType attributeType, Object value) throws OseeCoreException {
+   public final void deleteAttribute(AttributeTypeId attributeType, Object value) throws OseeCoreException {
       for (Attribute<Object> attribute : getAttributes(attributeType)) {
          if (attribute.getValue().equals(value)) {
             deleteAttribute(attribute);
@@ -772,21 +772,21 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
       getOrCreateSoleAttribute(attributeType).setValueFromInputStream(stream);
    }
 
-   public final String getAttributesToStringSorted(IAttributeType attributeType) throws OseeCoreException {
+   public final String getAttributesToStringSorted(AttributeTypeId attributeType) throws OseeCoreException {
       return getAttributesToString(attributeType, true);
    }
 
    /**
     * @return comma delimited representation of all the attributes of the type attributeType in an unspecified order
     */
-   public final String getAttributesToString(IAttributeType attributeType) throws OseeCoreException {
+   public final String getAttributesToString(AttributeTypeId attributeType) throws OseeCoreException {
       return getAttributesToString(attributeType, false);
    }
 
    /**
     * @return comma delimited representation of all the attributes of the type attributeName
     */
-   public final String getAttributesToString(IAttributeType attributeType, boolean sorted) throws OseeCoreException {
+   public final String getAttributesToString(AttributeTypeId attributeType, boolean sorted) throws OseeCoreException {
       List<String> strs = new ArrayList<>();
       List<Attribute<Object>> attributes = getAttributes(attributeType);
       if (sorted) {
@@ -802,7 +802,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
    /**
     * @return comma separator representation unique values of the attributes of the type attributeName
     */
-   public final String getAttributesToStringUnique(IAttributeType attributeType, String separator) throws OseeCoreException {
+   public final String getAttributesToStringUnique(AttributeTypeId attributeType, String separator) throws OseeCoreException {
       Set<String> strs = new HashSet<>();
       for (Attribute<?> attr : getAttributes(attributeType)) {
          strs.add(String.valueOf(attr));
@@ -830,7 +830,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
    /**
     * Will remove one or more of the single string value if artifact has it. Will not touch any other values.
     */
-   public void deleteSingletonAttributeValue(IAttributeType attributeType, String value) throws OseeCoreException {
+   public void deleteSingletonAttributeValue(AttributeTypeId attributeType, String value) throws OseeCoreException {
       for (Attribute<?> attribute : getAttributes(attributeType, value)) {
          attribute.delete();
       }
@@ -984,7 +984,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
    /**
     * @return string collection containing of all the attribute values of type attributeType
     */
-   public final List<String> getAttributesToStringList(IAttributeType attributeType) throws OseeCoreException {
+   public final List<String> getAttributesToStringList(AttributeTypeId attributeType) throws OseeCoreException {
       ensureAttributesLoaded();
 
       List<String> items = new ArrayList<>();
@@ -994,7 +994,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
       return items;
    }
 
-   public final <T> List<T> getAttributeValues(IAttributeType attributeType) throws OseeCoreException {
+   public final <T> List<T> getAttributeValues(AttributeTypeId attributeType) throws OseeCoreException {
       ensureAttributesLoaded();
 
       List<T> items = new ArrayList<>();
@@ -1426,27 +1426,27 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
     * Creates a new artifact and duplicates all of its attribute data.
     */
    public final Artifact duplicate(BranchId branch) throws OseeCoreException {
-      return duplicate(branch, new ArrayList<IAttributeType>());
+      return duplicate(branch, new ArrayList<AttributeTypeId>());
    }
 
-   public final Artifact duplicate(BranchId branch, Collection<IAttributeType> excludeAttributeTypes) throws OseeCoreException {
+   public final Artifact duplicate(BranchId branch, Collection<AttributeTypeId> excludeAttributeTypes) throws OseeCoreException {
       return duplicate(branch, getArtifactType(), excludeAttributeTypes);
    }
 
-   public final Artifact duplicate(BranchId branch, IArtifactType newType, Collection<IAttributeType> excludeAttributeTypes) throws OseeCoreException {
+   public final Artifact duplicate(BranchId branch, IArtifactType newType, Collection<AttributeTypeId> excludeAttributeTypes) throws OseeCoreException {
       Artifact newArtifact = ArtifactTypeManager.addArtifact(newType, branch);
       // we do this because attributes were added on creation to meet the
       // minimum attribute requirements
-      List<IAttributeType> typesToClear =
+      List<AttributeTypeId> typesToClear =
          Collections.setComplement(newArtifact.attributes.keySet(), excludeAttributeTypes);
-      for (IAttributeType type : typesToClear) {
+      for (AttributeTypeId type : typesToClear) {
          newArtifact.attributes.removeValues(type);
       }
       copyAttributes(newArtifact, excludeAttributeTypes);
       return newArtifact;
    }
 
-   private void copyAttributes(Artifact artifact, Collection<IAttributeType> excludeAttributeTypes) throws OseeCoreException {
+   private void copyAttributes(Artifact artifact, Collection<AttributeTypeId> excludeAttributeTypes) throws OseeCoreException {
       for (Attribute<?> attribute : getAttributes()) {
          if (!excludeAttributeTypes.contains(attribute.getAttributeType()) && isCopyAllowed(
             attribute) && artifact.isAttributeTypeValid(attribute.getAttributeType())) {
