@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.eclipse.osee.ote.OTEException;
 import org.eclipse.osee.ote.core.ServiceUtility;
@@ -34,6 +36,7 @@ public class MessageServiceSupport {
 
    private static EventAdmin admin;
    private static OteSendEventMessage send;
+   private static Executor worker = Executors.newSingleThreadExecutor();
    
    private static EventAdmin getEventAdmin(){
       if(admin == null){
@@ -49,8 +52,11 @@ public class MessageServiceSupport {
       return send;
    }
    
-
+   @Deprecated
    public static SubscriptionDetails subscribeToMessage(SubscribeToMessage subscribeToMessage) {
+      if(Thread.currentThread().getName().contains("main")){
+         System.out.println("bad");
+      }
       SerializedSubscriptionDetailsMessage resp = new SerializedSubscriptionDetailsMessage();
       try{
          SerializedSubscribeToMessage cmd = new SerializedSubscribeToMessage(subscribeToMessage);
@@ -65,6 +71,30 @@ public class MessageServiceSupport {
       } catch (ClassNotFoundException e) {
          throw new OTEException("Serialization Error", e);
       }
+   }
+   
+   public static void subscribeToMessage(SubscribeToMessage subscribeToMessage, SubscriptionHandler handler) {
+      worker.execute(new Runnable(){
+         @Override
+         public void run() {
+            SerializedSubscriptionDetailsMessage resp = new SerializedSubscriptionDetailsMessage();
+            try{
+               SerializedSubscribeToMessage cmd = new SerializedSubscribeToMessage(subscribeToMessage);
+               resp = get().synchSendAndResponse(resp, cmd, 10000);
+               if(resp == null){
+                  throw new OTEException("Timed out waiting for message response");
+               } 
+               SubscriptionDetails details = resp.getObject();
+               handler.onSubscriptionComplete(details);
+            } catch (IOException ex){
+               throw new OTEException("Serialization Error", ex);
+            } catch (ClassNotFoundException e) {
+               throw new OTEException("Serialization Error", e);
+            }
+         }
+         
+      });
+     
    }
 
    public static void unsubscribeToMessage(UnSubscribeToMessage unSubscribeToMessage) {

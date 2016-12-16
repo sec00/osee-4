@@ -68,6 +68,7 @@ public class MessageInstance {
       } else {
          details = MessageServiceSupport.subscribeToMessage(new SubscribeToMessage(msg.getClass().getName(), type, mode,
                client.getAddressByType(msg.getClass().getName(), type), client.getTestSessionKey()));
+         
       }
       if (details == null) {
          supported = false;

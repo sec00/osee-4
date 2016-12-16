@@ -168,12 +168,20 @@ public abstract class AbstractMessageDataBase {
 	}
 
 	private boolean doInstanceAttach(MessageInstance instance) throws Exception {
-		Integer id = instance.attachToService(client);
-		if (id == null) {
-			// can't subscribe because environment does not support this type
-			return false;
-		}
-		idToMsgMap.put(id, instance);
+	   new Thread(new Runnable() {
+         @Override
+         public void run() {
+            Integer id;
+            try {
+               id = instance.attachToService(client);
+               if (id != null) {
+                  idToMsgMap.put(id, instance);
+               }
+            } catch (Exception e) {
+               e.printStackTrace();
+            }
+         }
+      }).start();
 		return true;
 	}
 
