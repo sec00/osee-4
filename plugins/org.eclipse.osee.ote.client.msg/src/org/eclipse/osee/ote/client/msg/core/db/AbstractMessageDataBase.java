@@ -15,6 +15,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 import org.eclipse.osee.framework.logging.OseeLog;
@@ -38,6 +40,8 @@ public abstract class AbstractMessageDataBase {
 	private final ConcurrentHashMap<Integer, MessageInstance> idToMsgMap =
 			new ConcurrentHashMap<Integer, MessageInstance>();
 
+	private Executor worker = Executors.newSingleThreadExecutor();
+	
 	private IMsgToolServiceClient client;
 	private volatile boolean connected = false;
 	private final DataReader reader = new DataReader(null, null, true, null, new EntityFactory() {
@@ -168,7 +172,7 @@ public abstract class AbstractMessageDataBase {
 	}
 
 	private boolean doInstanceAttach(MessageInstance instance) throws Exception {
-	   new Thread(new Runnable() {
+	   worker.execute(new Runnable() {
          @Override
          public void run() {
             Integer id;
@@ -181,7 +185,7 @@ public abstract class AbstractMessageDataBase {
                e.printStackTrace();
             }
          }
-      }).start();
+      });
 		return true;
 	}
 

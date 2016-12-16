@@ -52,11 +52,13 @@ public class MessageServiceSupport {
       return send;
    }
    
+   /**
+    * @deprecated use {@link #subscribeToMessage(SubscribeToMessage, SubscriptionHandler)}
+    * @param subscribeToMessage
+    * @return
+    */
    @Deprecated
    public static SubscriptionDetails subscribeToMessage(SubscribeToMessage subscribeToMessage) {
-      if(Thread.currentThread().getName().contains("main")){
-         System.out.println("bad");
-      }
       SerializedSubscriptionDetailsMessage resp = new SerializedSubscriptionDetailsMessage();
       try{
          SerializedSubscribeToMessage cmd = new SerializedSubscribeToMessage(subscribeToMessage);
@@ -73,6 +75,12 @@ public class MessageServiceSupport {
       }
    }
    
+   /**
+    * Subscribes to a message and notifies the user in a callback so that we do not block any UI threads.
+    * 
+    * @param subscribeToMessage
+    * @param handler
+    */
    public static void subscribeToMessage(SubscribeToMessage subscribeToMessage, SubscriptionHandler handler) {
       worker.execute(new Runnable(){
          @Override
