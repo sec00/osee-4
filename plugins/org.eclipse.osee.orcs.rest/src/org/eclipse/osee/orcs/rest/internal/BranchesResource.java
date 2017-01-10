@@ -42,7 +42,7 @@ public class BranchesResource {
    Request request;
 
    @Path("{uuid}")
-   public BranchResource getBranch(@PathParam("uuid") Long id) {
+   public BranchResource getBranch(@PathParam("uuid") BranchId id) {
       return new BranchResource(uriInfo, request, id, OrcsApplication.getOrcsApi());
    }
 
