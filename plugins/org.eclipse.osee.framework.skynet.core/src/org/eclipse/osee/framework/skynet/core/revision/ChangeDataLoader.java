@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.AttributeId;
+import org.eclipse.osee.framework.core.data.AttributeTypeToken;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.GammaId;
 import org.eclipse.osee.framework.core.data.RelationId;
@@ -34,7 +35,6 @@ import org.eclipse.osee.framework.core.model.change.ChangeItem;
 import org.eclipse.osee.framework.core.model.change.ChangeItemUtil;
 import org.eclipse.osee.framework.core.model.change.ChangeVersion;
 import org.eclipse.osee.framework.core.model.change.CompareResults;
-import org.eclipse.osee.framework.core.model.type.AttributeType;
 import org.eclipse.osee.framework.core.model.type.RelationType;
 import org.eclipse.osee.framework.core.operation.AbstractOperation;
 import org.eclipse.osee.framework.jdk.core.type.CompositeKeyHashMap;
@@ -234,7 +234,7 @@ public class ChangeDataLoader extends AbstractOperation {
             }
             break;
          case ATTRIBUTE_CHANGE:
-            AttributeType attributeType = AttributeTypeManager.getTypeByGuid(item.getItemTypeId().getId());
+            AttributeTypeToken attributeType = AttributeTypeManager.getTypeByGuid(item.getItemTypeId().getId());
             if (item.isApplicabilityCopy() || ChangeItemUtil.hasApplicabilityOnlyChange(item)) {
                netModType = ModificationType.APPLICABILITY;
                change = new AttributeChange(startTxBranch, itemGammaId, artId, txDelta, netModType,
