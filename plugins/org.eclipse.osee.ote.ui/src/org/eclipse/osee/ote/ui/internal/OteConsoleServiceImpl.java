@@ -11,22 +11,67 @@
 package org.eclipse.osee.ote.ui.internal;
 
 import java.io.IOException;
+
 import org.eclipse.osee.framework.jdk.core.util.IConsoleInputListener;
-import org.eclipse.osee.framework.ui.plugin.util.OseeConsole;
 import org.eclipse.osee.ote.ui.IOteConsoleService;
+import org.eclipse.osee.ote.ui.OteConsoleWrapper;
+import org.eclipse.osee.ote.ui.internal.prefs.OteConsolePreferences;
+import org.eclipse.osee.ote.ui.internal.prefs.OteConsolePrefsUtil;
 
 /**
  * @author Roberto E. Escobar
  */
 public class OteConsoleServiceImpl implements IOteConsoleService {
 
-   private final OseeConsole console = new OseeConsole("OTE Console");
+   private static final int HIGH_TO_LOW_DIFF = 100;
+   private final OteConsoleWrapper console = new OteConsoleWrapper("OTE Console2");
+   private int limit;
+   private boolean noLimit;
+   private static OteConsoleServiceImpl instance;
 
    public OteConsoleServiceImpl() {
-
+      limit = OteConsolePrefsUtil.getInt(OteConsolePreferences.BUFFER_LIMIT);
+      noLimit = OteConsolePrefsUtil.getBoolean(OteConsolePreferences.NO_BUFFER_LIMIT);
+      setWaterMarks();
+      instance = this;
    }
 
-   private OseeConsole getConsole() {
+   /**
+    * 
+    */
+   private void setWaterMarks() {
+      int lowMark, highMark;
+      
+      if(noLimit) {
+         lowMark = -1;
+         highMark = -1;
+      } else if( limit > HIGH_TO_LOW_DIFF ){
+         lowMark = limit -1;
+         highMark = limit;
+      } else {
+         lowMark = limit - HIGH_TO_LOW_DIFF;
+         highMark = limit;
+      }
+      
+      console.setWaterMarks(lowMark, highMark);
+   }
+   
+   public static OteConsoleServiceImpl getInstance() {
+      return instance;
+   }
+   
+   /**
+    * @param limit the buffer size limit in bytes
+    */
+   public void setLimit(int limit) {
+      this.limit = limit;
+   }
+   
+   public void setNoLimit(boolean noLimit) {
+      this.noLimit = noLimit;
+   }
+
+   private OteConsoleWrapper getConsole() {
       return console;
    }
 
@@ -72,4 +117,4 @@ public class OteConsoleServiceImpl implements IOteConsoleService {
    public void close() {
       getConsole().shutdown();
    }
-}
+ }
