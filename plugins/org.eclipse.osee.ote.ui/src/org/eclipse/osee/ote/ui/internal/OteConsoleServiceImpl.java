@@ -11,22 +11,19 @@
 package org.eclipse.osee.ote.ui.internal;
 
 import java.io.IOException;
+
 import org.eclipse.osee.framework.jdk.core.util.IConsoleInputListener;
-import org.eclipse.osee.framework.ui.plugin.util.OseeConsole;
 import org.eclipse.osee.ote.ui.IOteConsoleService;
+import org.eclipse.osee.ote.ui.OteConsoleWrapper;
 
 /**
  * @author Roberto E. Escobar
  */
 public class OteConsoleServiceImpl implements IOteConsoleService {
 
-   private final OseeConsole console = new OseeConsole("OTE Console");
+   private final OteConsoleWrapper console = new OteConsoleWrapper("OTE Console");
 
-   public OteConsoleServiceImpl() {
-
-   }
-
-   private OseeConsole getConsole() {
+   private OteConsoleWrapper getConsole() {
       return console;
    }
 
@@ -72,4 +69,4 @@ public class OteConsoleServiceImpl implements IOteConsoleService {
    public void close() {
       getConsole().shutdown();
    }
-}
+ }

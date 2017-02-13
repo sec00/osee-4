@@ -62,4 +62,14 @@
        </viewerContribution>
          
    </extension>
+   <extension
+         point="org.eclipse.ui.console.consolePageParticipants">
+      <consolePageParticipant
+            class="org.eclipse.osee.ote.ui.internal.OteConsolePageParticipant"
+            id="org.eclipse.osee.ote.ui.oteConsolePreferences">
+         <enablement>
+             <instanceof value="org.eclipse.osee.ote.ui.OteConsole"/>
+             </enablement>
+      </consolePageParticipant>
+   </extension>
 </plugin>

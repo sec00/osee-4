@@ -11,7 +11,9 @@
 package org.eclipse.osee.ote.ui.internal;
 
 import java.util.logging.Level;
+
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osee.framework.core.exception.OseeExceptions;
 import org.eclipse.osee.framework.core.operation.AbstractOperation;
 import org.eclipse.osee.framework.core.operation.Operations;
@@ -21,7 +23,8 @@ import org.eclipse.osee.framework.plugin.core.IWorkbenchUserService;
 import org.eclipse.osee.framework.ui.plugin.workspace.SafeWorkspaceAccess;
 import org.eclipse.osee.ote.ui.IOteConsoleService;
 import org.eclipse.osee.ote.ui.RemoteConsoleLauncher;
-import org.osgi.framework.BundleActivator;
+import org.eclipse.osee.ote.ui.internal.prefs.OteConsolePreferences;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
@@ -30,7 +33,8 @@ import org.osgi.util.tracker.ServiceTracker;
 /**
  * The main plugin class to be used in the desktop.
  */
-public class TestCoreGuiPlugin implements BundleActivator {
+@SuppressWarnings("rawtypes")
+public class TestCoreGuiPlugin extends AbstractUIPlugin {
 
    public static final String PLUGIN_ID = "org.eclipse.osee.ote.ui";
 
@@ -43,12 +47,24 @@ public class TestCoreGuiPlugin implements BundleActivator {
    private OteConsoleServiceImpl oteConsoleService;
    private BundleContext context;
 
-   protected OteServerConsole oteServerConsole;
-
    @Override
    public void start(final BundleContext context) throws Exception {
       this.context = context;
       instance = this;
+      createWorkspaceTracker(context);
+      if (System.getProperty("NO_OTE_ARTIFACT_BULK_LOAD") == null) {
+         startOTEArtifactBulkLoad();
+      }
+      setDefaultPreferences();
+      
+      super.start(context);
+   }
+
+   /**
+    * @param context
+    */
+   @SuppressWarnings("unchecked")
+   private void createWorkspaceTracker(final BundleContext context) {
       workspaceStartTracker = new ServiceTracker(context, SafeWorkspaceAccess.class.getName(), null) {
          private RemoteConsoleLauncher tracker;
 
@@ -75,14 +91,12 @@ public class TestCoreGuiPlugin implements BundleActivator {
 
          @Override
          public void modifiedService(ServiceReference reference, Object service) {
-            // TODO Auto-generated method stub
-
+            // do nothing
          }
 
          @Override
          public Object addingService(ServiceReference reference) {
             oteConsoleService = new OteConsoleServiceImpl();
-            oteServerConsole = new OteServerConsole();
             oteConsoleServiceRegistration =
                context.registerService(IOteConsoleService.class.getName(), oteConsoleService, null);
             if (System.getProperty("NO_OTE_REMOTE_CONSOLE") == null) {
@@ -96,9 +110,12 @@ public class TestCoreGuiPlugin implements BundleActivator {
 
       workbenchUserServiceTracker = new ServiceTracker(context, IWorkbenchUserService.class.getName(), null);
       workbenchUserServiceTracker.open();
-
-      if (System.getProperty("NO_OTE_ARTIFACT_BULK_LOAD") == null) {
-         startOTEArtifactBulkLoad();
+   }
+   
+   public static void setDefaultPreferences() {
+      IPreferenceStore store = getDefault().getPreferenceStore();
+      for( OteConsolePreferences pref : OteConsolePreferences.values()) {
+         store.setDefault(pref.getPropKey(), pref.getDefaultValue().toString());
       }
    }
 
@@ -114,6 +131,8 @@ public class TestCoreGuiPlugin implements BundleActivator {
       }
       workspaceStartTracker.close();
       instance = null;
+      
+      super.stop(context);
    }
 
    private void startOTEArtifactBulkLoad() {
