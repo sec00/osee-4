@@ -12,7 +12,6 @@ package org.eclipse.osee.ote.ui.markers;
 
 import java.util.List;
 import java.util.logging.Level;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -56,21 +55,11 @@ public class MarkerPlugin implements BundleActivator {
                            // file.refreshLocal(depth, monitor);
                            if (file != null) {
                               switch (delta.getKind()) {
-                                 case IResourceDelta.ADDED:
-                                    // OseeLog.logf(Activator.class, Level.INFO, "ADDED %s updating
-                                    // markers - delta kind: %d", file.getName(), delta.getKind());
-                                    // addMarkers(file);
-                                    break;
-                                 case IResourceDelta.CHANGED:
-                                    // OseeLog.logf(Activator.class, Level.INFO, "CHANGED %s updating
-                                    // markers - delta kind: %d", file.getName(), delta.getKind());
-                                    // updateMarkers(file);
-                                    break;
                                  case IResourceDelta.REMOVED:
-                                    // OseeLog.logf(Activator.class, Level.INFO, "removing %s markers -
-                                    // delta kind: %d", file.getName(), delta.getKind());
                                     removeMarkers(file);
                                     break;
+                                 default:
+                                    // do nothing
                               }
                            }
                         }
@@ -115,18 +104,19 @@ public class MarkerPlugin implements BundleActivator {
    static synchronized void updateMarkerInfo(IFile file, List<IMarker> markers) {
       filesToWatch.put(file, markers);
    }
-   
-   public static void findAndRemoveOteMarkers(IResource resource){
-	   try {
-		   if(resource == null){
-			   return;
-		   }
-		   IMarker[] markersToRemove = resource.findMarkers("org.eclipse.osee.ote.ui.output.errorMarker", false, IResource.DEPTH_INFINITE);
-		   for(IMarker localMarker:markersToRemove){
-			   localMarker.delete();
-		   }
-	   } catch (CoreException e) {
-		   OseeLog.log(MarkerPlugin.class, Level.SEVERE, e);
-	   }
+
+   public static void findAndRemoveOteMarkers(IResource resource) {
+      try {
+         if (resource == null) {
+            return;
+         }
+         IMarker[] markersToRemove =
+            resource.findMarkers("org.eclipse.osee.ote.ui.output.errorMarker", false, IResource.DEPTH_INFINITE);
+         for (IMarker localMarker : markersToRemove) {
+            localMarker.delete();
+         }
+      } catch (CoreException e) {
+         OseeLog.log(MarkerPlugin.class, Level.SEVERE, e);
+      }
    }
 }

@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -72,7 +73,8 @@ public class StoreOutfileJob extends Job {
             try {
                storeOutfile(scriptTask);
             } catch (Exception e) {
-               return new Status(IStatus.ERROR, TestManagerPlugin.PLUGIN_ID, "Failed to write out file to workspace", e);
+               return new Status(IStatus.ERROR, TestManagerPlugin.PLUGIN_ID, "Failed to write out file to workspace",
+                  e);
             }
          }
          //         scriptTask.computeExists();
@@ -113,7 +115,8 @@ public class StoreOutfileJob extends Job {
    }
 
    private boolean isKeepSavedOutfileEnabled() {
-      return testManagerEditor.getPropertyStore().getBoolean(TestManagerStorageKeys.KEEP_OLD_OUTFILE_COPIES_ENABLED_KEY);
+      return testManagerEditor.getPropertyStore().getBoolean(
+         TestManagerStorageKeys.KEEP_OLD_OUTFILE_COPIES_ENABLED_KEY);
    }
 
    private void storeOutfile(ScriptTask scriptTask) throws Exception {
@@ -125,10 +128,12 @@ public class StoreOutfileJob extends Job {
             if (isKeepSavedOutfileEnabled()) {
                moveOutputToNextAvailableSpot(scriptTask);
             }
-            // else {
-            // task.getScriptModel().getOutputModel().getIFile().delete(true, null);
-            // }
-            IFile file = AIFile.constructIFile(clientOutfilePath);
+            IFile file = null;
+            IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(
+               org.eclipse.core.filesystem.URIUtil.toURI(clientOutfilePath));
+            if (files.length > 0) {
+               file = files[0];
+            }
             if (file != null) {
                AIFile.writeToFile(file, new ByteArrayInputStream(outBytes));
                MarkerPlugin.addMarkers(file);
@@ -146,15 +151,13 @@ public class StoreOutfileJob extends Job {
          String outputExtension = "." + outputModel.getFileExtension();
          String extensionRegex = "\\" + outputExtension + "\\b";//escape the . and should be the end of the string (word b
          int fileNum = 1;
-         File destFile =
-            new File(
-               oldFile.getAbsoluteFile().toString().replaceFirst(extensionRegex, "." + fileNum + outputExtension));
+         File destFile = new File(
+            oldFile.getAbsoluteFile().toString().replaceFirst(extensionRegex, "." + fileNum + outputExtension));
          if (destFile.exists()) {
             while (destFile.exists()) {
                fileNum++;
-               destFile =
-                  new File(oldFile.getAbsoluteFile().toString().replaceFirst(extensionRegex,
-                     "." + fileNum + outputExtension));
+               destFile = new File(
+                  oldFile.getAbsoluteFile().toString().replaceFirst(extensionRegex, "." + fileNum + outputExtension));
             }
          }
          try {
