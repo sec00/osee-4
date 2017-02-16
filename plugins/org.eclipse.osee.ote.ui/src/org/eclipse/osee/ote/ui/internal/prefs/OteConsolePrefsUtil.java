@@ -18,15 +18,21 @@ import org.eclipse.osee.ote.ui.internal.TestCoreGuiPlugin;
 public class OteConsolePrefsUtil {
 
    public static int getInt(OteConsolePreferences bufferLimit) {
-      return TestCoreGuiPlugin.getDefault().getPreferenceStore().getInt(bufferLimit.getPropKey());
+      String propKey = bufferLimit.getPropKey();
+      lateLoadDefaults(propKey);
+      return TestCoreGuiPlugin.getDefault().getPreferenceStore().getInt(propKey);
    }
 
    public static String getString(OteConsolePreferences bufferLimit) {
-      return TestCoreGuiPlugin.getDefault().getPreferenceStore().getString(bufferLimit.getPropKey());
+      String propKey = bufferLimit.getPropKey();
+      lateLoadDefaults(propKey);
+      return TestCoreGuiPlugin.getDefault().getPreferenceStore().getString(propKey);
    }
    
    public static boolean getBoolean(OteConsolePreferences bufferLimit) {
-      return TestCoreGuiPlugin.getDefault().getPreferenceStore().getBoolean(bufferLimit.getPropKey());
+      String propKey = bufferLimit.getPropKey();
+      lateLoadDefaults(propKey);
+      return TestCoreGuiPlugin.getDefault().getPreferenceStore().getBoolean(propKey);
    }
    
    public static void setInt(OteConsolePreferences preference, int value) {
@@ -39,6 +45,14 @@ public class OteConsolePrefsUtil {
    
    public static void setBoolean(OteConsolePreferences preference, boolean value) {
       TestCoreGuiPlugin.getDefault().getPreferenceStore().setValue(preference.getPropKey(), value);
+   }
+   
+   private static void lateLoadDefaults(String keyStr) {
+      TestCoreGuiPlugin plugin = TestCoreGuiPlugin.getDefault();
+      String defaultString = plugin.getPreferenceStore().getDefaultString(keyStr);
+      if(defaultString == null || defaultString.length() <= 0) {
+         TestCoreGuiPlugin.setDefaultPreferences();
+      }
    }
 
 }

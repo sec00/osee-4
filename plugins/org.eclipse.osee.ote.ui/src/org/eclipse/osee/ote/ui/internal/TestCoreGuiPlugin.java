@@ -55,8 +55,6 @@ public class TestCoreGuiPlugin extends AbstractUIPlugin {
       if (System.getProperty("NO_OTE_ARTIFACT_BULK_LOAD") == null) {
          startOTEArtifactBulkLoad();
       }
-      setDefaultPreferences();
-      
       super.start(context);
    }
 
