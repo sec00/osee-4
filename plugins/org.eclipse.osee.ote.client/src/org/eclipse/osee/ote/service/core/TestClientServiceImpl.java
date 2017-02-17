@@ -127,7 +127,7 @@ public class TestClientServiceImpl implements IOteClientService, IConnectorListe
 	}
 
 	@Override
-	public IServiceConnector getConnector(IHostTestEnvironment host) {
+	public synchronized IServiceConnector getConnector(IHostTestEnvironment host) {
 		try {
 			EnhancedProperties properties = host.getProperties();
 			if(properties != null){
