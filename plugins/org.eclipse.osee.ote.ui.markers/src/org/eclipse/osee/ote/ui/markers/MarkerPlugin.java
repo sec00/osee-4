@@ -107,7 +107,7 @@ public class MarkerPlugin implements BundleActivator {
 
    public static void findAndRemoveOteMarkers(IResource resource) {
       try {
-         if (resource == null) {
+         if (resource == null || !resource.exists()) {
             return;
          }
          IMarker[] markersToRemove =
