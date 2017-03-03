@@ -359,7 +359,7 @@ public class OTETestEnvironmentClient {
          SerializedRequestRemoteTestEnvironment req = new SerializedRequestRemoteTestEnvironment(new RequestRemoteTestEnvironment(session, id, config));
          SerializedConnectionRequestResult result = new SerializedConnectionRequestResult();
          OteEndpointSendEventMessage sendit = new OteEndpointSendEventMessage(service, destinationAddress);
-         result = sendit.synchSendAndResponse(result, req, OtePropertiesCore.serverConnectionTimeout.getLongValue(1000 * 10));
+         result = sendit.synchSendAndResponse(result, req, OtePropertiesCore.serverConnectionTimeout.getLongValue(1000 * 30));
          if(result != null){
             return result.getObject();
          }
