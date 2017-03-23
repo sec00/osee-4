@@ -200,7 +200,6 @@ public abstract class Element implements ITimeout {
       return this.getNonMappingElement();
    }
    
-   @Deprecated
    public Element switchMessages(Collection<? extends Message<?,?,?>> messages) {
       for (Message currentMessage : messages) {
          //         System.out.println("SwitchMessages" + currentMessage.getMessageName());

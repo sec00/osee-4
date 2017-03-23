@@ -49,7 +49,6 @@ public class LongIntegerElement extends NumericElement<Long> {
    }
 
    @Override
-   @Deprecated
    public LongIntegerElement switchMessages(Collection<? extends Message<?,?,?>> messages) {
       return (LongIntegerElement) super.switchMessages(messages);
    }

@@ -105,7 +105,6 @@ public class RecordMap<T extends RecordElement> extends RecordElement {
    }
    
    @Override
-   @Deprecated
    public RecordMap<T> switchMessages(Collection<? extends Message<?,?,?>> messages) {
       for (RecordElement element : this.records.values()) {
          element.switchMessages(messages);

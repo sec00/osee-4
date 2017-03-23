@@ -53,7 +53,6 @@ public class StringElement extends DiscreteElement<String> {
    }
    
    @Override
-   @Deprecated
    public StringElement switchMessages(Collection<? extends Message<?,?,?>> messages) {
       return (StringElement) super.switchMessages(messages);
    }

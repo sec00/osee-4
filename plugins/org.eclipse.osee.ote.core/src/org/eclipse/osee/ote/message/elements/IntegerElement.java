@@ -48,7 +48,6 @@ public class IntegerElement extends NumericElement<Integer> {
    }
    
    @Override
-   @Deprecated
    public IntegerElement switchMessages(Collection<? extends Message<?,?,?>> messages) {
       return (IntegerElement) super.switchMessages(messages);
    }
