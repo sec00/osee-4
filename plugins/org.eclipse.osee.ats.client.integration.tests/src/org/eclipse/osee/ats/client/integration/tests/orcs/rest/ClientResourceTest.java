@@ -18,6 +18,7 @@ import org.eclipse.osee.ats.demo.api.DemoUsers;
 import org.eclipse.osee.framework.core.client.OseeClientProperties;
 import org.eclipse.osee.jaxrs.client.JaxRsClient;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -46,6 +47,7 @@ public class ClientResourceTest {
    }
 
    @Test
+   @Ignore
    public void testGetClientsForUser() {
       String appServer = OseeClientProperties.getOseeApplicationServer();
       URI uri = UriBuilder.fromUri(appServer).path("orcs").path("client").path(DemoUsers.Joe_Smith.getUserId()).build();
