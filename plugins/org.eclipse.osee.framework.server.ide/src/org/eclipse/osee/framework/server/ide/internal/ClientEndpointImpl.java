@@ -41,6 +41,7 @@ import org.eclipse.osee.framework.core.util.HttpProcessor;
 import org.eclipse.osee.framework.core.util.HttpProcessor.AcquireResult;
 import org.eclipse.osee.framework.jdk.core.type.OseeArgumentException;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
+import org.eclipse.osee.framework.jdk.core.type.ResultSet;
 import org.eclipse.osee.framework.jdk.core.util.DateUtil;
 import org.eclipse.osee.framework.jdk.core.util.GUID;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
@@ -115,6 +116,7 @@ public class ClientEndpointImpl implements ClientEndpoint {
       Sessions sessions = new Sessions();
       Map<String, Boolean> portToAlive = new HashMap<>();
       List<String> resolvedUserIds = getUserIds(idOrName);
+      System.out.println(String.format("resolvedUserIds [%s]", resolvedUserIds));
       if (resolvedUserIds.isEmpty()) {
          throw new OseeArgumentException("User with id or name of [%s] not found", idOrName);
       }
@@ -122,9 +124,12 @@ public class ClientEndpointImpl implements ClientEndpoint {
       Consumer<JdbcStatement> consumer = stmt -> {
          IdeClientSession session = createSession(stmt, uriInfo);
          String key = session.getClientAddress() + session.getClientPort();
+
+         System.out.println(String.format("key [%s]", key));
          Boolean alive = portToAlive.get(key);
          if (alive == null) {
             alive = alive(session);
+            System.out.println(String.format("alive [%s]", alive));
             portToAlive.put(key, alive);
             if (alive) {
                sessions.add(session);
@@ -166,9 +171,11 @@ public class ClientEndpointImpl implements ClientEndpoint {
       if (Strings.isNumeric(userIdOrName)) {
          results.add(userIdOrName);
       } else {
-         for (ArtifactReadable userArt : orcsApi.getQueryFactory().fromBranch(CoreBranches.COMMON).andIsOfType(
-            CoreArtifactTypes.User).and(CoreAttributeTypes.Name, userIdOrName,
-               QueryOption.CONTAINS_MATCH_OPTIONS).getResults()) {
+         ResultSet<ArtifactReadable> users =
+            orcsApi.getQueryFactory().fromBranch(CoreBranches.COMMON).andIsOfType(CoreArtifactTypes.User).and(
+               CoreAttributeTypes.Name, userIdOrName, QueryOption.CONTAINS_MATCH_OPTIONS).getResults();
+         System.out.println(String.format("users [%s]", users));
+         for (ArtifactReadable userArt : users) {
             results.add(userArt.getSoleAttributeValue(CoreAttributeTypes.UserId, null));
          }
       }
@@ -179,9 +186,15 @@ public class ClientEndpointImpl implements ClientEndpoint {
       IdeClientSession session = new IdeClientSession(stmt.getString("CLIENT_ADDRESS"), stmt.getString("CLIENT_PORT"),
          stmt.getString("USER_ID"), stmt.getString("CLIENT_VERSION"), stmt.getString("SESSION_ID"),
          DateUtil.get(stmt.getDate("CREATED_ON"), DateUtil.MMDDYYHHMM));
+
+      System.out.println(String.format("session [%s]", session));
+
       URI location =
          UriBuilder.fromPath(uriInfo.getBaseUri().toASCIIString()).path("client").path(stmt.getString("USER_ID")).path(
             "session").path(stmt.getString("SESSION_ID")).build();
+
+      System.out.println(String.format("location [%s]", location.getRawPath()));
+
       session.setSessionLog(location.toString());
       return session;
    }
@@ -244,6 +257,7 @@ public class ClientEndpointImpl implements ClientEndpoint {
 
    private boolean alive(IdeClientSession session) throws OseeCoreException {
       boolean alive = isHostAlive(session);
+      System.out.println(String.format("isHostAlive [%s]", alive));
       if (!alive) {
          return false;
       }
@@ -253,8 +267,11 @@ public class ClientEndpointImpl implements ClientEndpoint {
          ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
          URL url = new URL(
             String.format("http://%s:%s/osee/request?cmd=pingId", session.getClientAddress(), session.getClientPort()));
+         System.out.println(String.format("url [%s]", url.getPath()));
          AcquireResult result = HttpProcessor.acquire(url, outputStream, 1000);
+         System.out.println(String.format("result [%s]", result));
          if (result.wasSuccessful()) {
+            System.out.println("result.wasSuccessful!");
             alive = true;
          }
       } catch (Exception ex) {
