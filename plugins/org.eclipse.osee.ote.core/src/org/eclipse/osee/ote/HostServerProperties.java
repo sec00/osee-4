@@ -15,5 +15,6 @@ public enum HostServerProperties {
    activeMq,
    appServerURI,
    oteUdpEndpoint,
-   serverLaunchWorkingDir
+   serverLaunchWorkingDir,
+   isSim
 }

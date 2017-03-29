@@ -59,6 +59,11 @@ class EnvironmentCreationParameter {
    public String getOutfileLocation() {
       return config.getOutfileLocation();
    }
+   
+   public boolean isSimulated() {
+      String toCheck = factory == null ? environmentFactoryClass : factory.getClass().getName();
+      return toCheck.contains("Sun");
+   }
 
    public MessageSystemTestEnvironment createEnvironment() throws Throwable {
       if (factory == null) {

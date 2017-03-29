@@ -76,6 +76,7 @@ public class OteService implements IHostTestEnvironment {
       enhancedProperties.setProperty(HostServerProperties.group.name(), "OSEE Test Environment");
       enhancedProperties.setProperty(HostServerProperties.owner.name(), OtePropertiesCore.userName.getValue());
       enhancedProperties.setProperty(HostServerProperties.id.name(), serviceID.toString());
+      enhancedProperties.setProperty(HostServerProperties.isSim.name(), Boolean.toString(environmentCreation.isSimulated()));
 //      enhancedProperties.setProperty(HostServerProperties.activeMq.name(), environmentCreation.getBroker().getUri().toString());
       try {
          String format = String.format("tcp://%s:%d", receiver.getLocalEndpoint().getAddress().getHostAddress(), receiver.getLocalEndpoint().getPort());
