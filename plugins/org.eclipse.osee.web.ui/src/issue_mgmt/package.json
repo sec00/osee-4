@@ -1,0 +1,36 @@
+{
+  "name": "make-it-happen-jsonforms",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Make it Happen Example for JSON Forms",
+  "repository": "https://github.com/eclipsesource/make-it-happen-jsonforms",
+  "license": "MIT",
+  "dependencies": {
+    "angular-resource": "1.5.9",
+    "angular-ui-bootstrap": "2.3.1",
+    "bootstrap": "3.3.7",
+    "jsonforms": "1.4.1"
+  },
+  "devDependencies": {
+    "jshint": "^2.9.3",
+    "jshint-html-reporter": "^0.2.4",
+    "json-server": "0.9.4",
+    "lite-server": "2.2.2",
+    "npm-run-all": "3.1.2"
+  },
+  "scripts": {
+    "prestart": "npm install",
+    "start": "npm run final",
+    "hint": "./node_modules/.bin/jshint -c .jshintrc --exclude .gitignore --exclude node_modules .",
+    "initial": "lite-server -c app/initial/bs-config.json",
+    "day1": "lite-server -c app/day1/bs-config.json",
+    "day2": "lite-server -c app/day2/bs-config.json",
+    "day3": "lite-server -c app/day3/bs-config.json",
+    "day4": "lite-server -c app/day4/bs-config.json",
+    "day5": "lite-server -c app/day5/bs-config.json",
+    "final": "npm-run-all --parallel  _final_frontend _final_backend",
+    "_final_frontend": "lite-server -c app/final/bs-config.json",
+    "_final_backend": "json-server --watch app/final/data/tasks.json --port 3004",
+    "update-index-async": "node -e \"require('shelljs/global'); sed('-i', /\\/\\/@@NG_LOADER_START@@[\\s\\S]*\\/\\/@@NG_LOADER_END@@/, '//@@NG_LOADER_START@@\\n' + sed(/sourceMappingURL=angular-loader.min.js.map/,'sourceMappingURL=bower_components/angular-loader/angular-loader.min.js.map','app/bower_components/angular-loader/angular-loader.min.js') + '\\n//@@NG_LOADER_END@@', 'app/index-async.html');\""
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "name": "Send email to Adrian",
+      "description": "Confirm if you have passed the subject",
+      "done": false,
+      "comments": [
+        {
+          "message": "Need Translation"
+        },
+        {
+          "message": "EMail must be reviewed"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Buy gloves",
+      "description": "I need them for the ski trip",
+      "done": true,
+      "recurrence": "Never",
+      "comments": [
+        {
+          "message": "Need more information of prefered glove type"
+        }
+      ]
+    },
+    {
+      "name": "New Task",
+      "id": 3
+    }
+  ]
+}
