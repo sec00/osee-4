@@ -96,7 +96,7 @@ public class AtsQueryServiceImpl extends AbstractAtsQueryService {
    }
 
    @Override
-   public Collection<ArtifactToken> getArtifacts(List<Integer> ids, BranchId branch) {
+   public Collection<ArtifactToken> getArtifacts(Collection<Integer> ids, BranchId branch) {
       List<Long> uuids = new LinkedList<>();
       for (Integer id : ids) {
          uuids.add(Long.valueOf(id));
