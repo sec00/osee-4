@@ -1,19 +1,41 @@
 angular.module('MiHexample').value("Schema",
 {
   "type": "object",
-  "properties": {
-    "required": [
+  "required": [
       "subject",
       "discrepancy",
+      "correctiveAction",
       "status",
       "type",
+      "priority",
+      "subsystem",
       "responsibleIpt",
       "colorTeam"
-    ],
+  ],
+  "properties": {
     "subject": {
-      "type": "string"
+      "type": "string",
+      "minLength": 3
     },
     "discrepancy": {
+      "type": "string"
+    },
+    "correctiveAction": {
+      "type": "string"
+    },
+    "comments": {
+      "type": "string"
+    },
+    "isCrewSystemImpact": {
+      "type": "boolean"
+    },
+    "isCrewSystemWorkAround": {
+      "type": "boolean"
+    },
+    "natureOfImpact": {
+      "type": "string"
+    },
+    "workAround": {
       "type": "string"
     },
     "status": {
@@ -26,6 +48,15 @@ angular.module('MiHexample').value("Schema",
         "Cancelled"
       ]
     },
+    "cognizant1": {
+      "type": "string"
+    },
+    "cognizant2": {
+      "type": "string"
+    },
+    "cognizant3": {
+      "type": "string"
+    },
     "type": {
       "type": "string",
       "enum": [
@@ -33,6 +64,51 @@ angular.module('MiHexample').value("Schema",
         "Supplier",
         "GFE"
       ]
+    },
+    "statusEcd": {
+      "type": "string",
+      "format": "date"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    "subsystem": {
+      "type": "string",
+      "enum": [
+        "ASM",
+        "NAV",
+        "COMM",
+        "CND",
+        "BATB"
+      ]
+    },
+    "whereFound": {
+      "type": "string",
+      "enum": [
+        "Formal Testing",
+        "Script",
+        "Hot Bench",
+        "Code Inspection",
+        "Flight Test"
+      ]
+    },
+    "buildFound": {
+      "type": "string",
+      "enum": [
+        "FTB1",
+        "SBVT",
+        "FTB2"
+      ]
+    },
+    "operatorImpact": {
+      "type": "boolean"
     },
     "responsibleIpt": {
       "type": "string",

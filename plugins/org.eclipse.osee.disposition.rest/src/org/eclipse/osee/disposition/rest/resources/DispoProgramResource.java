@@ -31,7 +31,6 @@ import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * @author Angel Avila
@@ -99,13 +98,13 @@ public class DispoProgramResource {
       });
       JSONArray jarray = new JSONArray();
 
-      for (IOseeBranch branch : allPrograms) {
-         JSONObject jobject = new JSONObject();
-         String uuid = branch.getIdString();
-         jobject.put("value", uuid);
-         jobject.put("text", branch.getName());
-         jarray.put(jobject);
-      }
+      //      for (IOseeBranch branch : allPrograms) {
+      //         JSONObject jobject = new JSONObject();
+      //         String uuid = branch.getIdString();
+      //         jobject.put("value", uuid);
+      //         jobject.put("text", branch.getName());
+      //         jarray.put(jobject);
+      //      }
       Status status;
       if (allPrograms.isEmpty()) {
          status = Status.NOT_FOUND;
