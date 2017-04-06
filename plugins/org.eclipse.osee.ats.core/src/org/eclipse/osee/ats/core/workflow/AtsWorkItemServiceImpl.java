@@ -37,6 +37,7 @@ import org.eclipse.osee.ats.core.validator.AtsXWidgetValidateManager;
 import org.eclipse.osee.ats.core.workflow.note.ArtifactNote;
 import org.eclipse.osee.ats.core.workflow.note.AtsWorkItemNotes;
 import org.eclipse.osee.framework.core.data.ArtifactId;
+import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.OseeStateException;
 import org.eclipse.osee.framework.jdk.core.util.Collections;
@@ -97,7 +98,7 @@ public class AtsWorkItemServiceImpl implements IAtsWorkItemService {
    public Collection<IAtsTeamWorkflow> getTeams(Object object) {
       List<IAtsTeamWorkflow> teams = new LinkedList<>();
       if (object instanceof IAtsAction) {
-         for (ArtifactId teamWfArt : services.getRelationResolver().getRelated((IAtsAction) object,
+         for (ArtifactToken teamWfArt : services.getRelationResolver().getRelated((IAtsAction) object,
             AtsRelationTypes.ActionToWorkflow_WorkFlow)) {
             teams.add(services.getWorkItemFactory().getTeamWf(teamWfArt));
          }
