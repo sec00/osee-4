@@ -64,8 +64,6 @@ public interface IAtsWorkItem extends IAtsObject, HasAssignees {
 
    String getCancelledReason();
 
-   void setStateManager(IAtsStateManager stateManager);
-
    IAtsAction getParentAction();
 
    boolean isGoal();
@@ -81,5 +79,7 @@ public interface IAtsWorkItem extends IAtsObject, HasAssignees {
    boolean isDecisionReview();
 
    boolean isPeerReview();
+
+   void setStateMgr(IAtsStateManager stateMgr);
 
 }
