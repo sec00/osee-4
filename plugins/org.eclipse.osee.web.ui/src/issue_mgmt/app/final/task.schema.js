@@ -1,130 +1,114 @@
-angular.module('MiHexample').value("Schema",
+app.value("Schema",
 {
   "type": "object",
-  "required": [
-      "subject",
-      "discrepancy",
-      "correctiveAction",
-      "status",
-      "type",
-      "priority",
-      "subsystem",
-      "responsibleIpt",
-      "colorTeam"
-  ],
   "properties": {
-    "subject": {
-      "type": "string",
-      "minLength": 3
-    },
-    "discrepancy": {
-      "type": "string"
-    },
-    "correctiveAction": {
-      "type": "string"
-    },
-    "comments": {
-      "type": "string"
-    },
-    "isCrewSystemImpact": {
-      "type": "boolean"
-    },
-    "isCrewSystemWorkAround": {
-      "type": "boolean"
-    },
-    "natureOfImpact": {
-      "type": "string"
-    },
-    "workAround": {
-      "type": "string"
-    },
-    "status": {
+    "aircraftSystem": {
       "type": "string",
       "enum": [
-        "Verification",
-        "Open",
-        "Closed",
-        "Promoted",
-        "Cancelled"
+        "Recorders",
+        "Other"
       ]
     },
-    "cognizant1": {
-      "type": "string"
-    },
-    "cognizant2": {
-      "type": "string"
-    },
-    "cognizant3": {
-      "type": "string"
-    },
-    "type": {
+    "ship": {
       "type": "string",
       "enum": [
-        "OFP",
-        "Supplier",
-        "GFE"
+        "25",
+        "26"
       ]
     },
-    "statusEcd": {
+    "testNumber": {
+      "type": "string"
+    },
+    "testDate": {
       "type": "string",
       "format": "date"
+    },
+    "flightNumber": {
+      "type": "string"
+    },
+    "build": {
+      "type": "string",
+      "enum": [
+        "1.0",
+        "FTB"
+      ]
+    },
+    "swVersion": {
+      "type": "string"
+    },
+    "originator": {
+      "type": "string"
+    },
+    "pilotPOC": {
+      "type": "string",
+      "enum": [
+        "Joe Smith",
+        "Jane Smith"
+      ]
+    },
+    "ftePOC": {
+      "type": "string",
+      "enum": [
+        "Joe Smith",
+        "Jane Smith"
+      ]
+    },
+    "msaProgram": {
+      "type": "string"
     },
     "priority": {
       "type": "string",
       "enum": [
         "1",
         "2",
-        "3",
-        "4",
-        "5"
+        "3"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Open",
+        "Close",
+        "In Work"
+      ]
+    },
+    "ipt": {
+      "type": "string",
+      "enum": [
+        "WPN",
+        "NAV",
+        "COMM"
       ]
     },
     "subsystem": {
       "type": "string",
       "enum": [
-        "ASM",
+        "MSM",
         "NAV",
-        "COMM",
-        "CND",
-        "BATB"
+        "COMM"
       ]
     },
-    "whereFound": {
+    "disposition": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "msaIssueId": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "originatorDate": {
       "type": "string",
-      "enum": [
-        "Formal Testing",
-        "Script",
-        "Hot Bench",
-        "Code Inspection",
-        "Flight Test"
-      ]
+      "format": "date"
     },
-    "buildFound": {
-      "type": "string",
-      "enum": [
-        "FTB1",
-        "SBVT",
-        "FTB2"
-      ]
+    "program": {
+      "type": "string"
     },
-    "operatorImpact": {
-      "type": "boolean"
-    },
-    "responsibleIpt": {
-      "type": "string",
-      "enum": [
-        "Crew Systems",
-        "AH6",
-        "AH6i"
-      ]
-    },
-    "colorTeam": {
-      "type": "string",
-      "enum": [
-        "Red",
-        "Bronze",
-        "Gold"
-      ]
+    "description": {
+      "type": "string"
     }
   }
 }

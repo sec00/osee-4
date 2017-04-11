@@ -10,3 +10,8 @@
 .jsf hr.creation-separator {
     border: 1px inset black
 }
+
+.osee-textarea {
+    height: 100px;
+    background-color: cyan;
+}

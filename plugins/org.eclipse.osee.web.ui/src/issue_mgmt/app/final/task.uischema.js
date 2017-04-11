@@ -1,240 +1,229 @@
-angular.module('MiHexample').value("UISchema", 
+app.value("UISchema", 
 {
-  "type": "HorizontalLayout",
+  "type": "VerticalLayout",
   "elements": [
     {
-      "type": "VerticalLayout",
+      "type": "HorizontalLayout",
       "elements": [
         {
           "type": "Control",
-          "label": "Subject",
+          "label": "Title",
           "scope": {
-            "$ref": "#/properties/subject"
+            "$ref": "#/properties/title"
+          },
+          "options": {
+            "useCustom": true
           },
           "readOnly": false
         },
         {
-          "type": "Control",
-          "label": "Discrepancy",
-          "scope": {
-            "$ref": "#/properties/discrepancy"
-          },
-          'options': {
-          'multi': true
-          },
-          "readOnly": false
+          "type": "HorizontalLayout",
+          "elements": [
+            {
+              "type": "Control",
+              "label": "Flight Test Issue Id",
+              "scope": {
+                "$ref": "#/properties/id"
+              },
+              "readOnly": true,
+            },
+            {
+            "type": "Control",
+            "label": "Linked MSA Issue ID",
+            "scope": {
+              "$ref": "#/properties/msaIssueId"
+            },
+            "readOnly": true,
+            "rule": {
+              "effect": "HIDE",
+              "condition": {
+                "scope": {
+                  "$ref": "#/properties/title"
+                },
+                "expectedValue": "Hello"
+              }
+            }
+          }
+          ]
         },
         {
           "type": "Control",
-          "label": "Corrective Action",
+          "label": "MSA Program",
           "scope": {
-            "$ref": "#/properties/correctiveAction"
+            "$ref": "#/properties/program"
           },
-          'options': {
-          'multi': true
-          },
-          "readOnly": false
-        },
-        {
-          "type": "Control",
-          "label": "Comments/Actions/Notes",
-          "scope": {
-            "$ref": "#/properties/comments"
-          },
-          'options': {
-          'multi': true
-          },
-          "readOnly": false
+          "readOnly": true
         }
       ]
     },
     {
-      "type": "VerticalLayout",
+      "type": "HorizontalLayout",
       "elements": [
         {
-          "type": "Control",
-          "label": "Status",
-          "scope": {
-            "$ref": "#/properties/status"
-          },
-          "readOnly": false
-        },
-        {
-          "type": "Control",
-          "label": "Type",
-          "scope": {
-            "$ref": "#/properties/type"
-          },
-          "readOnly": false
-        },
-        {
-          "type": "Control",
-          "label": "Status ECD:",
-          "scope": {
-            "$ref": "#/properties/statusEcd"
-          },
-          "readOnly": false
-        },
-        {
-          "type": "Control",
-          "label": "Priority",
-          "scope": {
-            "$ref": "#/properties/priority"
-          },
-          "readOnly": false
-        },
-        {
-          "type": "Group",
-          "elements": [
-            {
-              "type": "HorizontalLayout",
-              "elements": [
-                { 
-                  "type": "Control",
-                  "Label": "Subsystem",
-                  "scope": {
-                    "$ref": "#/properties/subsystem"
-                  },
-                  "readOnly": false
-                },
-                {
-                  "type": "Control",
-                  "Label": "Operator Impact",
-                  "scope": {
-                    "$ref": "#/properties/operatorImpact"
-                  },
-                  "readOnly": false
-                }
-              ] // End Horizontal Elements
-            }
-          ] // End Group Elements
-        },
-        {
-          "type": "Control",
-          "label": "Where Found",
-          "scope": {
-            "$ref": "#/properties/whereFound"
-          },
-          "readOnly": false
-        },
-        {
-          "type": "Control",
-          "label": "Build Found",
-          "scope": {
-            "$ref": "#/properties/buildFound"
-          },
-          "readOnly": false
-        },
-        {
-          "type": "Group",
-          "label": "Work Around",
+          "type": "VerticalLayout",
           "elements": [
             {
               "type": "Control",
-              "label": "Crew System",
+              "label": "Status",
               "scope": {
-                "$ref": "#/properties/isCrewSystemImpact"
-              }
+                "$ref": "#/properties/status"
+              },
+              "readOnly": true,
             },
             {
               "type": "Control",
-              "label": "",
+              "label": "Originator",
               "scope": {
-                "$ref": "#/properties/natureOfImpact"
+                "$ref": "#/properties/originator"
               },
-              'options': {
-              'multi': true
+              "readOnly": false
+            },
+            {
+              "type": "Control",
+              "label": "Originator Date",
+              "scope": {
+                "$ref": "#/properties/originatorDate"
               },
+              "readOnly": false,
+              "options": {
+                "multi": true
+              }
             }
           ]
         },
         {
-          "type": "Group",
-          "label": "Work Around",
+          "type": "VerticalLayout",
           "elements": [
             {
               "type": "Control",
-              "label": "Crew System",
+              "label": "Pilot POC",
               "scope": {
-                "$ref": "#/properties/isCrewSystemWorkAround"
-              }
+                "$ref": "#/properties/pilotPOC"
+              },
+              "readOnly": false,
             },
             {
               "type": "Control",
-              "label": "",
+              "label": "FTE POC",
               "scope": {
-                "$ref": "#/properties/workAround"
+                "$ref": "#/properties/ftePOC"
               },
-              'options': {
-              'multi': true
-              },  
-              "rule": {
-                "effect": "DISABLE",
-                "condition": {
-                  "type": "LEAF",
-                  "scope": {
-                    "$ref": "#/properties/isCrewSystemWorkAround"
-                  },
-                  "expectedValue": true
-                }
-              }
+              "readOnly": false,
+            },
+            {
+              "type": "Control",
+              "label": "IPT",
+              "scope": {
+                "$ref": "#/properties/ipt"
+              },
+              "readOnly": true,
             }
-          ]
+          ]          
+        },
+        {
+          "type": "VerticalLayout",
+          "elements": [
+            {
+              "type": "Control",
+              "label": "Ship",
+              "scope": {
+                "$ref": "#/properties/ship"
+              },
+              "readOnly": false,
+            },
+            {
+              "type": "Control",
+              "label": "Test Number",
+              "scope": {
+                "$ref": "#/properties/testNumber"
+              },
+              "readOnly": false,
+            },
+            {
+              "type": "Control",
+              "label": "Flight Number",
+              "scope": {
+                "$ref": "#/properties/flightNumber"
+              },
+              "readOnly": false,
+            },
+            {
+              "type": "Control",
+              "label": "Test Date",
+              "scope": {
+                "$ref": "#/properties/testDate"
+              },
+              "readOnly": false,
+            }
+          ]          
+        },
+        {
+          "type": "VerticalLayout",
+          "elements": [
+            {
+              "type": "Control",
+              "label": "Build",
+              "scope": {
+                "$ref": "#/properties/build"
+              },
+              "readOnly": false,
+            },
+            {
+              "type": "Control",
+              "label": "SW Version",
+              "scope": {
+                "$ref": "#/properties/swVersion"
+              },
+              "readOnly": false,
+            },
+            {
+              "type": "Control",
+              "label": "Aircraft System",
+              "scope": {
+                "$ref": "#/properties/aircraftSystem"
+              },
+              "readOnly": false
+            },
+            {
+              "type": "Control",
+              "label": "Subsystem",
+              "scope": {
+                "$ref": "#/properties/subsystem"
+              },
+              "readOnly": false
+            }
+          ]          
         }
+        
       ]
     },
     {
-      "type": "VerticalLayout",
+      "type": "HorizontalLayout",
       "elements": [
         {
           "type": "Control",
-          "label": "Responsible Ipt",
+          "label": "Description",
           "scope": {
-            "$ref": "#/properties/responsibleIpt"
+            "$ref": "#/properties/description"
           },
-          "readOnly": false
+          "readOnly": false,
+          "options": {
+            "multi": true
+          }
         },
         {
           "type": "Control",
-          "label": "Color Team",
+          "label": "Disposition",
           "scope": {
-            "$ref": "#/properties/colorTeam"
+            "$ref": "#/properties/disposition"
           },
-          "readOnly": false
-        },
-        {
-          "type": "Group",
-          "label": "Cognizant Engineers",
-          "elements": [
-             {
-                "type": "Control",
-                "label": "Engineer 1",
-                "scope": {
-                  "$ref": "#/properties/cognizant1"
-                },
-                "readOnly": false
-              },
-              {
-                "type": "Control",
-                "label": "Engineer 2",
-                "scope": {
-                  "$ref": "#/properties/cognizant2"
-                },
-                "readOnly": false
-              },
-              {
-                "type": "Control",
-                "label": "Engineer 3",
-                "scope": {
-                  "$ref": "#/properties/cognizant3"
-                },
-                "readOnly": false
-              }
-          ]
+          "readOnly": false,
+          "options": {
+            "multi": true
+          }
         }
       ]
     }
   ]
-} 
-
+}
 );
