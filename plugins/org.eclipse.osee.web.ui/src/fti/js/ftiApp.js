@@ -4,14 +4,14 @@ app.config(['$routeProvider',
 function($routeProvider) {
 	
   $routeProvider.when('/', {
-	  templateUrl: '/fti/views/issue_view.html',
-      controller: 'tasksController as tc'
+	  templateUrl: '/fti/views/landing.html',
+      controller: 'landingController as lc'
   }).when('/issue', {
 	  templateUrl: '/fti/views/issue_view.html',
       controller: 'tasksController as tc'
   })
   .otherwise({
-    redirectTo: "/issue"
+    redirectTo: "/"
     });
   }
 ]);

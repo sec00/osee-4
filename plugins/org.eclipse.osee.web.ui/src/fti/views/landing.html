@@ -1,0 +1,33 @@
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading clearfix">
+                        <div class="btn-group pull-right" >
+                        	<div id="searchLabelDiv">
+	                        	 <label>Searh By ID:</label>
+	                         </div>
+	                         <div id="searchInputDiv">
+	                            <input name="searchIdInput" id="searchIdInput" class="form-control"></input>
+	                         </div>
+                        </div>
+                        <h3 class="panel-title" style="line-height:34px;">
+                            <strong>Programs {{ lc.test }}</strong>
+                        </h3>
+                    </div>
+                    
+                    <div class="panel-body jsf" style="line-height: 2.0">
+                    		<div>
+                    			<ui>
+                    				<li ng-repeat="program in lc.programs">
+										   <a href="program?={{ program.id }}">{{ program.name }}</a>
+										</li>
+                    			</ui>
+                      	</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

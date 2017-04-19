@@ -15,3 +15,10 @@
     height: 100px;
     background-color: cyan;
 }
+
+#searchLabelDiv {
+	display: inline-block
+}
+#searchInputDiv {
+	display: inline-block
+}

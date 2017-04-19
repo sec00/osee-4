@@ -7,7 +7,7 @@ app.directive('oseeDropdownControl', function() {
                 vm.options = vm.resolvedSchema.enum;
             }],
             controllerAs: 'vm',
-            templateUrl: 'osee_dropdown_control.html'
+            templateUrl: '../views/osee_dropdown_control.html'
         };
     })
     .run(['RendererService', 'JSONFormsTesters', function(RendererService, Testers) {
