@@ -29,7 +29,7 @@ app.value("UISchema",
             },
             {
             "type": "Control",
-            "label": "Linked MSA Issue ID",
+            "label": "Linked Apache Issue Id",
             "scope": {
               "$ref": "#/properties/msaIssueId"
             },
@@ -205,17 +205,6 @@ app.value("UISchema",
           "label": "Description",
           "scope": {
             "$ref": "#/properties/description"
-          },
-          "readOnly": false,
-          "options": {
-            "multi": true
-          }
-        },
-        {
-          "type": "Control",
-          "label": "Disposition",
-          "scope": {
-            "$ref": "#/properties/disposition"
           },
           "readOnly": false,
           "options": {

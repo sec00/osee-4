@@ -22,3 +22,8 @@
 #searchInputDiv {
 	display: inline-block
 }
+
+.myGrid {
+    width: 500px;
+    height: 250px;
+  }

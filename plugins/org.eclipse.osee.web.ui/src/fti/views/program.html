@@ -1,25 +1,18 @@
 <div class="panel panel-primary">
-
     <div class="panel-body">
         <div class="row">
             <div class="col-lg-12">
-                
                 <div class="panel panel-primary">
                     <div class="panel-heading clearfix">
                         <h3 class="panel-title" style="line-height:34px;">
-                            <strong>Flight Test Issue</strong>
+                            <strong>Issues {{ pc.test }}</strong>
                         </h3>
                     </div>
                     
                     <div class="panel-body jsf" style="line-height: 2.0">
-                        <jsonforms schema="tc.taskSchema" uischema="tc.taskUISchema" data="tc.taskData"></jsonforms>
-                    </div>
-                </div>
-                <div class="panel panel-primary" ng-show="taskData && !dataLoaded">
-                    <div class="panel-heading clearfix">
-                        <h3 class="panel-title" style="line-height:34px;">
-                            <strong>Loading data ...</strong>
-                        </h3>
+                    		<div>
+									<div id="grid1" ui-grid="pc.gridOptions" class="grid"></div>
+                      	</div>
                     </div>
                 </div>
             </div>

@@ -6,14 +6,14 @@
                     <div class="panel-heading clearfix">
                         <div class="btn-group pull-right" >
                         	<div id="searchLabelDiv">
-	                        	 <label>Searh By ID:</label>
+	                        	 <label>Open Flight Test Issue By Id:</label>
 	                         </div>
 	                         <div id="searchInputDiv">
 	                            <input name="searchIdInput" id="searchIdInput" class="form-control"></input>
 	                         </div>
                         </div>
                         <h3 class="panel-title" style="line-height:34px;">
-                            <strong>Programs {{ lc.test }}</strong>
+                            <strong>Programs</strong>
                         </h3>
                     </div>
                     
@@ -21,7 +21,7 @@
                     		<div>
                     			<ui>
                     				<li ng-repeat="program in lc.programs">
-										   <a href="program?={{ program.id }}">{{ program.name }}</a>
+										   <a href="#/program?programId={{ program.id }}">{{ program.name }}</a>
 										</li>
                     			</ui>
                       	</div>

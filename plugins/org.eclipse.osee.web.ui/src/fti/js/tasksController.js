@@ -2,7 +2,6 @@ app.controller('tasksController', ['Schema', 'UISchema', 'Tasks', 'Task', functi
         var vm = this;
         vm.taskSchema = Schema;
         vm.taskUISchema = UISchema;
-        vm.tasks=Tasks.query();
         vm.dataLoaded=true;
         vm.taskData = Task;
         vm.temp = "dsf";

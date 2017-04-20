@@ -88,9 +88,6 @@ app.value("Schema",
         "COMM"
       ]
     },
-    "disposition": {
-      "type": "string"
-    },
     "id": {
       "type": "string"
     },
