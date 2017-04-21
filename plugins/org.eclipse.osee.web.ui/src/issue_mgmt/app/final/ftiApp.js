@@ -1,1 +1,0 @@
-var app = angular.module('ftiApp', ['jsonforms', 'jsonforms-bootstrap', 'ui.bootstrap', 'ngResource']);

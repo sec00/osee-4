@@ -1,11 +1,11 @@
-app.controller('TasksController', ['Schema', 'UISchema', 'Tasks', 'Task', function(Schema, UISchema, Tasks, Task) {
+app.controller('tasksController', ['Schema', 'UISchema', 'Tasks', 'Task', function(Schema, UISchema, Tasks, Task) {
         var vm = this;
         vm.taskSchema = Schema;
         vm.taskUISchema = UISchema;
         vm.tasks=Tasks.query();
         vm.dataLoaded=true;
         vm.taskData = Task;
-        vm.temp = 4;
+        vm.temp = "dsf";
 
         vm.query = function() {
             Tasks.query(function(response){

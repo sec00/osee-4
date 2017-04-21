@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" >
+<head>
+    <base href="/fti/ui/index.html">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Make It Happen</title>
+    <link rel="stylesheet" type="text/css" href="../css/app.css">
+    <link rel="stylesheet" href="/ajax/libs/node_modules2/bootstrap/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/ajax/libs/node_modules2/jsonforms/dist/jsonforms-bootstrap.css"/>
+
+    <script src="/ajax/libs/node_modules2/jsonforms/dist/jsonforms.js"></script>
+    <script src="/ajax/libs/node_modules2/jsonforms/dist/jsonforms-bootstrap.js"></script>
+    <script src="/ajax/libs/node_modules2/angular-ui-bootstrap/dist/ui-bootstrap.js"></script>
+    <script src="/ajax/libs/node_modules2/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
+    <script src="/ajax/libs/node_modules2/angular-resource/angular-resource.js"></script>
+    <script src="/ajax/libs/angularjs/1.3.11/angular-route.min.js"></script>
+    <script src="/ajax/libs/angularjs/1.3.11/angular-cookies.js"></script>
+    <script src="/ajax/libs/ngStorage/0.3.0/ngStorage.min.js"></script>
+    
+    <script src="../js/ftiApp.js"></script>
+    <script src="../js/tasksController.js"></script>
+    <script src="../js/task.schema.js"></script>
+    <script src="../js/task.uischema.js"></script>
+    <script src="../js/task.service.js"></script>
+    <script src="../js/task_data.js"></script>
+    <script src="../js/osee.dropdown.control.js"></script>
+    <script src="../js/osee.textarea.control.js"></script>
+    <script src="../js/mainController.js"></script>
+</head>
+<body ng-app="ftiApp" style="max-width:90%; margin:1vw auto;">
+
+    
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#/issue">Issues</a>
+            </div>
+            <p ng-dblclick="resetUserName()" class="navbar-text">Signed in as {{ cachedName }}</p>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                        <button id="helpButton" class="btn btn-info" ng-click="showHelpModal()">Help</button>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div ng-view></div>
+</body>
+</html>

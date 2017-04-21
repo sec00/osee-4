@@ -10,9 +10,13 @@
  *******************************************************************************/
 package org.eclipse.osee.disposition.rest.resources;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -111,7 +115,85 @@ public class DispoProgramResource {
       } else {
          status = Status.OK;
       }
+
+      test();
       return Response.status(status).entity(jarray.toString()).build();
+   }
+
+   private void test() {
+      List<Integer> mockL = new ArrayList<>();
+      mockL.add(9);
+
+      boolean b = isSumPresent(mockL, 9);
+      System.out.println(b);
+
+      int answer = getBadCommit(4, 600);
+      System.out.println(answer);
+      System.out.println();
+   }
+
+   public int getBadCommit(int s, int e) {
+      if (s == e) {
+         if (tester(s)) {
+            return s;
+         }
+      } else {
+         int mid = s + ((e - s) / 2);
+         if (tester(mid)) {
+            return getBadCommit(s, mid);
+         } else {
+            return getBadCommit(mid + 1, e);
+         }
+      }
+
+      return -1;
+   }
+
+   private boolean tester(int cId) {
+      if (cId >= 69) {
+         return true;
+      }
+      return false;
+   }
+
+   public boolean isSumPresent(List<Integer> l, int sum) {
+      boolean ret = false;
+
+      Queue<Integer> q = new LinkedList<>();
+      int tot = 0;
+      for (Integer i : l) {
+         if (i <= sum) {
+            tot += i;
+            if (tot == sum) {
+               return true;
+            } else if (tot < sum) {
+               q.add(i);
+            } else {
+               q.add(i);
+               while (tot > sum) {
+                  int r = q.remove();
+                  tot -= r;
+               }
+               if (tot == sum) {
+                  return true;
+               }
+            }
+         } else {
+            q = null;
+            tot = 0;
+            q = new PriorityQueue<>();
+         }
+      }
+
+      // ensure number is an candidate by checking its smaller than sum
+
+      // if it is, see if running total plus candidate is still valid
+
+      // if it's less add and keep going
+      // if it's more remove from queueu until valid
+      // if it's equal: done
+
+      return ret;
    }
 
    @Path("{branchId}/set")
