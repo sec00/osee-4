@@ -57,11 +57,11 @@ public class BranchStatusColumn extends XViewerAtsColumn implements IAtsXViewerP
       for (Object element : objects) {
          Long key = getKey(element);
          try {
-            if (element instanceof IAtsWorkItem) {
-               populateCachedValues(Arrays.asList(((IAtsWorkItem) element).getStoreObject()), preComputedValueMap);
-            } else if (Artifacts.isOfType(element, AtsArtifactTypes.TeamWorkflow)) {
+            if (Artifacts.isOfType(element, AtsArtifactTypes.TeamWorkflow)) {
                String status = getBranchStatus((IAtsTeamWorkflow) element);
                preComputedValueMap.put(key, status);
+            } else if (element instanceof IAtsWorkItem) {
+               populateCachedValues(Arrays.asList(((IAtsWorkItem) element).getStoreObject()), preComputedValueMap);
             } else {
                preComputedValueMap.put(key, "");
             }
