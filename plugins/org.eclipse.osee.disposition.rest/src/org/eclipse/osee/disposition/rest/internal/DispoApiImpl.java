@@ -350,7 +350,6 @@ public class DispoApiImpl implements DispoApi {
             dispoConnector.connectAnnotation(newAnnotation, discrepanciesList);
          }
          annotationsList.set(indexOfAnnotation, newAnnotation);
-         dispoItem.getAnnotationsList().get(0);
          ArtifactReadable author = getQuery().findUser();
          DispoItemData modifiedDispoItem = DispoUtil.itemArtToItemData(getDispoItemById(branch, itemId), true);
 
