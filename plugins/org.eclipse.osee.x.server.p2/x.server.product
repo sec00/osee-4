@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="OSEE Application Server X (Incubation)" uid="org.eclipse.osee.x.server.product" version="0.25.2.qualifier" useFeatures="true" includeLaunchers="true">
-
+<product name="OSEE Application Server X (Incubation)" uid="org.eclipse.osee.x.server.product" version="0.26.0.qualifier" useFeatures="true" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
 
    <launcherArgs>
-      <programArgs>-consoleLog -console -clean</programArgs>
+      <programArgs>-consoleLog -console -clean
+      </programArgs>
       <vmArgs>-Declipse.ignoreApp=true
 -Dosgi.noShutdown=true
 -Dequinox.ds.print=true
 -Dorg.osgi.service.http.port=8089
--Dlogback.configurationFile=logback-dev.xml</vmArgs>
-      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+-Dlogback.configurationFile=logback-dev.xml
+      </vmArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
+      </vmArgsMac>
    </launcherArgs>
 
    <windowImages/>
-
 
    <launcher name="osee_server">
       <solaris/>
@@ -27,10 +28,8 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
-
 
    <plugins>
    </plugins>
@@ -39,5 +38,12 @@
       <feature id="org.eclipse.osee.x.server.feature"/>
    </features>
 
+
+   <preferencesInfo>
+      <targetfile overwrite="false"/>
+   </preferencesInfo>
+
+   <cssInfo>
+   </cssInfo>
 
 </product>
