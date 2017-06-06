@@ -96,7 +96,7 @@ public class CommitBranchDatabaseCallable extends AbstractDatastoreCallable<Tran
       List<ChangeItem> changes = callComputeChanges(mergeBranch);
 
       CancellableCallable<TransactionId> commitCallable = new CommitBranchDatabaseTxCallable(getLogger(), getSession(),
-         getJdbcClient(), joinFactory, idManager, committer, source, destination, mergeBranch, changes);
+         getJdbcClient(), idManager, committer, source, destination, mergeBranch, changes);
       TransactionId newTx = callAndCheckForCancel(commitCallable);
 
       return newTx;

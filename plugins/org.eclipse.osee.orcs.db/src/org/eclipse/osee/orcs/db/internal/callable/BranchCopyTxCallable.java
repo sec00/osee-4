@@ -29,7 +29,6 @@ import org.eclipse.osee.jdbc.JdbcTransaction;
 import org.eclipse.osee.orcs.data.CreateBranchData;
 import org.eclipse.osee.orcs.db.internal.IdentityManager;
 import org.eclipse.osee.orcs.db.internal.accessor.UpdatePreviousTxCurrent;
-import org.eclipse.osee.orcs.db.internal.sql.join.SqlJoinFactory;
 
 /**
  * the behavior of this class - it needs to: have a branch
@@ -50,12 +49,10 @@ public final class BranchCopyTxCallable extends JdbcTransaction {
       "SELECT gamma_id, mod_type, app_id FROM osee_txs txs WHERE txs.branch_id = ? AND txs.transaction_id = ?";
 
    private final JdbcClient jdbcClient;
-   private final SqlJoinFactory joinFactory;
    private final IdentityManager idManager;
 
-   public BranchCopyTxCallable(JdbcClient jdbcClient, SqlJoinFactory joinFactory, IdentityManager idManager, CreateBranchData branchData) {
+   public BranchCopyTxCallable(JdbcClient jdbcClient, IdentityManager idManager, CreateBranchData branchData) {
       this.jdbcClient = jdbcClient;
-      this.joinFactory = joinFactory;
       this.branchData = branchData;
       this.idManager = idManager;
    }
@@ -80,8 +77,7 @@ public final class BranchCopyTxCallable extends JdbcTransaction {
       populateTransaction(0.30, connection, nextTransactionId, branchData.getParentBranch(),
          branchData.getSavedTransaction());
 
-      UpdatePreviousTxCurrent updater =
-         new UpdatePreviousTxCurrent(jdbcClient, joinFactory, connection, branchData.getBranch());
+      UpdatePreviousTxCurrent updater = new UpdatePreviousTxCurrent(jdbcClient, connection, branchData.getBranch());
       updater.updateTxNotCurrentsFromTx(nextTransactionId);
    }
 
