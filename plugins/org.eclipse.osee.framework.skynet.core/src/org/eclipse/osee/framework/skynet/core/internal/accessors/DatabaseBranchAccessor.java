@@ -42,7 +42,7 @@ public class DatabaseBranchAccessor implements IOseeDataAccessor<Branch> {
       "select br.*, parTx.tx_type as p_tx_type, parTx.author as p_author, parTx.time as p_time, parTx.osee_comment as p_osee_comment, parTx.commit_art_id as p_commit_art_id, baseTx.tx_type as b_tx_type, baseTx.author as b_author, baseTx.time as b_time, baseTx.osee_comment as b_osee_comment, baseTx.commit_art_id as b_commit_art_id, source_branch_id, dest_branch_id from osee_branch br left outer join osee_merge on merge_branch_id = branch_id, osee_tx_details baseTx, osee_tx_details parTx where parent_transaction_id = parTx.transaction_id and baseline_transaction_id = baseTx.transaction_id and br.branch_id = ?";
 
    private final JdbcClient jdbcClient;
-   private OseeClient oseeClient;
+   private final OseeClient oseeClient;
 
    public DatabaseBranchAccessor(JdbcClient jdbcClient, OseeClient oseeClient) {
       this.jdbcClient = jdbcClient;
@@ -73,7 +73,7 @@ public class DatabaseBranchAccessor implements IOseeDataAccessor<Branch> {
       ((BranchCache) cache).setBranchViews(branchViews);
    }
 
-   public static Branch loadBranch(IOseeCache<Branch> cache, Long branchId) {
+   public static Branch loadBranch(IOseeCache<Branch> cache, BranchId branchId) {
       return ConnectionHandler.getJdbcClient().fetchOrException(
          () -> new BranchDoesNotExist("Branch could not be acquired for branch id %d", branchId),
          stmt -> load(cache, stmt), SELECT_BRANCH, branchId);
