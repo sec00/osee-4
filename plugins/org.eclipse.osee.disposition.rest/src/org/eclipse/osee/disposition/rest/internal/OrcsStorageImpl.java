@@ -224,7 +224,7 @@ public class OrcsStorageImpl implements Storage {
          throw OseeCoreException.wrap(ex);
       }
 
-      return branch.getGuid();
+      return branch.getId();
    }
 
    @Override
