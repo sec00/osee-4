@@ -530,8 +530,7 @@ public abstract class AtsCoreServiceImpl implements IAtsServices {
    public ArtifactId getArtifactByAtsId(String id) {
       ArtifactId artifact = null;
       try {
-         Collection<ArtifactToken> workItems =
-            getQueryService().getArtifactsFromQuery(ATS_ID_QUERY, getAtsBranch().getId(), id);
+         Collection<ArtifactToken> workItems = getQueryService().getArtifactsFromQuery(ATS_ID_QUERY, getAtsBranch(), id);
          if (!workItems.isEmpty()) {
             artifact = workItems.iterator().next();
          }
