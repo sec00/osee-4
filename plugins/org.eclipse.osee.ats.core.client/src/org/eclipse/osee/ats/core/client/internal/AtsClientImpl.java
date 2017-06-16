@@ -75,7 +75,6 @@ import org.eclipse.osee.ats.core.workdef.AtsWorkDefinitionServiceImpl;
 import org.eclipse.osee.ats.core.workflow.WorkItemFactory;
 import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
-import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IArtifactType;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.DeletionFlag;
@@ -464,11 +463,6 @@ public class AtsClientImpl extends AtsCoreServiceImpl implements IAtsClient {
          sprintItemsCache = new ArtifactCollectorsCache<>(AtsRelationTypes.AgileSprintToItem_AtsItem);
       }
       return sprintItemsCache;
-   }
-
-   @Override
-   public Artifact checkArtifactFromId(long uuid, BranchId atsBranch) {
-      return ArtifactQuery.checkArtifactFromId((int) uuid, getAtsBranch(), DeletionFlag.EXCLUDE_DELETED);
    }
 
    @Override
