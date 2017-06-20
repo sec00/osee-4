@@ -201,4 +201,9 @@ public class AtsStoreServiceImpl implements IAtsStoreService {
       return Result.TrueResult;
    }
 
+   @Override
+   public boolean isDeleted(ArtifactId artifact) {
+      return atsServer.getArtifact(artifact).isDeleted();
+   }
+
 }

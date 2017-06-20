@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.eclipse.osee.ats.api.IAtsObject;
+import org.eclipse.osee.ats.api.IAtsServices;
 import org.eclipse.osee.ats.api.IAtsWorkItem;
 import org.eclipse.osee.ats.api.data.AtsArtifactTypes;
 import org.eclipse.osee.ats.api.team.IAtsWorkItemFactory;
@@ -52,8 +53,10 @@ public class AtsStoreService implements IAtsStoreService {
    private final IAtsWorkItemFactory workItemFactory;
    private final IAtsUserService userService;
    private final JdbcService jdbcService;
+   private final IAtsServices services;
 
-   public AtsStoreService(IAtsWorkItemFactory workItemFactory, IAtsUserService userService, JdbcService jdbcService) {
+   public AtsStoreService(IAtsServices services, IAtsWorkItemFactory workItemFactory, IAtsUserService userService, JdbcService jdbcService) {
+      this.services = services;
       this.workItemFactory = workItemFactory;
       this.userService = userService;
       this.jdbcService = jdbcService;
@@ -206,6 +209,11 @@ public class AtsStoreService implements IAtsStoreService {
    @Override
    public Result setTransactionAssociatedArtifact(TransactionId trans, IAtsTeamWorkflow teamWf) {
       throw new UnsupportedOperationException();
+   }
+
+   @Override
+   public boolean isDeleted(ArtifactId artifact) {
+      return ((Artifact) services.getArtifact(artifact)).isDeleted();
    }
 
 }

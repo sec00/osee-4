@@ -134,7 +134,7 @@ public class AtsClientImpl extends AtsCoreServiceImpl implements IAtsClient {
 
       logFactory = AtsCoreFactory.newLogFactory();
       stateFactory = AtsCoreFactory.newStateFactory(getServices(), logFactory);
-      storeService = new AtsStoreService(workItemFactory, getUserServiceClient(), jdbcService);
+      storeService = new AtsStoreService(this, workItemFactory, getUserServiceClient(), jdbcService);
 
       queryService = new AtsQueryServiceImpl(this, jdbcService);
       actionableItemManager = new ActionableItemManager(attributeResolverService, storeService, this);
@@ -518,7 +518,7 @@ public class AtsClientImpl extends AtsCoreServiceImpl implements IAtsClient {
    }
 
    @Override
-   public Collection<ArtifactToken> getArtifacts(List<Long> ids) {
+   public Collection<ArtifactToken> getArtifacts(Collection<Long> ids) {
       List<ArtifactId> artifactIds = new ArrayList<>(ids.size());
       for (Long id : ids) {
          artifactIds.add(ArtifactId.valueOf(id));

@@ -78,4 +78,6 @@ public interface IAtsStoreService {
 
    Result setTransactionAssociatedArtifact(TransactionId trans, IAtsTeamWorkflow teamWf);
 
+   boolean isDeleted(ArtifactId artifact);
+
 }
