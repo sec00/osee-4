@@ -80,4 +80,5 @@ public interface IAtsStoreService {
 
    TransactionId getTransactionId(IAtsWorkItem workItem);
 
+   boolean isDeleted(ArtifactId artifact);
 }
