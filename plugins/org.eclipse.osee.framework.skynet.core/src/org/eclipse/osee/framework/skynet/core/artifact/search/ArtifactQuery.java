@@ -117,6 +117,10 @@ public class ArtifactQuery {
       return getArtifactFromId(artId.getId(), branch);
    }
 
+   public static Artifact getArtifactFromId(ArtifactId artifactId, BranchId branch, DeletionFlag includeDeleted) {
+      return getArtifactFromId(artifactId, branch, includeDeleted);
+   }
+
    /**
     * search for exactly one artifact by one its id - otherwise throw an exception
     *
@@ -303,6 +307,10 @@ public class ArtifactQuery {
       return ArtifactLoader.loadArtifacts(artifactIds, branch, LoadLevel.ALL, INCLUDE_CACHE, INCLUDE_DELETED);
    }
 
+   public static List<Artifact> getArtifactListFrom(Collection<? extends ArtifactId> artifactIds, BranchId branch, DeletionFlag allowDeleted) {
+      return ArtifactLoader.loadArtifacts(artifactIds, branch, LoadLevel.ALL, INCLUDE_CACHE, allowDeleted);
+   }
+
    /**
     * search for artifacts with any of the given artifact ids
     *
@@ -334,8 +342,11 @@ public class ArtifactQuery {
    }
 
    public static Artifact getHistoricalArtifactFromId(int artifactId, TransactionToken transactionId, DeletionFlag allowDeleted) throws OseeCoreException {
-      return new ArtifactQueryBuilder(ArtifactId.valueOf(artifactId), transactionId, allowDeleted,
-         ALL).getOrCheckArtifact(QueryType.GET);
+      return getHistoricalArtifactFromId(ArtifactId.valueOf(artifactId), transactionId, allowDeleted);
+   }
+
+   public static Artifact getHistoricalArtifactFromId(ArtifactId artifactId, TransactionToken transactionId, DeletionFlag allowDeleted) throws OseeCoreException {
+      return new ArtifactQueryBuilder(artifactId, transactionId, allowDeleted, ALL).getOrCheckArtifact(QueryType.GET);
    }
 
    public static Artifact getHistoricalArtifactFromIdOrNull(int artifactId, TransactionToken transactionId, DeletionFlag allowDeleted) throws OseeCoreException {
@@ -1055,5 +1066,4 @@ public class ArtifactQuery {
       long transactionId = jdbcClient.fetch(-1L, query, artifact, artifact.getBranch(), artifact, artifact.getBranch());
       return !artifact.getTransaction().getId().equals(transactionId);
    }
-
 }
