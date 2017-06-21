@@ -11,6 +11,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.ote.collections.ObjectPool;
 
@@ -74,18 +75,16 @@ final class OteEndpointSendRunnable implements Runnable {
                if(debug){
                   OseeLog.log(getClass(), Level.SEVERE, "Error trying to send data", ex);
                }
-               closeChannel(threadChannel);
+               Lib.close(threadChannel);
                threadChannel = openAndInitializeDatagramChannel();
             } catch (ClosedChannelException ex){
                if(debug){
                   OseeLog.log(getClass(), Level.SEVERE, "Error trying to send data", ex);
                }
-               closeChannel(threadChannel);
+               Lib.close(threadChannel);
                threadChannel = openAndInitializeDatagramChannel();
             } catch (IOException ex){
-               if(debug){
-                  OseeLog.log(getClass(), Level.SEVERE, "Error trying to send data", ex);
-               }
+               OseeLog.log(getClass(), Level.SEVERE, "Error trying to send data", ex);
             } finally {
                int size = dataToSend.size();
                for (int i = 0; i < size; i++) {
@@ -94,27 +93,13 @@ final class OteEndpointSendRunnable implements Runnable {
             }
          } 
       } catch (IOException ex){
-         if(debug){
-            OseeLog.log(getClass(), Level.SEVERE, "Error opening DatagramChannel.  Ending OteEndpointSendRunnable unexpectedly.", ex);
-         }
+         OseeLog.log(getClass(), Level.SEVERE, "Error opening DatagramChannel.  Ending OteEndpointSendRunnable unexpectedly.", ex);
       } finally{
-         closeChannel(threadChannel);
+         Lib.close(threadChannel);
       }
 
    }
    
-   private void closeChannel(DatagramChannel channel){
-      try {
-         if (channel != null) {
-            channel.close();
-         }
-      } catch (IOException e) {
-         if(debug){
-            OseeLog.log(getClass(), Level.SEVERE, "Error trying to close channel", e);
-         }
-      } 
-   }
-
    private DatagramChannel openAndInitializeDatagramChannel() throws IOException {
       DatagramChannel channel = DatagramChannel.open();
       if (channel.socket().getSendBufferSize() < SEND_BUFFER_SIZE) {
