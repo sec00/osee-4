@@ -45,7 +45,8 @@ public class ElapsedTime {
 
    public static enum Units {
       SEC,
-      MSEC
+      MSEC,
+      MIN
    }
 
    public String end() {
@@ -55,9 +56,14 @@ public class ElapsedTime {
    public String end(Units units) {
       endDate = new Date();
       long diff = endDate.getTime() - startDate.getTime();
-      String str = String.format("%s - elapsed %d %s - start %s - end %s", name,
-         units == Units.SEC ? diff / 1000 : diff, units.name(), DateUtil.getDateStr(startDate, DateUtil.HHMMSSSS),
-         DateUtil.getDateStr(endDate, DateUtil.HHMMSSSS));
+      long time = diff; // milliseconds
+      if (units == Units.SEC) {
+         time = time / 1000; // convert from milliseconds to seconds
+      } else if (units == Units.MIN) {
+         time = time / 60000; // convert from milliseconds to minutes
+      }
+      String str = String.format("%s - elapsed %d %s - start %s - end %s", name, time, units.name(),
+         DateUtil.getDateStr(startDate, DateUtil.HHMMSSSS), DateUtil.getDateStr(endDate, DateUtil.HHMMSSSS));
       System.err.println(str + (logStart ? "" : "\n"));
       return str;
    }
