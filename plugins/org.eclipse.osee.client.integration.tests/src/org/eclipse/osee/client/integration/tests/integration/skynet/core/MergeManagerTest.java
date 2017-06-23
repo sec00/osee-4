@@ -77,7 +77,7 @@ public class MergeManagerTest {
       }
 
       workingBranch = BranchManager.createWorkingBranch(SAW_Bld_1, "Working Branch");
-      Artifact artOnWorking = ArtifactQuery.getArtifactFromToken(NewArtifactToken, workingBranch);
+      Artifact artOnWorking = ArtifactQuery.getArtifactFromId(NewArtifactToken, workingBranch);
       artOnWorking.setSoleAttributeValue(CoreAttributeTypes.WordTemplateContent, "Working Edit");
       artOnWorking.persist("Working Edit");
 
@@ -88,7 +88,7 @@ public class MergeManagerTest {
 
    @After
    public void tearDown() throws OseeCoreException {
-      Artifact artOnWorking = ArtifactQuery.getArtifactFromToken(NewArtifactToken, workingBranch);
+      Artifact artOnWorking = ArtifactQuery.getArtifactFromId(NewArtifactToken, workingBranch);
       Operations.executeWorkAndCheckStatus(new PurgeArtifacts(Collections.singleton(artOnWorking)));
 
       BranchManager.purgeBranch(workingBranch);
@@ -132,7 +132,7 @@ public class MergeManagerTest {
          workingBranch).isRebaselineInProgress() && !BranchManager.getState(workingBranch).isRebaselineInProgress());
 
       // Purge art from SAW 2 since we did a commit
-      Artifact artOnSaw2 = ArtifactQuery.getArtifactFromToken(NewArtifactToken, SAW_Bld_2);
+      Artifact artOnSaw2 = ArtifactQuery.getArtifactFromId(NewArtifactToken, SAW_Bld_2);
       Operations.executeWorkAndCheckStatus(new PurgeArtifacts(Collections.singleton(artOnSaw2)));
 
    }
@@ -212,8 +212,8 @@ public class MergeManagerTest {
 
       // Clean up this test
       // Purge art from new Updated Branch
-      Artifact artOnSaw2 = ArtifactQuery.getArtifactFromToken(NewArtifactToken, SAW_Bld_2);
-      Artifact artOnUpdateBranch = ArtifactQuery.getArtifactFromToken(NewArtifactToken, branchForUpdate);
+      Artifact artOnSaw2 = ArtifactQuery.getArtifactFromId(NewArtifactToken, SAW_Bld_2);
+      Artifact artOnUpdateBranch = ArtifactQuery.getArtifactFromId(NewArtifactToken, branchForUpdate);
       Operations.executeWorkAndCheckStatus(new PurgeArtifacts(Arrays.asList(artOnSaw2, artOnUpdateBranch)));
       BranchManager.purgeBranch(branchForUpdate);
    }
@@ -321,7 +321,7 @@ public class MergeManagerTest {
          workingBranch).isRebaselineInProgress() && !BranchManager.getState(workingBranch).isRebaselineInProgress());
 
       // Clean up this test
-      Artifact artOnSaw2 = ArtifactQuery.getArtifactFromToken(NewArtifactToken, SAW_Bld_2);
+      Artifact artOnSaw2 = ArtifactQuery.getArtifactFromId(NewArtifactToken, SAW_Bld_2);
       Operations.executeWorkAndCheckStatus(new PurgeArtifacts(Arrays.asList(artOnSaw2)));
    }
 }
