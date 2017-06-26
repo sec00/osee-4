@@ -33,7 +33,6 @@ import org.eclipse.osee.framework.core.enums.CoreArtifactTypes;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.CoreBranches;
 import org.eclipse.osee.framework.core.enums.CoreTupleTypes;
-import org.eclipse.osee.framework.core.enums.SystemUser;
 import org.eclipse.osee.framework.jdk.core.type.Pair;
 import org.eclipse.osee.orcs.OrcsApi;
 import org.eclipse.osee.orcs.data.ArtifactReadable;
@@ -62,7 +61,7 @@ public class ApplicabilityEndpointImpl implements ApplicabilityEndpoint {
    @Override
    public void createDemoApplicability() {
       TransactionBuilder tx =
-         orcsApi.getTransactionFactory().createTransaction(branch, SystemUser.OseeSystem, "Create Demo Applicability");
+         orcsApi.getTransactionFactory().createTransaction(branch, account, "Create Demo Applicability");
 
       ArtifactId config1 = tx.createArtifact(CoreArtifactTypes.BranchView, "Config1");
       ArtifactId config2 = tx.createArtifact(CoreArtifactTypes.BranchView, "Config2");
@@ -223,8 +222,8 @@ public class ApplicabilityEndpointImpl implements ApplicabilityEndpoint {
 
    @Override
    public void setView(ArtifactId branchView) {
-      TransactionBuilder tx = orcsApi.getTransactionFactory().createTransaction(CoreBranches.COMMON,
-         SystemUser.OseeSystem, "Create Branch View");
+      TransactionBuilder tx =
+         orcsApi.getTransactionFactory().createTransaction(CoreBranches.COMMON, account, "Create Branch View");
       tx.addTuple2(CoreTupleTypes.BranchView, branch.getId(), branchView.getId());
       tx.commit();
    }
@@ -232,7 +231,7 @@ public class ApplicabilityEndpointImpl implements ApplicabilityEndpoint {
    @Override
    public void createNewApplicabilityForView(ArtifactId viewId, String applicability) {
       TransactionBuilder tx =
-         orcsApi.getTransactionFactory().createTransaction(branch, SystemUser.OseeSystem, "Create new applicability");
+         orcsApi.getTransactionFactory().createTransaction(branch, account, "Create new applicability");
       tx.addTuple2(CoreTupleTypes.ViewApplicability, viewId, applicability);
       tx.commit();
    }
