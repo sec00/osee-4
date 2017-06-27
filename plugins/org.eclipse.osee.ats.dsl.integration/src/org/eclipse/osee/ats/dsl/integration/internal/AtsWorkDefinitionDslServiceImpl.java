@@ -101,14 +101,17 @@ public class AtsWorkDefinitionDslServiceImpl implements IAtsWorkDefinitionDslSer
    public IAtsWorkDefinition getWorkDefinition(Long id, String workDefinitionDsl) {
       try {
          AtsDsl atsDsl = ModelUtil.loadModel("model.ats", workDefinitionDsl);
-         XResultData result = new XResultData(false);
-         ConvertAtsDslToWorkDefinition convert =
-            new ConvertAtsDslToWorkDefinition(id, Strings.unquote(atsDsl.getWorkDef().iterator().next().getName()),
-               atsDsl, result, attrResolver, userService);
-         if (!result.isEmpty()) {
-            throw new IllegalStateException(result.toString());
+         if (atsDsl != null && atsDsl.getWorkDef() != null && !atsDsl.getWorkDef().isEmpty()) {
+            XResultData result = new XResultData(false);
+            ConvertAtsDslToWorkDefinition convert =
+               new ConvertAtsDslToWorkDefinition(id, Strings.unquote(atsDsl.getWorkDef().iterator().next().getName()),
+                  atsDsl, result, attrResolver, userService);
+            if (!result.isEmpty()) {
+               throw new IllegalStateException(result.toString());
+            }
+            return convert.convert().iterator().next();
          }
-         return convert.convert().iterator().next();
+         return null;
       } catch (Exception ex) {
          throw new OseeWrappedException(ex, "Error converting workDefStr [%s] to Work Definition", id);
       }
