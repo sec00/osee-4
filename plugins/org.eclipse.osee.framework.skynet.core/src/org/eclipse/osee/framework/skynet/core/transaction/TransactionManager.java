@@ -290,7 +290,7 @@ public final class TransactionManager {
       }
 
       TransactionId prevTransId = getPreviousTransactionId(art, revertTransaction);
-      Artifact prevArt = ArtifactQuery.getHistoricalArtifactFromId(art.getId().intValue(),
+      Artifact prevArt = ArtifactQuery.getHistoricalArtifactFromId(art,
          TransactionToken.valueOf(prevTransId, art.getBranch()), DeletionFlag.EXCLUDE_DELETED);
 
       boolean changed = false;
