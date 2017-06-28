@@ -18,9 +18,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.osee.client.integration.tests.integration.skynet.core.ConflictDeletionTest;
+import org.eclipse.osee.framework.core.data.AttributeTypeId;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IArtifactType;
-import org.eclipse.osee.framework.core.data.AttributeTypeId;
 import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.eclipse.osee.framework.core.enums.CoreArtifactTypes;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
@@ -179,7 +179,7 @@ public class ConflictTestManager {
       sourceBranch = BranchManager.createWorkingBranch(destBranch, SOURCE_BRANCH);
 
       for (int i = 0; i < NUMBER_OF_ARTIFACTS; i++) {
-         sourceArtifacts[i] = ArtifactQuery.getArtifactFromId(destArtifacts[i].getArtId(), sourceBranch);
+         sourceArtifacts[i] = ArtifactQuery.getArtifactFromId(destArtifacts[i], sourceBranch);
       }
       // create attribute conflicts
 

@@ -12,6 +12,7 @@ package org.eclipse.osee.framework.skynet.core.attribute.service;
 
 import java.util.Collection;
 import java.util.Collections;
+import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.AttributeTypeId;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.CoreBranches;
@@ -30,11 +31,10 @@ public class ArtifactAttributeAdapter implements AttributeAdapter<Artifact> {
 
    @Override
    public Artifact adapt(Attribute<?> attribute, Id identity) throws OseeCoreException {
-      Long uuid = identity.getId();
-      if (uuid <= 0L) {
+      if (identity.isInvalid()) {
          return null;
       }
-      return ArtifactQuery.getArtifactFromId(new Long(uuid).intValue(), CoreBranches.COMMON,
+      return ArtifactQuery.getArtifactFromId(ArtifactId.valueOf(identity.getId()), CoreBranches.COMMON,
          DeletionFlag.EXCLUDE_DELETED);
    }
 
