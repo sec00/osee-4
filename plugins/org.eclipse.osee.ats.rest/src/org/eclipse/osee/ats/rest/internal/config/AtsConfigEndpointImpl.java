@@ -231,7 +231,7 @@ public final class AtsConfigEndpointImpl implements AtsConfigEndpointApi {
 
    private boolean isTeamDefinitionId(Long childId) {
       if (teamDefIds.isEmpty()) {
-         for (ArtifactId art : services.getQueryService().createQuery(AtsArtifactTypes.TeamDefinition).getItemIds()) {
+         for (ArtifactId art : services.getQueryService().createQuery(AtsArtifactTypes.TeamDefinition).getIds()) {
             teamDefIds.add(art.getId());
          }
       }
@@ -240,7 +240,7 @@ public final class AtsConfigEndpointImpl implements AtsConfigEndpointApi {
 
    private boolean isActionableItemId(Long childId) {
       if (aiIds.isEmpty()) {
-         for (ArtifactId art : services.getQueryService().createQuery(AtsArtifactTypes.ActionableItem).getItemIds()) {
+         for (ArtifactId art : services.getQueryService().createQuery(AtsArtifactTypes.ActionableItem).getIds()) {
             aiIds.add(art.getId());
          }
       }
