@@ -149,4 +149,5 @@ public interface IAtsBranchService {
 
    BranchId getWorkingBranchInWork(IAtsTeamWorkflow teamWf);
 
+   void setAssociatedArtId(BranchId branch, ArtifactId artifact);
 }
