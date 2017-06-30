@@ -82,4 +82,9 @@ public interface IAtsWorkItem extends IAtsObject, HasAssignees {
 
    void setStateMgr(IAtsStateManager stateMgr);
 
+   @Override
+   default String toStringWithId() {
+      return String.format("[%s]-[%s]-[%s]", getName(), getAtsId(), getId());
+   }
+
 }
