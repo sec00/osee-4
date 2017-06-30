@@ -26,6 +26,7 @@ import org.eclipse.osee.framework.core.enums.BranchState;
 import org.eclipse.osee.framework.core.enums.BranchType;
 import org.eclipse.osee.framework.core.model.TransactionRecord;
 import org.eclipse.osee.framework.core.model.cache.BranchFilter;
+import org.eclipse.osee.framework.core.model.change.CompareResults;
 import org.eclipse.osee.framework.core.util.Result;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.util.Collections;
@@ -166,5 +167,20 @@ public class AtsBranchServiceImpl extends AbstractAtsBranchService {
    @Override
    public ArtifactId getAssociatedArtifactId(BranchId branch) {
       return BranchManager.getAssociatedArtifactId(branch);
+   }
+
+   @Override
+   public CompareResults getChangeData(BranchId branch) {
+      throw new UnsupportedOperationException("Not supported on client");
+   }
+
+   @Override
+   public CompareResults getChangeData(TransactionToken transaction) {
+      throw new UnsupportedOperationException("Not supported on client");
+   }
+
+   @Override
+   public void setAssociatedArtId(BranchId branch, ArtifactId artifact) {
+      BranchManager.setAssociatedArtifactId(branch, artifact);
    }
 }
