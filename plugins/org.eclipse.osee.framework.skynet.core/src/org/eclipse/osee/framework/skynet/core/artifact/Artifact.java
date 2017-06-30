@@ -11,6 +11,7 @@
 
 package org.eclipse.osee.framework.skynet.core.artifact;
 
+import static org.eclipse.osee.framework.core.enums.CoreArtifactTypes.Artifact;
 import static org.eclipse.osee.framework.core.enums.CoreRelationTypes.Default_Hierarchical__Child;
 import static org.eclipse.osee.framework.core.enums.RelationSorter.PREEXISTING;
 import static org.eclipse.osee.framework.core.enums.RelationSorter.USER_DEFINED;
@@ -28,12 +29,12 @@ import java.util.logging.Level;
 import java.util.regex.Pattern;
 import org.eclipse.osee.framework.core.data.Adaptable;
 import org.eclipse.osee.framework.core.data.ApplicabilityId;
-import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.ArtifactTypeId;
 import org.eclipse.osee.framework.core.data.AttributeId;
 import org.eclipse.osee.framework.core.data.AttributeTypeId;
 import org.eclipse.osee.framework.core.data.AttributeTypeToken;
 import org.eclipse.osee.framework.core.data.BranchId;
+import org.eclipse.osee.framework.core.data.HasBranch;
 import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.eclipse.osee.framework.core.data.IRelationType;
 import org.eclipse.osee.framework.core.data.RelationTypeSide;
@@ -60,8 +61,9 @@ import org.eclipse.osee.framework.core.model.type.ArtifactType;
 import org.eclipse.osee.framework.core.model.type.AttributeType;
 import org.eclipse.osee.framework.core.model.type.RelationType;
 import org.eclipse.osee.framework.core.operation.Operations;
-import org.eclipse.osee.framework.jdk.core.type.FullyNamedIdentity;
+import org.eclipse.osee.framework.jdk.core.type.FullyNamed;
 import org.eclipse.osee.framework.jdk.core.type.HashCollection;
+import org.eclipse.osee.framework.jdk.core.type.NamedIdBase;
 import org.eclipse.osee.framework.jdk.core.type.OseeArgumentException;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.OseeStateException;
@@ -94,7 +96,7 @@ import org.eclipse.osee.framework.skynet.core.types.IArtifact;
  * @author Ryan D. Brooks
  */
 
-public class Artifact extends FullyNamedIdentity<String> implements IArtifact, Adaptable {
+public class Artifact extends NamedIdBase implements IArtifact, Adaptable, FullyNamed {
    public static final String UNNAMED = "Unnamed";
    public static final String BEFORE_GUID_STRING = "/BeforeGUID/PrePend";
    public static final String AFTER_GUID_STRING = "/AfterGUID";
@@ -104,7 +106,6 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
       new HashSet<DefaultBasicUuidRelationReorder>();
    private final BranchId branch;
    private TransactionToken transaction = TransactionToken.SENTINEL;
-   private int artId;
    private int gammaId;
    private boolean linksLoaded;
    private boolean historical;
@@ -115,8 +116,19 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
    private ArtifactTypeId artifactTypeId;
    private ApplicabilityId applicabilityId;
 
+   private final String guid;
+
    public Artifact(String guid, BranchId branch, ArtifactTypeId artifactTypeId) {
-      super(GUID.checkOrCreate(guid), "");
+      this(Lib.generateArtifactIdAsInt(), guid, branch, artifactTypeId);
+   }
+
+   public Artifact(Long id, BranchId branch, ArtifactTypeId artifactTypeId) {
+      this(id, null, branch, artifactTypeId);
+   }
+
+   public Artifact(Long id, String guid, BranchId branch, ArtifactTypeId artifactTypeId) {
+      super(id, null);
+      this.guid = GUID.checkOrCreate(guid);
       this.artifactTypeId = artifactTypeId;
       objectEditState = EditState.NO_CHANGE;
       internalSetModType(ModificationType.NEW, false);
@@ -124,8 +136,30 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
       this.branch = branch;
    }
 
+   public Artifact(BranchId branch, ArtifactTypeId artifactType, String name) {
+      this((String) null, branch, artifactType);
+      setName(name);
+   }
+
+   public Artifact(BranchId branch) {
+      this(branch, Artifact);
+   }
+
+   public Artifact(BranchId branch, String name) {
+      this(branch, Artifact, name);
+   }
+
    public Artifact(BranchId branch, ArtifactTypeId artifactType) {
-      this(null, branch, artifactType);
+      this((String) null, branch, artifactType);
+   }
+
+   public Artifact(Long id, BranchId branch) {
+      this(id, null, branch, Artifact);
+   }
+
+   @Override
+   public String getGuid() {
+      return guid;
    }
 
    public final boolean isInDb() {
@@ -226,7 +260,7 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
 
    @Override
    public final int getArtId() {
-      return artId;
+      return getId().intValue();
    }
 
    public final long getArtTypeId() {
@@ -1601,33 +1635,11 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
     */
    @Override
    public final boolean equals(Object obj) {
-      if (obj instanceof DefaultBasicGuidArtifact) {
-         DefaultBasicGuidArtifact other = (DefaultBasicGuidArtifact) obj;
-         boolean result = getGuid().equals(other.getGuid());
-         if (result) {
-            if (getBranch().isValid() && other.getBranch().isValid()) {
-               result = isOnSameBranch(other);
-            }
-         }
-         return result;
+      boolean equals = super.equals(obj);
+      if (equals && obj instanceof HasBranch) {
+         return isOnSameBranch((HasBranch) obj);
       }
-      if (obj instanceof IArtifact) {
-         IArtifact other = (IArtifact) obj;
-         boolean result = getGuid().equals(other.getGuid());
-         if (result) {
-            if (getBranch().isValid() && other.getBranch().isValid()) {
-               result = isOnSameBranch(other);
-            } else {
-               result = getBranch().isInvalid() && other.getBranch().isInvalid();
-            }
-         }
-         return result;
-      }
-      if (obj instanceof ArtifactToken) {
-         ArtifactToken token = (ArtifactToken) obj;
-         return getGuid().equals(token.getGuid());
-      }
-      return false;
+      return equals;
    }
 
    public final int getRemainingAttributeCount(AttributeTypeId attributeType) throws OseeCoreException {
@@ -1637,10 +1649,6 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
    public final int getAttributeCount(AttributeTypeId attributeType) throws OseeCoreException {
       ensureAttributesLoaded();
       return getAttributes(attributeType).size();
-   }
-
-   void setArtId(Long artifactId) {
-      this.artId = artifactId.intValue();
    }
 
    /**
@@ -1760,15 +1768,5 @@ public class Artifact extends FullyNamedIdentity<String> implements IArtifact, A
          // do nothing
       }
       return artifact;
-   }
-
-   @Override
-   public Long getId() {
-      return Long.valueOf(getArtId());
-   }
-
-   // TODO: This method should be removed once Artifact extends BaseId
-   public ArtifactToken getHashableToken() {
-      return ArtifactToken.valueOf(getId(), getBranch());
    }
 }
