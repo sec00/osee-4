@@ -22,6 +22,7 @@ import org.eclipse.osee.framework.core.enums.ModificationType;
 import org.eclipse.osee.framework.core.model.change.ChangeItem;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.artifact.Attribute;
 import org.eclipse.osee.framework.skynet.core.change.Change;
 import org.eclipse.osee.framework.skynet.core.change.ErrorChange;
 import org.eclipse.osee.framework.ui.skynet.ArtifactImageManager;
@@ -76,6 +77,9 @@ public class XChangeLabelProvider extends XViewerLabelProvider {
          } else if (cCol.equals(ChangeXViewerFactory.Item_Type)) {
             return change.getItemTypeName();
          } else if (cCol.equals(ChangeXViewerFactory.Is_Value)) {
+            if (attributeWasDeleted(change)) {
+               return "";
+            }
             return change.getIsValue();
          } else if (cCol.equals(ChangeXViewerFactory.Was_Value)) {
             return change.getWasValue();
@@ -91,6 +95,20 @@ public class XChangeLabelProvider extends XViewerLabelProvider {
          return XViewerCells.getCellExceptionString(ex);
       }
       return "unhandled column";
+   }
+
+   private boolean attributeWasDeleted(Change change) {
+      if (change.getChangeArtifact().isDeleted()) {
+         return true;
+      }
+      boolean found = false;
+      for (Attribute<?> attr : change.getChangeArtifact().getAttributes()) {
+         if (change.getItemId().equals(attr.getId())) {
+            found = true;
+            break;
+         }
+      }
+      return !found;
    }
 
    @Override
