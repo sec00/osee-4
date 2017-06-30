@@ -36,7 +36,6 @@ import org.eclipse.osee.framework.core.enums.CoreBranches;
 import org.eclipse.osee.framework.core.enums.PresentationType;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.OseeStateException;
-import org.eclipse.osee.framework.jdk.core.util.GUID;
 import org.eclipse.osee.framework.skynet.core.UserManager;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.ui.skynet.render.DefaultArtifactRenderer;
@@ -56,7 +55,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test Case for {@link RendererManager}
- * 
+ *
  * @author Ryan D. Brooks
  */
 @RunWith(Parameterized.class)
@@ -81,7 +80,7 @@ public class RendererManagerTest {
 
    @Test
    public void testGetBestRenderer() throws OseeCoreException {
-      Artifact artifact = new Artifact(GUID.create(), CoreBranches.COMMON, artifactType);
+      Artifact artifact = new Artifact(CoreBranches.COMMON, artifactType);
 
       if (defaultOption == Both) {
          testGetBestRendererWithOption(artifact, On);
