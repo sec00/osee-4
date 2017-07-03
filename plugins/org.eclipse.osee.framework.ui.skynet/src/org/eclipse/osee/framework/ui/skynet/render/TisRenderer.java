@@ -16,11 +16,14 @@ import static org.eclipse.osee.framework.core.enums.PresentationType.PREVIEW;
 import java.io.InputStream;
 import java.nio.charset.CharacterCodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osee.framework.core.enums.CoreArtifactTypes;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.PresentationType;
+import org.eclipse.osee.framework.core.util.RendererOption;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.util.io.CharBackedInputStream;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
@@ -39,13 +42,26 @@ import org.eclipse.osee.framework.ui.swt.ImageManager;
  */
 public class TisRenderer extends WordTemplateRenderer {
 
+   public TisRenderer(Map<RendererOption, Object> rendererOptions) {
+      super(rendererOptions);
+   }
+
+   public TisRenderer() {
+      this(new HashMap<RendererOption, Object>());
+   }
+
+   @Override
+   public TisRenderer newInstance(Map<RendererOption, Object> rendererOptions) {
+      return new TisRenderer(rendererOptions);
+   }
+
    @Override
    public TisRenderer newInstance() {
       return new TisRenderer();
    }
 
    @Override
-   public int getApplicabilityRating(PresentationType presentationType, Artifact artifact, Object... objects) throws OseeCoreException {
+   public int getApplicabilityRating(PresentationType presentationType, Artifact artifact, Map<RendererOption, Object> rendererOptions) {
       if (artifact.getArtifactType().inheritsFrom(CoreArtifactTypes.TestInformationSheet) && presentationType.matches(
          DEFAULT_OPEN, PREVIEW)) {
          return SPECIALIZED_MATCH;
@@ -81,7 +97,8 @@ public class TisRenderer extends WordTemplateRenderer {
       handlers.add(new TISAttributeHandler());
       handlers.add(new WordAttributeTypeAttributeHandler());
       handlers.add(new BasicTemplateAttributeHandler());
-      WordTemplateManager wtm = new WordTemplateManager(template.getSoleAttributeValue(CoreAttributeTypes.WholeWordContent), handlers);
+      WordTemplateManager wtm =
+         new WordTemplateManager(template.getSoleAttributeValue(CoreAttributeTypes.WholeWordContent), handlers);
       CharBackedInputStream charBak = null;
       try {
          charBak = new CharBackedInputStream();
