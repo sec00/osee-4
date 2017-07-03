@@ -14,7 +14,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IArtifactType;
 import org.eclipse.osee.framework.core.dsl.integration.util.OseeDslSegmentParser;
@@ -23,6 +25,7 @@ import org.eclipse.osee.framework.core.enums.CoreArtifactTypes;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.PresentationType;
 import org.eclipse.osee.framework.core.operation.IOperation;
+import org.eclipse.osee.framework.core.util.RendererOption;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.ui.skynet.render.DefaultArtifactRenderer;
@@ -32,6 +35,7 @@ import org.eclipse.osee.framework.ui.skynet.render.FileToAttributeUpdateOperatio
  * @author Roberto E. Escobar
  */
 public final class OseeDslRenderer extends AbstractDslRenderer {
+
    private static final IArtifactType[] MATCHING_ARTIFACT_TYPES = {
       CoreArtifactTypes.AccessControlModel,
       CoreArtifactTypes.OseeTypeDefinition,
@@ -39,9 +43,22 @@ public final class OseeDslRenderer extends AbstractDslRenderer {
 
    private static final OseeDslSegmentParser parser = new OseeDslSegmentParser();
 
+   public OseeDslRenderer(Map<RendererOption, Object> rendererOptions) {
+      super(rendererOptions);
+   }
+
+   public OseeDslRenderer() {
+      this(new HashMap<RendererOption, Object>());
+   }
+
    @Override
    public String getName() {
       return "OseeDsl Editor";
+   }
+
+   @Override
+   public DefaultArtifactRenderer newInstance(Map<RendererOption, Object> rendererOptions) {
+      return new OseeDslRenderer(rendererOptions);
    }
 
    @Override
