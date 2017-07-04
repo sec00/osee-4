@@ -31,6 +31,7 @@ import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.BranchViewData;
 import org.eclipse.osee.framework.core.data.FeatureDefinitionData;
 import org.eclipse.osee.framework.core.data.TransactionId;
+import org.eclipse.osee.framework.core.data.TransactionToken;
 import org.eclipse.osee.framework.jdk.core.type.Pair;
 
 /**
@@ -132,8 +133,8 @@ public interface ApplicabilityEndpoint {
    List<BranchId> getAffectedBranches(@QueryParam("injectiontx") TransactionId injectionTx, @QueryParam("removaltx") @DefaultValue("-1") TransactionId removalTx, List<ApplicabilityId> applicabilityIds);
 
    @POST
-   @Path("view/{viewId}/applic/{applicability}/")
+   @Path("view/{viewId}/applic")
    @Consumes({MediaType.APPLICATION_JSON})
    @Produces(MediaType.APPLICATION_JSON)
-   void createNewApplicabilityForView(@PathParam("viewId") ArtifactId viewId, @PathParam("applicability") String applicability);
+   TransactionToken createNewApplicabilityForView(@PathParam("viewId") ArtifactId viewId, String applicability);
 }
