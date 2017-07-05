@@ -24,30 +24,27 @@ import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 import org.eclipse.osee.framework.skynet.core.attribute.AttributeAdapter;
 
 /**
- * Artifact Referenced Attributes that point to current Ats Branch
- * 
  * @author Donald G. Dunne
  */
-public class AtsBranchArtifactReferenceAttributeAdapter implements AttributeAdapter<Artifact> {
+public class CommonArtifactReferenceAttributeAdapter implements AttributeAdapter<Artifact> {
 
-   private static final List<AttributeTypeId> PROGRAM_UUID_LIST =
-      Arrays.asList(AtsAttributeTypes.ProgramUuid, AtsAttributeTypes.TeamDefinitionReference,
-         AtsAttributeTypes.WorkPackageProgram, AtsAttributeTypes.ActionableItemReference);
+   private static final List<AttributeTypeId> ATTR_TYPE_UUID_LIST = Arrays.asList(AtsAttributeTypes.ProgramUuid,
+      AtsAttributeTypes.TeamDefinitionReference, AtsAttributeTypes.ActionableItemReference);
 
    @Override
    public Collection<AttributeTypeId> getSupportedTypes() {
-      return PROGRAM_UUID_LIST;
+      return ATTR_TYPE_UUID_LIST;
    }
 
    @Override
    public Artifact adapt(Attribute<?> attribute, Id identity) throws OseeCoreException {
-      Artifact resultProgramArt = null;
-
-      int uuid = identity.getId() <= 0 ? 0 : identity.getId().intValue();
-      if (uuid > 0) {
-         resultProgramArt = ArtifactQuery.getArtifactFromId(uuid, AtsClientService.get().getAtsBranch());
+      Artifact resultArtifact = AtsClientService.get().getArtifact(identity.getId());
+      if (resultArtifact == null) {
+         if (identity.isValid()) {
+            resultArtifact = ArtifactQuery.getArtifactFromId(identity.getId(), AtsClientService.get().getAtsBranch());
+         }
       }
-      return resultProgramArt;
+      return resultArtifact;
    }
 
 }
