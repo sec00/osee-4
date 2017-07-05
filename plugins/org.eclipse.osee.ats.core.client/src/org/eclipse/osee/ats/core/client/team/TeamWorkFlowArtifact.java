@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import org.eclipse.osee.ats.api.IAtsObject;
 import org.eclipse.osee.ats.api.ai.IAtsActionableItem;
 import org.eclipse.osee.ats.api.data.AtsAttributeTypes;
 import org.eclipse.osee.ats.api.data.AtsRelationTypes;
@@ -37,6 +38,7 @@ import org.eclipse.osee.ats.core.client.task.TaskArtifact;
 import org.eclipse.osee.ats.core.client.util.AtsTaskCache;
 import org.eclipse.osee.ats.core.client.workflow.AbstractWorkflowArtifact;
 import org.eclipse.osee.ats.core.util.AtsUtilCore;
+import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactTypeId;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IOseeBranch;
@@ -125,17 +127,17 @@ public class TeamWorkFlowArtifact extends AbstractWorkflowArtifact implements IA
    }
 
    public void setTeamDefinition(IAtsTeamDefinition teamDef) throws OseeCoreException {
-      this.setSoleAttributeValue(AtsAttributeTypes.TeamDefinition,
-         AtsClientService.get().getArtifact(teamDef).getGuid());
+      this.setSoleAttributeValue(AtsAttributeTypes.TeamDefinitionReference, teamDef.getIdString());
    }
 
    @Override
    public IAtsTeamDefinition getTeamDefinition() throws OseeCoreException {
-      String guid = this.getSoleAttributeValue(AtsAttributeTypes.TeamDefinition, "");
-      if (!Strings.isValid(guid)) {
+      ArtifactId artId = AtsClientService.get().getAttributeResolver().getSoleArtifactIdReference((IAtsObject) this,
+         AtsAttributeTypes.TeamDefinitionReference, ArtifactId.SENTINEL);
+      if (artId.isInvalid()) {
          throw new OseeArgumentException("TeamWorkflow [%s] has no Team Definition associated.", getAtsId());
       }
-      IAtsTeamDefinition teamDef = AtsClientService.get().getConfigItem(guid);
+      IAtsTeamDefinition teamDef = AtsClientService.get().getConfigItem(artId);
       Conditions.checkNotNull(teamDef, String.format("TeamDef null for Team WF %s", toStringWithId()));
       return teamDef;
    }
