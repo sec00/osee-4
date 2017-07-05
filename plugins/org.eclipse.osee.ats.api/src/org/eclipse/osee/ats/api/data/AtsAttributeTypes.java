@@ -123,7 +123,6 @@ public final class AtsAttributeTypes {
    public static final AttributeTypeToken PlannedPoints = createType(232851836925913430L, "Planned Points");
    public static final AttributeTypeToken EndDate = createType(1152921504606847383L, "End Date");
    public static final AttributeTypeToken SwEnhancement = createType(1152921504606847227L, "SW Enhancement");
-   public static final AttributeTypeToken TeamDefinition = createType(1152921504606847201L, "Team Definition");
    public static final AttributeTypeToken TeamDefinitionReference = createType(4730961339090285773L, "Team Definition Reference");
    public static final AttributeTypeToken TestToSourceLocator = AttributeTypeToken.valueOf(130595201919637916L,
       "Test Run to Source Locator");
@@ -167,13 +166,13 @@ public final class AtsAttributeTypes {
 
    // @formatter:on
 
-   private static AttributeTypeToken createType(Long guid, String name) {
+   public static AttributeTypeToken createType(Long guid, String name) {
       AttributeTypeToken type = AttributeTypeToken.valueOf(guid, "ats." + name);
       nameToTypeMap.put(type.getName(), type);
       return type;
    }
 
-   private static AttributeTypeToken createType(Long guid, String name, String description) {
+   public static AttributeTypeToken createType(Long guid, String name, String description) {
       AttributeTypeToken type = AttributeTypeToken.valueOf(guid, "ats." + name, description);
       nameToTypeMap.put(type.getName(), type);
       return type;
