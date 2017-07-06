@@ -27,7 +27,7 @@ public interface IAtsActionableItemService {
 
    String getActionableItemsStr(IAtsObject atsObject) throws OseeCoreException;
 
-   Collection<String> getActionableItemGuids(IAtsObject atsObject) throws OseeCoreException;
+   Collection<String> getActionableItemIds(IAtsObject atsObject) throws OseeCoreException;
 
    void addActionableItem(IAtsObject atsObject, IAtsActionableItem aia, IAtsChangeSet changes) throws OseeCoreException;
 

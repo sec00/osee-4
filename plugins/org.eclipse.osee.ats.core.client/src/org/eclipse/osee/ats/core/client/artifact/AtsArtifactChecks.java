@@ -157,15 +157,15 @@ public class AtsArtifactChecks extends ArtifactCheck {
    }
 
    private IStatus checkActionableItems(boolean isAtsAdmin, Collection<Artifact> artifacts) throws OseeCoreException {
-      Set<String> aiaGuids = getActionableItemGuidsWithRecurse(new HashSet<String>(), artifacts);
-      if (!aiaGuids.isEmpty()) {
+      Set<String> aiIds = getActionableItemIdsWithRecurse(new HashSet<String>(), artifacts);
+      if (!aiIds.isEmpty()) {
          List<Artifact> teamWfsRelatedToAis =
             ArtifactQuery.getArtifactListFromTypeAndAttribute(AtsArtifactTypes.TeamWorkflow,
-               AtsAttributeTypes.ActionableItem, aiaGuids, AtsClientService.get().getAtsBranch(), 10);
+               AtsAttributeTypes.ActionableItemReference, aiIds, AtsClientService.get().getAtsBranch(), 10);
          if (!teamWfsRelatedToAis.isEmpty()) {
             return createStatus(String.format(
                "Actionable Items (or children AIs) [%s] selected to delete have related Team Workflows; Delete or re-assign Team Workflows first.",
-               aiaGuids));
+               aiIds));
          }
          if (!isAtsAdmin) {
             return createStatus("Deletion of Actionable Items is only permitted by ATS Admin.");
@@ -174,20 +174,20 @@ public class AtsArtifactChecks extends ArtifactCheck {
       return Status.OK_STATUS;
    }
 
-   private Set<String> getActionableItemGuidsWithRecurse(HashSet<String> aiaGuids, Collection<Artifact> artifacts) {
+   private Set<String> getActionableItemIdsWithRecurse(HashSet<String> aiIds, Collection<Artifact> artifacts) {
       for (Artifact art : artifacts) {
          if (art.isOfType(AtsArtifactTypes.ActionableItem)) {
-            IAtsActionableItem aia = AtsClientService.get().getCache().getAtsObject(art.getId());
-            if (aia != null) {
-               aiaGuids.add(AtsUtilCore.getGuid(aia));
+            IAtsActionableItem ai = AtsClientService.get().getCache().getAtsObject(art.getId());
+            if (ai != null) {
+               aiIds.add(ai.getIdString());
                Collection<Artifact> childArts = art.getChildren();
-               if (!aia.getChildrenActionableItems().isEmpty()) {
-                  getActionableItemGuidsWithRecurse(aiaGuids, childArts);
+               if (!ai.getChildrenActionableItems().isEmpty()) {
+                  getActionableItemIdsWithRecurse(aiIds, childArts);
                }
             }
          }
       }
-      return aiaGuids;
+      return aiIds;
    }
 
    private IStatus checkTeamDefinitions(boolean isAtsAdmin, Collection<Artifact> artifacts) throws OseeCoreException {
