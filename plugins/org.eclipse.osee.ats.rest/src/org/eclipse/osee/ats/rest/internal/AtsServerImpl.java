@@ -286,11 +286,11 @@ public class AtsServerImpl extends AtsCoreServiceImpl implements IAtsServer {
                loggedNotificationDisabled = true;
             }
          } else {
-            workItemNotificationProcessor =
-               new WorkItemNotificationProcessor(logger, this, workItemFactory, userService, attributeResolverService);
-            notificationEventProcessor = new AtsNotificationEventProcessor(workItemNotificationProcessor, userService,
-               getConfigValue("NoReplyEmail"));
-            notificationEventProcessor.sendNotifications(notifications, notifiers);
+            //            workItemNotificationProcessor =
+            //               new WorkItemNotificationProcessor(logger, this, workItemFactory, userService, attributeResolverService);
+            //            notificationEventProcessor = new AtsNotificationEventProcessor(workItemNotificationProcessor, userService,
+            //               getConfigValue("NoReplyEmail"));
+            //            notificationEventProcessor.sendNotifications(notifications, notifiers);
          }
       }
    }
