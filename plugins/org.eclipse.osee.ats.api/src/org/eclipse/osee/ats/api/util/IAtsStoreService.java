@@ -71,4 +71,5 @@ public interface IAtsStoreService {
 
    boolean isArtifactTypeInheritsFrom(IArtifactType artifactType, IArtifactType baseArtifactType);
 
+   AttributeTypeId getAttributeType(Long attrTypeId);
 }
