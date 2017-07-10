@@ -195,4 +195,9 @@ public class AtsStoreService implements IAtsStoreService {
       return ArtifactTypeManager.inheritsFrom(artifactType, baseArtifactType);
    }
 
+   @Override
+   public AttributeTypeId getAttributeType(Long attrTypeId) {
+      return AttributeTypeManager.getTypeByGuid(attrTypeId);
+   }
+
 }
