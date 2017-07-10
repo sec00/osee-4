@@ -13,9 +13,9 @@ package org.eclipse.osee.framework.ui.skynet.render.word.template;
 
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.CoreRelationTypes;
+import org.eclipse.osee.framework.core.util.WordMLProducer;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
-import org.eclipse.osee.framework.ui.skynet.render.word.WordMLProducer;
 
 /**
  * @author Andrew M. Finkbeiner

@@ -17,11 +17,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.eclipse.osee.framework.core.data.AttributeTypeToken;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
+import org.eclipse.osee.framework.core.util.WordMLProducer;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.attribute.AttributeTypeManager;
 import org.eclipse.osee.framework.skynet.core.word.WordUtil;
-import org.eclipse.osee.framework.ui.skynet.render.word.WordMLProducer;
 
 /**
  * @author Andrew M. Finkbeiner
@@ -199,7 +199,7 @@ public class WordTemplateManager {
                   wordMl.endOutlineSubSection();
                }
 
-               wordMl.setPageLayout(artifact);
+               wordMl.setPageLayout(artifact.getSoleAttributeValueAsString(CoreAttributeTypes.PageType, "Portrait"));
             }
          } else {
             task.process(wordMl, null, attributeHandlers);

@@ -14,9 +14,9 @@ package org.eclipse.osee.framework.ui.skynet.render.word.template;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.eclipse.osee.framework.core.util.WordMLProducer;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
-import org.eclipse.osee.framework.ui.skynet.render.word.WordMLProducer;
 
 /**
  * @author Andrew M. Finkbeiner
