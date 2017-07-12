@@ -13,7 +13,8 @@ package org.eclipse.osee.ote.ui.test.manager.models;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
-
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -23,7 +24,10 @@ import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.framework.ui.ws.AWorkspace;
 import org.eclipse.osee.ote.ui.test.manager.internal.TestManagerPlugin;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 
 public class FileModel {
 
@@ -149,6 +153,14 @@ public class FileModel {
    public void openEditor() {
       if (getIFile() != null) {
          AWorkspace.openEditor(getIFile());
+      } else {
+         IFileStore fileStore = EFS.getLocalFileSystem().getStore(new Path(file.getAbsolutePath()));
+         IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+         try {
+            IDE.openEditorOnFileStore(page, fileStore);
+         } catch (PartInitException e) {
+            e.printStackTrace();
+         }         
       }
    }
 
