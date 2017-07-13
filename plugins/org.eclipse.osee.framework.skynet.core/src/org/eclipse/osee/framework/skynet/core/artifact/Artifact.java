@@ -1658,7 +1658,7 @@ public class Artifact extends NamedIdBase implements IArtifact, Adaptable, Fully
       ArrayList<RelationLink> relations = new ArrayList<>();
       for (RelationLink relation : getRelationsAll(DeletionFlag.EXCLUDE_DELETED)) {
          try {
-            if (relation.getArtifactOnOtherSide(this).equals(artifact)) {
+            if (relation.getOtherSideArtifact(this).equals(artifact)) {
                relations.add(relation);
             }
          } catch (ArtifactDoesNotExist ex) {
@@ -1680,7 +1680,7 @@ public class Artifact extends NamedIdBase implements IArtifact, Adaptable, Fully
       ArrayList<RelationLink> relations = new ArrayList<>();
       for (RelationLink relation : getRelations(side)) {
          try {
-            if (relation.getArtifactOnOtherSide(this).equals(artifact)) {
+            if (relation.getOtherSideArtifact(this).equals(artifact)) {
                relations.add(relation);
             }
          } catch (ArtifactDoesNotExist ex) {
