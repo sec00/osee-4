@@ -129,6 +129,10 @@ public class ArtifactQuery {
       return getOrCheckArtifactFromId(artId, branch, allowDeleted, QueryType.GET);
    }
 
+   public static Artifact getArtifactFromId(ArtifactId artId, BranchId branch, DeletionFlag allowDeleted) {
+      return getOrCheckArtifactFromId(artId.getId().intValue(), branch, allowDeleted, QueryType.GET);
+   }
+
    public static Artifact getArtifactFromId(Long artId, BranchId branch, DeletionFlag allowDeleted) throws OseeCoreException {
       return getOrCheckArtifactFromId(artId.intValue(), branch, allowDeleted, QueryType.GET);
    }
@@ -187,6 +191,10 @@ public class ArtifactQuery {
     */
    public static Artifact checkArtifactFromId(long uuid, BranchId branch) throws OseeCoreException {
       return getOrCheckArtifactFromId(new Long(uuid).intValue(), branch, EXCLUDE_DELETED, QueryType.CHECK);
+   }
+
+   public static Artifact checkArtifactFromId(ArtifactId artifactId, BranchId branch) {
+      return getOrCheckArtifactFromId(artifactId.getId().intValue(), branch, EXCLUDE_DELETED, QueryType.CHECK);
    }
 
    /**
