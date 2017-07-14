@@ -23,6 +23,7 @@ import org.eclipse.osee.client.integration.tests.integration.skynet.core.utils.C
 import org.eclipse.osee.client.test.framework.OseeClientIntegrationRule;
 import org.eclipse.osee.client.test.framework.OseeHousekeepingRule;
 import org.eclipse.osee.framework.core.data.AttributeId;
+import org.eclipse.osee.client.test.framework.OseeLogMonitorRule;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.eclipse.osee.framework.core.data.TransactionId;
@@ -32,8 +33,6 @@ import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.model.TransactionRecord;
 import org.eclipse.osee.framework.jdk.core.type.Id;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
-import org.eclipse.osee.framework.logging.OseeLog;
-import org.eclipse.osee.framework.logging.SevereLoggingMonitor;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactTypeManager;
 import org.eclipse.osee.framework.skynet.core.artifact.Attribute;
@@ -63,6 +62,8 @@ import org.junit.runners.MethodSorters;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ConflictTest {
+   @Rule
+   public OseeLogMonitorRule monitorRule = new OseeLogMonitorRule();
 
    @Rule
    public OseeClientIntegrationRule integration = new OseeClientIntegrationRule(OSEE_CLIENT_DEMO);
@@ -81,8 +82,6 @@ public class ConflictTest {
     */
    @org.junit.Test
    public void test01GetMergeBranchNotCreated() throws Exception {
-      SevereLoggingMonitor monitorLog = new SevereLoggingMonitor();
-      OseeLog.registerLoggerListener(monitorLog);
       try {
          IOseeBranch mergeBranch =
             BranchManager.getMergeBranch(ConflictTestManager.getSourceBranch(), ConflictTestManager.getDestBranch());
@@ -91,8 +90,6 @@ public class ConflictTest {
       } catch (Exception ex) {
          fail(ex.getMessage());
       }
-      assertTrue(String.format("%d SevereLogs during test.", monitorLog.getSevereLogs().size()),
-         monitorLog.getSevereLogs().isEmpty());
    }
 
    /**
@@ -102,8 +99,6 @@ public class ConflictTest {
     */
    @org.junit.Test
    public void test02GetConflictsPerBranch() {
-      SevereLoggingMonitor monitorLog = new SevereLoggingMonitor();
-      OseeLog.registerLoggerListener(monitorLog);
       Collection<Conflict> conflicts = null;
       try {
          conflicts = ConflictManagerInternal.getConflictsPerBranch(ConflictTestManager.getSourceBranch(),
@@ -118,8 +113,6 @@ public class ConflictTest {
       } catch (Exception ex) {
          fail(Lib.exceptionToString(ex));
       }
-      assertTrue(String.format("%d SevereLogs during test.", monitorLog.getSevereLogs().size()),
-         monitorLog.getSevereLogs().isEmpty());
    }
 
    /**
@@ -128,8 +121,6 @@ public class ConflictTest {
     */
    @org.junit.Test
    public void test03GetMergeBranchCreated() throws Exception {
-      SevereLoggingMonitor monitorLog = new SevereLoggingMonitor();
-      OseeLog.registerLoggerListener(monitorLog);
       try {
          IOseeBranch mergeBranch =
             BranchManager.getMergeBranch(ConflictTestManager.getSourceBranch(), ConflictTestManager.getDestBranch());
@@ -144,14 +135,10 @@ public class ConflictTest {
       } catch (Exception ex) {
          fail(ex.getMessage());
       }
-      assertTrue(String.format("%d SevereLogs during test.", monitorLog.getAllLogs().size()),
-         monitorLog.getAllLogs().isEmpty());
    }
 
    @org.junit.Test
    public void test04ResolveConflicts() {
-      SevereLoggingMonitor monitorLog = new SevereLoggingMonitor();
-      OseeLog.registerLoggerListener(monitorLog);
       try {
          TransactionRecord baseTx = ConflictTestManager.getSourceBaseTransaction();
          Collection<Conflict> conflicts =
@@ -180,14 +167,10 @@ public class ConflictTest {
       } catch (Exception ex) {
          fail(Lib.exceptionToString(ex));
       }
-      assertTrue(String.format("%d SevereLogs during test.", monitorLog.getAllLogs().size()),
-         monitorLog.getAllLogs().isEmpty());
    }
 
    @Ignore
    public void test05CommitWithoutResolutionErrors() {
-      SevereLoggingMonitor monitorLog = new SevereLoggingMonitor();
-      OseeLog.registerLoggerListener(monitorLog);
       try {
          ConflictManagerExternal conflictManager =
             new ConflictManagerExternal(ConflictTestManager.getDestBranch(), ConflictTestManager.getSourceBranch());
@@ -200,9 +183,6 @@ public class ConflictTest {
       } catch (Exception ex) {
          fail("No Exceptions should have been thrown. Not even the " + ex.getLocalizedMessage() + "Exception");
       }
-
-      assertTrue(String.format("%d SevereLogs during test.", monitorLog.getSevereLogs().size()),
-         monitorLog.getSevereLogs().isEmpty());
    }
 
    @SuppressWarnings("deprecation")
