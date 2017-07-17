@@ -17,11 +17,14 @@ import java.util.Set;
 import org.eclipse.osee.ats.api.IAtsObject;
 import org.eclipse.osee.ats.api.IAtsWorkItem;
 import org.eclipse.osee.ats.api.user.IAtsUser;
+import org.eclipse.osee.ats.api.workflow.IAtsTeamWorkflow;
 import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactTypeId;
 import org.eclipse.osee.framework.core.data.AttributeTypeId;
 import org.eclipse.osee.framework.core.data.AttributeTypeToken;
 import org.eclipse.osee.framework.core.data.IArtifactType;
+import org.eclipse.osee.framework.core.data.TransactionId;
+import org.eclipse.osee.framework.core.util.Result;
 
 public interface IAtsStoreService {
 
@@ -72,5 +75,7 @@ public interface IAtsStoreService {
    boolean isArtifactTypeInheritsFrom(IArtifactType artifactType, IArtifactType baseArtifactType);
 
    AttributeTypeId getAttributeType(Long attrTypeId);
+
+   Result setTransactionAssociatedArtifact(TransactionId trans, IAtsTeamWorkflow teamWf);
 
 }
