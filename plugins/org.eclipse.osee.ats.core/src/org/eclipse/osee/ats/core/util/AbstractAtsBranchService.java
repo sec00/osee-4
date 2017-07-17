@@ -619,4 +619,16 @@ public abstract class AbstractAtsBranchService implements IAtsBranchService {
       return defaultBranchName;
    }
 
+   @Override
+   public void resetBranchAssociatedArtIds(Long fromId, Long toId) {
+      services.getQueryService().runUpdate("update osee_branch set associated_art_id = ? where associated_art_id = ?",
+         toId, fromId);
+   }
+
+   @Override
+   public void resetCommitArtIds(Long fromId, Long toId) {
+      services.getQueryService().runUpdate("update osee_tx_details set commit_art_id = ? where commit_art_id = ?", toId,
+         fromId);
+   }
+
 }
