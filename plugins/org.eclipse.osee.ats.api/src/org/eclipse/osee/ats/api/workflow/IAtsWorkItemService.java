@@ -57,4 +57,6 @@ public interface IAtsWorkItemService {
    IAtsWorkItemNotes getNotes(IAtsWorkItem workItem);
 
    ITeamWorkflowProvidersLazy getTeamWorkflowProviders();
+
+   IAtsWorkItem getWorkItemByAnyId(String actionId);
 }
