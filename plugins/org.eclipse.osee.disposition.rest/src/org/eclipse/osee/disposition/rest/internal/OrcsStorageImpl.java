@@ -70,7 +70,7 @@ public class OrcsStorageImpl implements Storage {
    }
 
    private ArtifactReadable getDispoUser() throws OseeCoreException {
-      return getQuery().fromBranch(COMMON).andIds(SystemUser.OseeSystem).getResults().getExactlyOne();
+      return getQuery().fromBranch(COMMON).andId(SystemUser.OseeSystem).getResults().getExactlyOne();
    }
 
    private QueryFactory getQuery() {
@@ -122,7 +122,7 @@ public class OrcsStorageImpl implements Storage {
 
    @Override
    public ArtifactReadable findUser() {
-      return getQuery().fromBranch(COMMON).andIds(SystemUser.OseeSystem).getResults().getExactlyOne();
+      return getQuery().fromBranch(COMMON).andId(SystemUser.OseeSystem).getResults().getExactlyOne();
    }
 
    @Override

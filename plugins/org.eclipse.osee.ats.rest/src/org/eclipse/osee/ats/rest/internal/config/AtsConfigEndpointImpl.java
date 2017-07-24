@@ -128,7 +128,7 @@ public final class AtsConfigEndpointImpl implements AtsConfigEndpointApi {
          configs.getUsers().add((AtsUser) user);
       }
       // load admins
-      ArtifactReadable atsAdminArt = orcsApi.getQueryFactory().fromBranch(services.getAtsBranch()).andIds(
+      ArtifactReadable atsAdminArt = orcsApi.getQueryFactory().fromBranch(services.getAtsBranch()).andId(
          AtsArtifactToken.AtsAdmin).getResults().getAtMostOneOrNull();
       if (atsAdminArt != null) {
          for (ArtifactReadable member : atsAdminArt.getRelated(CoreRelationTypes.Users_User)) {
@@ -381,7 +381,7 @@ public final class AtsConfigEndpointImpl implements AtsConfigEndpointApi {
 
    private ArtifactId introduceAndRelateTo(TransactionBuilder tx, org.eclipse.osee.orcs.data.BranchReadable fromBranch, ArtifactToken introToken, BranchReadable newBranch, ArtifactToken relateToToken, ArtifactId relateToArt) {
       ArtifactReadable introArt =
-         orcsApi.getQueryFactory().fromBranch(fromBranch).andIds(introToken).getResults().getAtMostOneOrNull();
+         orcsApi.getQueryFactory().fromBranch(fromBranch).andId(introToken).getResults().getAtMostOneOrNull();
       if (introArt == null) {
          introArt =
             orcsApi.getQueryFactory().fromBranch(fromBranch).andTypeEquals(introToken.getArtifactType()).andNameEquals(
@@ -391,7 +391,7 @@ public final class AtsConfigEndpointImpl implements AtsConfigEndpointApi {
       ArtifactId artifact = tx.introduceArtifact(fromBranch, introArt);
       if (relateToToken != null) {
          relateToArt =
-            orcsApi.getQueryFactory().fromBranch(newBranch).andIds(relateToToken).getResults().getAtMostOneOrNull();
+            orcsApi.getQueryFactory().fromBranch(newBranch).andId(relateToToken).getResults().getAtMostOneOrNull();
          if (relateToArt == null) {
             relateToArt = orcsApi.getQueryFactory().fromBranch(newBranch).andTypeEquals(
                relateToToken.getArtifactType()).andNameEquals(
