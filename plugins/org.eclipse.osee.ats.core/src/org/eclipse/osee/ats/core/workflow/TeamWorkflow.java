@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.ats.core.workflow;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import org.eclipse.osee.ats.api.IAtsServices;
@@ -20,6 +21,7 @@ import org.eclipse.osee.ats.api.workflow.IAtsTeamWorkflow;
 import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
+import org.eclipse.osee.framework.jdk.core.util.Conditions;
 import org.eclipse.osee.logger.Log;
 
 /**
@@ -34,14 +36,11 @@ public class TeamWorkflow extends WorkItem implements IAtsTeamWorkflow {
    @Override
    public Set<IAtsActionableItem> getActionableItems() throws OseeCoreException {
       Set<IAtsActionableItem> ais = new HashSet<>();
-      for (Object aiObj : services.getAttributeResolver().getAttributeValues(artifact,
-         AtsAttributeTypes.ActionableItemReference)) {
-         String aiId = (String) aiObj;
-         IAtsActionableItem ai = services.getConfigItem(aiId);
-         if (ai == null) {
-            ArtifactId aiArt = services.getArtifact(Long.valueOf(aiId));
-            ai = services.getConfigItemFactory().getActionableItem(aiArt);
-         }
+      Collection<ArtifactId> artIds =
+         services.getAttributeResolver().getArtifactIdReferences(artifact, AtsAttributeTypes.ActionableItemReference);
+      for (ArtifactId artId : artIds) {
+         IAtsActionableItem ai = services.getConfigItem(artId);
+         Conditions.assertNotNull(ai, "ai can not be null for artId %s", artId);
          ais.add(ai);
       }
       return ais;

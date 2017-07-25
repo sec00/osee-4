@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.osee.ats.core.workflow;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import org.eclipse.osee.ats.api.IAtsObject;
 import org.eclipse.osee.ats.api.workdef.IAttributeResolver;
 import org.eclipse.osee.framework.core.data.ArtifactId;
@@ -40,6 +43,17 @@ public abstract class AbstractAtsAttributeResolverService implements IAttributeR
          result = ArtifactId.valueOf(id);
       }
       return result;
+   }
+
+   @Override
+   public Collection<ArtifactId> getArtifactIdReferences(ArtifactToken artifact, AttributeTypeToken artifactReferencedAttributeType) {
+      List<ArtifactId> results = new LinkedList<>();
+      for (String id : getAttributesToStringList(artifact, artifactReferencedAttributeType)) {
+         if (Strings.isNumeric(id)) {
+            results.add(ArtifactId.valueOf(id));
+         }
+      }
+      return results;
    }
 
 }
