@@ -28,6 +28,7 @@ import org.eclipse.osee.disposition.model.DispoItemData;
 import org.eclipse.osee.disposition.model.DispoSet;
 import org.eclipse.osee.disposition.model.DispoSetData;
 import org.eclipse.osee.disposition.model.DispoSetDescriptorData;
+import org.eclipse.osee.disposition.model.DispoStorageMetadata;
 import org.eclipse.osee.disposition.model.DispoStrings;
 import org.eclipse.osee.disposition.model.DispoSummarySeverity;
 import org.eclipse.osee.disposition.model.Note;
@@ -142,7 +143,13 @@ public class DispoApiImpl implements DispoApi {
          DispoItem updatedItem;
          updatedItem = dataFactory.createUpdatedItem(annotationsList, discrepanciesList);
          ArtifactReadable author = getQuery().findUser();
-         getWriter().updateDispoItem(author, branch, dispoItem.getGuid(), updatedItem);
+
+         DispoStorageMetadata metadata = new DispoStorageMetadata();
+         getWriter().updateDispoItem(author, branch, dispoItem.getGuid(), updatedItem, metadata);
+         if (metadata.isStatusUpdated()) {
+            // notifiy ci
+         }
+
       }
       return idOfNewAnnotation;
    }
@@ -174,7 +181,11 @@ public class DispoApiImpl implements DispoApi {
 
       if (dispoItemToEdit != null && newDispoItem.getAnnotationsList() == null && newDispoItem.getDiscrepanciesList() == null) { // We will not allow the user to do mass edit of Annotations or discrepancies
          ArtifactReadable author = getQuery().findUser();
-         getWriter().updateDispoItem(author, branch, dispoItemToEdit.getGuid(), newDispoItem);
+         DispoStorageMetadata metadata = new DispoStorageMetadata();
+         getWriter().updateDispoItem(author, branch, dispoItemToEdit.getGuid(), newDispoItem, metadata);
+         if (metadata.isStatusUpdated()) {
+            // notifiy ci
+         }
          wasUpdated = true;
       }
       return wasUpdated;
@@ -238,7 +249,11 @@ public class DispoApiImpl implements DispoApi {
       boolean wasUpdated = false;
 
       ArtifactReadable author = getQuery().findUser();
-      getWriter().updateDispoItems(author, branch, dispoItems, resetRerunFlag, operation);
+      DispoStorageMetadata metadata = new DispoStorageMetadata();
+      getWriter().updateDispoItems(author, branch, dispoItems, resetRerunFlag, operation, metadata);
+      if (metadata.isStatusUpdated()) {
+         // notifiy ci
+      }
       wasUpdated = true;
       return wasUpdated;
    }
@@ -285,7 +300,12 @@ public class DispoApiImpl implements DispoApi {
 
          modifiedDispoItem.setAnnotationsList(annotationsList);
          modifiedDispoItem.setStatus(dispoConnector.getItemStatus(modifiedDispoItem));
-         getWriter().updateDispoItem(author, branch, dispoItem.getGuid(), modifiedDispoItem);
+
+         DispoStorageMetadata metadata = new DispoStorageMetadata();
+         getWriter().updateDispoItem(author, branch, dispoItem.getGuid(), modifiedDispoItem, metadata);
+         if (metadata.isStatusUpdated()) {
+            // notifiy ci
+         }
 
          wasUpdated = true;
       }
@@ -309,7 +329,11 @@ public class DispoApiImpl implements DispoApi {
          DispoItem updatedItem = dataFactory.createUpdatedItem(newAnnotationsList, discrepanciesList);
 
          ArtifactReadable author = getQuery().findUser();
-         getWriter().updateDispoItem(author, branch, dispoItem.getGuid(), updatedItem);
+         DispoStorageMetadata metadata = new DispoStorageMetadata();
+         getWriter().updateDispoItem(author, branch, dispoItem.getGuid(), updatedItem, metadata);
+         if (metadata.isStatusUpdated()) {
+            // notifiy ci
+         }
          wasUpdated = true;
       }
       return wasUpdated;

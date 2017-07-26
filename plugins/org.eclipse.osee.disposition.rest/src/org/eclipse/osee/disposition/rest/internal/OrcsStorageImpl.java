@@ -25,6 +25,7 @@ import java.util.Set;
 import org.eclipse.osee.disposition.model.DispoConfig;
 import org.eclipse.osee.disposition.model.DispoItem;
 import org.eclipse.osee.disposition.model.DispoSet;
+import org.eclipse.osee.disposition.model.DispoStorageMetadata;
 import org.eclipse.osee.disposition.model.OperationReport;
 import org.eclipse.osee.disposition.rest.DispoConstants;
 import org.eclipse.osee.disposition.rest.internal.importer.coverage.CoverageUtil;
@@ -328,7 +329,7 @@ public class OrcsStorageImpl implements Storage {
       tx.commit();
    }
 
-   private void updateSingleItem(ArtifactReadable author, BranchId branch, ArtifactReadable currentItemArt, DispoItem newItemData, TransactionBuilder tx, boolean resetRerunFlag) {
+   private void updateSingleItem(ArtifactReadable author, BranchId branch, ArtifactReadable currentItemArt, DispoItem newItemData, TransactionBuilder tx, boolean resetRerunFlag, DispoStorageMetadata metadata) {
       Date lastUpdate = newItemData.getLastUpdate();
       String name = newItemData.getName();
 
@@ -379,6 +380,7 @@ public class OrcsStorageImpl implements Storage {
          tx.setSoleAttributeFromString(currentItemArt, DispoConstants.DispoItemAssignee, assignee);
       }
       if (status != null && !status.equals(origItem.getStatus())) {
+         metadata.setStatusUpdated(true);
          tx.setSoleAttributeFromString(currentItemArt, DispoConstants.DispoItemStatus, status);
       }
       if (lastUpdate != null && !lastUpdate.equals(origItem.getLastUpdate())) {
@@ -418,15 +420,15 @@ public class OrcsStorageImpl implements Storage {
    }
 
    @Override
-   public void updateDispoItem(ArtifactReadable author, BranchId branch, String dispoItemId, DispoItem data) {
+   public void updateDispoItem(ArtifactReadable author, BranchId branch, String dispoItemId, DispoItem data, DispoStorageMetadata metadata) {
       TransactionBuilder tx = getTxFactory().createTransaction(branch, author, "Update Dispo Item");
       ArtifactReadable dispoItemArt = findDispoArtifact(branch, dispoItemId, DispoConstants.DispoItem);
-      updateSingleItem(author, branch, dispoItemArt, data, tx, false);
+      updateSingleItem(author, branch, dispoItemArt, data, tx, false, metadata);
       tx.commit();
    }
 
    @Override
-   public void updateDispoItems(ArtifactReadable author, BranchId branch, Collection<DispoItem> data, boolean resetRerunFlag, String operation) {
+   public void updateDispoItems(ArtifactReadable author, BranchId branch, Collection<DispoItem> data, boolean resetRerunFlag, String operation, DispoStorageMetadata metadata) {
       TransactionBuilder tx = getTxFactory().createTransaction(branch, author, operation);
       boolean isCommitNeeded = false;
 
@@ -435,7 +437,7 @@ public class OrcsStorageImpl implements Storage {
          if (Strings.isValid(itemId)) {
             isCommitNeeded = true;
             ArtifactReadable dispoItemArt = findDispoArtifact(branch, newItem.getGuid(), DispoConstants.DispoItem);
-            updateSingleItem(author, branch, dispoItemArt, newItem, tx, resetRerunFlag);
+            updateSingleItem(author, branch, dispoItemArt, newItem, tx, resetRerunFlag, metadata);
          }
       }
 
