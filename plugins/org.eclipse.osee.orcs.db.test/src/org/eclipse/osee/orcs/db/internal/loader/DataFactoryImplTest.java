@@ -18,10 +18,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.AttributeTypeId;
+import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.BranchId;
-import org.eclipse.osee.framework.core.data.HasLocalId;
 import org.eclipse.osee.framework.core.data.IArtifactType;
-import org.eclipse.osee.framework.core.data.IRelationType;
+import org.eclipse.osee.framework.core.data.RelationTypeId;
 import org.eclipse.osee.framework.core.data.RelationalConstants;
 import org.eclipse.osee.framework.core.data.TransactionId;
 import org.eclipse.osee.framework.core.enums.ModificationType;
@@ -76,6 +76,9 @@ public class DataFactoryImplTest {
    @Mock private IArtifactType artifactTypeToken;
    //@formatter:on
 
+   private final ArtifactId art88 = ArtifactId.valueOf(88);
+   private final ArtifactId art99 = ArtifactId.valueOf(99);
+
    private DataFactory dataFactory;
    private Object[] expectedProxyData;
    private String guid;
@@ -113,7 +116,7 @@ public class DataFactoryImplTest {
       when(attrData.getTypeUuid()).thenReturn(666L);
       when(attrData.getBaseModType()).thenReturn(ModificationType.NEW);
       when(attrData.getBaseTypeUuid()).thenReturn(777L);
-      when(attrData.getArtifactId()).thenReturn(88);
+      when(attrData.getArtifactId()).thenReturn(art88.getId().intValue());
       when(attrData.getDataProxy()).thenReturn(dataProxy);
 
       expectedProxyData = new Object[] {45, "hello", "hello"};
@@ -128,8 +131,8 @@ public class DataFactoryImplTest {
       relData.setTypeUuid(666);
       relData.setBaseModType(ModificationType.NEW);
       relData.setBaseTypeUuid(777);
-      relData.setArtIdA(ArtifactId.valueOf(88));
-      relData.setArtIdB(ArtifactId.valueOf(99));
+      relData.setArtIdA(art88);
+      relData.setArtIdB(art99);
       relData.setRationale("this is the rationale");
    }
 
@@ -248,19 +251,15 @@ public class DataFactoryImplTest {
       assertEquals("", objData[2]);
    }
 
-   @SuppressWarnings("unchecked")
    @Test
    public void testCreateRelationData() throws OseeCoreException {
-      IRelationType relationType = mock(IRelationType.class);
-      HasLocalId<Integer> localId1 = mock(HasLocalId.class);
-      HasLocalId<Integer> localId2 = mock(HasLocalId.class);
+      RelationTypeId relationType = RelationTypeId.valueOf(2389);
 
-      when(relationType.getId()).thenReturn(2389L);
-      when(localId1.getLocalId()).thenReturn(4562);
-      when(localId2.getLocalId()).thenReturn(9513);
+      ArtifactId aArt = ArtifactId.valueOf(4562);
+      ArtifactId bArt = ArtifactId.valueOf(9513);
       when(idFactory.getNextRelationId()).thenReturn(1);
 
-      RelationData actual = dataFactory.createRelationData(relationType, COMMON, localId1, localId2, "My rationale");
+      RelationData actual = dataFactory.createRelationData(relationType, COMMON, aArt, bArt, "My rationale");
 
       VersionData actualVer = actual.getVersion();
       assertEquals(COMMON, actualVer.getBranch());
@@ -276,8 +275,8 @@ public class DataFactoryImplTest {
       assertEquals(RelationalConstants.DEFAULT_MODIFICATION_TYPE, actual.getBaseModType());
       assertEquals(2389L, actual.getBaseTypeUuid());
 
-      assertEquals(4562, actual.getArtIdA());
-      assertEquals(9513, actual.getArtIdB());
+      assertEquals(aArt, actual.getArtifactIdA());
+      assertEquals(bArt, actual.getArtifactIdB());
       assertEquals("My rationale", actual.getRationale());
    }
 
@@ -321,7 +320,7 @@ public class DataFactoryImplTest {
       assertEquals(ModificationType.NEW, actual.getBaseModType());
       assertEquals(777L, actual.getBaseTypeUuid());
 
-      assertEquals(88, actual.getArtifactId());
+      assertEquals(art88, Long.valueOf(actual.getArtifactId()));
       assertNotSame(dataProxy, actual.getDataProxy());
 
       Object[] objData = actual.getDataProxy().getData();
@@ -376,7 +375,7 @@ public class DataFactoryImplTest {
       assertEquals(ModificationType.NEW, actual.getBaseModType());
       assertEquals(777L, actual.getBaseTypeUuid());
 
-      assertEquals(88, actual.getArtifactId());
+      assertEquals(art88, Long.valueOf(actual.getArtifactId()));
       assertNotSame(dataProxy, actual.getDataProxy());
 
       Object[] objData = actual.getDataProxy().getData();
@@ -432,7 +431,7 @@ public class DataFactoryImplTest {
       assertEquals(ModificationType.NEW, actual.getBaseModType());
       assertEquals(777L, actual.getBaseTypeUuid());
 
-      assertEquals(88, actual.getArtifactId());
+      assertEquals(art88, Long.valueOf(actual.getArtifactId()));
       assertNotSame(dataProxy, actual.getDataProxy());
 
       Object[] objData = actual.getDataProxy().getData();
@@ -463,8 +462,8 @@ public class DataFactoryImplTest {
       assertEquals(ModificationType.NEW, actual.getBaseModType());
       assertEquals(777L, actual.getBaseTypeUuid());
 
-      assertEquals(88, actual.getArtIdA());
-      assertEquals(99, actual.getArtIdB());
+      assertEquals(art88, actual.getArtifactIdA());
+      assertEquals(art99, actual.getArtifactIdB());
       assertEquals("this is the rationale", actual.getRationale());
    }
 
