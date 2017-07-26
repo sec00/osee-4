@@ -487,7 +487,7 @@ public class WfeWorkFlowTab extends FormPage implements IWorldViewerEventHandler
       toolBarMgr.add(new AddNoteAction(awa, editor));
       toolBarMgr.add(new OpenInAtsWorldAction(awa));
       toolBarMgr.add(new OpenActionViewAction());
-      if (AtsUtilClient.isAtsAdmin()) {
+      if (AtsClientService.get().getUserService().isAtsAdmin()) {
          toolBarMgr.add(new OpenInArtifactEditorAction(editor));
       }
       toolBarMgr.add(new OpenVersionArtifactAction(awa));
