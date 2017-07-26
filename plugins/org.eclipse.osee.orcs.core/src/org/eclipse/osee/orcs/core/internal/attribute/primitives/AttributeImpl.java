@@ -16,6 +16,7 @@ import java.lang.ref.Reference;
 import org.eclipse.osee.framework.core.data.AttributeTypeId;
 import org.eclipse.osee.framework.core.data.AttributeTypeToken;
 import org.eclipse.osee.framework.core.enums.ModificationType;
+import org.eclipse.osee.framework.jdk.core.type.Id;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.OseeStateException;
 import org.eclipse.osee.framework.jdk.core.util.Conditions;
@@ -321,4 +322,14 @@ public abstract class AttributeImpl<T> implements Comparable<AttributeImpl<T>>, 
       return getOrcsData().getId();
    }
 
+   @Override
+   public boolean equals(Object obj) {
+      if (obj instanceof Id) {
+         return getId().equals(((Id) obj).getId());
+      }
+      if (obj instanceof Long) {
+         return getId().equals(obj);
+      }
+      return false;
+   }
 }
