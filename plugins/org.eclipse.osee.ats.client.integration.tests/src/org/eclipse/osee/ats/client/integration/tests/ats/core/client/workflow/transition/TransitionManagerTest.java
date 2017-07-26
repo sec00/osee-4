@@ -21,6 +21,7 @@ import org.eclipse.osee.ats.api.task.IAtsTaskService;
 import org.eclipse.osee.ats.api.team.IAtsTeamDefinition;
 import org.eclipse.osee.ats.api.user.IAtsUser;
 import org.eclipse.osee.ats.api.util.IAtsChangeSet;
+import org.eclipse.osee.ats.api.version.IAtsVersion;
 import org.eclipse.osee.ats.api.workdef.IAtsStateDefinition;
 import org.eclipse.osee.ats.api.workdef.JaxAtsWorkDef;
 import org.eclipse.osee.ats.api.workdef.StateType;
@@ -48,6 +49,7 @@ import org.eclipse.osee.ats.core.workflow.state.TeamState;
 import org.eclipse.osee.ats.core.workflow.transition.TransitionFactory;
 import org.eclipse.osee.ats.core.workflow.transition.TransitionHelper;
 import org.eclipse.osee.ats.core.workflow.transition.TransitionManager;
+import org.eclipse.osee.ats.demo.api.DemoArtifactToken;
 import org.eclipse.osee.framework.core.enums.DemoUsers;
 import org.eclipse.osee.framework.core.enums.SystemUser;
 import org.eclipse.osee.framework.core.util.Result;
@@ -137,6 +139,7 @@ public class TransitionManagerTest {
    @org.junit.Test
    public void testHandleTransitionValidation__MustBeAssigned() throws OseeCoreException {
       AtsTestUtil.cleanupAndReset("TransitionManagerTest-B");
+      AtsClientService.get().clearCaches();
       TeamWorkFlowArtifact teamArt = AtsTestUtil.getTeamWf();
       IAtsTeamDefinition teamDef = teamArt.getTeamDefinition();
       Assert.assertNotNull(teamDef);
@@ -213,6 +216,7 @@ public class TransitionManagerTest {
    @org.junit.Test
    public void testHandleTransitionValidation__WorkingBranchTransitionable() throws OseeCoreException {
       AtsTestUtil.cleanupAndReset("TransitionManagerTest-C");
+      AtsClientService.get().clearCaches();
       TeamWorkFlowArtifact teamArt = AtsTestUtil.getTeamWf();
       MockTransitionHelper helper = new MockTransitionHelper(getClass().getSimpleName(), Arrays.asList(teamArt),
          AtsTestUtil.getImplementStateDef().getName(),
@@ -221,9 +225,14 @@ public class TransitionManagerTest {
       IAtsTransitionManager transMgr = TransitionFactory.getTransitionManager(helper);
       TransitionResults results = new TransitionResults();
 
+      IAtsChangeSet changes = AtsClientService.get().createChangeSet(getClass().getSimpleName());
+      IAtsVersion version = AtsClientService.get().getConfigItem(DemoArtifactToken.SAW_Bld_1);
+      AtsClientService.get().getVersionService().setTargetedVersion(teamArt, version, changes);
+      changes.execute();
+
       // this should pass
       transMgr.handleTransitionValidation(results);
-      Assert.assertTrue("Test wasn't reset to allow transition", results.isEmpty());
+      Assert.assertTrue("Test wasn't reset to allow transition - " + results.toString(), results.isEmpty());
 
       // attempt to transition to Implement with working branch
       helper.setWorkingBranchInWork(true);
@@ -461,7 +470,7 @@ public class TransitionManagerTest {
          jaxWorkDef.setName(AtsTestUtil.WORK_DEF_NAME);
          jaxWorkDef.setWorkDefDsl(atsDsl);
          AtsTestUtil.importWorkDefinition(jaxWorkDef);
-         AtsClientService.get().getWorkDefinitionService().clearCaches();
+         AtsClientService.get().clearCaches();
       } catch (Exception ex) {
          throw new OseeCoreException(ex, "Error importing " + workDefFilename);
       }
