@@ -380,7 +380,7 @@ public class OrcsStorageImpl implements Storage {
          tx.setSoleAttributeFromString(currentItemArt, DispoConstants.DispoItemAssignee, assignee);
       }
       if (status != null && !status.equals(origItem.getStatus())) {
-         metadata.setStatusUpdated(true);
+         metadata.addIdOfUpdatedItem(newItemData.getGuid());
          tx.setSoleAttributeFromString(currentItemArt, DispoConstants.DispoItemStatus, status);
       }
       if (lastUpdate != null && !lastUpdate.equals(origItem.getLastUpdate())) {

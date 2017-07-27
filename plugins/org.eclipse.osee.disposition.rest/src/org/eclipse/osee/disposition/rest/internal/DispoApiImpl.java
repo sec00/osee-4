@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.disposition.rest.internal;
 
+import static java.util.Collections.singleton;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +36,7 @@ import org.eclipse.osee.disposition.model.Note;
 import org.eclipse.osee.disposition.model.OperationReport;
 import org.eclipse.osee.disposition.rest.DispoApi;
 import org.eclipse.osee.disposition.rest.DispoImporterApi;
+import org.eclipse.osee.disposition.rest.external.DispoUpdateBroadcaster;
 import org.eclipse.osee.disposition.rest.internal.importer.DispoImporterFactory;
 import org.eclipse.osee.disposition.rest.internal.importer.DispoImporterFactory.ImportFormat;
 import org.eclipse.osee.disposition.rest.internal.importer.DispoSetCopier;
@@ -61,6 +63,7 @@ public class DispoApiImpl implements DispoApi {
    private DispoConnector dispoConnector;
    private DispoResolutionValidator resolutionValidator;
    private DispoImporterFactory importerFactory;
+   private DispoUpdateBroadcaster updateBroadcaster;
 
    public void setExecutor(ExecutorAdmin executor) {
       this.executor = executor;
@@ -84,6 +87,10 @@ public class DispoApiImpl implements DispoApi {
 
    public void setResolutionValidator(DispoResolutionValidator resolutionValidator) {
       this.resolutionValidator = resolutionValidator;
+   }
+
+   public void setDispoUpdateBroadcaster(DispoUpdateBroadcaster updateBroadcater) {
+      this.updateBroadcaster = updateBroadcater;
    }
 
    public void start() {
@@ -146,8 +153,8 @@ public class DispoApiImpl implements DispoApi {
 
          DispoStorageMetadata metadata = new DispoStorageMetadata();
          getWriter().updateDispoItem(author, branch, dispoItem.getGuid(), updatedItem, metadata);
-         if (metadata.isStatusUpdated()) {
-            // notifiy ci
+         if (!metadata.getIdsOfUpdatedItems().isEmpty()) {
+            updateBroadcaster.broadcastUpdateItems(metadata.getIdsOfUpdatedItems(), singleton(dispoItem));
          }
 
       }
@@ -183,8 +190,8 @@ public class DispoApiImpl implements DispoApi {
          ArtifactReadable author = getQuery().findUser();
          DispoStorageMetadata metadata = new DispoStorageMetadata();
          getWriter().updateDispoItem(author, branch, dispoItemToEdit.getGuid(), newDispoItem, metadata);
-         if (metadata.isStatusUpdated()) {
-            // notifiy ci
+         if (!metadata.getIdsOfUpdatedItems().isEmpty()) {
+            updateBroadcaster.broadcastUpdateItems(metadata.getIdsOfUpdatedItems(), singleton(newDispoItem));
          }
          wasUpdated = true;
       }
@@ -251,8 +258,8 @@ public class DispoApiImpl implements DispoApi {
       ArtifactReadable author = getQuery().findUser();
       DispoStorageMetadata metadata = new DispoStorageMetadata();
       getWriter().updateDispoItems(author, branch, dispoItems, resetRerunFlag, operation, metadata);
-      if (metadata.isStatusUpdated()) {
-         // notifiy ci
+      if (!metadata.getIdsOfUpdatedItems().isEmpty()) {
+         updateBroadcaster.broadcastUpdateItems(metadata.getIdsOfUpdatedItems(), dispoItems);
       }
       wasUpdated = true;
       return wasUpdated;
@@ -303,8 +310,8 @@ public class DispoApiImpl implements DispoApi {
 
          DispoStorageMetadata metadata = new DispoStorageMetadata();
          getWriter().updateDispoItem(author, branch, dispoItem.getGuid(), modifiedDispoItem, metadata);
-         if (metadata.isStatusUpdated()) {
-            // notifiy ci
+         if (!metadata.getIdsOfUpdatedItems().isEmpty()) {
+            updateBroadcaster.broadcastUpdateItems(metadata.getIdsOfUpdatedItems(), singleton(modifiedDispoItem));
          }
 
          wasUpdated = true;
@@ -331,7 +338,7 @@ public class DispoApiImpl implements DispoApi {
          ArtifactReadable author = getQuery().findUser();
          DispoStorageMetadata metadata = new DispoStorageMetadata();
          getWriter().updateDispoItem(author, branch, dispoItem.getGuid(), updatedItem, metadata);
-         if (metadata.isStatusUpdated()) {
+         if (!metadata.getIdsOfUpdatedItems().isEmpty()) {
             // notifiy ci
          }
          wasUpdated = true;
@@ -554,4 +561,5 @@ public class DispoApiImpl implements DispoApi {
    public DispoConfig getDispoConfig(BranchId branch) {
       return getQuery().findDispoConfig(branch);
    }
+
 }

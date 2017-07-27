@@ -5,20 +5,22 @@
  */
 package org.eclipse.osee.disposition.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class DispoStorageMetadata {
 
-   private boolean isStatusUpdated = false;
-
-   public boolean isStatusUpdated() {
-      return isStatusUpdated;
-   }
-
-   public void setStatusUpdated(boolean isStatusUpdated) {
-      this.isStatusUpdated = isStatusUpdated;
-   }
+   private final Set<String> idsOfUpdatedItems = new HashSet<>();
 
    public DispoStorageMetadata() {
 
    }
 
+   public Set<String> getIdsOfUpdatedItems() {
+      return idsOfUpdatedItems;
+   }
+
+   public void addIdOfUpdatedItem(String id) {
+      idsOfUpdatedItems.add(id);
+   }
 }
