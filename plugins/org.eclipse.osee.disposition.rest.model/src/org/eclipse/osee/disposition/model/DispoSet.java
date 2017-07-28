@@ -29,4 +29,6 @@ public interface DispoSet extends Identifiable<String> {
    String getDispoType();
 
    OperationReport getOperationSummary();
+
+   String getCiSet();
 }

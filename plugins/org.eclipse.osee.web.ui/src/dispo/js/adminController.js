@@ -331,7 +331,18 @@ app.controller('adminController', [
 		            	$scope.isRunningOperation = false;
 		            	$scope.getSetImportDetails(destinationSet);
 		            });
-		        }
+		        };
+		        
+		        
+		        $scope.configureCiSet = function setCiSet(inputs) {
+		        	var localSet =  $scope.getSetById(inputs.ciDispositionSet);
+		        	localSet.ciSet = inputs.ciSet;
+		            Set.update({
+	                programId: $scope.programSelection,
+	                setId: inputs.ciDispositionSet,
+	                }, localSet);
+		        };
+		        
 		        
 		        // -------------------- Summary Grids ----------------------\\
 		        var filterBarPlugin = {
@@ -653,7 +664,40 @@ app.controller('adminController', [
 		                $modalInstance.dismiss('cancel');
 		            };
 		        };
+		        
+		        // Configure/Set CI Set
+		        $scope.openConfigureCiSetModal = function() {
+		        	 var modalInstance = $modal.open({
+			                templateUrl: 'configureCiSet.html',
+			                controller: ConfigureCiSetCtrl,
+			                size: 'sm',
+			                windowClass: 'ConfigureCiSetModal',
+			                resolve: {
+			                	sets: function() {
+			                		return $scope.sets;
+			                	}
+			                }
+			            });
 
+			            modalInstance.result.then(function(inputs) {
+			            	$scope.configureCiSet(inputs);
+			            });
+		        }
+		        
+		        var ConfigureCiSetCtrl = function($scope, $modalInstance, sets) {
+		        	$scope.ciSet =  "";
+		        	$scope.ciDispositionSet = "";
+		        	$scope.setsLocal = angular.copy(sets);
+		            $scope.ok = function() {
+		                var inputs = {};
+		                inputs.ciSet = this.ciSet
+		                inputs.ciDispositionSet = this.dispositionSet;
+		                $modalInstance.close(inputs);
+		            };
 
+		            $scope.cancel = function() {
+		                $modalInstance.dismiss('cancel');
+		            };
+		        }
 		    }
 		]);

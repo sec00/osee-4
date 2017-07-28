@@ -236,6 +236,7 @@ public class OrcsStorageImpl implements Storage {
       tx.setSoleAttributeFromString(creatdArtId, DispoConstants.DispoType, descriptor.getDispoType());
       JSONArray notesJarray = DispoUtil.noteListToJsonObj(descriptor.getNotesList());
       tx.setSoleAttributeFromString(creatdArtId, DispoConstants.DispoNotesJson, notesJarray.toString());
+      tx.setSoleAttributeFromString(creatdArtId, DispoConstants.DispoCiSet, descriptor.getCiSet());
       tx.commit();
       return creatdArtId.getUuid();
    }
@@ -270,6 +271,7 @@ public class OrcsStorageImpl implements Storage {
 
       String name = newData.getName();
       String importPath = newData.getImportPath();
+      String ciSet = newData.getCiSet();
 
       JSONArray notesList = null;
       if (newData.getNotesList() != null) {
@@ -285,6 +287,14 @@ public class OrcsStorageImpl implements Storage {
       }
       if (notesList != null && !notesList.toString().equals(origSetAs.getNotesList().toString())) {
          tx.setSoleAttributeFromString(dispoSet, DispoConstants.DispoNotesJson, notesList.toString());
+      }
+      if (ciSet != null && !ciSet.equals(origSetAs.getCiSet())) {
+         String ciSetAttr = dispoSet.getSoleAttributeAsString(DispoConstants.DispoCiSet, null);
+         if (ciSetAttr == null) {
+            tx.createAttribute(dispoSet, DispoConstants.DispoCiSet, ciSet);
+         } else {
+            tx.setSoleAttributeFromString(dispoSet, DispoConstants.DispoCiSet, ciSet);
+         }
       }
       tx.commit();
    }
@@ -574,4 +584,5 @@ public class OrcsStorageImpl implements Storage {
          DispoUtil.operationReportToString(newReport));
       tx.commit();
    }
+
 }
