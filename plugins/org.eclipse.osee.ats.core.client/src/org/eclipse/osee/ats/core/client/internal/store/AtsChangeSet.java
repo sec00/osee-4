@@ -36,6 +36,7 @@ import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.AttributeId;
 import org.eclipse.osee.framework.core.data.AttributeTypeId;
+import org.eclipse.osee.framework.core.data.AttributeTypeToken;
 import org.eclipse.osee.framework.core.data.IArtifactType;
 import org.eclipse.osee.framework.core.data.IAttribute;
 import org.eclipse.osee.framework.core.data.RelationTypeSide;
@@ -408,6 +409,13 @@ public class AtsChangeSet extends AbstractAtsChangeSet {
    public void unrelateFromAll(RelationTypeSide relationSide, ArtifactId artifact) {
       Artifact art = getArtifact(artifact);
       art.deleteRelations(relationSide);
+   }
+
+   @Override
+   public void deleteAttributes(ArtifactId artifact, AttributeTypeToken attributeType) {
+      Artifact art = getArtifact(artifact);
+      art.deleteAttributes(attributeType);
+      add(art);
    }
 
 }
