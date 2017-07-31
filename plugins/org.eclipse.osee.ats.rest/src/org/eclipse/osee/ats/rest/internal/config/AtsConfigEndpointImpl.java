@@ -48,6 +48,7 @@ import org.eclipse.osee.ats.api.user.IAtsUser;
 import org.eclipse.osee.ats.api.workdef.JaxAtsWorkDef;
 import org.eclipse.osee.ats.api.workdef.WorkDefData;
 import org.eclipse.osee.ats.core.users.AtsCoreUsers;
+import org.eclipse.osee.ats.core.util.AtsUtilCore;
 import org.eclipse.osee.ats.rest.IAtsServer;
 import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
@@ -63,6 +64,7 @@ import org.eclipse.osee.framework.jdk.core.type.ResultSet;
 import org.eclipse.osee.framework.jdk.core.type.ViewModel;
 import org.eclipse.osee.framework.jdk.core.util.Conditions;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
+import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.jaxrs.OseeWebApplicationException;
 import org.eclipse.osee.logger.Log;
 import org.eclipse.osee.orcs.OrcsApi;
@@ -93,8 +95,20 @@ public final class AtsConfigEndpointImpl implements AtsConfigEndpointApi {
       Thread thread = new Thread("ATS Configuration Re-Loader") {
          @Override
          public void run() {
-            AtsConfigurations configs = getAtsConfigurationsFromDb();
-            atsConfigurations = configs;
+            while (true) {
+               AtsConfigurations configs = getAtsConfigurationsFromDb();
+               atsConfigurations = configs;
+               try {
+                  long reloadTime = AtsUtilCore.SERVER_CONFIG_RELOAD_MS_DEFAULT;
+                  String reloadTimeStr = services.getConfigValue(AtsUtilCore.SERVER_CONFIG_RELOAD_MS_KEY);
+                  if (Strings.isNumeric(reloadTimeStr)) {
+                     reloadTime = Long.valueOf(reloadTimeStr);
+                  }
+                  Thread.sleep(reloadTime);
+               } catch (InterruptedException ex) {
+                  // do nothing
+               }
+            }
          }
       };
       thread.start();
