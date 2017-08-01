@@ -455,6 +455,8 @@ public class DispoApiImpl implements DispoApi {
          } catch (Exception ex) {
             throw new OseeCoreException(ex);
          }
+      } else if (operation.equals(DispoStrings.Operation_MassSendStatus)) {
+         MassSendDispoItemStatus(branch, setToEdit);
       }
 
       // Create the Note to document the Operation
@@ -464,6 +466,19 @@ public class DispoApiImpl implements DispoApi {
 
       // Generate report
       getWriter().updateOperationSummary(author, branch, setToEdit.getGuid(), report);
+   }
+
+   private void MassSendDispoItemStatus(BranchId branch, DispoSet set) {
+      try {
+         HashMap<String, DispoItem> nameToItemMap = getItemsMap(branch, set);
+         Collection<String> ids = new ArrayList<>();
+         for (DispoItem item : nameToItemMap.values()) {
+            ids.add(item.getGuid());
+         }
+         updateBroadcaster.broadcastUpdateItems(ids, nameToItemMap.values(), set);
+      } catch (Exception ex) {
+         throw new OseeCoreException(ex);
+      }
    }
 
    private HashMap<String, DispoItem> getItemsMap(BranchId branch, DispoSet set) {

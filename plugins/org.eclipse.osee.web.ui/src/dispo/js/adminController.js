@@ -344,6 +344,16 @@ app.controller('adminController', [
 		        };
 		        
 		        
+		        $scope.massSendDispoItemStatus = function massSendDispoItemStatus (set) {
+		        	var newSet = $scope.getSetById(set.ciDispositionSet);
+		        	newSet.operation = "MassSendDispoItemStatus";
+		        	Set.update({
+		        		programId: $scope.programSelection,
+		        		setId: set.ciDispositionSet
+		        	}, newSet);
+		        };
+		        
+		        
 		        // -------------------- Summary Grids ----------------------\\
 		        var filterBarPlugin = {
 		                init: function(scope, grid) {
@@ -691,6 +701,39 @@ app.controller('adminController', [
 		            $scope.ok = function() {
 		                var inputs = {};
 		                inputs.ciSet = this.ciSet
+		                inputs.ciDispositionSet = this.dispositionSet;
+		                $modalInstance.close(inputs);
+		            };
+
+		            $scope.cancel = function() {
+		                $modalInstance.dismiss('cancel');
+		            };
+		        }
+		        
+		        // Mass Send Disposition Item Status
+		        $scope.openMassSendDispoItemStatusModal = function() {
+		        	 var modalInstance = $modal.open({
+			                templateUrl: 'massSendDispoItemStatus.html',
+			                controller: MassSendDispoItemStatusCtrl,
+			                size: 'sm',
+			                windowClass: 'MassSendDispoItemStatusModal',
+			                resolve: {
+			                	sets: function() {
+			                		return $scope.sets;
+			                	}
+			                }
+			            });
+
+			            modalInstance.result.then(function(inputs) {
+			            	$scope.massSendDispoItemStatus(inputs);
+			            });
+		        }
+		        
+		        var MassSendDispoItemStatusCtrl = function($scope, $modalInstance, sets) {
+		        	$scope.ciDispositionSet = "";
+		        	$scope.setsLocal = angular.copy(sets);
+		            $scope.ok = function() {
+		                var inputs = {};
 		                inputs.ciDispositionSet = this.dispositionSet;
 		                $modalInstance.close(inputs);
 		            };
