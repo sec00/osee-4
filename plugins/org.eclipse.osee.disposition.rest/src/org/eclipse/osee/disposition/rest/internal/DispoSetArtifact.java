@@ -91,4 +91,5 @@ public class DispoSetArtifact extends BaseIdentity<String> implements DispoSet {
    public String getCiSet() {
       return artifact.getSoleAttributeAsString(DispoConstants.DispoCiSet, "");
    }
+
 }

@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import org.eclipse.osee.disposition.model.DispoItem;
+import org.eclipse.osee.disposition.model.DispoSet;
 import org.eclipse.osee.logger.Log;
 
 public class DispoUpdateBroadcaster {
@@ -32,9 +33,9 @@ public class DispoUpdateBroadcaster {
       listeners.add(listener);
    }
 
-   public void broadcastUpdateItems(Collection<String> ids, Collection<DispoItem> items) {
+   public void broadcastUpdateItems(Collection<String> ids, Collection<DispoItem> items, DispoSet set) {
       for (DispoListenerApi listener : listeners) {
-         listener.onUpdateItemStats(ids, items);
+         listener.onUpdateItemStats(ids, items, set);
       }
    }
 }

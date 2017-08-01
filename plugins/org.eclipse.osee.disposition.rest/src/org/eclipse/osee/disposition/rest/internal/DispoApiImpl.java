@@ -154,7 +154,8 @@ public class DispoApiImpl implements DispoApi {
          DispoStorageMetadata metadata = new DispoStorageMetadata();
          getWriter().updateDispoItem(author, branch, dispoItem.getGuid(), updatedItem, metadata);
          if (!metadata.getIdsOfUpdatedItems().isEmpty()) {
-            updateBroadcaster.broadcastUpdateItems(metadata.getIdsOfUpdatedItems(), singleton(dispoItem));
+            updateBroadcaster.broadcastUpdateItems(metadata.getIdsOfUpdatedItems(), singleton(dispoItem),
+               getDispoItemParentSet(branch, itemId));
          }
 
       }
@@ -191,7 +192,8 @@ public class DispoApiImpl implements DispoApi {
          DispoStorageMetadata metadata = new DispoStorageMetadata();
          getWriter().updateDispoItem(author, branch, dispoItemToEdit.getGuid(), newDispoItem, metadata);
          if (!metadata.getIdsOfUpdatedItems().isEmpty()) {
-            updateBroadcaster.broadcastUpdateItems(metadata.getIdsOfUpdatedItems(), singleton(newDispoItem));
+            updateBroadcaster.broadcastUpdateItems(metadata.getIdsOfUpdatedItems(), singleton(newDispoItem),
+               getDispoItemParentSet(branch, itemId));
          }
          wasUpdated = true;
       }
@@ -239,7 +241,7 @@ public class DispoApiImpl implements DispoApi {
                   DispoSummarySeverity.WARNING);
             }
          }
-         editDispoItems(branch, dispoItems, false, operation);
+         editDispoItems(branch, setId, dispoItems, false, operation);
       } else {
          report.addEntry("Womp womp womp",
             "No items were updated. Please check your 'Items' list and make sure it's a comma seperated list of item names",
@@ -252,14 +254,15 @@ public class DispoApiImpl implements DispoApi {
       return wasUpdated;
    }
 
-   private boolean editDispoItems(BranchId branch, Collection<DispoItem> dispoItems, boolean resetRerunFlag, String operation) {
+   private boolean editDispoItems(BranchId branch, String setId, Collection<DispoItem> dispoItems, boolean resetRerunFlag, String operation) {
       boolean wasUpdated = false;
 
       ArtifactReadable author = getQuery().findUser();
       DispoStorageMetadata metadata = new DispoStorageMetadata();
       getWriter().updateDispoItems(author, branch, dispoItems, resetRerunFlag, operation, metadata);
       if (!metadata.getIdsOfUpdatedItems().isEmpty()) {
-         updateBroadcaster.broadcastUpdateItems(metadata.getIdsOfUpdatedItems(), dispoItems);
+         updateBroadcaster.broadcastUpdateItems(metadata.getIdsOfUpdatedItems(), dispoItems,
+            getDispoSetById(branch, setId));
       }
       wasUpdated = true;
       return wasUpdated;
@@ -311,7 +314,8 @@ public class DispoApiImpl implements DispoApi {
          DispoStorageMetadata metadata = new DispoStorageMetadata();
          getWriter().updateDispoItem(author, branch, dispoItem.getGuid(), modifiedDispoItem, metadata);
          if (!metadata.getIdsOfUpdatedItems().isEmpty()) {
-            updateBroadcaster.broadcastUpdateItems(metadata.getIdsOfUpdatedItems(), singleton(modifiedDispoItem));
+            updateBroadcaster.broadcastUpdateItems(metadata.getIdsOfUpdatedItems(), singleton(modifiedDispoItem),
+               getDispoItemParentSet(branch, itemId));
          }
 
          wasUpdated = true;
@@ -444,7 +448,7 @@ public class DispoApiImpl implements DispoApi {
                   createDispoItems(branch, setToEdit.getGuid(), itemsToCreate);
                }
                if (itemsToEdit.size() > 0) {
-                  editDispoItems(branch, itemsToEdit, true, "Import");
+                  editDispoItems(branch, setToEdit.getGuid(), itemsToEdit, true, "Import");
                }
             }
 
@@ -511,7 +515,7 @@ public class DispoApiImpl implements DispoApi {
       String operation =
          String.format("Copy From Legacy Coverage - Branch [%s] and Source Set [%s]", sourceBranch, sourceCoverageUuid);
       if (!copyData.isEmpty()) {
-         editDispoItems(destBranch, copyData, false, operation);
+         editDispoItems(destBranch, destSetId, copyData, false, operation);
          storageProvider.get().updateOperationSummary(getQuery().findUser(), destBranch, destSetId, report);
       }
    }
@@ -551,7 +555,7 @@ public class DispoApiImpl implements DispoApi {
 
       String operation = String.format("Copy Set from Program [%s] and Set [%s]", sourceBranch, sourceSetId);
       if (!namesToToEditItems.isEmpty() && !report.getStatus().isFailed()) {
-         editDispoItems(branch, namesToToEditItems.values(), false, operation);
+         editDispoItems(branch, destSetId, namesToToEditItems.values(), false, operation);
          storageProvider.get().updateOperationSummary(getQuery().findUser(), branch, destSetId, report);
       }
 
@@ -560,6 +564,12 @@ public class DispoApiImpl implements DispoApi {
    @Override
    public DispoConfig getDispoConfig(BranchId branch) {
       return getQuery().findDispoConfig(branch);
+   }
+
+   @Override
+   public DispoSet getDispoItemParentSet(BranchId branch, String itemId) {
+      Long id = getQuery().getDispoItemParentSet(branch, itemId);
+      return getDispoSetById(branch, String.valueOf(id));
    }
 
 }

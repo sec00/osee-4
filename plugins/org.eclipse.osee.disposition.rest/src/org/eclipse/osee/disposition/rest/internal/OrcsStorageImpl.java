@@ -290,7 +290,7 @@ public class OrcsStorageImpl implements Storage {
       }
       if (ciSet != null && !ciSet.equals(origSetAs.getCiSet())) {
          String ciSetAttr = dispoSet.getSoleAttributeAsString(DispoConstants.DispoCiSet, null);
-         if (ciSetAttr == null) {
+         if (ciSetAttr != null) {
             tx.createAttribute(dispoSet, DispoConstants.DispoCiSet, ciSet);
          } else {
             tx.setSoleAttributeFromString(dispoSet, DispoConstants.DispoCiSet, ciSet);
@@ -583,6 +583,12 @@ public class OrcsStorageImpl implements Storage {
       tx.setSoleAttributeFromString(dispoSet, DispoConstants.OperationSummary,
          DispoUtil.operationReportToString(newReport));
       tx.commit();
+   }
+
+   @Override
+   public Long getDispoItemParentSet(BranchId branch, String itemId) {
+      ArtifactReadable artifact = findDispoArtifact(branch, itemId, DispoConstants.DispoItem);
+      return artifact.getParent().getUuid();
    }
 
 }
