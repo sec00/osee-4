@@ -16,7 +16,6 @@ import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.ArtifactTypeId;
 import org.eclipse.osee.framework.core.data.IArtifactType;
 import org.eclipse.osee.framework.core.enums.CoreArtifactTypes;
-import org.eclipse.osee.framework.jdk.core.type.Id;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.util.Collections;
 
@@ -119,8 +118,8 @@ public class AtsUser extends JaxAtsObject implements IAtsUser {
       if (this == obj) {
          return true;
       }
-      if (obj instanceof Id) {
-         return obj.equals(getId());
+      if (!(obj instanceof IAtsUser)) {
+         return false;
       }
       try {
          String thisUserId = getUserId();
