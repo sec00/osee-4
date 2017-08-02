@@ -37,6 +37,7 @@ import org.eclipse.osee.executor.admin.HasCancellation;
 import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.AttributeId;
+import org.eclipse.osee.framework.core.data.GammaId;
 import org.eclipse.osee.framework.core.data.TokenFactory;
 import org.eclipse.osee.framework.core.data.TransactionId;
 import org.eclipse.osee.framework.core.enums.CoreArtifactTokens;
@@ -104,27 +105,34 @@ public class LoaderTest {
    private static ArtifactReadable OseeTypesFrameworkArt;
    private static AttributeId OseeTypesFrameworkNameAttrId;
    private static AttributeId OseeTypesFrameworkActiveAttrId;
-   private static long OseeTypesFrameworkActiveGammaId, OseeTypesFrameworkNameGammaId;
+   private static GammaId OseeTypesFrameworkActiveGammaId;
+   private static GammaId OseeTypesFrameworkActiveGammaIdPlus1;
+   private static GammaId OseeTypesFrameworkActiveGammaIdPlus2;
+   private static GammaId OseeTypesFrameworkNameGammaId;
    private static String OseeTypesFrameworkGuid;
    private static ArtifactReadable OseeTypesClientDemoArt;
    private static AttributeId OseeTypesClientDemoActiveAttrId;
    private static AttributeId OseeTypesClientDemoActiveAttrIdPlus1;
    private static AttributeId OseeTypesClientDemoActiveAttrIdPlus2;
    private static AttributeId OseeTypesClientDemoNameAttrId;
-   private static long OseeTypesClientDemoActiveGammaId, OseeTypesClientDemoNameGammaId;
+   private static GammaId OseeTypesClientDemoActiveGammaId;
+   private static GammaId OseeTypesClientDemoActiveGammaIdPlus1;
+   private static GammaId OseeTypesClientDemoActiveGammaIdPlus2;
+   private static GammaId OseeTypesClientDemoNameGammaId;
    private static String OseeTypesClientDemoGuid;
-   private static final long UserGroupsArtifactGammaId = 43L, OseeTypesClientDemoGammaId = 11L,
-      OseeTypesFrameworkGammaId = 8L;
+   private static final GammaId UserGroupsArtifactGammaId = GammaId.valueOf(43);
+   private static final GammaId OseeTypesClientDemoGammaId = GammaId.valueOf(11);
+   private static final GammaId OseeTypesFrameworkGammaId = GammaId.valueOf(8);
    private static AttributeId UserGroupsNameAttrId;
-   private static long UserGroupsNameGammaId;
+   private static GammaId UserGroupsNameGammaId;
    private static final Map<ArtifactToken, Integer> artTokenToRelationId = new HashMap<>();
-   private static final Map<ArtifactToken, Long> artTokenToRelationGammaId = new HashMap<>();
+   private static final Map<ArtifactToken, GammaId> artTokenToRelationGammaId = new HashMap<>();
    private final String UserGroupsGuid = CoreArtifactTokens.UserGroups.getGuid();
    private static final List<ArtifactToken> relationsArts =
       Arrays.asList(CoreArtifactTokens.Everyone, CoreArtifactTokens.DefaultHierarchyRoot, CoreArtifactTokens.OseeAdmin,
          CoreArtifactTokens.OseeAccessAdmin, AtsTempAdminToken, AtsAdminToken);
-   private static long defaultHierRootToUserGroupsRelationGammaId;
-   private static long userGroupsToOseeAdminRelationGammaId;
+   private static GammaId defaultHierRootToUserGroupsRelationGammaId;
+   private static GammaId userGroupsToOseeAdminRelationGammaId;
    // Transaction that OseeTypes_ClientDemo and OseeTypes_Framework were created in
    private final TransactionId tx5 = TransactionId.valueOf(5);
    // Transaction that User Groups was created in
@@ -151,10 +159,12 @@ public class LoaderTest {
                for (AttributeReadable<Object> attr : art.getAttributes()) {
                   if (attr.isOfType(CoreAttributeTypes.Active)) {
                      OseeTypesFrameworkActiveAttrId = attr;
-                     OseeTypesFrameworkActiveGammaId = Long.valueOf(attr.getGammaId());
+                     OseeTypesFrameworkActiveGammaId = GammaId.valueOf(attr.getGammaId());
+                     OseeTypesFrameworkActiveGammaIdPlus1 = GammaId.valueOf(attr.getGammaId() + 1);
+                     OseeTypesFrameworkActiveGammaIdPlus2 = GammaId.valueOf(attr.getGammaId() + 2);
                   } else if (attr.isOfType(CoreAttributeTypes.Name)) {
                      OseeTypesFrameworkNameAttrId = attr;
-                     OseeTypesFrameworkNameGammaId = Long.valueOf(attr.getGammaId());
+                     OseeTypesFrameworkNameGammaId = GammaId.valueOf(attr.getGammaId());
                   }
                }
             } else if (art.getName().contains("OseeTypes_ClientDemo")) {
@@ -168,10 +178,12 @@ public class LoaderTest {
                         AttributeId.valueOf(OseeTypesClientDemoActiveAttrId.getId() + 1);
                      OseeTypesClientDemoActiveAttrIdPlus2 =
                         AttributeId.valueOf(OseeTypesClientDemoActiveAttrId.getId() + 2);
-                     OseeTypesClientDemoActiveGammaId = attr.getGammaId();
+                     OseeTypesClientDemoActiveGammaId = GammaId.valueOf(attr.getGammaId());
+                     OseeTypesClientDemoActiveGammaIdPlus1 = GammaId.valueOf(attr.getGammaId() + 1);
+                     OseeTypesClientDemoActiveGammaIdPlus2 = GammaId.valueOf(attr.getGammaId() + 2);
                   } else if (attr.isOfType(CoreAttributeTypes.Name)) {
                      OseeTypesClientDemoNameAttrId = attr;
-                     OseeTypesClientDemoNameGammaId = Long.valueOf(attr.getGammaId());
+                     OseeTypesClientDemoNameGammaId = GammaId.valueOf(attr.getGammaId());
                   }
                }
             }
@@ -182,14 +194,14 @@ public class LoaderTest {
          for (AttributeReadable<Object> attr : userGroupFolder.getAttributes()) {
             if (attr.isOfType(CoreAttributeTypes.Name)) {
                UserGroupsNameAttrId = attr;
-               UserGroupsNameGammaId = attr.getGammaId();
+               UserGroupsNameGammaId = GammaId.valueOf(attr.getGammaId());
             }
          }
          ArtifactReadable defaultHierRoot = orcsApi.getQueryFactory().fromBranch(CoreBranches.COMMON).andId(
             CoreArtifactTokens.DefaultHierarchyRoot).getResults().getExactlyOne();
          for (RelationReadable relation : defaultHierRoot.getRelations(CoreRelationTypes.Default_Hierarchical__Child)) {
             if (relation.getArtIdB() == CoreArtifactTokens.UserGroups.getId().intValue()) {
-               defaultHierRootToUserGroupsRelationGammaId = relation.getGammaId();
+               defaultHierRootToUserGroupsRelationGammaId = GammaId.valueOf(relation.getGammaId());
                break;
             }
          }
@@ -197,11 +209,11 @@ public class LoaderTest {
             for (ArtifactToken token : relationsArts) {
                if (rel.getArtIdB() == token.getId().intValue() || rel.getArtIdA() == token.getId().intValue()) {
                   artTokenToRelationId.put(token, rel.getId().intValue());
-                  artTokenToRelationGammaId.put(token, rel.getGammaId());
+                  artTokenToRelationGammaId.put(token, GammaId.valueOf(rel.getGammaId()));
                }
             }
             if (rel.getArtIdB() == CoreArtifactTokens.OseeAdmin.getId().intValue()) {
-               userGroupsToOseeAdminRelationGammaId = rel.getGammaId();
+               userGroupsToOseeAdminRelationGammaId = GammaId.valueOf(rel.getGammaId());
             }
          }
          Assert.assertEquals(6, relationsArts.size());
@@ -263,19 +275,19 @@ public class LoaderTest {
       verifyData(attrs.next(), OseeTypesFrameworkActiveAttrId, OseeTypesFrameworkId, NEW, Active.getId(), COMMON, tx5,
          OseeTypesFrameworkActiveGammaId, true, "");
       verifyData(attrs.next(), AttributeId.valueOf(OseeTypesFrameworkActiveAttrId.getId() + 1), OseeTypesFrameworkId,
-         NEW, Name.getId(), COMMON, tx5, OseeTypesFrameworkActiveGammaId + 1,
+         NEW, Name.getId(), COMMON, tx5, OseeTypesFrameworkActiveGammaIdPlus1,
          "org.eclipse.osee.framework.skynet.core.OseeTypes_Framework", "");
       verifyData(attrs.next(), AttributeId.valueOf(OseeTypesFrameworkActiveAttrId.getId() + 2), OseeTypesFrameworkId,
-         NEW, UriGeneralStringData.getId(), COMMON, tx5, OseeTypesFrameworkActiveGammaId + 2, "",
-         "attr://" + (OseeTypesFrameworkActiveGammaId + 2) + "/" + OseeTypesFrameworkGuid + ".zip");
+         NEW, UriGeneralStringData.getId(), COMMON, tx5, OseeTypesFrameworkActiveGammaIdPlus2, "",
+         "attr://" + OseeTypesFrameworkActiveGammaIdPlus2.getIdString() + "/" + OseeTypesFrameworkGuid + ".zip");
 
       verifyData(attrs.next(), OseeTypesClientDemoActiveAttrId, OseeTypesClientDemoId, NEW, Active.getId(), COMMON, tx5,
          OseeTypesClientDemoActiveGammaId, true, "");
       verifyData(attrs.next(), OseeTypesClientDemoActiveAttrIdPlus1, OseeTypesClientDemoId, NEW, Name.getId(), COMMON,
-         tx5, OseeTypesClientDemoActiveGammaId + 1, "org.eclipse.osee.client.demo.OseeTypes_ClientDemo", "");
+         tx5, OseeTypesClientDemoActiveGammaIdPlus1, "org.eclipse.osee.client.demo.OseeTypes_ClientDemo", "");
       verifyData(attrs.next(), OseeTypesClientDemoActiveAttrIdPlus2, OseeTypesClientDemoId, NEW,
-         UriGeneralStringData.getId(), COMMON, tx5, OseeTypesClientDemoActiveGammaId + 2, "",
-         "attr://" + (OseeTypesClientDemoActiveGammaId + 2) + "/" + OseeTypesClientDemoGuid + ".zip");
+         UriGeneralStringData.getId(), COMMON, tx5, OseeTypesClientDemoActiveGammaIdPlus2, "",
+         "attr://" + OseeTypesClientDemoActiveGammaIdPlus2.getIdString() + "/" + OseeTypesClientDemoGuid + ".zip");
 
       verifyData(attrs.next(), UserGroupsNameAttrId, UserGroups, NEW, Name.getId(), COMMON, tx7, UserGroupsNameGammaId,
          "User Groups", "");
@@ -389,9 +401,9 @@ public class LoaderTest {
       Iterator<AttributeData> attrs = attributeCaptor.getAllValues().iterator();
 
       verifyData(attrs.next(), frameworkActiveAttr, OseeTypesFrameworkId, NEW, Active.getId(), COMMON, tx5,
-         frameworkActiveAttr.getGammaId(), true, "");
+         GammaId.valueOf(frameworkActiveAttr.getGammaId()), true, "");
       verifyData(attrs.next(), clientDemoActiveAttr, OseeTypesClientDemoId, NEW, Active.getId(), COMMON, tx5,
-         clientDemoActiveAttr.getGammaId(), true, "");
+         GammaId.valueOf(clientDemoActiveAttr.getGammaId()), true, "");
 
       sort(relationCaptor.getAllValues());
       Iterator<RelationData> rels = relationCaptor.getAllValues().iterator();

@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.orcs.db.internal.transaction;
 
+import org.eclipse.osee.framework.core.data.GammaId;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.orcs.core.ds.DataProxy;
 
@@ -17,11 +18,11 @@ import org.eclipse.osee.orcs.core.ds.DataProxy;
  * @author Roberto E. Escobar
  */
 public class DaoToSql {
-   private final long gammaId;
+   private final GammaId gammaId;
    private final DataProxy proxy;
    private final boolean isNewGammaId;
 
-   public DaoToSql(long gammaId, DataProxy proxy, boolean isNewGammaId) {
+   public DaoToSql(GammaId gammaId, DataProxy proxy, boolean isNewGammaId) {
       super();
       this.gammaId = gammaId;
       this.proxy = proxy;
@@ -32,7 +33,7 @@ public class DaoToSql {
       return isNewGammaId;
    }
 
-   public long getGammaId() {
+   public GammaId getGammaId() {
       return gammaId;
    }
 
@@ -52,7 +53,7 @@ public class DaoToSql {
 
    public void persist() throws OseeCoreException {
       if (isNewGammaId) {
-         proxy.persist(gammaId);
+         proxy.persist(gammaId.getId());
       }
    }
 
