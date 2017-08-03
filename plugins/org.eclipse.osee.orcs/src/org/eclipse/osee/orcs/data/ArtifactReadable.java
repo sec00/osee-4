@@ -12,6 +12,7 @@ package org.eclipse.osee.orcs.data;
 
 import java.util.Collection;
 import java.util.List;
+import org.eclipse.osee.framework.core.data.ApplicabilityId;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.ArtifactTypeId;
 import org.eclipse.osee.framework.core.data.AttributeId;
@@ -106,4 +107,5 @@ public interface ArtifactReadable extends ArtifactToken, HasTransaction, OrcsRea
 
    Collection<Long> getRelatedIds(RelationTypeSide relationTypeSide);
 
+   ApplicabilityId getApplicability();
 }
