@@ -12,6 +12,7 @@ package org.eclipse.osee.orcs.core.ds;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.eclipse.osee.framework.core.data.ApplicabilityToken;
 import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.BranchId;
@@ -25,5 +26,7 @@ public interface ApplicabilityDsQuery {
    ApplicabilityToken getApplicabilityToken(ArtifactId artId, BranchId branch);
 
    List<Pair<ArtifactId, ApplicabilityToken>> getApplicabilityTokens(Collection<? extends ArtifactId> artIds, BranchId branch);
+
+   Set<ArtifactId> getExcludedArtifacts(BranchId branch, ArtifactId view);
 
 }
