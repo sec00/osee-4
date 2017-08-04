@@ -49,6 +49,7 @@ import org.eclipse.osee.ats.api.workflow.transition.TransitionResults;
 import org.eclipse.osee.ats.core.users.AtsCoreUsers;
 import org.eclipse.osee.ats.core.workflow.WorkflowManagerCore;
 import org.eclipse.osee.ats.core.workflow.state.TeamState;
+import org.eclipse.osee.framework.core.data.TransactionId;
 import org.eclipse.osee.framework.core.util.Result;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
@@ -583,7 +584,8 @@ public class TransitionManager implements IAtsTransitionManager, IExecuteListene
    public TransitionResults handleAllAndPersist() {
       TransitionResults result = handleAll();
       if (result.isEmpty()) {
-         helper.getChangeSet().execute();
+         TransactionId transactionId = helper.getChangeSet().execute();
+         result.setTransactionId(transactionId);
       }
       return result;
    }

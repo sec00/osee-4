@@ -11,6 +11,7 @@
 package org.eclipse.osee.ats.client.integration.tests.ats.core.client.review;
 
 import java.util.Arrays;
+import java.util.List;
 import org.eclipse.osee.ats.api.data.AtsAttributeTypes;
 import org.eclipse.osee.ats.api.util.IAtsChangeSet;
 import org.eclipse.osee.ats.api.workdef.JaxAtsWorkDef;
@@ -29,7 +30,11 @@ import org.eclipse.osee.ats.core.client.review.ReviewManager;
 import org.eclipse.osee.ats.core.client.team.TeamWorkFlowArtifact;
 import org.eclipse.osee.ats.core.workflow.state.TeamState;
 import org.eclipse.osee.ats.core.workflow.transition.TransitionFactory;
+import org.eclipse.osee.framework.core.data.ArtifactId;
+import org.eclipse.osee.framework.core.data.TransactionId;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
+import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
+import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 import org.eclipse.osee.framework.ui.ws.AWorkspace;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -62,7 +67,7 @@ public class DecisionReviewDefinitionManagerTest extends DecisionReviewDefinitio
          jaxWorkDef.setName(AtsTestUtil.WORK_DEF_NAME);
          jaxWorkDef.setWorkDefDsl(atsDsl);
          AtsTestUtil.importWorkDefinition(jaxWorkDef);
-         AtsClientService.get().getWorkDefinitionService().clearCaches();
+         AtsClientService.get().clearCaches();
       } catch (Exception ex) {
          throw new OseeCoreException(ex, "Error importing " + WORK_DEF_FILE_NAME);
       }
@@ -77,7 +82,8 @@ public class DecisionReviewDefinitionManagerTest extends DecisionReviewDefinitio
          TeamState.Implement.getName(), Arrays.asList(AtsClientService.get().getUserService().getCurrentUser()), null,
          changes, TransitionOption.None);
       IAtsTransitionManager transitionMgr = TransitionFactory.getTransitionManager(helper);
-      TransitionResults results = transitionMgr.handleAllAndPersist();
+      TransitionResults results =
+         transitionAndLogResults("testCreateDecisionReviewDuringTransition_ToDecision", transitionMgr);
 
       Assert.assertTrue(results.toString(), results.isEmpty());
       Assert.assertFalse(teamArt.isDirty());
@@ -108,7 +114,7 @@ public class DecisionReviewDefinitionManagerTest extends DecisionReviewDefinitio
          jaxWorkDef.setName(AtsTestUtil.WORK_DEF_NAME);
          jaxWorkDef.setWorkDefDsl(atsDsl);
          AtsTestUtil.importWorkDefinition(jaxWorkDef);
-         AtsClientService.get().getWorkDefinitionService().clearCaches();
+         AtsClientService.get().clearCaches();
       } catch (Exception ex) {
          throw new OseeCoreException(ex, "Error importing " + WORK_DEF_FILE_NAME_PREPARE);
       }
@@ -120,9 +126,10 @@ public class DecisionReviewDefinitionManagerTest extends DecisionReviewDefinitio
       MockTransitionHelper helper = new MockTransitionHelper(getClass().getSimpleName(), Arrays.asList(teamArt),
          TeamState.Implement.getName(), Arrays.asList(AtsClientService.get().getUserService().getCurrentUser
 
-      ()), null, changes, TransitionOption.None);
+         ()), null, changes, TransitionOption.None);
       IAtsTransitionManager transitionMgr = TransitionFactory.getTransitionManager(helper);
-      TransitionResults results = transitionMgr.handleAllAndPersist();
+      TransitionResults results =
+         transitionAndLogResults("testCreateDecisionReviewDuringTransition_Prepare", transitionMgr);
 
       Assert.assertTrue(results.toString(), results.isEmpty());
 
@@ -139,6 +146,26 @@ public class DecisionReviewDefinitionManagerTest extends DecisionReviewDefinitio
          decArt.getSoleAttributeValue(AtsAttributeTypes.RelatedToState));
 
       AtsTestUtil.validateArtifactCache();
+   }
+
+   private TransitionResults transitionAndLogResults(String testName, IAtsTransitionManager transitionMgr) {
+      System.err.println("entering test " + testName);
+      TransitionResults results = transitionMgr.handleAllAndPersist();
+      TransactionId transId = results.getTransactionId();
+      System.err.println(String.format("transaction record [%s]", transId));
+      List<ArtifactId> artIds = AtsClientService.get().getQueryService().getArtifactIdsFromQuery(
+         "Select * From Osee_Txs Txs, Osee_Artifact Art Where Branch_Id = 570 And Transaction_Id = ? And Mod_Type = 1 And" //
+            + " Txs.Gamma_Id = Art.Gamma_Id",
+         transId);
+      System.err.println(String.format("Artifact Ids %s", artIds));
+      if (artIds.isEmpty()) {
+         Artifact artifactFromId =
+            ArtifactQuery.getArtifactFromId(artIds.iterator().next(), AtsClientService.get().getAtsBranch());
+         AtsClientService.get().getLogger().error("Artifact  %s Type %s", artifactFromId.toStringWithId(),
+            artifactFromId.getArtifactType());
+      }
+      System.err.println("leaving test " + testName + " with results " + results);
+      return results;
    }
 
 }

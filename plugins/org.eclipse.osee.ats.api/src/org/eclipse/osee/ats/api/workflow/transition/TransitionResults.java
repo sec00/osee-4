@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.osee.ats.api.IAtsWorkItem;
 import org.eclipse.osee.ats.api.workdef.ITransitionResult;
+import org.eclipse.osee.framework.core.data.TransactionId;
 import org.eclipse.osee.framework.core.util.result.XResultData;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
 
@@ -30,6 +31,12 @@ public class TransitionResults {
 
    private final Map<IAtsWorkItem, List<ITransitionResult>> workItemToResults =
       new HashMap<IAtsWorkItem, List<ITransitionResult>>();
+
+   private TransactionId transactionId;
+
+   public TransactionId getTransactionId() {
+      return transactionId;
+   }
 
    public void addResult(IAtsWorkItem workItem, ITransitionResult result) {
       List<ITransitionResult> results = workItemToResults.get(workItem);
@@ -143,6 +150,10 @@ public class TransitionResults {
 
    public Map<IAtsWorkItem, List<ITransitionResult>> getWorkItemToResults() {
       return workItemToResults;
+   }
+
+   public void setTransactionId(TransactionId transactionId) {
+      this.transactionId = transactionId;
    }
 
 }
