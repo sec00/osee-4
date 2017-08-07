@@ -352,4 +352,10 @@ public class ArtifactReadOnlyImpl extends AbstractProxied<Artifact> implements A
    public ApplicabilityId getApplicability() {
       return getProxiedObject().getOrcsData().getApplicabilityId();
    }
+
+   @Override
+   public boolean isHistorical() {
+      return getProxiedObject().getOrcsData().getVersion().isHistorical();
+   }
+
 }
