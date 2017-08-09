@@ -90,6 +90,11 @@ public class TransitionManagerTest {
    }
 
    @BeforeClass
+   public static void before() throws OseeCoreException {
+      AtsClientService.get().clearCaches();
+   }
+
+   @BeforeClass
    @AfterClass
    public static void cleanup() throws OseeCoreException {
       AtsTestUtil.cleanup();
