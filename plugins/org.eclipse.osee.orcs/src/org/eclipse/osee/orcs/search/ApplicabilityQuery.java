@@ -42,4 +42,6 @@ public interface ApplicabilityQuery {
    Map<String, List<String>> getBranchViewFeatureValues(BranchId branch, ArtifactId viewId);
 
    List<BranchViewData> getViews();
+
+   ArtifactId getVersionConfig(ArtifactId art, BranchId branch);
 }
