@@ -1763,4 +1763,5 @@ public class Artifact extends NamedIdBase implements IArtifact, Adaptable, Fully
       }
       return artifact;
    }
+
 }

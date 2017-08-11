@@ -155,4 +155,6 @@ public interface IAtsChangeSet {
 
    void deleteAttributes(ArtifactId artifact, AttributeTypeToken attributeType);
 
+   void setAttributeValuesAsStrings(IAtsObject atsObject, AttributeTypeId attrType, List<String> values);
+
 }
