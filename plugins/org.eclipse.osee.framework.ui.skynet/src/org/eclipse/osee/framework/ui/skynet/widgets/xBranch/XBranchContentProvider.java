@@ -118,8 +118,7 @@ public class XBranchContentProvider implements ITreeContentProvider {
 
          Set<BranchId> branchesToReturn = new HashSet<>();
          if (showOnlyWorkingBranches) {
-            branchesToReturn.addAll(
-               BranchManager.getBranchesAndViews(BranchArchivedState.UNARCHIVED, BranchType.WORKING));
+            branchesToReturn.addAll(BranchManager.getBranches(BranchArchivedState.UNARCHIVED, BranchType.WORKING));
          }
          if (!showChildBranchesAtMainLevel) {
             if (AccessControlManager.isOseeAdmin()) {
@@ -137,7 +136,7 @@ public class XBranchContentProvider implements ITreeContentProvider {
             }
          } else {
             branchesToReturn.addAll(
-               BranchManager.getBranchesAndViews(branchState, branchTypes.toArray(new BranchType[branchTypes.size()])));
+               BranchManager.getBranches(branchState, branchTypes.toArray(new BranchType[branchTypes.size()])));
          }
          return branchesToReturn.toArray();
       } catch (OseeCoreException ex) {
