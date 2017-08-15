@@ -110,6 +110,11 @@ public interface ApplicabilityEndpoint {
    @Produces({MediaType.APPLICATION_JSON})
    List<BranchViewData> getViews();
 
+   @GET
+   @Path("table")
+   @Produces({MediaType.TEXT_HTML})
+   String getViewTable();
+
    @PUT
    @Path("branchview/{branchView}")
    @Consumes({MediaType.APPLICATION_JSON})
