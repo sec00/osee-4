@@ -396,13 +396,12 @@ public final class SkynetTransaction extends TransactionOperation<BranchId> {
       if (comment == null) {
          comment = "";
       }
-      Integer authorArtId = userToBlame.getArtId();
       TransactionDetailsType txType = TransactionDetailsType.NonBaselined;
       Date timestamp = GlobalTime.GreenwichMeanTimestamp();
       //keep transaction id's sequential in the face of concurrent transaction by multiple users
       Long txId = ConnectionHandler.getNextSequence("SKYNET_TRANSACTION_ID_SEQ", false);
 
-      return new TransactionRecord(txId, branch, comment, timestamp, authorArtId, 0, txType);
+      return new TransactionRecord(txId, branch, comment, timestamp, userToBlame, 0, txType);
    }
 
    @Override
