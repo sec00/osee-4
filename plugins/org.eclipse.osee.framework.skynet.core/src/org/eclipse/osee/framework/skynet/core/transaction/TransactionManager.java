@@ -26,6 +26,7 @@ import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IRelationType;
 import org.eclipse.osee.framework.core.data.TransactionId;
 import org.eclipse.osee.framework.core.data.TransactionToken;
+import org.eclipse.osee.framework.core.data.UserId;
 import org.eclipse.osee.framework.core.enums.DeletionFlag;
 import org.eclipse.osee.framework.core.enums.ModificationType;
 import org.eclipse.osee.framework.core.enums.TransactionDetailsType;
@@ -183,7 +184,7 @@ public final class TransactionManager {
       Long transactionNumber = stmt.getLong("transaction_id");
       String comment = stmt.getString("osee_comment");
       Date timestamp = stmt.getTimestamp("time");
-      Integer authorArtId = stmt.getInt("author");
+      UserId authorArtId = UserId.valueOf(stmt.getLong("author"));
       Integer commitArtId = stmt.getInt("commit_art_id");
       TransactionDetailsType txType = TransactionDetailsType.toEnum(stmt.getInt("tx_type"));
       return new TransactionRecord(transactionNumber, branch, comment, timestamp, authorArtId, commitArtId, txType);
