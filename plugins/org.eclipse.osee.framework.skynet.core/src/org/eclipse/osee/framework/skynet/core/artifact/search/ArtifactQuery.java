@@ -119,10 +119,6 @@ public class ArtifactQuery {
       return getOrCheckArtifactFromId(artifactId, branch, deletionFlag, QueryType.CHECK);
    }
 
-   public static Artifact getArtifactFromId(Long artId, BranchId branch, DeletionFlag allowDeleted) throws OseeCoreException {
-      return getOrCheckArtifactFromId(ArtifactId.valueOf(artId), branch, allowDeleted, QueryType.GET);
-   }
-
    private static Artifact getOrCheckArtifactFromId(ArtifactId artifactId, BranchId branch, DeletionFlag allowDeleted, QueryType queryType) throws OseeCoreException {
       ArtifactToken artifactToken;
       if (artifactId instanceof ArtifactToken) {
@@ -1007,5 +1003,4 @@ public class ArtifactQuery {
       long transactionId = jdbcClient.fetch(-1L, query, artifact, artifact.getBranch(), artifact, artifact.getBranch());
       return !artifact.getTransaction().getId().equals(transactionId);
    }
-
 }
