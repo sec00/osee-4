@@ -42,10 +42,6 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.osee.define.report.api.DataRightInput;
-import org.eclipse.osee.define.report.api.DataRightResult;
-import org.eclipse.osee.define.report.api.PageOrientation;
-import org.eclipse.osee.define.report.api.ReportConstants;
 import org.eclipse.osee.framework.core.data.ApplicabilityId;
 import org.eclipse.osee.framework.core.data.ApplicabilityToken;
 import org.eclipse.osee.framework.core.data.ArtifactId;
@@ -56,10 +52,12 @@ import org.eclipse.osee.framework.core.data.IArtifactType;
 import org.eclipse.osee.framework.core.enums.CoreArtifactTypes;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.CoreRelationTypes;
-import org.eclipse.osee.framework.core.enums.DataRightsClassification;
 import org.eclipse.osee.framework.core.enums.PresentationType;
+import org.eclipse.osee.framework.core.model.datarights.DataRightResult;
 import org.eclipse.osee.framework.core.model.type.AttributeType;
+import org.eclipse.osee.framework.core.util.PageOrientation;
 import org.eclipse.osee.framework.core.util.RendererOption;
+import org.eclipse.osee.framework.core.util.ReportConstants;
 import org.eclipse.osee.framework.jdk.core.type.OseeArgumentException;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
@@ -74,7 +72,6 @@ import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
 import org.eclipse.osee.framework.skynet.core.attribute.AttributeTypeManager;
 import org.eclipse.osee.framework.skynet.core.transaction.SkynetTransaction;
 import org.eclipse.osee.framework.ui.skynet.internal.ServiceUtil;
-import org.eclipse.osee.framework.ui.skynet.render.DataRightProvider;
 import org.eclipse.osee.framework.ui.skynet.render.RendererManager;
 import org.eclipse.osee.framework.ui.skynet.render.RenderingUtil;
 import org.eclipse.osee.framework.ui.skynet.render.WordTemplateRenderer;
@@ -119,6 +116,8 @@ public class WordTemplateProcessor {
    private String slaveTemplateStyles;
 
    private String elementType;
+   private String overrideClassification;
+   private BranchId branch;
 
    //Outlining Options
    private AttributeTypeId headingAttributeType;
@@ -155,17 +154,13 @@ public class WordTemplateProcessor {
    private boolean isDiff;
    private boolean excludeFolders;
    private CharSequence paragraphNumber = null;
-   private final DataRightInput request;
-   private final DataRightProvider provider;
    private IArtifactType[] excludeArtifactTypes;
    private HashMap<ApplicabilityId, ApplicabilityToken> applicabilityTokens;
    private HashMap<ArtifactId, ArtifactId> artifactsToExclude;
 
-   public WordTemplateProcessor(WordTemplateRenderer renderer, DataRightProvider provider) {
+   public WordTemplateProcessor(WordTemplateRenderer renderer) {
       this.renderer = renderer;
-      this.provider = provider;
       loadIgnoreAttributeExtensions();
-      request = provider.createRequest();
       artifactsToExclude = new HashMap<>();
    }
 
@@ -286,20 +281,29 @@ public class WordTemplateProcessor {
     */
    public InputStream applyTemplate(List<Artifact> artifacts, String templateContent, String templateOptions, String templateStyles, IContainer folder, String outlineNumber, String outlineType, PresentationType presentationType) throws OseeCoreException {
 
-      ArtifactId view = (ArtifactId) renderer.getRendererOptionValue(RendererOption.VIEW);
+      overrideClassification = (String) renderer.getRendererOptionValue(RendererOption.OVERRIDE_DATA_RIGHTS);
+      if (overrideClassification == null) {
+         overrideClassification = "invalid";
+      }
+
       excludeFolders = (boolean) renderer.getRendererOptionValue(RendererOption.EXCLUDE_FOLDERS);
-      artifactsToExclude = getNonApplicableArtifacts(artifacts, view == null ? ArtifactId.SENTINEL : view);
 
       if (!artifacts.isEmpty()) {
-         ApplicabilityEndpoint applEndpoint =
-            ServiceUtil.getOseeClient().getApplicabilityEndpoint(artifacts.get(0).getBranch());
+         branch = artifacts.get(0).getBranch();
+
+         ApplicabilityEndpoint applEndpoint = ServiceUtil.getOseeClient().getApplicabilityEndpoint(branch);
 
          applicabilityTokens = new HashMap<>();
          Collection<ApplicabilityToken> appTokens = applEndpoint.getApplicabilityTokenMap();
          for (ApplicabilityToken token : appTokens) {
             applicabilityTokens.put(token, token);
          }
+      } else {
+         branch = BranchId.SENTINEL;
       }
+
+      ArtifactId view = (ArtifactId) renderer.getRendererOptionValue(RendererOption.VIEW);
+      artifactsToExclude = getNonApplicableArtifacts(artifacts, view == null ? ArtifactId.SENTINEL : view);
 
       WordMLProducer wordMl = null;
       CharBackedInputStream charBak = null;
@@ -563,9 +567,23 @@ public class WordTemplateProcessor {
          templateFileDiffer.generateFileDifferences(artifacts, "/results/", outlineNumber, outlineType,
             recurseChildren);
       } else {
-         populateRequest(artifacts, request);
 
-         DataRightResult response = provider.getDataRights(request);
+         List<ArtifactId> allArtifacts = new ArrayList<>();
+         if (recurseChildren || (((boolean) renderer.getRendererOptionValue(
+            RendererOption.RECURSE_ON_LOAD)) && !((boolean) renderer.getRendererOptionValue(
+               RendererOption.ORIG_PUBLISH_AS_DIFF)))) {
+            for (Artifact art : artifacts) {
+               allArtifacts.add(art);
+               if (!art.isHistorical()) {
+                  allArtifacts.addAll(art.getDescendants());
+               }
+            }
+         } else {
+            allArtifacts.addAll(artifacts);
+         }
+
+         DataRightResult response = ServiceUtil.getOseeClient().getDataRightsEndpoint().getDataRights(allArtifacts,
+            branch, overrideClassification);
 
          for (Artifact artifact : artifacts) {
             processObjectArtifact(artifact, wordMl, outlineType, presentationType, response);
@@ -573,7 +591,6 @@ public class WordTemplateProcessor {
       }
       // maintain a list of artifacts that have been processed so we do not
       // have duplicates.
-      request.clear();
       processedArtifacts.clear();
    }
 
@@ -581,7 +598,6 @@ public class WordTemplateProcessor {
       HashMap<ArtifactId, ArtifactId> toReturn = new HashMap<>();
 
       if (artifacts != null && !artifacts.isEmpty()) {
-         BranchId branch = artifacts.get(0).getBranch();
          Object[] objs = {branch, view, branch};
 
          if (!view.equals(ArtifactId.SENTINEL)) {
@@ -651,7 +667,7 @@ public class WordTemplateProcessor {
                   }
                }
                PageOrientation orientation = WordRendererUtil.getPageOrientation(artifact);
-               String footer = data.getContent(artifact.getGuid(), orientation);
+               String footer = data.getContent(artifact.getId(), orientation);
 
                processMetadata(artifact, wordMl);
 
@@ -675,41 +691,6 @@ public class WordTemplateProcessor {
          }
       } else {
          nonTemplateArtifacts.add(artifact);
-      }
-   }
-
-   private void populateRequest(List<Artifact> artifacts, DataRightInput request) {
-      if (request.isEmpty()) {
-         List<Artifact> allArtifacts = new ArrayList<>();
-         boolean recurseOnLoad = (boolean) renderer.getRendererOptionValue(RendererOption.RECURSE_ON_LOAD);
-         boolean publishAsDiff = (boolean) renderer.getRendererOptionValue(RendererOption.ORIG_PUBLISH_AS_DIFF);
-
-         if (recurseChildren || (recurseOnLoad && !publishAsDiff)) {
-            for (Artifact art : artifacts) {
-               allArtifacts.add(art);
-               if (!art.isHistorical()) {
-                  allArtifacts.addAll(art.getDescendants());
-               }
-            }
-         } else {
-            allArtifacts.addAll(artifacts);
-         }
-
-         int index = 0;
-         String overrideClassification = (String) renderer.getRendererOptionValue(RendererOption.OVERRIDE_DATA_RIGHTS);
-         for (Artifact artifact : allArtifacts) {
-
-            String classification = null;
-            if (overrideClassification != null && DataRightsClassification.isValid(overrideClassification)) {
-               classification = overrideClassification;
-            } else {
-               classification = artifact.getSoleAttributeValueAsString(CoreAttributeTypes.DataRightsClassification, "");
-            }
-
-            PageOrientation orientation = WordRendererUtil.getPageOrientation(artifact);
-            request.addData(artifact.getGuid(), classification, orientation, index);
-            index++;
-         }
       }
    }
 
