@@ -82,4 +82,8 @@ public interface IAtsStoreService {
 
    TransactionId getTransactionId(IAtsWorkItem workItem);
 
+   default boolean isInDb(IAtsWorkItem workItem) {
+      return getTransactionId(workItem).isValid();
+   }
+
 }
