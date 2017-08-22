@@ -78,7 +78,11 @@ public interface IAtsStoreService {
 
    Result setTransactionAssociatedArtifact(TransactionId trans, IAtsTeamWorkflow teamWf);
 
+   boolean isDeleted(ArtifactId artifact);
+
    TransactionId getTransactionId(IAtsWorkItem workItem);
 
-   boolean isDeleted(ArtifactId artifact);
+   default boolean isInDb(IAtsWorkItem workItem) {
+      return getTransactionId(workItem).isValid();
+   }
 }
