@@ -72,9 +72,11 @@ public interface IAtsStoreService {
 
    boolean isOfType(IAtsObject atsObject, IArtifactType artifactType);
 
+   AttributeTypeId getAttributeType(Long attrTypeId);
+
    boolean isArtifactTypeInheritsFrom(IArtifactType artifactType, IArtifactType baseArtifactType);
 
    Result setTransactionAssociatedArtifact(TransactionId trans, IAtsTeamWorkflow teamWf);
 
-   AttributeTypeId getAttributeType(Long attrTypeId);
+   TransactionId getTransactionId(IAtsWorkItem workItem);
 }
