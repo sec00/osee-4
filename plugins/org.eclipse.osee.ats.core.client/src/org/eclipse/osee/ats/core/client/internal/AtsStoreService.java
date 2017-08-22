@@ -221,4 +221,14 @@ public class AtsStoreService implements IAtsStoreService {
       return true;
    }
 
+   @Override
+   public TransactionId getTransactionId(IAtsWorkItem workItem) {
+      TransactionId transId = TransactionId.SENTINEL;
+      ArtifactId artifact = services.getArtifact(workItem.getStoreObject());
+      if (artifact instanceof Artifact) {
+         transId = ((Artifact) artifact).getTransaction();
+      }
+      return transId;
+   }
+
 }
