@@ -201,4 +201,14 @@ public class AtsStoreServiceImpl implements IAtsStoreService {
       return Result.TrueResult;
    }
 
+   @Override
+   public TransactionId getTransactionId(IAtsWorkItem workItem) {
+      TransactionId transId = TransactionId.SENTINEL;
+      ArtifactId artifact = atsServer.getArtifact(workItem.getStoreObject());
+      if (artifact instanceof ArtifactReadable) {
+         transId = ((ArtifactReadable) artifact).getTransaction();
+      }
+      return transId;
+   }
+
 }
