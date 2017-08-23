@@ -503,7 +503,10 @@ public class AtsClientImpl extends AtsCoreServiceImpl implements IAtsClient {
 
    @Override
    public void clearImplementersCache(IAtsWorkItem workItem) {
-      ((AbstractWorkflowArtifact) workItem).clearImplementersCache();
+      AbstractWorkflowArtifact awa = (AbstractWorkflowArtifact) getArtifact(workItem);
+      if (awa != null) {
+         awa.clearImplementersCache();
+      }
    }
 
    @Override
