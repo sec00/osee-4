@@ -23,7 +23,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import org.eclipse.osee.framework.core.data.ApplicabilityId;
 import org.eclipse.osee.framework.core.data.ApplicabilityToken;
 import org.eclipse.osee.framework.core.data.ArtifactId;
@@ -42,27 +41,13 @@ public interface ApplicabilityEndpoint {
 
    @GET
    @Produces({MediaType.APPLICATION_JSON})
-   List<ApplicabilityToken> getApplicabilityTokens();
+   Collection<ApplicabilityToken> getApplicabilityTokens();
 
    @GET
-   @Path("feature/data")
-   @Produces({MediaType.APPLICATION_JSON})
-   List<FeatureDefinitionData> getFeatureDefinitionData();
-
-   @GET
-   @Path("view/{viewId}")
-   @Produces({MediaType.APPLICATION_JSON})
-   List<ApplicabilityToken> getViewApplicabilityTokens(@PathParam("viewId") ArtifactId view);
-
-   /**
-    * Set the applicabilities referenced by the provided artifacts. This is stored in the tuple table which means it
-    * does not impact applicability in a branch view.
-    */
-   @PUT
-   @Path("artifact/reference")
+   @Path("artifact/{artId}")
    @Consumes({MediaType.APPLICATION_JSON})
    @Produces({MediaType.APPLICATION_JSON})
-   Response setApplicabilityReference(HashMap<ArtifactId, List<ApplicabilityId>> artifacts);
+   ApplicabilityToken getApplicabilityToken(@PathParam("artId") ArtifactId artId);
 
    @GET
    @Path("artifact/reference/{artId}")
@@ -76,6 +61,50 @@ public interface ApplicabilityEndpoint {
    @Produces({MediaType.APPLICATION_JSON})
    List<ApplicabilityToken> getApplicabilityReferenceTokens(@PathParam("artId") ArtifactId artifact);
 
+   @GET
+   @Path("view/{viewId}")
+   @Consumes({MediaType.APPLICATION_JSON})
+   @Produces({MediaType.APPLICATION_JSON})
+   List<ApplicabilityToken> getViewApplicabilityTokens(@PathParam("viewId") ArtifactId view);
+
+   @GET
+   @Path("views")
+   @Produces({MediaType.APPLICATION_JSON})
+   List<BranchViewData> getViews();
+
+   @GET
+   @Path("feature-data")
+   @Produces({MediaType.APPLICATION_JSON})
+   List<FeatureDefinitionData> getFeatureDefinitionData();
+
+   /**
+    * @return a list of branches that contain the injected change (prior to removalDate)
+    * @param injectDateMs & removalDateMs are relative to the change injection/removal into the root branch.
+    * @param removalDateMs if default value of -1 is used, return list of branches after injectionDate
+    */
+   @GET
+   @Path("change/")
+   @Consumes({MediaType.APPLICATION_JSON})
+   @Produces(MediaType.APPLICATION_JSON)
+   List<BranchId> getAffectedBranches(@QueryParam("injectionDateMs") Long injectDateMs, @QueryParam("removalDateMs") @DefaultValue("-1") Long removalDateMs, List<ApplicabilityId> applicabilityIds);
+
+   @PUT
+   @Path("artifacts")
+   @Consumes({MediaType.APPLICATION_JSON})
+   @Produces(MediaType.APPLICATION_JSON)
+   List<Pair<ArtifactId, ApplicabilityToken>> getApplicabilityTokens(List<? extends ArtifactId> artIds);
+
+   @GET
+   @Path("change/")
+   @Consumes({MediaType.APPLICATION_JSON})
+   @Produces(MediaType.APPLICATION_JSON)
+   List<BranchId> getAffectedBranches(@QueryParam("injectiontx") TransactionId injectionTx, @QueryParam("removaltx") @DefaultValue("-1") TransactionId removalTx, List<ApplicabilityId> applicabilityIds);
+
+   @GET
+   @Path("table")
+   @Produces({MediaType.TEXT_HTML})
+   String getViewTable();
+
    /**
     * Set the applicability in osee_txs for the given artifacts. This affects whether the artifact is included in a
     * branch view.
@@ -84,74 +113,40 @@ public interface ApplicabilityEndpoint {
    @Path("{applicId}")
    @Consumes({MediaType.APPLICATION_JSON})
    @Produces({MediaType.APPLICATION_JSON})
-   Response setApplicability(@PathParam("applicId") ApplicabilityId applicId, List<? extends ArtifactId> artifacts);
-
-   @POST
-   void createDemoApplicability();
-
-   @GET
-   @Path("artifact/{artId}")
-   @Consumes({MediaType.APPLICATION_JSON})
-   @Produces({MediaType.APPLICATION_JSON})
-   ApplicabilityToken getApplicabilityToken(@PathParam("artId") ArtifactId artId);
-
-   @PUT
-   @Path("artifacts")
-   @Consumes({MediaType.APPLICATION_JSON})
-   @Produces(MediaType.APPLICATION_JSON)
-   List<Pair<ArtifactId, ApplicabilityToken>> getApplicabilityTokensForArts(Collection<? extends ArtifactId> artIds);
-
-   @PUT
-   @Consumes({MediaType.APPLICATION_JSON})
-   @Produces(MediaType.APPLICATION_JSON)
-   List<Pair<ArtifactId, ApplicabilityToken>> getApplicabilityTokens(Collection<? extends ArtifactId> artIds);
-
-   @GET
-   @Path("tokenMap")
-   @Produces({MediaType.APPLICATION_JSON})
-   Collection<ApplicabilityToken> getApplicabilityTokenMap();
-
-   @GET
-   @Path("views")
-   @Produces({MediaType.APPLICATION_JSON})
-   List<BranchViewData> getViews();
-
-   @GET
-   @Path("table")
-   @Produces({MediaType.TEXT_HTML})
-   String getViewTable();
-
-   @PUT
-   @Path("branchview/{branchView}")
-   @Consumes({MediaType.APPLICATION_JSON})
-   void setView(@PathParam("branchView") ArtifactId branchView);
+   TransactionToken setApplicability(@PathParam("applicId") ApplicabilityId applicId, List<? extends ArtifactId> artifacts);
 
    /**
-    * @return a list of branches that contain the injected change (prior to removalDate)
-    * @param injectDateMs & removalDateMs are relative to the change injection/removal into the root branch.
-    * @param removalDateMs if default value of -1 is used, return list of branches after injectionDate
+    * Set the applicabilities referenced by the provided artifacts. This is stored in the tuple table which means it
+    * does not impact applicability in a branch view.
     */
    @PUT
-   @Path("change/")
+   @Path("artifact/reference")
    @Consumes({MediaType.APPLICATION_JSON})
-   @Produces(MediaType.APPLICATION_JSON)
-   List<BranchId> getAffectedBranches(@QueryParam("injectionDateMs") Long injectDateMs, @QueryParam("removalDateMs") @DefaultValue("-1") Long removalDateMs, List<ApplicabilityId> applicabilityIds);
-
-   @PUT
-   @Path("change/")
-   @Consumes({MediaType.APPLICATION_JSON})
-   @Produces(MediaType.APPLICATION_JSON)
-   List<BranchId> getAffectedBranches(@QueryParam("injectiontx") TransactionId injectionTx, @QueryParam("removaltx") @DefaultValue("-1") TransactionId removalTx, List<ApplicabilityId> applicabilityIds);
-
-   @POST
-   @Path("view/{viewId}/applic")
-   @Consumes({MediaType.APPLICATION_JSON})
-   @Produces(MediaType.APPLICATION_JSON)
-   TransactionToken createNewApplicabilityForView(@PathParam("viewId") ArtifactId viewId, String applicability);
+   @Produces({MediaType.APPLICATION_JSON})
+   TransactionToken setApplicabilityReference(HashMap<ArtifactId, List<ApplicabilityId>> artifacts);
 
    @GET
    @Path("versionConfig/{version}")
    @Produces({MediaType.APPLICATION_JSON})
+   @Consumes({MediaType.APPLICATION_JSON})
    ArtifactId getVersionConfig(@PathParam("version") ArtifactId version);
+
+   @POST
+   @Path("view/{view-name}")
+   @Consumes({MediaType.APPLICATION_JSON})
+   @Produces(MediaType.APPLICATION_JSON)
+   TransactionToken createView(@PathParam("view-name") String viewName);
+
+   @POST
+   @Path("view/{viewId}/applic/{applicability}")
+   @Consumes({MediaType.APPLICATION_JSON})
+   @Produces(MediaType.APPLICATION_JSON)
+   TransactionToken createApplicabilityForView(@PathParam("viewId") ArtifactId viewId, @PathParam("applicability") String applicability);
+
+   /**
+    * Used for Demo DB Init.
+    */
+   @POST
+   void createDemoApplicability();
 
 }
