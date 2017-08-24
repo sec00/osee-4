@@ -33,5 +33,6 @@ Import-Package: org.apache.commons.codec.binary,
  org.codehaus.jackson.annotate,
  org.codehaus.jackson.map,
  org.codehaus.jackson.map.annotate,
- org.codehaus.jackson.map.ser.std
+ org.codehaus.jackson.map.ser.std,
+ org.eclipse.jdt.annotation
 Require-Bundle: org.codehaus.jackson.mapper;bundle-version="1.9.13"
