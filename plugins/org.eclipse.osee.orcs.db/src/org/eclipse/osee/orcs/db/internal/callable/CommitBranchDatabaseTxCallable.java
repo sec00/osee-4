@@ -152,7 +152,7 @@ public class CommitBranchDatabaseTxCallable extends AbstractDatastoreTxCallable<
             newTx,
             destinationBranch,
             change.getNetChange().getGammaId(),
-            modType.getValue(),
+            modType,
             TxChange.getCurrent(modType),
             appToken});
       }
