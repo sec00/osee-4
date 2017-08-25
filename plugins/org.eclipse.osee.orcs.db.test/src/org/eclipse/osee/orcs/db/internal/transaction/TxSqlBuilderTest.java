@@ -190,7 +190,7 @@ public class TxSqlBuilderTest {
 
          // @formatter:off
          verifyRow(SqlOrderEnum.ARTIFACTS, ITEM_ID, TYPE_UUID, NEXT_GAMMA_ID, EXP_GUID);
-         verifyRow(SqlOrderEnum.TXS, EXPECTED_TX, NEXT_GAMMA_ID, modType.getValue(), TxChange.CURRENT, COMMON);
+         verifyRow(SqlOrderEnum.TXS, EXPECTED_TX, NEXT_GAMMA_ID, modType, TxChange.CURRENT, COMMON);
          verifyQuery(SqlOrderEnum.ARTIFACTS);
          // @formatter:on
 
@@ -212,7 +212,7 @@ public class TxSqlBuilderTest {
          ModificationType expectedType = modType != REPLACED_WITH_VERSION ? modType : MODIFIED;
 
          // @formatter:off
-         verifyRow(SqlOrderEnum.TXS, EXPECTED_TX, GammaId.SENTINEL, expectedType.getValue(), TxChange.getCurrent(expectedType), COMMON);
+         verifyRow(SqlOrderEnum.TXS, EXPECTED_TX, GammaId.SENTINEL, expectedType, TxChange.getCurrent(expectedType), COMMON);
          verifyQuery(SqlOrderEnum.ARTIFACTS);
          // @formatter:on
 
@@ -260,7 +260,7 @@ public class TxSqlBuilderTest {
 
          // @formatter:off
          verifyRow(SqlOrderEnum.RELATIONS, ITEM_ID, TYPE_UUID, NEXT_GAMMA_ID, A_ART_ID.getId().intValue(), B_ART_ID.getId().intValue(), RATIONALE);
-         verifyRow(SqlOrderEnum.TXS, EXPECTED_TX, NEXT_GAMMA_ID, modType.getValue(), TxChange.CURRENT, COMMON);
+         verifyRow(SqlOrderEnum.TXS, EXPECTED_TX, NEXT_GAMMA_ID, modType, TxChange.CURRENT, COMMON);
          verifyQuery(SqlOrderEnum.RELATIONS);
          // @formatter:on
 
@@ -282,7 +282,7 @@ public class TxSqlBuilderTest {
          ModificationType expectedType = modType != REPLACED_WITH_VERSION ? modType : MODIFIED;
 
          // @formatter:off
-         verifyRow(SqlOrderEnum.TXS, EXPECTED_TX, GammaId.SENTINEL, expectedType.getValue(), TxChange.getCurrent(expectedType), COMMON);
+         verifyRow(SqlOrderEnum.TXS, EXPECTED_TX, GammaId.SENTINEL, expectedType, TxChange.getCurrent(expectedType), COMMON);
          verifyQuery(SqlOrderEnum.RELATIONS);
          // @formatter:on
 
@@ -305,7 +305,7 @@ public class TxSqlBuilderTest {
 
          // @formatter:off
          verifyRow(SqlOrderEnum.ATTRIBUTES, ITEM_ID, TYPE_UUID, NEXT_GAMMA_ID, ATTR_ARTIFACT_ID,  ATTR_VALUE, ATTR_URI);
-         verifyRow(SqlOrderEnum.TXS, EXPECTED_TX, NEXT_GAMMA_ID, modType.getValue(), TxChange.CURRENT, COMMON);
+         verifyRow(SqlOrderEnum.TXS, EXPECTED_TX, NEXT_GAMMA_ID, modType, TxChange.CURRENT, COMMON);
          verifyQuery(SqlOrderEnum.ATTRIBUTES);
          // @formatter:on
 
@@ -337,7 +337,7 @@ public class TxSqlBuilderTest {
          ModificationType expectedType = modType != REPLACED_WITH_VERSION ? modType : MODIFIED;
 
          // @formatter:off
-         verifyRow(SqlOrderEnum.TXS, EXPECTED_TX, GammaId.SENTINEL, expectedType.getValue(), TxChange.getCurrent(expectedType), COMMON);
+         verifyRow(SqlOrderEnum.TXS, EXPECTED_TX, GammaId.SENTINEL, expectedType, TxChange.getCurrent(expectedType), COMMON);
          verifyQuery(SqlOrderEnum.ATTRIBUTES);
          // @formatter:on
 
