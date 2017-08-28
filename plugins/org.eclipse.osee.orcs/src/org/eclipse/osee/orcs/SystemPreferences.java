@@ -18,6 +18,8 @@ import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
  */
 public interface SystemPreferences {
 
+   public static String OSEE_PERMANENT_URL = "osee.permanent.base.url";
+
    public Set<String> getKeys() throws OseeCoreException;
 
    public String getSystemUuid() throws OseeCoreException;
