@@ -8,14 +8,20 @@
  * Contributors:
  *     Boeing - initial API and implementation
  *******************************************************************************/
-package org.eclipse.osee.define.report.internal.wordupdate;
+package org.eclipse.osee.define.report.api;
 
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import org.eclipse.osee.framework.core.data.BranchId;
+import org.eclipse.osee.framework.core.data.OseeServerContext;
 import org.eclipse.osee.framework.core.data.TransactionId;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.DeletionFlag;
+import org.eclipse.osee.framework.core.enums.PresentationType;
 import org.eclipse.osee.framework.core.model.type.LinkType;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
+import org.eclipse.osee.framework.jdk.core.util.HttpUrlBuilder;
 import org.eclipse.osee.framework.jdk.core.util.xml.Xml;
 import org.eclipse.osee.orcs.data.ArtifactReadable;
 
@@ -135,9 +141,13 @@ public class OseeLinkBuilder {
       return String.format(OSEE_LINK_MARKER, guid);
    }
 
-   public String getWordMlLink(LinkType destLinkType, ArtifactReadable artifact, TransactionId txId, String sessionId, String oseeLink) throws OseeCoreException {
+   public String getWordMlLink(LinkType destLinkType, ArtifactReadable artifact, TransactionId txId, String sessionId, String permanentUrl) {
+      return getWordMlLink(destLinkType, artifact, txId, sessionId, PresentationType.DEFAULT_OPEN, permanentUrl);
+   }
+
+   public String getWordMlLink(LinkType destLinkType, ArtifactReadable artifact, TransactionId txId, String sessionId, PresentationType presentationType, String permanentUrl) throws OseeCoreException {
       String linkFormat = getLinkFormat(destLinkType);
-      String linkId = getLinkId(destLinkType, artifact, txId, sessionId, oseeLink);
+      String linkId = getLinkId(destLinkType, artifact, txId, sessionId, presentationType, permanentUrl);
       String linkText = getLinkText(destLinkType, artifact);
       return String.format(linkFormat, linkId, linkText);
    }
@@ -152,14 +162,40 @@ public class OseeLinkBuilder {
       return toReturn;
    }
 
-   private String getLinkId(LinkType destLinkType, ArtifactReadable artifact, TransactionId tx, String sessionId, String oseeLink) throws OseeCoreException {
+   private String getLinkId(LinkType destLinkType, ArtifactReadable artifact, TransactionId tx, String sessionId, PresentationType presentationType, String permanentUrl) throws OseeCoreException {
       String toReturn;
       if (destLinkType == LinkType.OSEE_SERVER_LINK) {
-         toReturn = escapeXml(oseeLink);
+         toReturn = escapeXml(getOseeLink(artifact, presentationType, sessionId, permanentUrl));
       } else {
          toReturn = artifact.getGuid();
       }
       return toReturn;
+   }
+
+   private String getOseeLink(ArtifactReadable artifact, PresentationType presentationType, String sessionId, String permanentUrl) {
+      Map<String, String> parameters = new HashMap<>();
+      parameters.put("sessionId", sessionId);
+      parameters.put("context", "osee/loopback");
+      parameters.put("guid", artifact.getGuid());
+      parameters.put("branchUuid", String.valueOf(artifact.getBranch().getGuid()));
+      parameters.put("isDeleted", String.valueOf(artifact.isDeleted()));
+
+      if (artifact.isHistorical() && presentationType != PresentationType.DIFF && presentationType != PresentationType.F5_DIFF) {
+         parameters.put("transactionId", String.valueOf(artifact.getTransaction()));
+      }
+
+      parameters.put("cmd", "open.artifact");
+      URL url = null;
+
+      try {
+         String urlString =
+            HttpUrlBuilder.createURL(permanentUrl, OseeServerContext.CLIENT_LOOPBACK_CONTEXT, parameters);
+         url = new URL(urlString);
+      } catch (Exception ex) {
+         throw OseeCoreException.wrap(ex);
+      }
+
+      return url.toString();
    }
 
    private String getLinkText(LinkType linkType, ArtifactReadable artifact) throws OseeCoreException {
