@@ -311,7 +311,7 @@ public class AccessControlService implements IAccessControlService {
    private void addLockAccessControl(ArtifactToken userArtifact, Collection<?> objectsToCheck, AccessData accessData) throws OseeCoreException {
       for (Object obj : objectsToCheck) {
          Artifact subject = getSubjectFromLockedObject(obj);
-         if (subject != null && !subject.equals(userArtifact)) {
+         if (subject != null && subject.notEqual(userArtifact)) {
             accessData.add(obj,
                new AccessDetail<ArtifactToken>((Artifact) obj, PermissionEnum.LOCK, Scope.createArtifactLockScope()));
          }
@@ -439,8 +439,8 @@ public class AccessControlService implements IAccessControlService {
          }
       }
       if (userPermission == null) {
-         if (!CoreBranches.COMMON.equals(accessObject.getBranch()) && BranchManager.getType(
-            accessObject.getBranch()).isBaselineBranch()) {
+         if (CoreBranches.COMMON.notEqual(
+            accessObject.getBranch()) && BranchManager.getType(accessObject.getBranch()).isBaselineBranch()) {
             userPermission = PermissionEnum.READ;
          } else {
             userPermission = PermissionEnum.FULLACCESS;
