@@ -51,7 +51,7 @@ public class BranchXViewer extends XViewer {
       ArrayList<BranchId> branches = xBranchViewer.getSelectedBranches();
       if (branches != null && !branches.isEmpty()) {
          for (BranchId branch : branches) {
-            if (!branch.equals(CoreBranches.SYSTEM_ROOT)) {
+            if (branch.notEqual(CoreBranches.SYSTEM_ROOT)) {
                if (!BranchManager.getType(branch).isMergeBranch()) {
                   ArtifactExplorer.exploreBranch(branch);
                   BranchManager.setLastBranch(branch);
