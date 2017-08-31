@@ -27,10 +27,11 @@ import org.eclipse.osee.framework.skynet.core.attribute.AttributeAdapter;
 /**
  * @author Donald G. Dunne
  */
-public class CommonArtifactReferenceAttributeAdapter implements AttributeAdapter<Artifact> {
+public class CommonArtifactReferenceAttributeAdapter implements AttributeAdapter<ArtifactId> {
 
-   private static final List<AttributeTypeId> ATTR_TYPE_UUID_LIST = Arrays.asList(AtsAttributeTypes.ProgramUuid,
-      AtsAttributeTypes.TeamDefinitionReference, AtsAttributeTypes.ActionableItemReference);
+   private static final List<AttributeTypeId> ATTR_TYPE_UUID_LIST =
+      Arrays.asList(AtsAttributeTypes.ProgramUuid, AtsAttributeTypes.TeamDefinitionReference,
+         AtsAttributeTypes.ActionableItemReference, AtsAttributeTypes.WorkPackageReference);
 
    @Override
    public Collection<AttributeTypeId> getSupportedTypes() {

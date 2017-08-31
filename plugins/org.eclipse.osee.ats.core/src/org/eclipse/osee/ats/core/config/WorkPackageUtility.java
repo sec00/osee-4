@@ -96,10 +96,10 @@ public class WorkPackageUtility {
     */
    public Pair<ArtifactId, Boolean> getWorkPackageArtifact(IAtsServices services, IAtsWorkItem workItem) {
       Pair<ArtifactId, Boolean> result = new Pair<>(null, false);
-      String workPackageGuid =
-         services.getAttributeResolver().getSoleAttributeValue(workItem, AtsAttributeTypes.WorkPackageGuid, null);
-      if (Strings.isValid(workPackageGuid)) {
-         ArtifactId workPackageArt = services.getArtifactByGuid(workPackageGuid);
+      String workPackageId =
+         services.getAttributeResolver().getSoleAttributeValue(workItem, AtsAttributeTypes.WorkPackageReference, null);
+      if (Strings.isNumeric(workPackageId)) {
+         ArtifactId workPackageArt = services.getArtifact(Long.valueOf(workPackageId));
          if (workPackageArt != null) {
             result.setFirst(workPackageArt);
          }

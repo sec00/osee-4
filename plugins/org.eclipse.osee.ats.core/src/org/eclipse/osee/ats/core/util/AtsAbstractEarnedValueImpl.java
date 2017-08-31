@@ -53,15 +53,16 @@ public abstract class AtsAbstractEarnedValueImpl implements IAtsEarnedValueServi
    public String getWorkPackageId(IAtsWorkItem workItem) {
       ArtifactId artifact = services.getArtifact(workItem);
       Conditions.checkNotNull(artifact, "workItem", "Can't Find Work Package matching %s", workItem.toStringWithId());
-      return services.getAttributeResolver().getSoleAttributeValue(workItem, AtsAttributeTypes.WorkPackageGuid, null);
+      return services.getAttributeResolver().getSoleAttributeValue(workItem, AtsAttributeTypes.WorkPackageReference,
+         null);
    }
 
    @Override
    public IAtsWorkPackage getWorkPackage(IAtsWorkItem workItem) throws OseeCoreException {
       WorkPackage wpa = null;
-      String workPackageGuid = getWorkPackageId(workItem);
-      if (Strings.isValid(workPackageGuid)) {
-         ArtifactToken workPkgArt = services.getArtifactById(workPackageGuid);
+      String workPackageId = getWorkPackageId(workItem);
+      if (Strings.isNumeric(workPackageId)) {
+         ArtifactToken workPkgArt = services.getArtifact(Long.valueOf(workPackageId));
          wpa = new WorkPackage(logger, workPkgArt, services);
       }
       return wpa;
@@ -199,7 +200,7 @@ public abstract class AtsAbstractEarnedValueImpl implements IAtsEarnedValueServi
 
    @Override
    public void setWorkPackage(IAtsWorkPackage workPackage, IAtsWorkItem workItem, IAtsChangeSet changes) {
-      changes.setSoleAttributeValue(workItem, AtsAttributeTypes.WorkPackageGuid, workPackage.getGuid());
+      changes.setSoleAttributeValue(workItem, AtsAttributeTypes.WorkPackageReference, workPackage.getIdString());
    }
 
 }

@@ -213,19 +213,19 @@ public class AtsArtifactChecks extends ArtifactCheck {
    }
 
    private IStatus checkWorkPackages(boolean isAtsAdmin, Collection<Artifact> artifacts) throws OseeCoreException {
-      List<String> guids = new ArrayList<>();
+      List<String> ids = new ArrayList<>();
       for (Artifact art : artifacts) {
          if (art.isOfType(AtsArtifactTypes.WorkPackage)) {
-            guids.add(art.getGuid());
+            ids.add(art.getIdString());
          }
       }
-      if (!guids.isEmpty()) {
+      if (!ids.isEmpty()) {
          List<Artifact> artifactListFromIds = ArtifactQuery.getArtifactListFromAttributeValues(
-            AtsAttributeTypes.WorkPackageGuid, guids, AtsClientService.get().getAtsBranch(), 5);
+            AtsAttributeTypes.WorkPackageReference, ids, AtsClientService.get().getAtsBranch(), 5);
          if (artifactListFromIds.size() > 0) {
             return createStatus(String.format(
                "Work Packages [%s] selected to delete have related Work Items; Delete or re-assign Work Packages first.",
-               guids));
+               ids));
          }
       }
       return Status.OK_STATUS;

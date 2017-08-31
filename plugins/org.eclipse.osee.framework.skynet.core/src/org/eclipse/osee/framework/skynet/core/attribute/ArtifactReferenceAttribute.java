@@ -10,19 +10,19 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.skynet.core.attribute;
 
+import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
-import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 
 /**
  * @author Roberto E. Escobar
  */
-public class ArtifactReferenceAttribute extends IdentityReferenceAttribute<Artifact> {
+public class ArtifactReferenceAttribute extends IdentityReferenceAttribute<ArtifactId> {
 
    Long rawValue;
 
    @Override
-   protected boolean subClassSetValue(Artifact artifact) throws OseeCoreException {
-      rawValue = artifact == null ? null : artifact.getUuid();
+   protected boolean subClassSetValue(ArtifactId artifact) throws OseeCoreException {
+      rawValue = artifact == null ? null : artifact.getId();
       return getAttributeDataProvider().setValue(artifact == null ? "" : artifact.getIdString());
    }
 

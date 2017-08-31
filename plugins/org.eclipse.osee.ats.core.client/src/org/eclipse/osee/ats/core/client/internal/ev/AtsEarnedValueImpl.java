@@ -40,14 +40,14 @@ public class AtsEarnedValueImpl extends AtsAbstractEarnedValueImpl {
 
    @Override
    public String getWorkPackageId(IAtsWorkItem workItem) {
-      String guid = null;
+      String id = null;
       Artifact artifact = AtsClientService.get().getArtifact(workItem);
       Conditions.checkNotNull(artifact, "workItem", "Can't Find Work Package matching %s", workItem.toStringWithId());
       if (artifact instanceof AbstractWorkflowArtifact) {
          AbstractWorkflowArtifact awa = (AbstractWorkflowArtifact) artifact;
-         guid = awa.getSoleAttributeValue(AtsAttributeTypes.WorkPackageGuid, null);
+         id = awa.getSoleAttributeValue(AtsAttributeTypes.WorkPackageReference, null);
       }
-      return guid;
+      return id;
    }
 
    @Override

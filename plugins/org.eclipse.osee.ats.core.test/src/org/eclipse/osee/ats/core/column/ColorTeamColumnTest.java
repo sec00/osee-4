@@ -57,19 +57,20 @@ public class ColorTeamColumnTest {
 
    @org.junit.Test
    public void testTeamWorkflow() throws Exception {
-      when(attributeResolver.getSoleAttributeValue(teamWf1, AtsAttributeTypes.WorkPackageGuid, null)).thenReturn(null);
+      when(attributeResolver.getSoleAttributeValue(teamWf1, AtsAttributeTypes.WorkPackageReference, null)).thenReturn(
+         null);
 
       Pair<String, Boolean> result = ColorTeamColumn.getWorkItemColorTeam(teamWf1, atsServices);
       assertEquals("", result.getFirst());
 
-      when(attributeResolver.getSoleAttributeValue(teamWf1, AtsAttributeTypes.WorkPackageGuid, null)).thenReturn(
-         "guid");
-      when(atsServices.getArtifactById("guid")).thenReturn(null);
+      when(attributeResolver.getSoleAttributeValue(teamWf1, AtsAttributeTypes.WorkPackageReference, null)).thenReturn(
+         "id");
+      when(atsServices.getArtifactById("id")).thenReturn(null);
 
       result = ColorTeamColumn.getWorkItemColorTeam(teamWf1, atsServices);
       assertEquals("", result.getFirst());
 
-      when(atsServices.getArtifactById("guid")).thenReturn(workPackageArt);
+      when(atsServices.getArtifactById("id")).thenReturn(workPackageArt);
       when(attributeResolver.getSoleAttributeValue(workPackageArt, AtsAttributeTypes.ColorTeam, "")).thenReturn("");
 
       result = ColorTeamColumn.getWorkItemColorTeam(teamWf1, atsServices);
@@ -92,8 +93,8 @@ public class ColorTeamColumnTest {
    }
 
    private void testChildWorkItem(IAtsWorkItem childWorkItem) {
-      when(attributeResolver.getSoleAttributeValue(childWorkItem, AtsAttributeTypes.WorkPackageGuid, null)).thenReturn(
-         null);
+      when(attributeResolver.getSoleAttributeValue(childWorkItem, AtsAttributeTypes.WorkPackageReference,
+         null)).thenReturn(null);
 
       Pair<String, Boolean> result = ColorTeamColumn.getWorkItemColorTeam(childWorkItem, atsServices);
       assertEquals("", result.getFirst());
@@ -102,14 +103,14 @@ public class ColorTeamColumnTest {
       result = ColorTeamColumn.getWorkItemColorTeam(childWorkItem, atsServices);
       assertEquals("", result.getFirst());
 
-      when(attributeResolver.getSoleAttributeValue(teamWf1, AtsAttributeTypes.WorkPackageGuid, null)).thenReturn(
-         "guid");
-      when(atsServices.getArtifactById("guid")).thenReturn(null);
+      when(attributeResolver.getSoleAttributeValue(teamWf1, AtsAttributeTypes.WorkPackageReference, null)).thenReturn(
+         "id");
+      when(atsServices.getArtifactById("id")).thenReturn(null);
 
       result = ColorTeamColumn.getWorkItemColorTeam(childWorkItem, atsServices);
       assertEquals("", result.getFirst());
 
-      when(atsServices.getArtifactById("guid")).thenReturn(workPackageArt);
+      when(atsServices.getArtifactById("id")).thenReturn(workPackageArt);
       when(attributeResolver.getSoleAttributeValue(workPackageArt, AtsAttributeTypes.ColorTeam, "")).thenReturn("");
 
       result = ColorTeamColumn.getWorkItemColorTeam(childWorkItem, atsServices);

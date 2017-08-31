@@ -31,20 +31,20 @@ public class ColorTeamColumn {
    public static Pair<String, Boolean> getWorkItemColorTeam(IAtsWorkItem workItem, IAtsServices atsServices) {
       Pair<String, Boolean> result = new Pair<>(null, false);
       IAttributeResolver attributeResolver = atsServices.getAttributeResolver();
-      String workPackageGuid =
-         attributeResolver.getSoleAttributeValue(workItem, AtsAttributeTypes.WorkPackageGuid, null);
-      if (workPackageGuid == null) {
-         if (!(workItem instanceof IAtsTeamWorkflow)) {
+      String workPackageId =
+         attributeResolver.getSoleAttributeValue(workItem, AtsAttributeTypes.WorkPackageReference, null);
+      if (workPackageId == null) {
+         if (!workItem.isTeamWorkflow()) {
             IAtsTeamWorkflow teamWf = workItem.getParentTeamWorkflow();
             if (teamWf != null) {
-               workPackageGuid =
-                  attributeResolver.getSoleAttributeValue(teamWf, AtsAttributeTypes.WorkPackageGuid, null);
+               workPackageId =
+                  attributeResolver.getSoleAttributeValue(teamWf, AtsAttributeTypes.WorkPackageReference, null);
                result.setSecond(true);
             }
          }
       }
-      if (workPackageGuid != null) {
-         ArtifactId workPackageArt = atsServices.getArtifactById(workPackageGuid);
+      if (workPackageId != null) {
+         ArtifactId workPackageArt = atsServices.getArtifactById(workPackageId);
          if (workPackageArt != null) {
             String colorTeam = attributeResolver.getSoleAttributeValue(workPackageArt, AtsAttributeTypes.ColorTeam, "");
             result.setFirst(colorTeam);
