@@ -220,7 +220,7 @@ public class AttributeTypesImpl implements AttributeTypes {
    @Override
    public boolean isStringType(AttributeTypeId attributeType) {
       String baseType = getBaseAttributeTypeId(attributeType);
-      return baseType != null && baseType.toLowerCase().contains("string");
+      return baseType != null && baseType.endsWith("StringAttribute");
    }
 
    @Override
@@ -236,6 +236,12 @@ public class AttributeTypesImpl implements AttributeTypes {
    }
 
    @Override
+   public boolean isArtifactReferencedAttribute(AttributeTypeId attrType) {
+      String baseType = getBaseAttributeTypeId(attrType);
+      return baseType != null && baseType.endsWith("ArtifactReferenceAttribute");
+   }
+
+   @Override
    public AttributeTypeId getByName(String attrTypeName) {
       AttributeTypeId attrType = null;
       for (AttributeTypeToken type : getAll()) {
@@ -246,4 +252,5 @@ public class AttributeTypesImpl implements AttributeTypes {
       }
       return attrType;
    }
+
 }
