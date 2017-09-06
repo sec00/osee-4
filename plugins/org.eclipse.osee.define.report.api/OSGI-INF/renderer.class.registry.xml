@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="start" deactivate="stop" name="org.eclipse.osee.define.report.api.RendererClassRegistry">
+   <implementation class="org.eclipse.osee.define.report.api.RendererClassRegistry"/>
+    <service>
+         <provide interface="org.eclipse.osee.define.report.api.RendererClassRegistry"/>
+      </service>
+      <reference bind="addProvider" cardinality="1..n" interface="org.eclipse.osee.define.report.api.Renderer" name="Renderer" policy="dynamic" unbind="removeProvider"/>
+</scr:component>

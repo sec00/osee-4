@@ -134,11 +134,6 @@ public final class RendererManager {
       return bestRendererPrototype;
    }
 
-   public static void renderAttribute(AttributeTypeToken attributeType, PresentationType presentationType, Artifact artifact, WordMLProducer producer, String format, String label, String footer, Map<RendererOption, Object> rendererOptions) throws OseeCoreException {
-      getBestRenderer(PRODUCE_ATTRIBUTE, artifact, rendererOptions).renderAttribute(attributeType, artifact,
-         presentationType, producer, format, label, footer);
-   }
-
    public static Collection<AttributeTypeToken> getAttributeTypeOrderList(Artifact artifact) throws OseeCoreException {
       return getBestRenderer(PresentationType.PRODUCE_ATTRIBUTE, artifact,
          new HashMap<RendererOption, Object>()).getOrderedAttributeTypes(artifact, artifact.getAttributeTypes());

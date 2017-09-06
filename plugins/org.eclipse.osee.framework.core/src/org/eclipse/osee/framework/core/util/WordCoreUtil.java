@@ -34,6 +34,9 @@ import org.eclipse.osee.framework.jdk.core.util.xml.Xml;
  */
 
 public class WordCoreUtil {
+   public static final String BEFORE_GUID_STRING = "/BeforeGUID/PrePend";
+   public static final String AFTER_GUID_STRING = "/AfterGUID";
+
    public static String FEATUREAPP = "feature";
    public static String CONFIGAPP = "configuration";
 
@@ -299,5 +302,19 @@ public class WordCoreUtil {
       }
 
       return toReturn;
+   }
+
+   public static String removeGuidFromTemplate(String templateContent) {
+      String newTemplate = "";
+
+      String[] splitsBeforeAndAfter = templateContent.split(BEFORE_GUID_STRING + "|" + AFTER_GUID_STRING);
+
+      if (splitsBeforeAndAfter.length == 3) {
+         newTemplate = splitsBeforeAndAfter[0] + " " + splitsBeforeAndAfter[2];
+      } else {
+         newTemplate = templateContent;
+      }
+
+      return newTemplate;
    }
 }

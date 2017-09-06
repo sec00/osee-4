@@ -73,6 +73,9 @@ public final class DiffUsingRenderer extends AbstractOperation {
       }
 
       IComparator comparator = renderer.getComparator();
+      if (renderer instanceof DefaultArtifactRenderer) {
+         ((DefaultArtifactRenderer) renderer).updateOption(RendererOption.PUBLISH_DIFF, true);
+      }
       if (artifactDeltas.size() == 1) {
          comparator.compare(monitor, collector, DIFF, firstDelta, pathPrefix);
       } else {

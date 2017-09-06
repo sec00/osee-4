@@ -60,13 +60,11 @@ import org.xml.sax.SAXException;
 public class WordUpdateArtifact {
    private final OrcsApi orcsApi;
    private final QueryFactory queryFactory;
-   private final Log logger;
    private final EventAdmin eventAdmin;
 
-   public WordUpdateArtifact(Log logger, OrcsApi orcsApi, EventAdmin eventAdmin) {
+   public WordUpdateArtifact(OrcsApi orcsApi, EventAdmin eventAdmin) {
       this.orcsApi = orcsApi;
       this.queryFactory = orcsApi.getQueryFactory();
-      this.logger = logger;
       this.eventAdmin = eventAdmin;
    }
 
@@ -214,15 +212,11 @@ public class WordUpdateArtifact {
       updateChange.setTx(tx);
       updateChange.setBranch(tx.getBranch());
       if (updateChange.hasSafetyRelatedArtifactChange()) {
-         try {
-            HashMap<String, Object> properties = new HashMap<String, Object>();
-            properties.put(SafetyWorkflowEventHandler.SAFETY_EVENT_BRANCH_ID, tx.getBranch());
-            properties.put(SafetyWorkflowEventHandler.SAFETY_EVENT_USER_ART, account);
-            Event event = new Event(SafetyWorkflowEventHandler.SAFETY_EVENT_TOPIC, properties);
-            eventAdmin.postEvent(event);
-         } catch (Exception ex) {
-            logger.error(ex, "Could not create safety workflow");
-         }
+         HashMap<String, Object> properties = new HashMap<String, Object>();
+         properties.put(SafetyWorkflowEventHandler.SAFETY_EVENT_BRANCH_ID, tx.getBranch());
+         properties.put(SafetyWorkflowEventHandler.SAFETY_EVENT_USER_ART, account);
+         Event event = new Event(SafetyWorkflowEventHandler.SAFETY_EVENT_TOPIC, properties);
+         eventAdmin.postEvent(event);
       }
    }
 

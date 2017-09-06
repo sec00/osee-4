@@ -53,6 +53,7 @@ public class SingleNativeDiffHandler extends CommandHandler {
       rendererOptions.put(RendererOption.VIEW, Handlers.getViewId());
 
       RendererManager.diffInJob(artifactDeltas, pathPrefix, rendererOptions);
+
       return null;
    }
 }

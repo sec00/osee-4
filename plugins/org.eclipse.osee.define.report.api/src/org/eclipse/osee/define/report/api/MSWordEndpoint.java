@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.define.report.api;
 
+import java.io.InputStream;
 import java.util.Set;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -33,6 +34,19 @@ public interface MSWordEndpoint {
    @POST
    @Consumes({MediaType.APPLICATION_JSON})
    @Produces({MediaType.APPLICATION_JSON})
-   @Path("render")
+   @Path("render-applicability")
    Pair<String, Set<String>> renderWordTemplateContent(WordTemplateContentData data) throws OseeCoreException;
+
+   @POST
+   @Consumes({MediaType.APPLICATION_JSON})
+   @Produces({MediaType.APPLICATION_JSON})
+   @Path("template")
+   InputStream applyTemplate(TemplateData data);
+
+   @POST
+   @Consumes({MediaType.APPLICATION_JSON})
+   @Produces({MediaType.APPLICATION_JSON})
+   @Path("nested-templates")
+   InputStream applyNestedTemplates(NestedTemplateData data);
+
 }

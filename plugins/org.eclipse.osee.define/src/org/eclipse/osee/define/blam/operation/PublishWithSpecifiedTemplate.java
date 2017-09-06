@@ -169,7 +169,6 @@ public class PublishWithSpecifiedTemplate extends AbstractBlam {
       rendererOptionsMap.put(LINK_TYPE, linkType);
       rendererOptionsMap.put(UPDATE_PARAGRAPH_NUMBERS, variableMap.getBoolean(UPDATE_PARAGRAPH_NUMBERS.getKey()));
       rendererOptionsMap.put(EXCLUDE_ARTIFACT_TYPES, variableMap.getArtifactTypes(EXCLUDE_ARTIFACT_TYPES.getKey()));
-      rendererOptionsMap.put(TRANSACTION_OPTION, transaction);
       rendererOptionsMap.put(SKIP_ERRORS, true);
       rendererOptionsMap.put(EXCLUDE_FOLDERS, true);
       rendererOptionsMap.put(RECURSE, true);

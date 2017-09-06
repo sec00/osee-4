@@ -73,7 +73,7 @@ public final class WordTemplateFileDiffer {
 
       TransactionToken startTransaction;
 
-      if (compareBranch == null) {
+      if (compareBranch == null || compareBranch.isInvalid()) {
          startTransaction = BranchManager.getBaseTransaction(endBranch);
          compareBranch = endBranch;
       } else {

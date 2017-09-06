@@ -12,6 +12,7 @@
 package org.eclipse.osee.framework.ui.skynet.render;
 
 import static org.eclipse.osee.framework.core.enums.CoreAttributeTypes.WordTemplateContent;
+import static org.eclipse.osee.framework.core.enums.CoreBranches.COMMON;
 import static org.eclipse.osee.framework.core.enums.PresentationType.DEFAULT_OPEN;
 import static org.eclipse.osee.framework.core.enums.PresentationType.DIFF;
 import static org.eclipse.osee.framework.core.enums.PresentationType.GENERALIZED_EDIT;
@@ -27,18 +28,20 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.osee.define.report.api.WordTemplateContentData;
+import org.eclipse.osee.define.report.api.NestedTemplateData;
+import org.eclipse.osee.define.report.api.TemplateData;
 import org.eclipse.osee.framework.core.client.ClientSessionManager;
 import org.eclipse.osee.framework.core.data.ArtifactId;
-import org.eclipse.osee.framework.core.data.AttributeTypeToken;
 import org.eclipse.osee.framework.core.data.BranchId;
-import org.eclipse.osee.framework.core.data.TransactionId;
+import org.eclipse.osee.framework.core.data.UserId;
 import org.eclipse.osee.framework.core.enums.CommandGroup;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.CoreBranches;
@@ -46,22 +49,20 @@ import org.eclipse.osee.framework.core.enums.CoreRelationTypes;
 import org.eclipse.osee.framework.core.enums.PresentationType;
 import org.eclipse.osee.framework.core.operation.IOperation;
 import org.eclipse.osee.framework.core.util.RendererOption;
-import org.eclipse.osee.framework.core.util.WordMLProducer;
+import org.eclipse.osee.framework.core.util.RendererUtil;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
-import org.eclipse.osee.framework.jdk.core.type.Pair;
+import org.eclipse.osee.framework.jdk.core.util.Strings;
+import org.eclipse.osee.framework.jdk.core.util.io.CharBackedInputStream;
 import org.eclipse.osee.framework.jdk.core.util.xml.Jaxp;
 import org.eclipse.osee.framework.logging.OseeLog;
+import org.eclipse.osee.framework.skynet.core.UserManager;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
-import org.eclipse.osee.framework.skynet.core.artifact.ArtifactURL;
 import org.eclipse.osee.framework.skynet.core.artifact.search.ArtifactQuery;
-import org.eclipse.osee.framework.skynet.core.httpRequests.HttpWordUpdateRequest;
-import org.eclipse.osee.framework.skynet.core.linking.LinkType;
-import org.eclipse.osee.framework.skynet.core.linking.OseeLinkBuilder;
 import org.eclipse.osee.framework.skynet.core.word.WordUtil;
 import org.eclipse.osee.framework.ui.skynet.MenuCmdDef;
+import org.eclipse.osee.framework.ui.skynet.internal.ServiceUtil;
 import org.eclipse.osee.framework.ui.skynet.render.compare.IComparator;
 import org.eclipse.osee.framework.ui.skynet.render.compare.WordTemplateCompare;
-import org.eclipse.osee.framework.ui.skynet.render.word.WordTemplateProcessor;
 import org.eclipse.osee.framework.ui.skynet.templates.TemplateManager;
 import org.eclipse.osee.framework.ui.skynet.util.WordUiUtil;
 import org.eclipse.osee.framework.ui.swt.Displays;
@@ -74,6 +75,13 @@ import org.w3c.dom.Element;
  * @author Jeff C. Phillips
  */
 public class WordTemplateRenderer extends WordRenderer {
+   private static final String INSERT_LINK = "INSERT_LINK_HERE";
+   private static final String INSERT_ARTIFACT_HERE = "INSERT_ARTIFACT_HERE";
+
+   private static final Pattern headElementsPattern =
+      Pattern.compile("(" + INSERT_ARTIFACT_HERE + ")" + "|" + INSERT_LINK,
+         Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
+
    private static final String EMBEDDED_OBJECT_NO = "w:embeddedObjPresent=\"no\"";
    private static final String EMBEDDED_OBJECT_YES = "w:embeddedObjPresent=\"yes\"";
    private static final String STYLES = "<w:styles>.*?</w:styles>";
@@ -81,13 +89,11 @@ public class WordTemplateRenderer extends WordRenderer {
    private static final String OLE_START = "<w:docOleData>";
    private static final String OLE_END = "</w:docOleData>";
 
-   private final WordTemplateProcessor templateProcessor;
    private final IComparator comparator;
 
    public WordTemplateRenderer(Map<RendererOption, Object> options) {
       super(options);
       this.comparator = new WordTemplateCompare(this);
-      this.templateProcessor = new WordTemplateProcessor(this);
    }
 
    public WordTemplateRenderer() {
@@ -105,7 +111,25 @@ public class WordTemplateRenderer extends WordRenderer {
    }
 
    public void publish(Artifact masterTemplateArtifact, Artifact slaveTemplateArtifact, List<Artifact> artifacts) throws OseeCoreException {
-      templateProcessor.publishWithNestedTemplates(masterTemplateArtifact, slaveTemplateArtifact, artifacts);
+      List<ArtifactId> artifactTokens = new ArrayList<>();
+      artifactTokens.addAll(artifacts);
+
+      Map<RendererOption, Object> rendererOptions = getRendererOptions();
+
+      BranchId branch = artifacts.iterator().next().getBranch();
+      NestedTemplateData data = new NestedTemplateData();
+      data.setArtifacts(artifactTokens);
+      data.setBranch(branch);
+      data.setMasterTemplate(masterTemplateArtifact);
+      data.setSlaveTemplate(slaveTemplateArtifact);
+      data.setRendererOptions(rendererOptions);
+      data.setUser(UserId.valueOf(UserManager.getUser().getId()));
+      data.setSessionId(ClientSessionManager.getSessionId());
+
+      IFile file = RendererUtil.getRenderFile(COMMON, PREVIEW, "/", masterTemplateArtifact.getName(), ".xml");
+      rendererOptions.put(RendererOption.RESULT_PATH_RETURN, file.getLocation().toOSString());
+
+      ServiceUtil.getOseeClient().getMSWordEndpoint().applyNestedTemplates(data);
    }
 
    /**
@@ -159,67 +183,6 @@ public class WordTemplateRenderer extends WordRenderer {
          }
       }
       return rating;
-   }
-
-   @Override
-   public void renderAttribute(AttributeTypeToken attributeType, Artifact artifact, PresentationType presentationType, WordMLProducer producer, String format, String label, String footer) throws OseeCoreException {
-      WordMLProducer wordMl = producer;
-
-      if (attributeType.equals(CoreAttributeTypes.WordTemplateContent)) {
-         String data = null;
-         LinkType linkType = (LinkType) getRendererOptionValue(RendererOption.LINK_TYPE);
-
-         if (label.length() > 0) {
-            wordMl.addParagraph(label);
-         }
-
-         TransactionId txId = null;
-         if (artifact.isHistorical()) {
-            txId = artifact.getTransaction();
-         } else {
-            txId = TransactionId.SENTINEL;
-         }
-
-         String oseeLink = ArtifactURL.getOpenInOseeLink(artifact, presentationType).toString();
-
-         WordTemplateContentData wtcData = new WordTemplateContentData();
-         wtcData.setArtId(artifact.getUuid());
-         wtcData.setBranch(artifact.getBranch());
-         wtcData.setFooter(footer);
-         wtcData.setIsEdit(presentationType == PresentationType.SPECIALIZED_EDIT);
-         wtcData.setLinkType(linkType != null ? linkType.toString() : null);
-         wtcData.setTxId(txId);
-         wtcData.setSessionId(ClientSessionManager.getSessionId());
-         wtcData.setOseeLink(oseeLink);
-         ArtifactId view = (ArtifactId) getRendererOptionValue(RendererOption.VIEW);
-         wtcData.setViewId(view == null ? ArtifactId.SENTINEL : view);
-
-         Pair<String, Set<String>> content = null;
-         try {
-            content = HttpWordUpdateRequest.renderWordTemplateContent(wtcData);
-         } catch (Exception e) {
-            WordUiUtil.displayErrorMessage(e.toString());
-         }
-
-         if (content != null) {
-            data = content.getFirst();
-            WordUiUtil.displayUnknownGuids(artifact, content.getSecond());
-         }
-
-         if (presentationType == PresentationType.SPECIALIZED_EDIT) {
-            OseeLinkBuilder linkBuilder = new OseeLinkBuilder();
-            wordMl.addEditParagraphNoEscape(linkBuilder.getStartEditImage(artifact.getGuid()));
-            wordMl.addWordMl(data);
-            wordMl.addEditParagraphNoEscape(linkBuilder.getEndEditImage(artifact.getGuid()));
-
-         } else if (data != null) {
-            wordMl.addWordMl(data);
-         }
-         wordMl.resetListValue();
-      } else {
-         super.renderAttribute(attributeType, artifact, PresentationType.SPECIALIZED_EDIT, wordMl, format, label,
-            footer);
-      }
    }
 
    @Override
@@ -301,8 +264,93 @@ public class WordTemplateRenderer extends WordRenderer {
 
       templateContent = WordUtil.removeGUIDFromTemplate(templateContent);
 
-      return templateProcessor.applyTemplate(artifacts, templateContent, templateOptions, templateStyles, null, null,
-         (String) getRendererOptionValue(RendererOption.OUTLINE_TYPE), presentationType);
+      List<ArtifactId> artifactTokens = new ArrayList<>();
+      artifactTokens.addAll(artifacts);
+      BranchId branch = artifacts.iterator().next().getBranch();
+      // TODO: CHECK HERE FOR DIFF? - how will this work?
+      Map<RendererOption, Object> rendererOptions = getRendererOptions();
+      String outlineNumber = (String) getRendererOptionValue(RendererOption.OUTLINE_TYPE);
+      String outlineType = null;
+      boolean recurseChildren = (boolean) getRendererOptionValue(RendererOption.RECURSE);
+
+      CharBackedInputStream charBak = null;
+      //      if ((boolean) rendererOptions.get(PUBLISH_DIFF) || (boolean) rendererOptions.get(ORIG_PUBLISH_AS_DIFF)) {
+      //         try {
+      //            charBak = new CharBackedInputStream();
+      //
+      //            WordMLProducer wordMl = new WordMLProducer(charBak);
+      //            outlineNumber = peekAtFirstArtifactToGetParagraphNumber(templateContent, null, artifacts);
+      //            //set heading numbers for wordml using templatecontent
+      //            templateContent = wordMl.setHeadingNumbers(outlineNumber, templateContent, outlineType);
+      //
+      //            Matcher matcher = headElementsPattern.matcher(templateContent);
+      //
+      //            int lastEndIndex = 0;
+      //            // add wordml from template content based on matcher
+      //            if (matcher.find()) {
+      //               wordMl.addWordMl(templateContent.substring(lastEndIndex, matcher.start()));
+      //               lastEndIndex = matcher.end();
+      //            }
+      //
+      //            // set next paragraph number
+      //            if (Strings.isValid(outlineNumber)) {
+      //               wordMl.setNextParagraphNumberTo(outlineNumber);
+      //            }
+      //
+      //            WordTemplateFileDiffer templateFileDiffer = new WordTemplateFileDiffer(this);
+      //            templateFileDiffer.generateFileDifferences(artifacts, "/results/", outlineNumber, outlineType,
+      //               recurseChildren);
+      //
+      //            String endOfTemplate = templateContent.substring(lastEndIndex);
+      //
+      //            wordMl.addWordMl(updateFooter(endOfTemplate));
+      //
+      //         } catch (Exception ex) {
+      //            // throw
+      //            throw new OseeCoreException(ex);
+      //         }
+      //
+      //         return charBak;
+      //      } else {
+
+      TemplateData data = new TemplateData();
+      data.setArtifacts(artifactTokens);
+      data.setBranch(branch);
+      data.setTemplateContent(templateContent);
+      data.setTemplateOptions(templateOptions);
+      data.setTemplateStyles(templateStyles);
+      data.setFolder(null);
+      data.setOutlineNumber(null);
+      data.setOutlineType((String) rendererOptions.get(RendererOption.OUTLINE_TYPE));
+      data.setPresentationType(presentationType);
+      data.setRendererOptions(getRendererOptions());
+      data.setUser(UserId.valueOf(UserManager.getUser().getId()));
+      data.setSessionId(ClientSessionManager.getSessionId());
+
+      return ServiceUtil.getOseeClient().getMSWordEndpoint().applyTemplate(data);
+      //   }
+   }
+
+   protected String peekAtFirstArtifactToGetParagraphNumber(String template, String nextParagraphNumber, List<Artifact> artifacts) throws OseeCoreException {
+      String startParagraphNumber = "1";
+      if (artifacts != null) {
+         Matcher matcher = headElementsPattern.matcher(template);
+
+         if (matcher.find()) {
+            String elementType = matcher.group(0);
+
+            if (elementType != null && elementType.equals(INSERT_ARTIFACT_HERE) && !artifacts.isEmpty()) {
+               Artifact artifact = artifacts.iterator().next();
+               if (artifact.isAttributeTypeValid(CoreAttributeTypes.ParagraphNumber)) {
+                  String paragraphNum = artifact.getSoleAttributeValue(CoreAttributeTypes.ParagraphNumber, "");
+                  if (Strings.isValid(paragraphNum)) {
+                     startParagraphNumber = paragraphNum;
+                  }
+               }
+            }
+         }
+      }
+      return startParagraphNumber;
    }
 
    protected Artifact getTemplate(Artifact artifact, PresentationType presentationType) throws OseeCoreException {

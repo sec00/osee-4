@@ -30,7 +30,6 @@ import org.eclipse.osee.framework.core.data.TransactionToken;
 import org.eclipse.osee.framework.core.data.TupleTypeId;
 import org.eclipse.osee.framework.core.enums.ModificationType;
 import org.eclipse.osee.framework.core.model.TransactionDelta;
-import org.eclipse.osee.framework.core.model.change.ChangeIgnoreType;
 import org.eclipse.osee.framework.core.model.change.ChangeItem;
 import org.eclipse.osee.framework.core.model.change.ChangeItemUtil;
 import org.eclipse.osee.framework.core.model.change.ChangeVersion;
@@ -365,7 +364,7 @@ public class ChangeDataLoader extends AbstractOperation {
          CompareResults results = proxy.compareTxs(txDelta.getStartTx(), txDelta.getEndTx());
          List<ChangeItem> changes = new ArrayList<>();
          for (ChangeItem item : results.getChanges()) {
-            if (isAllowableChange(item.getIgnoreType())) {
+            if (item.getIgnoreType().isAllowableChange()) {
                changes.add(item);
             }
          }
@@ -376,11 +375,5 @@ public class ChangeDataLoader extends AbstractOperation {
       }
    }
 
-   private static boolean isAllowableChange(ChangeIgnoreType ignoreType) {
-      return //
-      ignoreType.isNone() || //
-         ignoreType.isResurrected() || //
-         ignoreType.isDeletedOnDestAndNotResurrected() || //
-         ignoreType.isDeletedOnDestination();
-   }
+
 }

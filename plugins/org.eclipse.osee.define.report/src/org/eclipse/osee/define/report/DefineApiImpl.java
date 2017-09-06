@@ -44,9 +44,10 @@ public class DefineApiImpl implements DefineApi {
    }
 
    public void start() {
-      wordOperations = new MSWordOperationsImpl(orcsApi, logger, eventAdmin);
+      
       dataRightsOperations = new DataRightsOperationsImpl(orcsApi);
       traceabilityOperations = new TraceabilityOperationsImpl(orcsApi);
+      wordOperations = new MSWordOperationsImpl(orcsApi, logger, eventAdmin, dataRightsOperations);
    }
 
    @Override

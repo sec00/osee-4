@@ -98,6 +98,7 @@ public abstract class FileSystemRenderer extends DefaultArtifactRenderer {
    public abstract InputStream getRenderInputStream(PresentationType presentationType, List<Artifact> artifacts) throws OseeCoreException;
 
    public InputStream getRenderInputStream(PresentationType presentationType, IOseeBranch branch, List<Artifact> artifacts) throws OseeCoreException {
+      updateOption(RendererOption.BRANCH, branch);
       return getRenderInputStream(presentationType, artifacts);
    }
 

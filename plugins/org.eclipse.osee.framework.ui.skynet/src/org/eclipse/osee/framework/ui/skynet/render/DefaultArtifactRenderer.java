@@ -32,16 +32,11 @@ import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.PresentationType;
 import org.eclipse.osee.framework.core.util.OptionType;
 import org.eclipse.osee.framework.core.util.RendererOption;
-import org.eclipse.osee.framework.core.util.WordMLProducer;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
-import org.eclipse.osee.framework.jdk.core.util.xml.Xml;
 import org.eclipse.osee.framework.logging.OseeLevel;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.Attribute;
-import org.eclipse.osee.framework.skynet.core.linking.OseeLinkBuilder;
-import org.eclipse.osee.framework.skynet.core.relation.RelationManager;
-import org.eclipse.osee.framework.skynet.core.relation.order.RelationOrderData;
 import org.eclipse.osee.framework.ui.plugin.util.AWorkbench;
 import org.eclipse.osee.framework.ui.skynet.FrameworkImage;
 import org.eclipse.osee.framework.ui.skynet.MenuCmdDef;
@@ -50,7 +45,6 @@ import org.eclipse.osee.framework.ui.skynet.artifact.editor.ArtifactEditorInput;
 import org.eclipse.osee.framework.ui.skynet.artifact.massEditor.MassArtifactEditor;
 import org.eclipse.osee.framework.ui.skynet.explorer.ArtifactExplorer;
 import org.eclipse.osee.framework.ui.skynet.internal.Activator;
-import org.eclipse.osee.framework.ui.skynet.internal.ServiceUtil;
 import org.eclipse.osee.framework.ui.skynet.render.compare.DefaultArtifactCompare;
 import org.eclipse.osee.framework.ui.skynet.render.compare.IComparator;
 import org.eclipse.osee.framework.ui.skynet.skywalker.SkyWalkerView;
@@ -145,39 +139,6 @@ public class DefaultArtifactRenderer implements IRenderer {
    }
 
    @Override
-   public void renderAttribute(AttributeTypeToken attributeType, Artifact artifact, PresentationType presentationType, WordMLProducer producer, String format, String label, String footer) throws OseeCoreException {
-      WordMLProducer wordMl = producer;
-      boolean allAttrs = (boolean) rendererOptions.get(RendererOption.ALL_ATTRIBUTES);
-
-      wordMl.startParagraph();
-
-      if (allAttrs) {
-         if (!attributeType.matches(CoreAttributeTypes.PlainTextContent)) {
-            wordMl.addWordMl("<w:r><w:t> " + Xml.escape(attributeType.getName()) + ": </w:t></w:r>");
-         } else {
-            wordMl.addWordMl("<w:r><w:t> </w:t></w:r>");
-         }
-      } else {
-         // assumption: the label is of the form <w:r><w:t> text </w:t></w:r>
-         wordMl.addWordMl(label);
-      }
-
-      if (attributeType.equals(CoreAttributeTypes.RelationOrder)) {
-         wordMl.endParagraph();
-         String data = renderRelationOrder(artifact);
-         wordMl.addWordMl(data);
-      } else {
-         String valueList = artifact.getAttributesToString(attributeType);
-         if (format.contains(">x<")) {
-            wordMl.addWordMl(format.replace(">x<", ">" + Xml.escape(valueList).toString() + "<"));
-         } else {
-            wordMl.addTextInsideParagraph(valueList);
-         }
-         wordMl.endParagraph();
-      }
-   }
-
-   @Override
    public String renderAttributeAsString(AttributeTypeId attributeType, Artifact artifact, PresentationType presentationType, final String defaultValue) throws OseeCoreException {
       String returnValue = defaultValue;
       if (presentationType.matches(RENDER_AS_HUMAN_READABLE_TEXT)) {
@@ -193,18 +154,6 @@ public class DefaultArtifactRenderer implements IRenderer {
          }
       }
       return returnValue;
-   }
-
-   private String renderRelationOrder(Artifact artifact) throws OseeCoreException {
-      StringBuilder builder = new StringBuilder();
-      ArtifactGuidToWordML guidResolver = new ArtifactGuidToWordML(new OseeLinkBuilder());
-      RelationOrderRenderer renderer =
-         new RelationOrderRenderer(ServiceUtil.getOseeCacheService().getRelationTypeCache(), guidResolver);
-
-      WordMLProducer producer = new WordMLProducer(builder);
-      RelationOrderData relationOrderData = RelationManager.createRelationOrderData(artifact);
-      renderer.toWordML(producer, artifact.getBranch(), relationOrderData);
-      return builder.toString();
    }
 
    @Override

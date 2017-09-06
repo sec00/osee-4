@@ -44,9 +44,8 @@ public class WordTemplateContentRendererHandler {
 
    private WordMLApplicabilityHandler applicHandler;
 
-   public WordTemplateContentRendererHandler(OrcsApi orcsApi, Log logger) {
+   public WordTemplateContentRendererHandler(OrcsApi orcsApi) {
       this.orcsApi = orcsApi;
-      this.logger = logger;
    }
 
    public Pair<String, Set<String>> renderWordML(WordTemplateContentData wtcData) throws OseeCoreException {

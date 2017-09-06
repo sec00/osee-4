@@ -44,6 +44,7 @@ import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IArtifactType;
 import org.eclipse.osee.framework.core.enums.CoreArtifactTypes;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
+import org.eclipse.osee.framework.core.enums.CoreBranches;
 import org.eclipse.osee.framework.core.enums.DemoUsers;
 import org.eclipse.osee.framework.core.enums.PermissionEnum;
 import org.eclipse.osee.framework.core.util.RendererOption;
@@ -153,7 +154,6 @@ public class WordTemplateRendererTest {
       rendererOptionsMap.put(PUBLISH_DIFF, true);
       rendererOptionsMap.put(LINK_TYPE, LinkType.INTERNAL_DOC_REFERENCE_USE_NAME);
       rendererOptionsMap.put(UPDATE_PARAGRAPH_NUMBERS, false);
-      rendererOptionsMap.put(TRANSACTION_OPTION, null);
       rendererOptionsMap.put(SKIP_ERRORS, true);
       rendererOptionsMap.put(EXCLUDE_FOLDERS, true);
       rendererOptionsMap.put(EXCLUDE_ARTIFACT_TYPES, new ArrayList<IArtifactType>());
@@ -171,16 +171,17 @@ public class WordTemplateRendererTest {
          PermissionEnum.FULLACCESS);
 
       Artifact programRoot = OseeSystemArtifacts.getDefaultHierarchyRootArtifact(rootBranch);
+      Artifact commonRoot = OseeSystemArtifacts.getDefaultHierarchyRootArtifact(CoreBranches.COMMON);
 
-      templateFolder = ArtifactTypeManager.addArtifact(CoreArtifactTypes.Folder, rootBranch, "Templates");
+      templateFolder = ArtifactTypeManager.addArtifact(CoreArtifactTypes.Folder, CoreBranches.COMMON, "Templates");
       swReqFolder = ArtifactTypeManager.addArtifact(CoreArtifactTypes.Folder, rootBranch, "Software Requirements");
       docFolder = ArtifactTypeManager.addArtifact(CoreArtifactTypes.Folder, rootBranch, "Document Folder");
 
       programRoot.addChild(docFolder);
-      programRoot.addChild(templateFolder);
+      commonRoot.addChild(templateFolder);
       programRoot.addChild(swReqFolder);
 
-      setupTemplates(templateFolder, rootBranch);
+      setupTemplates(templateFolder, CoreBranches.COMMON); //rootbranch
       templateFolder.persist("TEMPLATE FOLDER SETUP");
 
       setUpDocFolder(docFolder, rootBranch);
@@ -423,16 +424,14 @@ public class WordTemplateRendererTest {
 
    @Test
    public void testPublishWithoutDiffUpdateParagraphNumbers() throws OseeCoreException {
-      SkynetTransaction transaction =
-         TransactionManager.createTransaction(updateBranch, String.format("%s", method.getQualifiedTestName()));
       modifyOption(BRANCH, updateBranch);
-      modifyOption(TRANSACTION_OPTION, transaction);
       modifyOption(PUBLISH_DIFF, false);
       modifyOption(LINK_TYPE, LinkType.INTERNAL_DOC_REFERENCE_USE_PARAGRAPH_NUMBER_AND_NAME);
       modifyOption(UPDATE_PARAGRAPH_NUMBERS, true);
       List<Artifact> artifacts = new ArrayList<>();
       Artifact updateDoc = ArtifactQuery.getArtifactFromId(docFolder, updateBranch);
       artifacts.add(updateDoc);
+      
       renderer.publish(singleTemplateAttrib, null, artifacts);
 
       String resultPath = (String) renderer.getRendererOptionValue(RESULT_PATH_RETURN);

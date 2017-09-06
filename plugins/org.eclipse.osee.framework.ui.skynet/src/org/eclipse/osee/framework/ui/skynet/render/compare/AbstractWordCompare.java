@@ -185,7 +185,7 @@ public abstract class AbstractWordCompare implements IComparator {
          "Preparing comparison for: " + (newerArtifact == null ? baseArtifact.getName() : newerArtifact.getName()));
 
       Pair<IFile, IFile> compareFiles;
-      if (artifactDelta.getStartArtifact() == artifactDelta.getBaseArtifact()) {
+      if (artifactDelta.getStartArtifact().equals(artifactDelta.getBaseArtifact())) {
          compareFiles = converter.convertToFile(presentationType, artifactDelta);
       } else {
          // The artifactDelta is a 3 Way Merge

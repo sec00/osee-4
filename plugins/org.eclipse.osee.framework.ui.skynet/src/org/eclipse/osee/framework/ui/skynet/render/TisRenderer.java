@@ -104,6 +104,7 @@ public class TisRenderer extends WordTemplateRenderer {
       try {
          charBak = new CharBackedInputStream();
          WordMLProducer wordMl = new WordMLProducer(charBak);
+         //TODO: Move to server
          wtm.processArtifacts(wordMl, artifacts);
       } catch (CharacterCodingException ex) {
          OseeCoreException.wrapAndThrow(ex);

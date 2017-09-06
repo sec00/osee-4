@@ -224,6 +224,11 @@ public class OseeClientImpl implements OseeClient, QueryExecutor {
    }
 
    @Override
+   public MSWordEndpoint getMSWordEndpoint() {
+      return client.targetProxy(defineUri, MSWordEndpoint.class);
+   }
+
+   @Override
    public boolean isLocalHost() {
       return orcsUri.toString().contains("localhost");
    }

@@ -10,12 +10,15 @@
  *******************************************************************************/
 package org.eclipse.osee.define.report;
 
+import java.io.InputStream;
 import java.util.Set;
 import org.eclipse.osee.define.report.api.DefineApi;
+import org.eclipse.osee.define.report.api.MSWordEndpoint;
+import org.eclipse.osee.define.report.api.NestedTemplateData;
+import org.eclipse.osee.define.report.api.TemplateData;
 import org.eclipse.osee.define.report.api.WordTemplateContentData;
 import org.eclipse.osee.define.report.api.WordUpdateChange;
 import org.eclipse.osee.define.report.api.WordUpdateData;
-import org.eclipse.osee.define.report.api.MSWordEndpoint;
 import org.eclipse.osee.framework.jdk.core.type.Pair;
 
 /**
@@ -37,5 +40,19 @@ public final class MSWordEndpointImpl implements MSWordEndpoint {
    @Override
    public Pair<String, Set<String>> renderWordTemplateContent(WordTemplateContentData data) {
       return defineApi.getMSWordOperations().renderWordTemplateContent(data);
+   }
+
+   @Override
+   public InputStream applyTemplate(TemplateData data) {
+      return defineApi.getMSWordOperations().applyTemplate(data.getArtifacts(), data.getBranch(), data.getUser(), data.getSessionId(),
+         data.getTemplateContent(), data.getTemplateOptions(), data.getTemplateStyles(), data.getFolder(),
+         data.getOutlineNumber(), data.getOutlineType(), data.getPresentationType(), data.getRendererOptions());
+   }
+
+   @Override
+   public InputStream applyNestedTemplates(NestedTemplateData data) {
+      return defineApi.getMSWordOperations().applyNestedTemplates(data.getMasterTemplate(), data.getSlaveTemplate(),
+         data.getArtifacts(), data.getBranch(), data.getUser(), data.getSessionId(), data.getRendererOptions());
+
    }
 }

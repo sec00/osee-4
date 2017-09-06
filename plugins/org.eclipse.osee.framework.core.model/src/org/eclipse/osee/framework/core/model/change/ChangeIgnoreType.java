@@ -69,4 +69,8 @@ public enum ChangeIgnoreType {
    public boolean isInvalid() {
       return !isValid();
    }
+
+   public boolean isAllowableChange() {
+      return isNone() || isResurrected() || isDeletedOnDestAndNotResurrected() || isDeletedOnDestination();
+   }
 }

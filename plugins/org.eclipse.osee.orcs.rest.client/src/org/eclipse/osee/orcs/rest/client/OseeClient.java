@@ -62,6 +62,8 @@ public interface OseeClient {
 
    ActivityLogEndpoint getActivityLogEndpoint();
 
+   MSWordEndpoint getMSWordEndpoint();
+
    boolean isLocalHost();
 
    String getBaseUri();
