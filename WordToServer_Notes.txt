@@ -1,0 +1,32 @@
+-Verify the Diff works in Resource History, F5 from change report, and publish with specific template blam.
+-Verify the SRS publish works and all links work.
+-Verify Data Rights (although I believe this works)
+-OSGI service currently returning null in WordTemplateProcessor
+-Verify every getRenderInputStream call goes through the main one in WordTemplateRenderer (besides TisRenderer) and hits the server
+	-NOTE: the commented out Diff code can be removed in this method, that was not the correct place for that.
+
+	
+Things i need to move to server/Issues/Additional Notes:
+
+	-redirect linux server to windows server for vbascript
+	-RendererManager - do this in same move to endpoint creation
+	-SkynetTransaction - make transactionOption a boolean (or use ParagraphNumbers?) and use txEndpoint on server to update paragraphNumbers
+	-WordUiUtil - used to dislpay unhandled artifacts, how does server do client popups?
+		-Displays - same as above
+	-WordTemplateRenderer ? remove? or just pass options? is that all it is needed for?
+	-change attributelement to use attributetypeid
+	-delete attributeElement on client side
+	- need getArtifactType on artifactReadable??
+	-ChangeDataLoader line 180 artId.isValid()
+	-RendererUtil has a display to ui commented out
+	-WordTemplateProcessor line 345 
+	-RelationOrderRenderer - no longer be supported.
+	-WordTemplateRendererTest consolidate into 1 SRS test that uses all the renderer options
+
+
+	-No longer supporting Relation Order attribute on server
+	-RDT is being retired. Store wordml for all of history for RDT artifacts - edited in word moving forward.
+	-move renderer clas registry to report
+	-rename to RendererRegistry
+	-/plugins/org.eclipse.osee.define.report.api/.project b/plugins/org.eclipse.osee.define.report.api/.project
+		automatically adds buildcommand - why?
