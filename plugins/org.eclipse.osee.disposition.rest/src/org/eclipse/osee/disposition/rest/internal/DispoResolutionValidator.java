@@ -11,6 +11,7 @@
 package org.eclipse.osee.disposition.rest.internal;
 
 import java.util.Map;
+import org.eclipse.osee.ats.rest.IAtsServer;
 import org.eclipse.osee.disposition.model.DispoAnnotationData;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.logger.Log;
@@ -20,8 +21,26 @@ import org.eclipse.osee.logger.Log;
  */
 public class DispoResolutionValidator {
 
+   private static final String REGEX_1 = "\\(.*\\)?";
+   private static final String REGEX_2 = "TRAX|MPD|TPCR|RPCR";
+
+   enum types {
+      CODE,
+      TEST,
+      REQUIREMENT
+   }
+
    private Log logger;
    private String resolutionRegex;
+   private IAtsServer atsServer;
+
+   private IAtsServer getAtsServer() {
+      return atsServer;
+   }
+
+   public void setAtsServer(IAtsServer atsServer) {
+      this.atsServer = atsServer;
+   }
 
    public void setLogger(Log logger) {
       this.logger = logger;
@@ -38,11 +57,40 @@ public class DispoResolutionValidator {
 
    public boolean validate(DispoAnnotationData annotation) {
       String pcr = annotation.getResolution().toUpperCase().trim();
-      boolean isValid = false;
-      if (Strings.isValid(pcr)) {
-         isValid = true;
+      if (!Strings.isValid(pcr)) {
+         return false;
       }
+      String type = annotation.getResolutionType().toUpperCase().trim();
+      if (isValidType(type)) {
+         return isValidWorkItem(pcr);
+      }
+      return true;
+   }
 
+   private boolean isValidWorkItem(String pcr) {
+      boolean isValid = false;
+      try {
+         String workItemsByLegacyPcrId = getAtsServer().getActionEndpoint().getActionState(filterPcr(pcr));
+         if (workItemsByLegacyPcrId != null && !workItemsByLegacyPcrId.isEmpty()) {
+            isValid = true;
+         }
+      } catch (Exception ex) {
+         logger.error("Error validating DispoAnnotationData [%s]", ex.getMessage());
+      }
       return isValid;
    }
+
+   private boolean isValidType(String type) {
+      return types.CODE.name().equals(type) || //
+         types.REQUIREMENT.name().equals(type) || //
+         types.TEST.name().equals(type);
+   }
+
+   private String filterPcr(String pcr) {
+      String pcrNum = pcr;
+      pcrNum = pcrNum.replaceAll(REGEX_2, "");
+      pcrNum = pcrNum.replaceAll(REGEX_1, "");
+      return pcrNum.trim();
+   }
+
 }
