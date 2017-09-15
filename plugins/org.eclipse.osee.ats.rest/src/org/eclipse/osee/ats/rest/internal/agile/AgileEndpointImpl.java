@@ -17,10 +17,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -289,6 +292,22 @@ public class AgileEndpointImpl implements AgileEndpointApi {
          sprints.add(toJaxSprint(sprint));
       }
       return sprints;
+   }
+
+   @Override
+   @GET
+   @Path("team/{teamUuid}/sprintcurrent")
+   @Produces(MediaType.APPLICATION_JSON)
+   public JaxAgileSprint getSprintCurrent(@PathParam("teamUuid") long teamUuid) {
+      if (teamUuid <= 0) {
+         throw new OseeWebApplicationException(Status.NOT_FOUND, "teamUuid is not valid");
+      }
+      for (IAgileSprint sprint : atsServer.getAgileService().getSprintsForTeam(teamUuid)) {
+         if (sprint.isActive()) {
+            return toJaxSprint(sprint);
+         }
+      }
+      return null;
    }
 
    @Override

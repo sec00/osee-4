@@ -4,7 +4,7 @@
 angular
 		.module('AgileApp')
 		.controller(
-				'TeamCtrl',
+				'TeamsCtrl',
 				[
 						'$scope',
 						'AgileFactory',
@@ -22,13 +22,7 @@ angular
 							// ////////////////////////////////////
 							// Agile Team table
 							// ////////////////////////////////////
-							$scope.team = {};
-							$scope.team.uuid = $routeParams.team;
-							$scope.selectedTeam = {};
-							$scope.selectedTeam.name = "";
-							$scope.selectedTeam.backlog = "";
-							$scope.selectedTeam.sprint = "";
-							$scope.isLoaded = "";
+							$scope.selectedTeams = [];
 
 							var openTeamTmpl = '<button class="btn btn-default btn-sm" ng-click="openTeam(row.entity)">Open</button>';
 							var configTeamTmpl = '<button class="btn btn-default btn-sm" ng-click="configTeam(row.entity)">Config</button>';
@@ -55,7 +49,7 @@ angular
 								}, {
 									field : "open",
 									displayName : 'Open',
-									width : 66,
+									width : 48,
 									cellTemplate : openTeamTmpl
 								}, {
 									field : "backlog",
@@ -69,6 +63,20 @@ angular
 									cellTemplate : configTeamTmpl
 								} ]
 							};
+
+							$scope.updateTeams = function() {
+								$scope.sheets = null;
+								var loadingModal = PopupService
+								.showLoadingModal();
+								AgileFactory.getTeams().$promise
+										.then(function(data) {
+											$scope.teams = data;
+											loadingModal.close();
+											LayoutService
+													.resizeElementHeight("teamTable");
+											LayoutService.refresh();
+										});
+							}
 
 							$scope.openTeam = function(team) {
 								window.location.assign("main#/team?team="
@@ -85,37 +93,38 @@ angular
 										.concat(team.uuid))
 							}
 
+							$scope.addNewTeam = function() {
+								var modalInstance = $modal.open({
+									templateUrl : 'addNewTeam.html',
+									controller : AddNewTeamModalCtrl,
+								});
+
+								modalInstance.result.then(function(teamName) {
+									AgileFactory.addNewTeam(teamName).$promise
+											.then(function(data) {
+												$scope.updateTeams();
+											});
+								});
+							}
+
+							var AddNewTeamModalCtrl = function($scope,
+									$modalInstance) {
+
+								$scope.newTeam = {
+									name : ""
+								};
+
+								$scope.ok = function() {
+									$modalInstance.close($scope.newTeam.name);
+								};
+
+								$scope.cancel = function() {
+									$modalInstance.dismiss('cancel');
+								};
+							};
+
 							$scope.refresh = function() {
-								$scope.isLoaded = "";
-								var loadingModal = PopupService
-										.showLoadingModal();
-								AgileFactory.getTeamSingle($scope.team).$promise
-										.then(function(data) {
-											$scope.selectedTeam = data;
-										//	$scope.updateSprints();
-										//	$scope.updateFeatureGroups();
-											AgileFactory.getBacklog($scope.selectedTeam).$promise
-											.then(function(data) {
-												if (data && data.name) {
-													$scope.selectedTeam.backlog = data.name;
-													$scope.selectedTeam.backlogUuid = data.uuid;
-												}
-											});
-											AgileFactory.getSprintCurrent($scope.selectedTeam).$promise
-											.then(function(data) {
-												if (data && data.name) {
-													$scope.selectedTeam.sprint = data.name;
-													$scope.selectedTeam.sprintUuid = data.uuid;
-												}
-											});
-										//	LayoutService
-										//			.resizeElementHeight("sprintConfigTable");
-										//	LayoutService
-										//			.resizeElementHeight("featureGroupConfigTable");
-										//	LayoutService.refresh();
-											loadingModal.close();
-											$scope.isLoaded = "true";
-										});
+								$scope.updateTeams();
 							}
 
 							$scope.refresh();
