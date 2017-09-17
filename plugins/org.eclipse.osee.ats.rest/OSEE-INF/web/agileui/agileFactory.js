@@ -88,6 +88,13 @@ angular.module('AgileApp').factory('AgileFactory',
 				return sprintForKbResource.get(sprint, sprint);
 			}
 			
+			factory.getSprint = function(teamId, sprintId) {
+				var param = {};
+				param.teamUuid = teamId;
+				param.uuid = sprintId;
+				return sprintSingleResource.get(param);
+			}
+			
 			factory.deleteSprint = function(team) {
 				return sprintSingleResource.delete(team);
 			}

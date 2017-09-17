@@ -71,6 +71,11 @@ public interface AgileEndpointApi {
    public List<JaxAgileSprint> getSprints(@PathParam("teamUuid") long teamUuid);
 
    @GET
+   @Path("team/{teamUuid}/sprint/{sprintUuid}")
+   @Produces(MediaType.APPLICATION_JSON)
+   public JaxAgileSprint getSprint(@PathParam("teamUuid") long teamUuid, @PathParam("sprintUuid") long sprintUuid);
+
+   @GET
    @Path("team/{teamUuid}/sprint/{sprintUuid}/kb")
    @Produces(MediaType.APPLICATION_JSON)
    public JaxKbSprint getSprintItemsForKb(@PathParam("teamUuid") long teamUuid, @PathParam("sprintUuid") long sprintUuid);
@@ -81,6 +86,10 @@ public interface AgileEndpointApi {
    public JaxAgileSprint getSprintCurrent(@PathParam("teamUuid") long teamUuid);
 
    /**
+    * @param query param </br>
+    * "type" = "best" then if inwork, get current, else get stored if exists, else get current</br>
+    * "type" = "stored" then get stored or show error page </br>
+    * "type" = null then get current
     * @return html sprint summary
     */
    @GET
@@ -94,6 +103,10 @@ public interface AgileEndpointApi {
    public AgileSprintData getSprintData(@PathParam("teamUuid") long teamUuid, @PathParam("sprintUuid") long sprintUuid);
 
    /**
+    * @param query param </br>
+    * "type" = "best" then if inwork, get current, else get stored if exists, else get current</br>
+    * "type" = "stored" then get stored or show error page </br>
+    * "type" = null then get current
     * @return html representation of weekly sprint metrics. Same metrics used in charts.
     */
    @GET
@@ -101,6 +114,22 @@ public interface AgileEndpointApi {
    @Produces(MediaType.TEXT_HTML)
    public String getSprintDataTable(@PathParam("teamUuid") long teamUuid, @PathParam("sprintUuid") long sprintUuid);
 
+   /**
+    * @return Find only or first sprint and open best burndown available. If in-work, open live version, else stored (if
+    * available), else live.
+    */
+   @GET
+   @Path("team/{teamUuid}/burndown?type=best")
+   @Produces(MediaType.TEXT_HTML)
+   public String getBurndownBest(@PathParam("teamUuid") long teamUuid);
+
+   /**
+    * @param query param </br>
+    * "type" = "best" then if inwork, get current, else get stored if exists, else get current</br>
+    * "type" = "stored" then get stored or show error page </br>
+    * "type" = null then get current
+    * @return html sprint burndown
+    */
    @GET
    @Path("team/{teamUuid}/sprint/{sprintUuid}/burndown/chart/ui")
    @Produces(MediaType.TEXT_HTML)
@@ -116,6 +145,13 @@ public interface AgileEndpointApi {
    @Produces(MediaType.APPLICATION_JSON)
    public XResultData storeSprintReports(@PathParam("teamUuid") long teamUuid, @PathParam("sprintUuid") long sprintUuid);
 
+   /**
+    * @param query param </br>
+    * "type" = "best" then if inwork, get current, else get stored if exists, else get current</br>
+    * "type" = "stored" then get stored or show error page </br>
+    * "type" = null then get current
+    * @return html sprint burnup
+    */
    @GET
    @Path("team/{teamUuid}/sprint/{sprintUuid}/burnup/chart/ui")
    @Produces(MediaType.TEXT_HTML)

@@ -24,6 +24,9 @@ app.config([ '$routeProvider', function($routeProvider) {
 	}).when('/team', {
 		templateUrl : 'team.html',
 		controller : 'TeamCtrl'
+	}).when('/report', {
+		templateUrl : 'report.html',
+		controller : 'ReportCtrl'
 	}).otherwise({
 		redirectTo : "/teams"
 	});
