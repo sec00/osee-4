@@ -30,39 +30,49 @@ angular
 							$scope.selectedTeam.sprint = "";
 							$scope.isLoaded = "";
 
-							var openTeamTmpl = '<button class="btn btn-default btn-sm" ng-click="openTeam(row.entity)">Open</button>';
-							var configTeamTmpl = '<button class="btn btn-default btn-sm" ng-click="configTeam(row.entity)">Config</button>';
-							var openBacklogImpl = '<button class="btn btn-default btn-sm" ng-click="openBacklog(row.entity)">Backlog</button>';
-							var openKanbanImpl = '<button class="btn btn-default btn-sm" ng-click="openKanban(row.entity)">Kanban</button>';
+							var atsIdCellTemplate = '<div class="ngCellText" ng-class="col.colIndex()">'
+									+ '  <a href="/ats/ui/action/{{row.getProperty(col.field)}}">{{row.getProperty(col.field)}}</a>'
+									+ '</div>';
 
-							$scope.teamGridOptions = {
-								data : 'teams',
+							$scope.sprintGridOptions = {
+								data : 'items',
 								enableHighlighting : true,
 								enableColumnResize : true,
 								multiSelect : false,
 								showFilter : true,
 								sortInfo : {
-									fields : [ 'name' ],
+									fields : [ 'order' ],
 									directions : [ 'asc' ]
 								},
 								columnDefs : [ {
-									field : 'uuid',
-									displayName : 'Id',
+									field : 'order',
+									displayName : 'Order',
 									width : 50
+								}, {
+									field : 'state',
+									displayName : 'State',
+									width : 85
 								}, {
 									field : 'name',
 									displayName : 'Name',
-									width : 290
+									width : 310
 								}, {
-									field : "backlog",
-									displayName : 'Backlog',
-									width : 66,
-									cellTemplate : openBacklogImpl
+									field : 'assignees',
+									displayName : 'Assignees',
+									width : 160
 								}, {
-									field : "config",
-									displayName : 'Config',
+									field : 'featureGroups',
+									displayName : 'Feature Group',
+									width : 150
+								}, {
+									field : "sprint",
+									displayName : 'Sprint',
 									width : 60,
-									cellTemplate : configTeamTmpl
+								}, {
+									field : "atsId",
+									displayName : 'ATS Id',
+									width : 90,
+									cellTemplate : atsIdCellTemplate
 								} ]
 							};
 
@@ -88,16 +98,6 @@ angular
 								AgileFactory.getTeamSingle($scope.team).$promise
 										.then(function(data) {
 											$scope.selectedTeam = data;
-											// $scope.updateSprints();
-											// $scope.updateFeatureGroups();
-											AgileFactory
-													.getBacklog($scope.selectedTeam).$promise
-													.then(function(data) {
-														if (data && data.name) {
-															$scope.selectedTeam.backlog = data.name;
-															$scope.selectedTeam.backlogUuid = data.uuid;
-														}
-													});
 											AgileFactory
 													.getSprintCurrent($scope.selectedTeam).$promise
 													.then(function(data) {
@@ -106,12 +106,16 @@ angular
 															$scope.selectedTeam.sprintUuid = data.uuid;
 														}
 													});
-											// LayoutService
-											// .resizeElementHeight("sprintConfigTable");
-											// LayoutService
-											// .resizeElementHeight("featureGroupConfigTable");
-											// LayoutService.refresh();
-											loadingModal.close();
+											AgileFactory
+													.getSprintItems($scope.selectedTeam).$promise
+													.then(function(data) {
+														$scope.items = data;
+														$scope.count = $scope.items.length;
+														LayoutService
+																.resizeElementHeight("sprintTable");
+														LayoutService.refresh();
+														loadingModal.close();
+													});
 											$scope.isLoaded = "true";
 										});
 							}
