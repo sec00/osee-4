@@ -13,6 +13,7 @@ package org.eclipse.osee.ats.api.agile;
 import java.util.Collection;
 import java.util.List;
 import org.eclipse.osee.ats.api.IAtsWorkItem;
+import org.eclipse.osee.ats.api.team.IAtsTeamDefinition;
 import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.AttributeTypeId;
@@ -100,5 +101,9 @@ public interface IAgileService {
    Collection<ArtifactToken> getRelatedSprints(ArtifactId artifact);
 
    XResultData storeSprintReports(long teamId, long sprintId);
+
+   Collection<IAtsTeamDefinition> getAtsTeams(IAgileTeam aTeam);
+
+   IAgileTeam getAgileTeam(IAtsTeamDefinition teamDef);
 
 }
