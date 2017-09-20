@@ -41,13 +41,13 @@ public class AtsAttributeEndpointImplTest extends AbstractRestTest {
 
    @Test
    public void testGetValidAssignees() throws Exception {
-      JsonArray json = queryAndConfirmCount("ats/attr/Assignee", 20);
+      JsonArray json = queryAndConfirmCount("ats/attr/Assignee", 6);
       Assert.assertEquals(DemoUsers.Alex_Kay.getName(), json.iterator().next().getAsString());
    }
 
    @Test
    public void testGetValidOriginators() throws Exception {
-      queryAndConfirmCount("ats/attr/Originator", 20);
+      queryAndConfirmCount("ats/attr/Originator", 6);
    }
 
    @Test

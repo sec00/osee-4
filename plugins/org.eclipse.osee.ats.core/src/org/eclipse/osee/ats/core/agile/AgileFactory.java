@@ -111,7 +111,12 @@ public class AgileFactory {
    }
 
    public static IAgileTeam getAgileTeam(Log logger, IAtsServices services, Object artifact) {
-      return new AgileTeam(logger, services, (ArtifactToken) artifact);
+      IAgileTeam team = null;
+      if (artifact instanceof ArtifactId) {
+         ArtifactToken art = services.getArtifact((ArtifactId) artifact);
+         team = new AgileTeam(logger, services, art);
+      }
+      return team;
    }
 
    public static IAgileFeatureGroup createAgileFeatureGroup(Log logger, IAtsServices services, long teamUuid, String name, String guid, Long uuid) {

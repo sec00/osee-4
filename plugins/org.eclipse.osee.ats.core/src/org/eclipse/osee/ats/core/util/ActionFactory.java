@@ -93,15 +93,24 @@ public class ActionFactory implements IAtsActionFactory {
    @Override
    public ActionResult createAction(NewActionData data, IAtsChangeSet changes) {
       IAtsUser asUser = services.getUserService().getUserById(data.getAsUserId());
-      Conditions.assertNotNull(asUser, "asUser");
-      IAtsUser createdBy = services.getUserService().getUserById(data.getCreatedByUserId());
-      Conditions.assertNotNull(createdBy, "createdBy");
+      Conditions.assertNotNull(asUser, "As-User must be specified.");
+      IAtsUser createdBy = null;
+      if (Strings.isValid(data.getCreatedByUserId())) {
+         createdBy = services.getUserService().getUserById(data.getCreatedByUserId());
+      }
+      if (createdBy == null && Strings.isValid(data.getCreatedDateLong())) {
+         createdBy = services.getUserService().getUserByAccountId(Long.valueOf(data.getCreatedDateLong()));
+      }
+      Conditions.assertNotNull(createdBy, "Created-By must be specified.");
+      Conditions.assertNotNullOrEmpty(data.getAiIds(), "Actionable Items must be specified");
       List<IAtsActionableItem> ais = new LinkedList<>();
       for (String aiId : data.getAiIds()) {
          IAtsActionableItem ai = services.getConfigItem(Long.valueOf(aiId));
-         Conditions.assertNotNull(ai, "as");
+         Conditions.assertNotNull(ai, "Actionable Item must be specified.");
          ais.add(ai);
       }
+      Conditions.assertNotNull(data.getDescription(), "Description must be specified.");
+
       Date needByDate = null;
       if (Strings.isNumeric(data.getNeedByDateLong())) {
          needByDate = new Date(Long.valueOf(data.getNeedByDateLong()));

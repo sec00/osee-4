@@ -33,6 +33,7 @@ public class NewActionData {
    String createdByUserId;
    String transactionComment;
    String needByDateLong;
+   String needByDate;
    Map<String, String> attrValues = new HashMap<String, String>();
 
    public NewActionData() {
@@ -150,5 +151,13 @@ public class NewActionData {
 
    public void addAttrValue(AttributeTypeId type, String value) {
       attrValues.put(type.getIdString(), value);
+   }
+
+   public String getNeedByDate() {
+      return needByDate;
+   }
+
+   public void setNeedByDate(String needByDate) {
+      this.needByDate = needByDate;
    }
 }

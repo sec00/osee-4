@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import javax.ws.rs.GET;
@@ -53,9 +54,11 @@ import org.eclipse.osee.ats.api.agile.JaxNewAgileFeatureGroup;
 import org.eclipse.osee.ats.api.agile.JaxNewAgileSprint;
 import org.eclipse.osee.ats.api.agile.JaxNewAgileTeam;
 import org.eclipse.osee.ats.api.agile.kanban.JaxKbSprint;
+import org.eclipse.osee.ats.api.ai.IAtsActionableItem;
 import org.eclipse.osee.ats.api.data.AtsArtifactTypes;
 import org.eclipse.osee.ats.api.data.AtsAttributeTypes;
 import org.eclipse.osee.ats.api.data.AtsRelationTypes;
+import org.eclipse.osee.ats.api.team.IAtsTeamDefinition;
 import org.eclipse.osee.ats.api.util.IAtsChangeSet;
 import org.eclipse.osee.ats.api.util.ILineChart;
 import org.eclipse.osee.ats.api.workflow.JaxAtsObjects;
@@ -68,6 +71,7 @@ import org.eclipse.osee.ats.rest.IAtsServer;
 import org.eclipse.osee.ats.rest.internal.agile.operations.KanbanOperations;
 import org.eclipse.osee.ats.rest.internal.util.RestUtil;
 import org.eclipse.osee.ats.rest.internal.world.WorldResource;
+import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.AttributeTypeId;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
@@ -79,6 +83,8 @@ import org.eclipse.osee.framework.jdk.core.util.AHTML;
 import org.eclipse.osee.framework.jdk.core.util.Conditions;
 import org.eclipse.osee.framework.jdk.core.util.GUID;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
+import org.eclipse.osee.framework.jdk.core.util.NamedComparator;
+import org.eclipse.osee.framework.jdk.core.util.SortOrder;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.jaxrs.OseeWebApplicationException;
 import org.eclipse.osee.orcs.data.ArtifactReadable;
@@ -126,6 +132,20 @@ public class AgileEndpointImpl implements AgileEndpointApi {
    public JaxAgileTeam getTeam(long teamUuid) {
       IAgileTeam team = atsServer.getAgileService().getAgileTeamById(teamUuid);
       return toJaxTeam(team);
+   }
+
+   @Override
+   @Path("team/{teamId}/ai")
+   @GET
+   @Produces(MediaType.APPLICATION_JSON)
+   public List<IAtsActionableItem> getActionableAis(@PathParam("teamId") ArtifactId teamId) {
+      IAgileTeam aTeam = atsServer.getAgileService().getAgileTeam(teamId);
+      List<IAtsActionableItem> ais = new LinkedList<>();
+      for (IAtsTeamDefinition teamDef : atsServer.getAgileService().getAtsTeams(aTeam)) {
+         ais.addAll(atsServer.getActionableItemService().getActiveActionableItemsAndChildren(teamDef));
+      }
+      Collections.sort(ais, new NamedComparator(SortOrder.ASCENDING));
+      return ais;
    }
 
    @Override

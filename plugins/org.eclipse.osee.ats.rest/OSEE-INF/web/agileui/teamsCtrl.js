@@ -33,6 +33,7 @@ angular
 							var openBurnupImpl = '<button class="btn btn-default btn-sm" ng-click="openBurnup(row.entity)">Burn-Up</button>';
 							var openSummaryImpl = '<button class="btn btn-default btn-sm" ng-click="openSummary(row.entity)">Summary</button>';
 							var openDataImpl = '<button class="btn btn-default btn-sm" ng-click="openData(row.entity)">Data</button>';
+							var openNewActionImpl = '<button class="btn btn-default btn-sm" ng-click="openNewAction(row.entity)">New Action</button>';
 							
 							$scope.teamGridOptions = {
 								data : 'teams',
@@ -152,6 +153,11 @@ angular
 							$scope.openBacklog = function(team) {
 								window.location.assign("main#/backlog?team="
 										.concat(team.uuid).concat("&default=backlog"))
+							}
+
+							$scope.openNewAction = function(team) {
+								window.location.assign("main#/newAction?team="
+										.concat(team.uuid))
 							}
 
 							$scope.openSprint = function(team) {

@@ -37,6 +37,7 @@ import org.eclipse.osee.ats.api.agile.JaxNewAgileTeam;
 import org.eclipse.osee.ats.api.data.AtsArtifactTypes;
 import org.eclipse.osee.ats.api.data.AtsAttributeTypes;
 import org.eclipse.osee.ats.api.data.AtsRelationTypes;
+import org.eclipse.osee.ats.api.team.IAtsTeamDefinition;
 import org.eclipse.osee.ats.api.util.IAtsChangeSet;
 import org.eclipse.osee.ats.core.agile.operations.SprintBurndownOperations;
 import org.eclipse.osee.ats.core.agile.operations.SprintBurnupOperations;
@@ -460,6 +461,16 @@ public class AgileService implements IAgileService {
       } catch (UnsupportedEncodingException ex) {
          throw new OseeArgumentException(ex, "Error trying to store Agile " + operation.getReportType());
       }
+   }
+
+   @Override
+   public Collection<IAtsTeamDefinition> getAtsTeams(IAgileTeam aTeam) {
+      List<IAtsTeamDefinition> teamDefs = new LinkedList<>();
+      for (ArtifactId teamArt : services.getRelationResolver().getRelated(aTeam.getStoreObject(),
+         AtsRelationTypes.AgileTeamToAtsTeam_AtsTeam)) {
+         teamDefs.add(services.getConfigItem(teamArt));
+      }
+      return teamDefs;
    }
 
 }
