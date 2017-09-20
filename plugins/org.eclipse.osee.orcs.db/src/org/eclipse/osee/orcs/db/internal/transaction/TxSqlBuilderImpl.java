@@ -47,7 +47,7 @@ public class TxSqlBuilderImpl implements OrcsVisitor, TxSqlBuilder {
    private final IdentityManager idManager;
 
    private TransactionId txId;
-   private List<DaoToSql> binaryStores;
+   private List<DataProxy> binaryStores;
    private HashCollection<SqlOrderEnum, Object[]> dataItemInserts;
    private Map<SqlOrderEnum, IdJoinQuery> txNotCurrentsJoin;
 
@@ -73,8 +73,8 @@ public class TxSqlBuilderImpl implements OrcsVisitor, TxSqlBuilder {
    }
 
    @Override
-   public List<DaoToSql> getBinaryStores() {
-      return binaryStores != null ? binaryStores : Collections.<DaoToSql> emptyList();
+   public List<DataProxy> getBinaryStores() {
+      return binaryStores != null ? binaryStores : Collections.emptyList();
    }
 
    @Override
@@ -126,15 +126,15 @@ public class TxSqlBuilderImpl implements OrcsVisitor, TxSqlBuilder {
             updateGamma(data);
 
             DataProxy dataProxy = data.getDataProxy();
-            DaoToSql daoToSql = new DaoToSql(data.getVersion().getGammaId(), dataProxy, createNewGamma);
-            addBinaryStore(daoToSql);
+            dataProxy.setGamma(data.getVersion().getGammaId(), createNewGamma);
+            binaryStores.add(dataProxy);
 
             if (RelationalConstants.DEFAULT_ITEM_ID == data.getLocalId()) {
                int localId = idManager.getNextAttributeId();
                data.setLocalId(localId);
             }
             addRow(SqlOrderEnum.ATTRIBUTES, data.getLocalId(), data.getTypeUuid(), data.getVersion().getGammaId(),
-               data.getArtifactId(), daoToSql.getValue(), daoToSql.getUri());
+               data.getArtifactId(), dataProxy.getRawValue(), dataProxy.getUri());
          }
          addTxs(SqlOrderEnum.ATTRIBUTES, data);
       }
@@ -164,11 +164,11 @@ public class TxSqlBuilderImpl implements OrcsVisitor, TxSqlBuilder {
    public void updateAfterBinaryStorePersist() throws OseeCoreException {
       List<Object[]> insertData = getInsertData(SqlOrderEnum.ATTRIBUTES);
       for (int index = 0; index < binaryStores.size() && index < insertData.size(); index++) {
-         DaoToSql dao = binaryStores.get(index);
+         DataProxy proxy = binaryStores.get(index);
          Object[] rowData = insertData.get(index);
          int end = rowData.length;
-         rowData[end - 2] = dao.getValue();
-         rowData[end - 1] = dao.getUri();
+         rowData[end - 2] = proxy.getRawValue();
+         rowData[end - 1] = proxy.getUri();
       }
    }
 
@@ -241,9 +241,4 @@ public class TxSqlBuilderImpl implements OrcsVisitor, TxSqlBuilder {
    private void addRow(SqlOrderEnum sqlKey, Object... data) {
       dataItemInserts.put(sqlKey, data);
    }
-
-   private void addBinaryStore(DaoToSql binaryTx) {
-      binaryStores.add(binaryTx);
-   }
-
 }
