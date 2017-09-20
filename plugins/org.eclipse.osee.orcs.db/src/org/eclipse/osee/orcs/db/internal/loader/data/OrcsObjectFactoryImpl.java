@@ -36,16 +36,16 @@ import org.eclipse.osee.orcs.core.ds.TupleData;
 import org.eclipse.osee.orcs.core.ds.TxOrcsData;
 import org.eclipse.osee.orcs.core.ds.VersionData;
 import org.eclipse.osee.orcs.db.internal.OrcsObjectFactory;
-import org.eclipse.osee.orcs.db.internal.loader.ProxyDataFactory;
+import org.eclipse.osee.orcs.db.internal.proxy.AttributeDataProxyFactory;
 
 /**
  * @author Roberto E. Escobar
  */
 public class OrcsObjectFactoryImpl implements OrcsObjectFactory {
 
-   private final ProxyDataFactory proxyFactory;
+   private final AttributeDataProxyFactory proxyFactory;
 
-   public OrcsObjectFactoryImpl(ProxyDataFactory proxyFactory) {
+   public OrcsObjectFactoryImpl(AttributeDataProxyFactory proxyFactory) {
       super();
       this.proxyFactory = proxyFactory;
    }
@@ -211,9 +211,10 @@ public class OrcsObjectFactoryImpl implements OrcsObjectFactory {
 
    @Override
    public BranchData createCopy(BranchData source) {
-      return createBranchData(BranchId.create(source.getId(), source.getViewId()), source.getBranchType(), source.getName(), source.getParentBranch(),
-         source.getBaseTransaction(), source.getSourceTransaction(), source.getArchiveState(), source.getBranchState(),
-         source.getAssociatedArtifact(), source.isInheritAccessControl());
+      return createBranchData(BranchId.create(source.getId(), source.getViewId()), source.getBranchType(),
+         source.getName(), source.getParentBranch(), source.getBaseTransaction(), source.getSourceTransaction(),
+         source.getArchiveState(), source.getBranchState(), source.getAssociatedArtifact(),
+         source.isInheritAccessControl());
    }
 
    @Override
