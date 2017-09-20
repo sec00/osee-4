@@ -71,6 +71,7 @@ public class DemoDatabaseConfig implements IDbInitializationTask {
          PermissionEnum.FULLACCESS);
 
       AtsDatabaseConfig.organizePrograms(AtsArtifactTypes.Program, DemoArtifactToken.DemoPrograms);
+
    }
 
    private void populateProgramBranch(BranchId programBranch) throws OseeCoreException {
