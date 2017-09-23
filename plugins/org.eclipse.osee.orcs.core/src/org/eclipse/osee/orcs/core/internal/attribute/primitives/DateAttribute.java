@@ -14,7 +14,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
-import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.orcs.core.annotations.OseeAttribute;
 
 /**
@@ -30,35 +29,9 @@ public class DateAttribute extends CharacterBackedAttribute<Date> {
    public final DateFormat MMDDYYYYHHMMSSAMPM = new SimpleDateFormat("MMM dd,yyyy hh:mm:ss a");
    public final DateFormat ALLDATETIME = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy");
 
-   /**
-    * Return current date or null if not set
-    *
-    * @return date or null if not set
-    */
    @Override
-   public Date getValue() throws OseeCoreException {
-      Object value = getDataProxy().getValue();
-      return new Date((Long) value);
-   }
-
-   @Override
-   protected void setToDefaultValue() throws OseeCoreException {
-      String defaultValue = getDefaultValueFromMetaData();
-      if (Strings.isValid(defaultValue)) {
-         subClassSetValue(convertStringToValue(defaultValue));
-      } else {
-         subClassSetValue(new Date());
-      }
-   }
-
-   /**
-    * Sets date
-    *
-    * @param value value or null to clear
-    */
-   @Override
-   public boolean subClassSetValue(Date value) throws OseeCoreException {
-      return getDataProxy().setValue(value != null ? value.getTime() : "");
+   public String convertToStorageString(Date rawValue) {
+      return String.valueOf(rawValue.getTime());
    }
 
    @Override
@@ -67,10 +40,7 @@ public class DateAttribute extends CharacterBackedAttribute<Date> {
    }
 
    @Override
-   protected Date convertStringToValue(String value) {
-      if (!Strings.isValid(value)) {
-         return null;
-      }
+   public Date convertStringToValue(String value) {
       return new Date(Long.parseLong(value));
    }
 
@@ -84,5 +54,4 @@ public class DateAttribute extends CharacterBackedAttribute<Date> {
       Date date = getValue();
       return date != null ? dateFormat.format(date) : "";
    }
-
 }
