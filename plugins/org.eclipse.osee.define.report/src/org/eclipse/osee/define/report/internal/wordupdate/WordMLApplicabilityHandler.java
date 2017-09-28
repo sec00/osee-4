@@ -27,7 +27,6 @@ import javax.script.ScriptException;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.BranchViewData;
@@ -39,6 +38,7 @@ import org.eclipse.osee.framework.core.grammar.ApplicabilityBlock;
 import org.eclipse.osee.framework.core.grammar.ApplicabilityBlock.ApplicabilityType;
 import org.eclipse.osee.framework.core.grammar.ApplicabilityGrammarLexer;
 import org.eclipse.osee.framework.core.grammar.ApplicabilityGrammarParser;
+import org.eclipse.osee.framework.core.util.JsonUtil;
 import org.eclipse.osee.framework.core.util.WordCoreUtil;
 import org.eclipse.osee.framework.jdk.core.type.ResultSet;
 import org.eclipse.osee.logger.Log;
@@ -50,7 +50,7 @@ public class WordMLApplicabilityHandler {
 
    private static String SCRIPT_ENGINE_NAME = "JavaScript";
 
-   private Set<String> validConfigurations;
+   private final Set<String> validConfigurations;
    private Map<String, List<String>> viewApplicabilitiesMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
    private final String configurationToView;
    private final Stack<ApplicabilityBlock> applicBlocks;
@@ -577,20 +577,14 @@ public class WordMLApplicabilityHandler {
 
    private String getDefaultValue(String feature) {
       String toReturn = null;
-      try {
-         ObjectMapper mapper = new ObjectMapper();
-         FeatureDefinitionData[] featDataList = mapper.readValue(featureDefinitionJson, FeatureDefinitionData[].class);
+      FeatureDefinitionData[] featDataList = JsonUtil.readValue(featureDefinitionJson, FeatureDefinitionData[].class);
 
-         for (FeatureDefinitionData featData : featDataList) {
-            if (featData.getName().equalsIgnoreCase(feature)) {
-               toReturn = featData.getDefaultValue();
-               break;
-            }
+      for (FeatureDefinitionData featData : featDataList) {
+         if (featData.getName().equalsIgnoreCase(feature)) {
+            toReturn = featData.getDefaultValue();
+            break;
          }
-      } catch (Exception e) {
-         logger.error("Error getting default value for feature: " + feature);
       }
-
       return toReturn;
    }
 
