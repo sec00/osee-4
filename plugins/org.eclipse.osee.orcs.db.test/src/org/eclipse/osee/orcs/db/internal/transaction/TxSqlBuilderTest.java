@@ -111,7 +111,7 @@ public class TxSqlBuilderTest {
    private final TransactionDataImpl tx = new TransactionDataImpl(EXPECTED_TX.getId());
 
    @Before
-   public void setUp()  {
+   public void setUp() {
       MockitoAnnotations.initMocks(this);
 
       versionData = new VersionDataImpl();
@@ -156,7 +156,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAccept()  {
+   public void testAccept() {
       builder.accept(tx, txData);
       verify(txData).accept(builder);
 
@@ -178,7 +178,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAcceptArtifactData()  {
+   public void testAcceptArtifactData() {
       for (ModificationType modType : MODS_ITEMS_ROW) {
          builder.accept(tx, txData);
          artData.setModType(modType);
@@ -199,7 +199,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAcceptArtifactDataNoItemRow()  {
+   public void testAcceptArtifactDataNoItemRow() {
       for (ModificationType modType : MODS_REUSE_ROW) {
          builder.accept(tx, txData);
          artData.setModType(modType);
@@ -221,7 +221,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAcceptArtifactDataNoRows()  {
+   public void testAcceptArtifactDataNoRows() {
       builder.accept(tx, txData);
 
       // test new artData that is deleted adds no rows
@@ -248,7 +248,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAcceptRelationData()  {
+   public void testAcceptRelationData() {
       for (ModificationType modType : MODS_ITEMS_ROW) {
          builder.accept(tx, txData);
          relData.setModType(modType);
@@ -269,7 +269,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAcceptRelationDataNoItemRow()  {
+   public void testAcceptRelationDataNoItemRow() {
       for (ModificationType modType : MODS_REUSE_ROW) {
          builder.accept(tx, txData);
          relData.setModType(modType);
@@ -291,7 +291,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAcceptAttributeData()  {
+   public void testAcceptAttributeData() {
       for (ModificationType modType : MODS_ITEMS_ROW) {
          when(dataProxy.getStorageString()).thenReturn(ATTR_VALUE);
          when(dataProxy.getUri()).thenReturn(ATTR_URI);
@@ -324,7 +324,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAcceptAttributeDataNoRow()  {
+   public void testAcceptAttributeDataNoRow() {
       for (ModificationType modType : MODS_REUSE_ROW) {
          builder.accept(tx, txData);
          attrData.setModType(modType);

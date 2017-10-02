@@ -95,7 +95,7 @@ public class Pdd10SetupAndImportReqs implements IPopulateDemoDatabase {
       createMainWorkingBranchTx();
    }
 
-   private static void validateArtifactCache()  {
+   private static void validateArtifactCache() {
       final Collection<Artifact> list = ArtifactCache.getDirtyArtifacts();
       if (!list.isEmpty()) {
          for (Artifact artifact : list) {
@@ -240,7 +240,7 @@ public class Pdd10SetupAndImportReqs implements IPopulateDemoDatabase {
       }
    }
 
-   private void relate(RelationTypeSide relationSide, Artifact artifact, Collection<Artifact> artifacts)  {
+   private void relate(RelationTypeSide relationSide, Artifact artifact, Collection<Artifact> artifacts) {
       for (Artifact otherArtifact : artifacts) {
          artifact.addRelation(relationSide, otherArtifact);
       }

@@ -33,12 +33,12 @@ public class CopyActionDetailsTest {
 
    @BeforeClass
    @AfterClass
-   public static void cleanup()  {
+   public static void cleanup() {
       AtsTestUtil.cleanup();
    }
 
    @Test
-   public void test01GetDetailsStringForTeamWf()  {
+   public void test01GetDetailsStringForTeamWf() {
       AtsTestUtil.cleanupAndReset(getClass().getSimpleName());
       String str = new CopyActionDetails(AtsTestUtil.getTeamWf()).getDetailsString();
       assertEquals(
@@ -47,7 +47,7 @@ public class CopyActionDetailsTest {
    }
 
    @Test
-   public void test02GetDetailsStringForTask()  {
+   public void test02GetDetailsStringForTask() {
       String str = new CopyActionDetails(AtsTestUtil.getOrCreateTaskOffTeamWf1()).getDetailsString();
       assertEquals(
          "\"Task\" - " + AtsTestUtil.getOrCreateTaskOffTeamWf1().getAtsId() + " - \"AtsTestUtil - Task [CopyActionDetailsTest]\"",
@@ -55,7 +55,7 @@ public class CopyActionDetailsTest {
    }
 
    @Test
-   public void test03GetDetailsStringForDecisionReview()  {
+   public void test03GetDetailsStringForDecisionReview() {
       IAtsChangeSet changes = AtsClientService.get().createChangeSet(getClass().getSimpleName());
       DecisionReviewArtifact review =
          AtsTestUtil.getOrCreateDecisionReview(ReviewBlockType.Commit, AtsTestUtilState.Analyze, changes);
@@ -65,7 +65,7 @@ public class CopyActionDetailsTest {
    }
 
    @Test
-   public void test04GetDetailsStringForPeerReview()  {
+   public void test04GetDetailsStringForPeerReview() {
       PeerToPeerReviewArtifact review = AtsTestUtil.getOrCreatePeerReview(ReviewBlockType.None,
          AtsTestUtilState.Analyze, AtsClientService.get().createChangeSet("test04GetDetailsStringForPeerReview"));
       String str = new CopyActionDetails(review).getDetailsString();

@@ -214,7 +214,7 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
       excelWriter.endSheet();
    }
 
-   private boolean isAllocated(Artifact higherLevelReq)  {
+   private boolean isAllocated(Artifact higherLevelReq) {
       for (Artifact component : higherLevelReq.getRelatedArtifacts(CoreRelationTypes.Allocation__Component)) {
          if (components.contains(component)) {
             return true;
@@ -223,7 +223,7 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
       return false;
    }
 
-   private void initLowLevelRequirements(List<Artifact> artifacts)  {
+   private void initLowLevelRequirements(List<Artifact> artifacts) {
       RelationManager.getRelatedArtifacts(artifacts, 999, INCLUDE_DELETED,
          CoreRelationTypes.Default_Hierarchical__Child);
       for (Artifact artifact : artifacts) {
@@ -239,7 +239,7 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
       ViewIdUtility.removeExcludedArtifacts(lowLevelReqs.iterator(), excludedArtifactIdMap);
    }
 
-   private void initAllocationComponents(List<Artifact> artifacts)  {
+   private void initAllocationComponents(List<Artifact> artifacts) {
       RelationManager.getRelatedArtifacts(artifacts, 999, INCLUDE_DELETED,
          CoreRelationTypes.Default_Hierarchical__Child);
       for (Artifact artifact : artifacts) {
@@ -270,7 +270,7 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
       return "N/A";
    }
 
-   private void orderSubsystemReqs(Artifact subsysTopFolder)  {
+   private void orderSubsystemReqs(Artifact subsysTopFolder) {
       List<Artifact> children = subsysTopFolder.getChildren();
       if (children != null) {
          ViewIdUtility.removeExcludedArtifacts(children.iterator(), excludedArtifactIdMap);

@@ -38,7 +38,7 @@ public class FindErroneousEmbeddedLinksBlam extends AbstractBlam {
    private static final String BRANCH = "Branch Input";
 
    @Override
-   public String getXWidgetsXml()  {
+   public String getXWidgetsXml() {
       return String.format("<xWidgets><XWidget xwidgetType=\"XBranchSelectWidget\" displayName=\"%s\"/></xWidgets>",
          BRANCH);
    }
@@ -82,14 +82,14 @@ public class FindErroneousEmbeddedLinksBlam extends AbstractBlam {
       if (!links.isEmpty()) {
          unknownGuids.addAll(links.keySet());
       }
-      
+
       Iterator<String> guidIter = unknownGuids.iterator();
       while (guidIter.hasNext()) {
          // Pointing to itself
          String linkGuid = guidIter.next();
          logLinksToSelf(artifact, linkGuid);
-         logInvalidGuidLink(artifact, linkGuid);         
-         
+         logInvalidGuidLink(artifact, linkGuid);
+
          guidIter.remove();
       }
    }
@@ -98,13 +98,15 @@ public class FindErroneousEmbeddedLinksBlam extends AbstractBlam {
       try {
          ArtifactQuery.getArtifactFromId(linkGuid, artifact.getBranch());
       } catch (Exception e) {
-         logf("Warning: this artifact contains an invalid link - Artifact: [%s] Guid: [%s] Invalid Link Guid: [%s]", artifact.getName(), artifact.getGuid(), linkGuid);
+         logf("Warning: this artifact contains an invalid link - Artifact: [%s] Guid: [%s] Invalid Link Guid: [%s]",
+            artifact.getName(), artifact.getGuid(), linkGuid);
       }
    }
 
    private void logLinksToSelf(Artifact artifact, String linkGuid) {
       if (linkGuid.equals(artifact.getGuid())) {
-         logf("Warning: this artifact contains a link pointing to itself - Artifact: [%s] Guid: [%s]", artifact.getName(), artifact.getGuid());
+         logf("Warning: this artifact contains a link pointing to itself - Artifact: [%s] Guid: [%s]",
+            artifact.getName(), artifact.getGuid());
       }
    }
 

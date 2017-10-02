@@ -33,11 +33,11 @@ import org.eclipse.osee.framework.skynet.core.artifact.BranchManager;
  */
 public class TraceUnitFromResourceOperation {
 
-   public static Set<String> getTraceUnitHandlerIds()  {
+   public static Set<String> getTraceUnitHandlerIds() {
       return TraceUnitExtensionManager.getInstance().getTraceUnitHandlerIds();
    }
 
-   private static ResourceToTraceUnit getResourceToTestUnit(Iterable<URI> sources, boolean isRecursive, boolean isFileWithMultiplePaths, boolean addGuidToSourceFile, String... testUnitTraceIds)  {
+   private static ResourceToTraceUnit getResourceToTestUnit(Iterable<URI> sources, boolean isRecursive, boolean isFileWithMultiplePaths, boolean addGuidToSourceFile, String... testUnitTraceIds) {
       checkSourceArgument(sources);
       checkTraceUnitHandlerIdsArgument(testUnitTraceIds);
 
@@ -53,7 +53,7 @@ public class TraceUnitFromResourceOperation {
       return operation;
    }
 
-   public static void printTraceFromTestUnits(IProgressMonitor monitor, Iterable<URI> sources, boolean isRecursive, boolean isFileWithMultiplePaths, boolean addGuidToSourceFile, String... traceUnitHandlerIds)  {
+   public static void printTraceFromTestUnits(IProgressMonitor monitor, Iterable<URI> sources, boolean isRecursive, boolean isFileWithMultiplePaths, boolean addGuidToSourceFile, String... traceUnitHandlerIds) {
       ResourceToTraceUnit operation =
          getResourceToTestUnit(sources, isRecursive, isFileWithMultiplePaths, addGuidToSourceFile, traceUnitHandlerIds);
       if (monitor == null) {
@@ -63,7 +63,7 @@ public class TraceUnitFromResourceOperation {
       operation.execute(monitor);
    }
 
-   public static void importTraceFromTestUnits(IProgressMonitor monitor, Iterable<URI> sources, boolean isRecursive, boolean isFileWithMultiplePaths, BranchId importToBranch, boolean addGuidToSourceFile, String... traceUnitHandlerIds)  {
+   public static void importTraceFromTestUnits(IProgressMonitor monitor, Iterable<URI> sources, boolean isRecursive, boolean isFileWithMultiplePaths, BranchId importToBranch, boolean addGuidToSourceFile, String... traceUnitHandlerIds) {
       checkBranchArguments(importToBranch);
 
       ResourceToTraceUnit operation =
@@ -75,7 +75,7 @@ public class TraceUnitFromResourceOperation {
       operation.execute(monitor);
    }
 
-   private static void checkTraceUnitHandlerIdsArgument(String... traceUnitHandlerIds)  {
+   private static void checkTraceUnitHandlerIdsArgument(String... traceUnitHandlerIds) {
       if (traceUnitHandlerIds == null) {
          throw new OseeArgumentException("Test unit trace ids was null");
       }
@@ -94,7 +94,7 @@ public class TraceUnitFromResourceOperation {
       }
    }
 
-   private static void checkSourceArgument(Iterable<URI> sources)  {
+   private static void checkSourceArgument(Iterable<URI> sources) {
       if (sources == null) {
          throw new OseeArgumentException("Source was null");
       }
@@ -111,7 +111,7 @@ public class TraceUnitFromResourceOperation {
       }
    }
 
-   private static void checkBranchArguments(BranchId importToBranch)  {
+   private static void checkBranchArguments(BranchId importToBranch) {
       if (importToBranch == null) {
          throw new OseeArgumentException("Branch to import into was null");
       }

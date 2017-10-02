@@ -86,7 +86,7 @@ public class OrcsStorageImpl implements Storage {
       orcsApi.getOrcsTypes().invalidateAll();
    }
 
-   private ResultSet<ArtifactReadable> getDispoTypesArtifact()  {
+   private ResultSet<ArtifactReadable> getDispoTypesArtifact() {
       return getQuery().fromBranch(COMMON).andUuid(DISPO_ARTIFACT.getUuid()).andTypeEquals(
          DISPO_ARTIFACT.getArtifactType()).getResults();
    }

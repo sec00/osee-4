@@ -60,7 +60,7 @@ public class CopyActionDetails {
       return detailsStr;
    }
 
-   private String getChangeTypeOrObjectType(AbstractWorkflowArtifact awa)  {
+   private String getChangeTypeOrObjectType(AbstractWorkflowArtifact awa) {
       String result = "";
       if (awa instanceof TeamWorkFlowArtifact) {
          TeamWorkFlowArtifact teamArt = (TeamWorkFlowArtifact) awa;
@@ -88,7 +88,7 @@ public class CopyActionDetails {
       return result;
    }
 
-   private String getFormatStr(IAtsTeamDefinition teamDef)  {
+   private String getFormatStr(IAtsTeamDefinition teamDef) {
       if (teamDef != null) {
          Artifact artifact = AtsClientService.get().getConfigArtifact(teamDef);
          if (artifact != null) {

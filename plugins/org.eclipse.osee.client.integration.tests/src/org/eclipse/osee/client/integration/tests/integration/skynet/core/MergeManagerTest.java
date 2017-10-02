@@ -86,7 +86,7 @@ public class MergeManagerTest {
    }
 
    @After
-   public void tearDown()  {
+   public void tearDown() {
       BranchManager.purgeBranch(workingBranch);
    }
 

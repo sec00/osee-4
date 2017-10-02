@@ -44,7 +44,7 @@ public final class OseeLinkParser {
       }
    }
 
-   public BranchId getId()  {
+   public BranchId getId() {
       BranchId branchUuid = BranchId.SENTINEL;
       if (parameterMap != null) {
          String branchUuidStr = parameterMap.get("branchUuid");
@@ -59,7 +59,7 @@ public final class OseeLinkParser {
       return branchUuid;
    }
 
-   public String getGuid()  {
+   public String getGuid() {
       String guidToReturn = null;
       if (parameterMap != null) {
          String guid = parameterMap.get("guid");

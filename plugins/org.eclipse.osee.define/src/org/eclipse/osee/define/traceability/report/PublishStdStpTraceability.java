@@ -86,7 +86,7 @@ public class PublishStdStpTraceability extends AbstractBlam {
    }
 
    @Override
-   public String getXWidgetsXml()  {
+   public String getXWidgetsXml() {
       StringBuilder builder = new StringBuilder();
       builder.append("<xWidgets>");
       builder.append("<XWidget xwidgetType=\"XLabel\" displayName=\"Select tables to generate:\"/>");
@@ -117,7 +117,7 @@ public class PublishStdStpTraceability extends AbstractBlam {
       return builder.toString();
    }
 
-   private List<TraceabilityStyle> getStyles(VariableMap variableMap)  {
+   private List<TraceabilityStyle> getStyles(VariableMap variableMap) {
       List<TraceabilityStyle> styles = new ArrayList<>();
       for (TraceabilityStyle style : TraceabilityStyle.values()) {
          boolean isSelected = variableMap.getBoolean(style.asLabel());

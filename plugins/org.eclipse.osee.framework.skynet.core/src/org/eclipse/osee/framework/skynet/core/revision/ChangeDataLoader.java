@@ -106,7 +106,7 @@ public class ChangeDataLoader extends AbstractOperation {
       }
    }
 
-   public void determineChanges(IProgressMonitor monitor)  {
+   public void determineChanges(IProgressMonitor monitor) {
       monitor.setTaskName("Retrieve Change Items");
       List<ChangeItem> changeItems = requestChanges(txDelta);
 
@@ -201,7 +201,7 @@ public class ChangeDataLoader extends AbstractOperation {
       return change;
    }
 
-   private Change createChangeObject(CompositeKeyHashMap<TransactionId, ArtifactId, Artifact> bulkLoaded, ChangeItem item, TransactionDelta txDelta, BranchId startTxBranch, ArtifactDelta artifactDelta)  {
+   private Change createChangeObject(CompositeKeyHashMap<TransactionId, ArtifactId, Artifact> bulkLoaded, ChangeItem item, TransactionDelta txDelta, BranchId startTxBranch, ArtifactDelta artifactDelta) {
       Change change = null;
 
       Long itemId = item.getItemId().getId();
@@ -320,7 +320,7 @@ public class ChangeDataLoader extends AbstractOperation {
       return change;
    }
 
-   private void bulkLoadArtifactDeltas(CompositeKeyHashMap<TransactionId, ArtifactId, Artifact> bulkLoaded, Collection<ChangeItem> changeItems)  {
+   private void bulkLoadArtifactDeltas(CompositeKeyHashMap<TransactionId, ArtifactId, Artifact> bulkLoaded, Collection<ChangeItem> changeItems) {
       Set<ArtifactId> artIds = asArtIds(changeItems);
 
       preloadArtifacts(bulkLoaded, artIds, txDelta.getStartTx(), txDelta.areOnTheSameBranch());
@@ -333,7 +333,7 @@ public class ChangeDataLoader extends AbstractOperation {
       }
    }
 
-   private static void preloadArtifacts(CompositeKeyHashMap<TransactionId, ArtifactId, Artifact> bulkLoaded, Collection<ArtifactId> artIds, TransactionToken tx, boolean isHistorical)  {
+   private static void preloadArtifacts(CompositeKeyHashMap<TransactionId, ArtifactId, Artifact> bulkLoaded, Collection<ArtifactId> artIds, TransactionToken tx, boolean isHistorical) {
       List<Artifact> artifacts;
 
       if (isHistorical) {
@@ -357,7 +357,7 @@ public class ChangeDataLoader extends AbstractOperation {
       return artIds;
    }
 
-   private static List<ChangeItem> requestChanges(TransactionDelta txDelta)  {
+   private static List<ChangeItem> requestChanges(TransactionDelta txDelta) {
       OseeClient client = ServiceUtil.getOseeClient();
       TransactionEndpoint proxy = client.getTransactionEndpoint();
 
