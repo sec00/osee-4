@@ -52,7 +52,7 @@ public class DatabaseBranchAccessor implements IOseeDataAccessor<Branch> {
    }
 
    @Override
-   public void load(IOseeCache<Branch> cache) throws OseeCoreException {
+   public void load(IOseeCache<Branch> cache)  {
       String sql = String.format(SELECT_BRANCHES, jdbcClient.getDbType().getRecursiveWithSql());
       jdbcClient.runQuery(stmt -> cache.cache(load(cache, stmt)), JDBC__MAX_FETCH_SIZE, sql);
 

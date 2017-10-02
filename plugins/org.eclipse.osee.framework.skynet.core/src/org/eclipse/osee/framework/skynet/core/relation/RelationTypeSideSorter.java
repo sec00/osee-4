@@ -65,17 +65,17 @@ public class RelationTypeSideSorter extends RelationTypeSide {
       }
    }
 
-   public RelationSorter getSorterId() throws OseeCoreException {
+   public RelationSorter getSorterId()  {
       return orderData.getCurrentSorterGuid(relationType, getSide());
    }
 
-   public void sort(List<? extends ArtifactToken> listToOrder) throws OseeCoreException {
+   public void sort(List<? extends ArtifactToken> listToOrder)  {
       IRelationSorter order = sorterProvider.getRelationOrder(getSorterId());
       List<String> relativeOrder = orderData.getOrderList(getRelationType(), getSide());
       order.sort(listToOrder, relativeOrder);
    }
 
-   public void addItem(RelationSorter sorterId, Artifact itemToAdd) throws OseeCoreException {
+   public void addItem(RelationSorter sorterId, Artifact itemToAdd)  {
       RelationSorter sorterIdToUse = sorterId;
       if (sorterIdToUse == PREEXISTING) {
          sorterIdToUse = getSorterId();
@@ -92,7 +92,7 @@ public class RelationTypeSideSorter extends RelationTypeSide {
       setOrder(relatives, sorterIdToUse);
    }
 
-   public void removeItem(ArtifactId itemToRemove) throws OseeCoreException {
+   public void removeItem(ArtifactId itemToRemove)  {
       List<Artifact> relatives = Collections.emptyList();
       if (USER_DEFINED == getSorterId()) {
          Artifact target = getArtifact();

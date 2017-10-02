@@ -24,12 +24,12 @@ import org.eclipse.osee.framework.skynet.core.artifact.ArtifactTypeManager;
  */
 public final class GlobalXViewerSettings {
 
-   public static Artifact getCustomArtifact() throws OseeCoreException {
+   public static Artifact getCustomArtifact()  {
       return OseeSystemArtifacts.getCachedArtifact(CoreArtifactTypes.XViewerGlobalCustomization,
          CoreArtifactTypes.XViewerGlobalCustomization.getName(), COMMON);
    }
 
-   public static Artifact createCustomArtifact() throws OseeCoreException {
+   public static Artifact createCustomArtifact()  {
       return ArtifactTypeManager.addArtifact(CoreArtifactTypes.XViewerGlobalCustomization, COMMON,
          CoreArtifactTypes.XViewerGlobalCustomization.getName());
    }

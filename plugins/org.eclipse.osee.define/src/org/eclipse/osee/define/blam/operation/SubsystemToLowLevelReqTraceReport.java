@@ -116,7 +116,7 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
       Program.launch(iFile.getLocation().toOSString());
    }
 
-   private void generateLowLevelToSubsystemTrace() throws IOException, OseeCoreException {
+   private void generateLowLevelToSubsystemTrace() throws IOException {
       excelWriter.startSheet("5.1", 7);
 
       excelWriter.writeRow("5.1  Lower Level Requirements Traceability to Subsystem Requirements");
@@ -168,7 +168,7 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
       return false;
    }
 
-   private void generateSubsystemToLowLevelReqTrace() throws IOException, OseeCoreException {
+   private void generateSubsystemToLowLevelReqTrace() throws IOException {
       excelWriter.startSheet("5.2", 6);
 
       excelWriter.writeRow("5.2  Subsystem Requirements Allocation Traceability to Lower Level Requirements");
@@ -217,7 +217,7 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
       excelWriter.endSheet();
    }
 
-   private boolean isAllocated(Artifact higherLevelReq) throws OseeCoreException {
+   private boolean isAllocated(Artifact higherLevelReq)  {
       for (Artifact component : higherLevelReq.getRelatedArtifacts(CoreRelationTypes.Allocation__Component)) {
          if (components.contains(component)) {
             return true;
@@ -226,7 +226,7 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
       return false;
    }
 
-   private void initLowLevelRequirements(List<Artifact> artifacts) throws OseeCoreException {
+   private void initLowLevelRequirements(List<Artifact> artifacts)  {
       RelationManager.getRelatedArtifacts(artifacts, 999, INCLUDE_DELETED,
          CoreRelationTypes.Default_Hierarchical__Child);
       for (Artifact artifact : artifacts) {
@@ -242,7 +242,7 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
       ViewIdUtility.removeExcludedArtifacts(lowLevelReqs.iterator(), excludedArtifactIdMap);
    }
 
-   private void initAllocationComponents(List<Artifact> artifacts) throws OseeCoreException {
+   private void initAllocationComponents(List<Artifact> artifacts)  {
       RelationManager.getRelatedArtifacts(artifacts, 999, INCLUDE_DELETED,
          CoreRelationTypes.Default_Hierarchical__Child);
       for (Artifact artifact : artifacts) {
@@ -273,7 +273,7 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
       return "N/A";
    }
 
-   private void orderSubsystemReqs(Artifact subsysTopFolder) throws OseeCoreException {
+   private void orderSubsystemReqs(Artifact subsysTopFolder)  {
       List<Artifact> children = subsysTopFolder.getChildren();
       if (children != null) {
          ViewIdUtility.removeExcludedArtifacts(children.iterator(), excludedArtifactIdMap);
