@@ -19,7 +19,6 @@ import org.eclipse.osee.ats.client.integration.tests.ats.core.client.AtsTestUtil
 import org.eclipse.osee.ats.core.client.review.DecisionReviewArtifact;
 import org.eclipse.osee.ats.core.client.review.PeerToPeerReviewArtifact;
 import org.eclipse.osee.ats.core.client.util.CopyActionDetails;
-import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
