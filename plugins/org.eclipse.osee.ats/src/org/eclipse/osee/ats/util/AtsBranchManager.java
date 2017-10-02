@@ -114,7 +114,7 @@ public final class AtsBranchManager {
       }
    }
 
-   public static void showMergeManager(TeamWorkFlowArtifact teamArt, BranchId destinationBranch) throws OseeCoreException {
+   public static void showMergeManager(TeamWorkFlowArtifact teamArt, BranchId destinationBranch)  {
       if (AtsClientService.get().getBranchService().isWorkingBranchInWork(teamArt)) {
          IOseeBranch workingBranch = AtsClientService.get().getBranchService().getWorkingBranch(teamArt);
          MergeView.openView(workingBranch, destinationBranch, BranchManager.getBaseTransaction(workingBranch));
@@ -176,7 +176,7 @@ public final class AtsBranchManager {
    /**
     * Either return a single commit transaction or user must choose from a list of valid commit transactions
     */
-   public static TransactionToken getTransactionIdOrPopupChoose(IAtsTeamWorkflow teamWf, String title, boolean showMergeManager) throws OseeCoreException {
+   public static TransactionToken getTransactionIdOrPopupChoose(IAtsTeamWorkflow teamWf, String title, boolean showMergeManager)  {
       Collection<TransactionRecord> transactions =
          AtsClientService.get().getBranchService().getTransactionIds(teamWf, showMergeManager);
       final Map<IOseeBranch, TransactionId> branchToTx = new LinkedHashMap<>();
@@ -272,7 +272,7 @@ public final class AtsBranchManager {
     * @param overrideStateValidation if true, don't do checks to see if commit can be performed. This should only be
     * used for developmental testing or automation
     */
-   public static IOperation commitWorkingBranch(final TeamWorkFlowArtifact teamArt, final boolean commitPopup, final boolean overrideStateValidation, BranchId destinationBranch, boolean archiveWorkingBranch) throws OseeCoreException {
+   public static IOperation commitWorkingBranch(final TeamWorkFlowArtifact teamArt, final boolean commitPopup, final boolean overrideStateValidation, BranchId destinationBranch, boolean archiveWorkingBranch)  {
       if (AtsClientService.get().getBranchService().isBranchInCommit(teamArt)) {
          throw new OseeCoreException("Branch is currently being committed.");
       }
@@ -280,7 +280,7 @@ public final class AtsBranchManager {
          archiveWorkingBranch);
    }
 
-   public static ChangeData getChangeDataFromEarliestTransactionId(TeamWorkFlowArtifact teamArt) throws OseeCoreException {
+   public static ChangeData getChangeDataFromEarliestTransactionId(TeamWorkFlowArtifact teamArt)  {
       return getChangeData(teamArt, null);
    }
 
@@ -289,7 +289,7 @@ public final class AtsBranchManager {
     *
     * @param commitConfigArt that configures commit or null
     */
-   public static ChangeData getChangeData(IAtsTeamWorkflow teamWf, ICommitConfigItem commitConfigArt) throws OseeCoreException {
+   public static ChangeData getChangeData(IAtsTeamWorkflow teamWf, ICommitConfigItem commitConfigArt)  {
       if (commitConfigArt != null && !isBaselinBranchConfigured(commitConfigArt)) {
          throw new OseeArgumentException("Parent Branch not configured for [%s]", commitConfigArt);
       }
