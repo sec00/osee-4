@@ -104,7 +104,7 @@ public final class AttributeChange extends Change {
       return wasValue;
    }
 
-   public Attribute<?> getAttribute() throws OseeCoreException {
+   public Attribute<?> getAttribute()  {
       List<Attribute<?>> attributes = getChangeArtifact().getAttributes(true);
       for (Attribute<?> attribute : attributes) {
          if (attribute.getId() == attrId.getId().intValue()) {

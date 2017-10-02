@@ -111,7 +111,7 @@ public class WordOutlineExtractorDelegate implements IArtifactExtractorDelegate 
     * Core of processing different WordML content "chunks".
     */
    @Override
-   public final void processContent(OperationLogger logger, RoughArtifactCollector collector, boolean forceBody, boolean forcePrimaryType, String headerNumber, String listIdentifier, String paragraphStyle, String content, boolean isParagraph) throws OseeCoreException {
+   public final void processContent(OperationLogger logger, RoughArtifactCollector collector, boolean forceBody, boolean forcePrimaryType, String headerNumber, String listIdentifier, String paragraphStyle, String content, boolean isParagraph)  {
       if (Strings.isValid(content) && initalized) {
 
          if (!possibleTableOfContents) {
@@ -300,9 +300,9 @@ public class WordOutlineExtractorDelegate implements IArtifactExtractorDelegate 
    /**
     * Sets up storage (word formatted storage) for new artifact.
     * 
-    * @throws OseeCoreException
+    * 
     */
-   private void setContent() throws OseeCoreException {
+   private void setContent()  {
       if (roughArtifact != null) {
          roughArtifact.addAttribute(CoreAttributeTypes.WordTemplateContent, wordFormattedContent.toString());
          postProcessContent(wordFormattedContent, roughArtifact);
@@ -311,18 +311,18 @@ public class WordOutlineExtractorDelegate implements IArtifactExtractorDelegate 
    }
 
    @Override
-   public void finish() throws OseeCoreException {
+   public void finish()  {
       setContent();
    }
 
-   public void processHeadingText(RoughArtifact roughArtifact, String headingText) throws OseeCoreException {
+   public void processHeadingText(RoughArtifact roughArtifact, String headingText)  {
       roughArtifact.setName(headingText.trim());
    }
 
    /**
     * Checks if another artifact with the same outlineNumber was created
     */
-   private RoughArtifact setUpNewArtifact(RoughArtifactCollector collector, String outlineNumber) throws OseeCoreException {
+   private RoughArtifact setUpNewArtifact(RoughArtifactCollector collector, String outlineNumber)  {
       RoughArtifact duplicateArtifact = duplicateCatcher.get(outlineNumber);
       if (duplicateArtifact == null) {
          RoughArtifact roughArtifact = new RoughArtifact(RoughArtifactKind.PRIMARY);

@@ -33,7 +33,6 @@ import org.eclipse.osee.framework.core.enums.SystemUser;
 import org.eclipse.osee.framework.core.model.Branch;
 import org.eclipse.osee.framework.core.operation.IOperation;
 import org.eclipse.osee.framework.core.operation.Operations;
-import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 import org.eclipse.osee.framework.skynet.core.artifact.ArtifactTypeManager;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchManager;
@@ -65,7 +64,7 @@ public class BranchStateTest {
    }
 
    @Test
-   public void testCreateState() throws OseeCoreException {
+   public void testCreateState() {
       String originalBranchName = "Create State Branch";
       BranchId workingBranch = null;
       try {
@@ -80,7 +79,7 @@ public class BranchStateTest {
    }
 
    @Test
-   public void testModifiedState() throws OseeCoreException {
+   public void testModifiedState() {
       String originalBranchName = "Modified State Branch";
       IOseeBranch workingBranch = null;
       try {
@@ -102,7 +101,7 @@ public class BranchStateTest {
    }
 
    @Test
-   public void testDeleteState() throws OseeCoreException, InterruptedException {
+   public void testDeleteState() throws InterruptedException {
       String originalBranchName = "Deleted State Branch";
       IOseeBranch workingBranch = null;
       try {
@@ -126,7 +125,7 @@ public class BranchStateTest {
    }
 
    @Test
-   public void testPurgeState() throws OseeCoreException, InterruptedException {
+   public void testPurgeState() throws InterruptedException {
       String originalBranchName = "Purged State Branch";
       IOseeBranch workingBranch = null;
       boolean branchPurged = false;
@@ -151,7 +150,7 @@ public class BranchStateTest {
    }
 
    @Test
-   public void testCommitState() throws OseeCoreException, InterruptedException {
+   public void testCommitState() throws InterruptedException {
       String originalBranchName = "Commit State Branch";
       IOseeBranch workingBranch = null;
       Artifact change = null;
@@ -372,7 +371,7 @@ public class BranchStateTest {
       }
    }
 
-   private void purgeBranchAndChildren(BranchId branch) throws OseeCoreException {
+   private void purgeBranchAndChildren(BranchId branch) {
       for (IOseeBranch child : BranchManager.getChildBranches(branch, true)) {
          BranchManager.purgeBranch(child);
       }

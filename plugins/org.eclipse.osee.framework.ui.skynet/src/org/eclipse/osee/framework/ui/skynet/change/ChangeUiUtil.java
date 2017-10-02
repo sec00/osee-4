@@ -32,11 +32,11 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.progress.UIJob;
 
 public final class ChangeUiUtil {
-   public static void open(BranchId branch) throws OseeCoreException {
+   public static void open(BranchId branch)  {
       open(branch, false);
    }
 
-   public static void open(BranchId branch, boolean showTransactionTab) throws OseeCoreException {
+   public static void open(BranchId branch, boolean showTransactionTab)  {
       Conditions.checkNotNull(branch, "Branch");
       if (BranchManager.getType(branch).isBaselineBranch()) {
          if (!MessageDialog.openConfirm(AWorkbench.getActiveShell(), "Show Change Report",
@@ -50,12 +50,12 @@ public final class ChangeUiUtil {
       open(editorInput);
    }
 
-   public static void open(TransactionToken transactionId) throws OseeCoreException {
+   public static void open(TransactionToken transactionId)  {
       Conditions.checkNotNull(transactionId, "TransactionId");
       open(createInput(transactionId, true));
    }
 
-   public static void open(TransactionToken startTx, TransactionToken endTx) throws OseeCoreException {
+   public static void open(TransactionToken startTx, TransactionToken endTx)  {
       Conditions.checkNotNull(startTx, "First TransactionId");
       Conditions.checkNotNull(endTx, "Second TransactionId");
       TransactionDelta txDelta = new TransactionDelta(startTx, endTx);
@@ -65,14 +65,14 @@ public final class ChangeUiUtil {
       open(createInput(CompareType.COMPARE_SPECIFIC_TRANSACTIONS, txDelta, true));
    }
 
-   public static ChangeReportEditorInput createInput(TransactionToken transactionId, boolean loadOnOpen) throws OseeCoreException {
+   public static ChangeReportEditorInput createInput(TransactionToken transactionId, boolean loadOnOpen)  {
       TransactionToken startTx = TransactionManager.getPriorTransaction(transactionId);
       TransactionToken endTx = transactionId;
       TransactionDelta txDelta = new TransactionDelta(startTx, endTx);
       return createInput(CompareType.COMPARE_SPECIFIC_TRANSACTIONS, txDelta, loadOnOpen);
    }
 
-   public static ChangeReportEditorInput createInput(BranchId branch, boolean loadOnOpen) throws OseeCoreException {
+   public static ChangeReportEditorInput createInput(BranchId branch, boolean loadOnOpen)  {
       if (BranchManager.isArchived(branch) || BranchManager.getState(branch).equals(BranchState.COMMITTED)) {
          TransactionToken startTx = BranchManager.getBaseTransaction(branch);
          TransactionToken endTx = TransactionManager.getHeadTransaction(branch);
@@ -86,7 +86,7 @@ public final class ChangeUiUtil {
       }
    }
 
-   public static ChangeReportEditorInput createInput(BranchId branch, BranchId parentBranch, boolean loadOnOpen) throws OseeCoreException {
+   public static ChangeReportEditorInput createInput(BranchId branch, BranchId parentBranch, boolean loadOnOpen)  {
       TransactionToken startTx = TransactionManager.getHeadTransaction(branch);
       TransactionToken endTx = TransactionManager.getHeadTransaction(parentBranch);
       TransactionDelta txDelta = new TransactionDelta(startTx, endTx);

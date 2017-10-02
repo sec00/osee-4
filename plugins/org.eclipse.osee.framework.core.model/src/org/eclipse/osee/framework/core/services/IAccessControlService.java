@@ -19,9 +19,9 @@ import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 
 public interface IAccessControlService {
 
-   boolean hasPermission(Object object, PermissionEnum permission) throws OseeCoreException;
+   boolean hasPermission(Object object, PermissionEnum permission) ;
 
-   void removePermissions(BranchId branch) throws OseeCoreException;
+   void removePermissions(BranchId branch) ;
 
-   AccessDataQuery getAccessData(ArtifactToken userArtifact, Collection<?> itemsToCheck) throws OseeCoreException;
+   AccessDataQuery getAccessData(ArtifactToken userArtifact, Collection<?> itemsToCheck) ;
 }

@@ -143,7 +143,7 @@ public class LoaderTest {
    private static ArtifactId OseeTypesFrameworkId;
    private static Collection<ArtifactId> artifactIds;
 
-   public void setUp() throws OseeCoreException {
+   public void setUp()  {
       JdbcClient jdbcClient = jdbcService.getClient();
       if (jdbcClient.getConfig().isProduction()) {
          throw new OseeStateException("Test should not be run against a Production Database");
@@ -232,7 +232,7 @@ public class LoaderTest {
     * Only need one copy of the database for all 4 tests.
     */
    @org.junit.Test
-   public void testAll() throws OseeCoreException {
+   public void testAll()  {
       setUp();
       testLoad();
       setUp();
@@ -243,7 +243,7 @@ public class LoaderTest {
       testLoadByGuids();
    }
 
-   public void testLoad() throws OseeCoreException {
+   public void testLoad()  {
       DataLoader loader = loaderFactory.newDataLoader(session, COMMON, artifactIds);
       loader.withLoadLevel(LoadLevel.ALL);
       verifyArtsAttrAndRelData(loader);
@@ -325,7 +325,7 @@ public class LoaderTest {
          tx5, OseeTypesFrameworkGammaId);
    }
 
-   public void testLoadByTypes() throws OseeCoreException {
+   public void testLoadByTypes()  {
       DataLoader loader = loaderFactory.newDataLoader(session, COMMON, artifactIds);
       loader.withLoadLevel(LoadLevel.ALL);
 
@@ -366,7 +366,7 @@ public class LoaderTest {
       verifyRels(rels);
    }
 
-   public void testLoadByIds() throws OseeCoreException {
+   public void testLoadByIds()  {
       DataLoader loader = loaderFactory.newDataLoader(session, COMMON, artifactIds);
       loader.withLoadLevel(LoadLevel.ALL);
 
@@ -423,7 +423,7 @@ public class LoaderTest {
       return null;
    }
 
-   public void testLoadByGuids() throws OseeCoreException {
+   public void testLoadByGuids()  {
       String[] ids = new String[] {OseeTypesFrameworkGuid, OseeTypesClientDemoGuid, UserGroupsGuid};
       DataLoader loader = loaderFactory.newDataLoaderFromGuids(session, COMMON, ids);
       loader.withLoadLevel(LoadLevel.ALL);
