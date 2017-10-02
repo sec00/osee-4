@@ -15,7 +15,6 @@ import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.enums.PermissionEnum;
 import org.eclipse.osee.framework.core.model.access.AccessDataQuery;
-import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 
 public interface IAccessControlService {
 
