@@ -270,6 +270,7 @@ oseeEnumType "enum.dispo.item status" {
 	entry "PASS"
 	entry "INCOMPLETE"
 	entry "COMPLETE"
+	entry "COMPLETE-ANALYZED"
 	entry "Unspecified"
 }
 
