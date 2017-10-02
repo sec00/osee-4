@@ -26,12 +26,12 @@ public class DateAttribute extends CharacterBackedAttribute<Date> {
    public final DateFormat ALLDATETIME = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy");
 
    @Override
-   public Date getValue()  {
+   public Date getValue() {
       return (Date) getAttributeDataProvider().getValue();
    }
 
    @Override
-   protected void setToDefaultValue()  {
+   protected void setToDefaultValue() {
       String defaultValue = getAttributeType().getDefaultValue();
       if (defaultValue == null) {
          subClassSetValue(new Date());
@@ -41,7 +41,7 @@ public class DateAttribute extends CharacterBackedAttribute<Date> {
    }
 
    @Override
-   public String getDisplayableString()  {
+   public String getDisplayableString() {
       return getAsFormattedString(MMDDYYHHMM);
    }
 
@@ -56,7 +56,7 @@ public class DateAttribute extends CharacterBackedAttribute<Date> {
     * @param pattern DateAttribute.MMDDYY, etc...
     * @return formated date
     */
-   public String getAsFormattedString(DateFormat dateFormat)  {
+   public String getAsFormattedString(DateFormat dateFormat) {
       return dateFormat.format(getValue());
    }
 

@@ -52,13 +52,13 @@ public class VCastDataStoreImpl implements VCastDataStore {
       this.client = client;
    }
 
-   private JdbcStatement getStatement()  {
+   private JdbcStatement getStatement() {
       JdbcConnection connection = client.getConnection();
       return client.getStatement(connection, true);
    }
 
    @Override
-   public Collection<VCastBranchCoverage> getAllBranchCoverages()  {
+   public Collection<VCastBranchCoverage> getAllBranchCoverages() {
       Collection<VCastBranchCoverage> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -83,7 +83,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastBranchData> getAllBranchData()  {
+   public Collection<VCastBranchData> getAllBranchData() {
       Collection<VCastBranchData> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -104,7 +104,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastFunction> getAllFunctions()  {
+   public Collection<VCastFunction> getAllFunctions() {
       Collection<VCastFunction> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -129,7 +129,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastInstrumentedFile> getAllInstrumentedFiles()  {
+   public Collection<VCastInstrumentedFile> getAllInstrumentedFiles() {
       Collection<VCastInstrumentedFile> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -153,7 +153,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastMcdcCoverage> getAllMcdcCoverages()  {
+   public Collection<VCastMcdcCoverage> getAllMcdcCoverages() {
       Collection<VCastMcdcCoverage> toReturn = new ArrayList<>();
       JdbcStatement stmt = getStatement();
       try {
@@ -177,7 +177,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastMcdcCoverageCondition> getAllMcdcCoverageConditions()  {
+   public Collection<VCastMcdcCoverageCondition> getAllMcdcCoverageConditions() {
       Collection<VCastMcdcCoverageCondition> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -204,7 +204,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastMcdcCoveragePairRow> getAllMcdcCoveragePairRows()  {
+   public Collection<VCastMcdcCoveragePairRow> getAllMcdcCoveragePairRows() {
       Collection<VCastMcdcCoveragePairRow> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -227,7 +227,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastMcdcCoveragePair> getAllMcdcCoveragePairs()  {
+   public Collection<VCastMcdcCoveragePair> getAllMcdcCoveragePairs() {
       Collection<VCastMcdcCoveragePair> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -248,7 +248,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastMcdcData> getAllMcdcData()  {
+   public Collection<VCastMcdcData> getAllMcdcData() {
       Collection<VCastMcdcData> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -271,7 +271,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastMcdcDataCondition> getAllMcdcDataConditions()  {
+   public Collection<VCastMcdcDataCondition> getAllMcdcDataConditions() {
       Collection<VCastMcdcDataCondition> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -292,7 +292,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastProjectFile> getAllProjectFiles()  {
+   public Collection<VCastProjectFile> getAllProjectFiles() {
       Collection<VCastProjectFile> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -315,7 +315,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastProject> getAllProjects()  {
+   public Collection<VCastProject> getAllProjects() {
       Collection<VCastProject> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -334,7 +334,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastResult> getAllResults()  {
+   public Collection<VCastResult> getAllResults() {
       Collection<VCastResult> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -358,7 +358,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastSetting> getAllSettings()  {
+   public Collection<VCastSetting> getAllSettings() {
       Collection<VCastSetting> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -377,7 +377,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastSourceFile> getAllSourceFiles()  {
+   public Collection<VCastSourceFile> getAllSourceFiles() {
       Collection<VCastSourceFile> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -399,7 +399,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastStatementCoverage> getAllStatementCoverages()  {
+   public Collection<VCastStatementCoverage> getAllStatementCoverages() {
       Collection<VCastStatementCoverage> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -422,7 +422,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastStatementData> getAllStatementData()  {
+   public Collection<VCastStatementData> getAllStatementData() {
       Collection<VCastStatementData> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -444,7 +444,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public VCastVersion getVersion()  {
+   public VCastVersion getVersion() {
       VCastVersion toReturn = null;
 
       JdbcStatement stmt = getStatement();
@@ -462,7 +462,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public VCastWritable getWritable()  {
+   public VCastWritable getWritable() {
       VCastWritable toReturn = null;
 
       JdbcStatement stmt = getStatement();
@@ -480,7 +480,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public VCastSourceFileJoin getSourceFileJoin(VCastInstrumentedFile instrumentedFile)  {
+   public VCastSourceFileJoin getSourceFileJoin(VCastInstrumentedFile instrumentedFile) {
       VCastSourceFileJoin toReturn = null;
 
       JdbcStatement stmt = getStatement();
@@ -505,7 +505,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastFunction> getFunctions(VCastInstrumentedFile instrumentedFile)  {
+   public Collection<VCastFunction> getFunctions(VCastInstrumentedFile instrumentedFile) {
       Collection<VCastFunction> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -531,7 +531,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastStatementCoverage> getStatementCoverageLines(VCastFunction function)  {
+   public Collection<VCastStatementCoverage> getStatementCoverageLines(VCastFunction function) {
       if (isMCDC) {
          return getStatementCoverageLinesWithMCDC(function);
       } else if (isBranchCoverage) {
@@ -641,7 +641,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastStatementData> getStatementData(VCastStatementCoverage statementCoverage)  {
+   public Collection<VCastStatementData> getStatementData(VCastStatementCoverage statementCoverage) {
       Collection<VCastStatementData> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();
@@ -663,7 +663,7 @@ public class VCastDataStoreImpl implements VCastDataStore {
    }
 
    @Override
-   public Collection<VCastResult> getResults(VCastStatementData statementDataItem)  {
+   public Collection<VCastResult> getResults(VCastStatementData statementDataItem) {
       Collection<VCastResult> toReturn = new ArrayList<>();
 
       JdbcStatement stmt = getStatement();

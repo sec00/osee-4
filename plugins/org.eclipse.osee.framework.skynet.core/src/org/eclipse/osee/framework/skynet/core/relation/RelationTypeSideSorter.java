@@ -64,17 +64,17 @@ public class RelationTypeSideSorter extends RelationTypeSide {
       }
    }
 
-   public RelationSorter getSorterId()  {
+   public RelationSorter getSorterId() {
       return orderData.getCurrentSorterGuid(relationType, getSide());
    }
 
-   public void sort(List<? extends ArtifactToken> listToOrder)  {
+   public void sort(List<? extends ArtifactToken> listToOrder) {
       IRelationSorter order = sorterProvider.getRelationOrder(getSorterId());
       List<String> relativeOrder = orderData.getOrderList(getRelationType(), getSide());
       order.sort(listToOrder, relativeOrder);
    }
 
-   public void addItem(RelationSorter sorterId, Artifact itemToAdd)  {
+   public void addItem(RelationSorter sorterId, Artifact itemToAdd) {
       RelationSorter sorterIdToUse = sorterId;
       if (sorterIdToUse == PREEXISTING) {
          sorterIdToUse = getSorterId();
@@ -91,7 +91,7 @@ public class RelationTypeSideSorter extends RelationTypeSide {
       setOrder(relatives, sorterIdToUse);
    }
 
-   public void removeItem(ArtifactId itemToRemove)  {
+   public void removeItem(ArtifactId itemToRemove) {
       List<Artifact> relatives = Collections.emptyList();
       if (USER_DEFINED == getSorterId()) {
          Artifact target = getArtifact();

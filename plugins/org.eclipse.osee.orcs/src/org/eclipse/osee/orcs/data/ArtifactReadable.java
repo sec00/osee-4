@@ -33,19 +33,19 @@ public interface ArtifactReadable extends ArtifactToken, HasTransaction, OrcsRea
 
    TransactionId getLastModifiedTransaction();
 
-   boolean isOfType(ArtifactTypeId... otherTypes) ;
+   boolean isOfType(ArtifactTypeId... otherTypes);
 
    ////////////////////
 
-   int getAttributeCount(AttributeTypeId type) ;
+   int getAttributeCount(AttributeTypeId type);
 
-   int getAttributeCount(AttributeTypeId type, DeletionFlag deletionFlag) ;
+   int getAttributeCount(AttributeTypeId type, DeletionFlag deletionFlag);
 
-   boolean isAttributeTypeValid(AttributeTypeId attributeType) ;
+   boolean isAttributeTypeValid(AttributeTypeId attributeType);
 
-   Collection<AttributeTypeToken> getValidAttributeTypes() ;
+   Collection<AttributeTypeToken> getValidAttributeTypes();
 
-   Collection<AttributeTypeToken> getExistingAttributeTypes() ;
+   Collection<AttributeTypeToken> getExistingAttributeTypes();
 
    <T> T getSoleAttributeValue(AttributeTypeId attributeType);
 
@@ -53,52 +53,52 @@ public interface ArtifactReadable extends ArtifactToken, HasTransaction, OrcsRea
 
    <T> T getSoleAttributeValue(AttributeTypeId attributeType, T defaultValue);
 
-   String getSoleAttributeAsString(AttributeTypeId attributeType) ;
+   String getSoleAttributeAsString(AttributeTypeId attributeType);
 
-   String getSoleAttributeAsString(AttributeTypeId attributeType, String defaultValue) ;
+   String getSoleAttributeAsString(AttributeTypeId attributeType, String defaultValue);
 
    Long getSoleAttributeId(AttributeTypeId attributeType);
 
-   <T> List<T> getAttributeValues(AttributeTypeId attributeType) ;
+   <T> List<T> getAttributeValues(AttributeTypeId attributeType);
 
    ////////////////////
 
-   AttributeReadable<Object> getAttributeById(AttributeId attributeId) ;
+   AttributeReadable<Object> getAttributeById(AttributeId attributeId);
 
-   ResultSet<? extends AttributeReadable<Object>> getAttributes() ;
+   ResultSet<? extends AttributeReadable<Object>> getAttributes();
 
-   <T> ResultSet<? extends AttributeReadable<T>> getAttributes(AttributeTypeId attributeType) ;
+   <T> ResultSet<? extends AttributeReadable<T>> getAttributes(AttributeTypeId attributeType);
 
-   ResultSet<? extends AttributeReadable<Object>> getAttributes(DeletionFlag deletionFlag) ;
+   ResultSet<? extends AttributeReadable<Object>> getAttributes(DeletionFlag deletionFlag);
 
-   <T> ResultSet<? extends AttributeReadable<T>> getAttributes(AttributeTypeId attributeType, DeletionFlag deletionFlag) ;
+   <T> ResultSet<? extends AttributeReadable<T>> getAttributes(AttributeTypeId attributeType, DeletionFlag deletionFlag);
 
    ////////////////////
-   int getMaximumRelationAllowed(RelationTypeSide relationTypeSide) ;
+   int getMaximumRelationAllowed(RelationTypeSide relationTypeSide);
 
-   Collection<RelationTypeId> getValidRelationTypes() ;
+   Collection<RelationTypeId> getValidRelationTypes();
 
-   Collection<RelationTypeId> getExistingRelationTypes() ;
+   Collection<RelationTypeId> getExistingRelationTypes();
 
-   ArtifactReadable getParent() ;
+   ArtifactReadable getParent();
 
-   List<ArtifactReadable> getDescendants() ;
+   List<ArtifactReadable> getDescendants();
 
-   void getDescendants(List<ArtifactReadable> descendants) ;
+   void getDescendants(List<ArtifactReadable> descendants);
 
-   List<ArtifactReadable> getAncestors() ;
+   List<ArtifactReadable> getAncestors();
 
-   ResultSet<ArtifactReadable> getChildren() ;
+   ResultSet<ArtifactReadable> getChildren();
 
-   ResultSet<ArtifactReadable> getRelated(RelationTypeSide relationTypeSide) ;
+   ResultSet<ArtifactReadable> getRelated(RelationTypeSide relationTypeSide);
 
-   ResultSet<ArtifactReadable> getRelated(RelationTypeSide relationTypeSide, DeletionFlag deletionFlag) ;
+   ResultSet<ArtifactReadable> getRelated(RelationTypeSide relationTypeSide, DeletionFlag deletionFlag);
 
-   boolean areRelated(RelationTypeSide typeAndSide, ArtifactReadable readable) ;
+   boolean areRelated(RelationTypeSide typeAndSide, ArtifactReadable readable);
 
-   int getRelatedCount(RelationTypeSide typeAndSide) ;
+   int getRelatedCount(RelationTypeSide typeAndSide);
 
-   String getRationale(RelationTypeSide typeAndSide, ArtifactReadable readable) ;
+   String getRationale(RelationTypeSide typeAndSide, ArtifactReadable readable);
 
    ResultSet<RelationReadable> getRelations(RelationTypeSide relationTypeSide);
 

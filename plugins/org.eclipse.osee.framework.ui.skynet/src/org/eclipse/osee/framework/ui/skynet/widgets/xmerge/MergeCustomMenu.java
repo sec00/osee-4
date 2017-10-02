@@ -303,7 +303,7 @@ public class MergeCustomMenu extends XViewerCustomMenu {
    private void createEditArtifactMenuItem(MenuManager menuManager, IHandlerService handlerService) {
       IHandler handler = new MenuSelectionEnabledHandler(menuManager) {
          @Override
-         public void executeWithException(AttributeConflict attributeConflict)  {
+         public void executeWithException(AttributeConflict attributeConflict) {
 
             if (MergeUtility.okToOverwriteEditedValue(attributeConflict, Displays.getActiveShell().getShell(), false)) {
                RendererManager.openInJob(attributeConflict.getArtifact(), PresentationType.SPECIALIZED_EDIT);
@@ -320,7 +320,7 @@ public class MergeCustomMenu extends XViewerCustomMenu {
    private void createSourceResourceHistoryMenuItem(MenuManager menuManager, IHandlerService handlerService) {
       IHandler handler = new MenuSelectionEnabledHandler(menuManager) {
          @Override
-         public void executeWithException(AttributeConflict attributeConflict)  {
+         public void executeWithException(AttributeConflict attributeConflict) {
             HistoryView.open(attributeConflict.getSourceArtifact());
          }
       };
@@ -331,7 +331,7 @@ public class MergeCustomMenu extends XViewerCustomMenu {
    private void createDestinationResourceHistoryMenuItem(MenuManager menuManager, IHandlerService handlerService) {
       IHandler handler = new MenuSelectionEnabledHandler(menuManager) {
          @Override
-         public void executeWithException(AttributeConflict attributeConflict)  {
+         public void executeWithException(AttributeConflict attributeConflict) {
             HistoryView.open(attributeConflict.getDestArtifact());
          }
       };
@@ -341,7 +341,7 @@ public class MergeCustomMenu extends XViewerCustomMenu {
    private void createSourceRevealMenuItem(MenuManager menuManager, IHandlerService handlerService) {
       IHandler handler = new MenuSelectionEnabledHandler(menuManager) {
          @Override
-         public void executeWithException(AttributeConflict attributeConflict)  {
+         public void executeWithException(AttributeConflict attributeConflict) {
             ArtifactExplorer.revealArtifact(attributeConflict.getSourceArtifact());
          }
       };
@@ -351,7 +351,7 @@ public class MergeCustomMenu extends XViewerCustomMenu {
    private void createDestinationRevealMenuItem(MenuManager menuManager, IHandlerService handlerService) {
       IHandler handler = new MenuSelectionEnabledHandler(menuManager) {
          @Override
-         public void executeWithException(AttributeConflict attributeConflict)  {
+         public void executeWithException(AttributeConflict attributeConflict) {
             ArtifactExplorer.revealArtifact(attributeConflict.getDestArtifact());
          }
       };
@@ -468,7 +468,7 @@ public class MergeCustomMenu extends XViewerCustomMenu {
       }
 
       @Override
-      public boolean isEnabledWithException(IStructuredSelection structuredSelection)  {
+      public boolean isEnabledWithException(IStructuredSelection structuredSelection) {
          artifacts = new LinkedList<>();
          List<Conflict> conflicts = Handlers.getConflictsFromStructuredSelection(structuredSelection);
          for (Conflict conflict : conflicts) {

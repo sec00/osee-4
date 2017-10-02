@@ -47,7 +47,7 @@ public class FrameworkArtifactImageProvider extends ArtifactImageProvider {
          CoreArtifactTypes.InterfaceRequirement, CoreArtifactTypes.SystemFunction, CoreArtifactTypes.SubsystemFunction);
 
    @Override
-   public void init()  {
+   public void init() {
       ArtifactImageManager.registerBaseImage(CoreArtifactTypes.RootArtifact, FrameworkImage.ROOT_HIERARCHY, this);
       ArtifactImageManager.registerBaseImage(CoreArtifactTypes.HeadingMSWord, FrameworkImage.HEADING, this);
       ArtifactImageManager.registerBaseImage(CoreArtifactTypes.Folder, PluginUiImage.FOLDER, this);
@@ -158,7 +158,7 @@ public class FrameworkArtifactImageProvider extends ArtifactImageProvider {
    }
 
    @Override
-   public String setupImage(Artifact artifact)  {
+   public String setupImage(Artifact artifact) {
       if (artifact.isDeleted()) {
          return null;
       }
@@ -174,7 +174,7 @@ public class FrameworkArtifactImageProvider extends ArtifactImageProvider {
       return super.setupImage(artifact);
    }
 
-   public static org.eclipse.swt.graphics.Image getUserImage(Collection<User> users)  {
+   public static org.eclipse.swt.graphics.Image getUserImage(Collection<User> users) {
       if (users.size() > 0) {
          if (containsSystemUser(users)) {
             return ImageManager.getImage(FrameworkImage.USER_GREY);
@@ -189,7 +189,7 @@ public class FrameworkArtifactImageProvider extends ArtifactImageProvider {
       return null;
    }
 
-   private static boolean containsCurrentUser(Collection<User> users)  {
+   private static boolean containsCurrentUser(Collection<User> users) {
       for (User user : users) {
          if (UserManager.getUser().equals(user)) {
             return true;
@@ -207,7 +207,7 @@ public class FrameworkArtifactImageProvider extends ArtifactImageProvider {
       return false;
    }
 
-   private static boolean containsInactiveUser(Collection<User> users)  {
+   private static boolean containsInactiveUser(Collection<User> users) {
       for (User user : users) {
          if (!user.isActive()) {
             return true;

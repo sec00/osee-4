@@ -93,37 +93,37 @@ public class ArtifactReadOnlyImpl extends AbstractProxied<Artifact> implements A
    }
 
    @Override
-   public IArtifactType getArtifactType()  {
+   public IArtifactType getArtifactType() {
       return getProxiedObject().getArtifactType();
    }
 
    @Override
-   public boolean isOfType(ArtifactTypeId... otherTypes)  {
+   public boolean isOfType(ArtifactTypeId... otherTypes) {
       return getProxiedObject().isOfType(otherTypes);
    }
 
    @Override
-   public int getAttributeCount(AttributeTypeId type)  {
+   public int getAttributeCount(AttributeTypeId type) {
       return getProxiedObject().getAttributeCount(type);
    }
 
    @Override
-   public int getAttributeCount(AttributeTypeId type, DeletionFlag deletionFlag)  {
+   public int getAttributeCount(AttributeTypeId type, DeletionFlag deletionFlag) {
       return getProxiedObject().getAttributeCount(type, deletionFlag);
    }
 
    @Override
-   public boolean isAttributeTypeValid(AttributeTypeId attributeType)  {
+   public boolean isAttributeTypeValid(AttributeTypeId attributeType) {
       return getProxiedObject().isAttributeTypeValid(attributeType);
    }
 
    @Override
-   public Collection<AttributeTypeToken> getValidAttributeTypes()  {
+   public Collection<AttributeTypeToken> getValidAttributeTypes() {
       return getProxiedObject().getValidAttributeTypes();
    }
 
    @Override
-   public Collection<AttributeTypeToken> getExistingAttributeTypes()  {
+   public Collection<AttributeTypeToken> getExistingAttributeTypes() {
       return getProxiedObject().getExistingAttributeTypes();
    }
 
@@ -138,17 +138,17 @@ public class ArtifactReadOnlyImpl extends AbstractProxied<Artifact> implements A
    }
 
    @Override
-   public <T> T getSoleAttributeValue(AttributeTypeId attributeType, T defaultValue)  {
+   public <T> T getSoleAttributeValue(AttributeTypeId attributeType, T defaultValue) {
       return getProxiedObject().getSoleAttributeValue(attributeType, defaultValue);
    }
 
    @Override
-   public String getSoleAttributeAsString(AttributeTypeId attributeType)  {
+   public String getSoleAttributeAsString(AttributeTypeId attributeType) {
       return getProxiedObject().getSoleAttributeAsString(attributeType);
    }
 
    @Override
-   public String getSoleAttributeAsString(AttributeTypeId attributeType, String defaultValue)  {
+   public String getSoleAttributeAsString(AttributeTypeId attributeType, String defaultValue) {
       return getProxiedObject().getSoleAttributeAsString(attributeType, defaultValue);
    }
 
@@ -158,78 +158,78 @@ public class ArtifactReadOnlyImpl extends AbstractProxied<Artifact> implements A
    }
 
    @Override
-   public <T> List<T> getAttributeValues(AttributeTypeId attributeType)  {
+   public <T> List<T> getAttributeValues(AttributeTypeId attributeType) {
       return getProxiedObject().getAttributeValues(attributeType);
    }
 
    @Override
-   public ResultSet<? extends AttributeReadable<Object>> getAttributes()  {
+   public ResultSet<? extends AttributeReadable<Object>> getAttributes() {
       List<Attribute<Object>> attributes = getProxiedObject().getAttributes();
       return getProxyManager().asExternalAttributes(getSession(), attributes);
    }
 
    @Override
-   public <T> ResultSet<? extends AttributeReadable<T>> getAttributes(AttributeTypeId attributeType)  {
+   public <T> ResultSet<? extends AttributeReadable<T>> getAttributes(AttributeTypeId attributeType) {
       List<Attribute<T>> attributes = getProxiedObject().getAttributes(attributeType);
       return getProxyManager().asExternalAttributes(getSession(), attributes);
    }
 
    @Override
-   public ResultSet<? extends AttributeReadable<Object>> getAttributes(DeletionFlag deletionFlag)  {
+   public ResultSet<? extends AttributeReadable<Object>> getAttributes(DeletionFlag deletionFlag) {
       List<Attribute<Object>> attributes = getProxiedObject().getAttributes(deletionFlag);
       return getProxyManager().asExternalAttributes(getSession(), attributes);
    }
 
    @Override
-   public <T> ResultSet<? extends AttributeReadable<T>> getAttributes(AttributeTypeId attributeType, DeletionFlag deletionFlag)  {
+   public <T> ResultSet<? extends AttributeReadable<T>> getAttributes(AttributeTypeId attributeType, DeletionFlag deletionFlag) {
       List<Attribute<T>> attributes = getProxiedObject().getAttributes(attributeType, deletionFlag);
       return getProxyManager().asExternalAttributes(getSession(), attributes);
    }
 
    @Override
-   public AttributeReadable<Object> getAttributeById(AttributeId attributeId)  {
+   public AttributeReadable<Object> getAttributeById(AttributeId attributeId) {
       Attribute<Object> attribute = getProxiedObject().getAttributeById(attributeId);
       return getProxyManager().asExternalAttribute(getSession(), attribute);
    }
 
    @Override
-   public int getMaximumRelationAllowed(RelationTypeSide typeAndSide)  {
+   public int getMaximumRelationAllowed(RelationTypeSide typeAndSide) {
       IRelationType type = typeAndSide.getRelationType();
       RelationSide side = whichSideAmIOn(typeAndSide);
       return getRelationManager().getMaximumRelationAllowed(getSession(), type, getProxiedObject(), side);
    }
 
    @Override
-   public Collection<RelationTypeId> getValidRelationTypes()  {
+   public Collection<RelationTypeId> getValidRelationTypes() {
       return getRelationManager().getValidRelationTypes(getSession(), getProxiedObject());
    }
 
    @Override
-   public Collection<RelationTypeId> getExistingRelationTypes()  {
+   public Collection<RelationTypeId> getExistingRelationTypes() {
       return getRelationManager().getExistingRelationTypes(getSession(), getProxiedObject());
    }
 
    @Override
-   public ArtifactReadable getParent()  {
+   public ArtifactReadable getParent() {
       Artifact parent = getRelationManager().getParent(getSession(), getProxiedObject());
       return getProxyManager().asExternalArtifact(getSession(), parent);
    }
 
    @Override
-   public ResultSet<ArtifactReadable> getChildren()  {
+   public ResultSet<ArtifactReadable> getChildren() {
       ResultSet<Artifact> children = getRelationManager().getChildren(getSession(), getProxiedObject());
       return getProxyManager().asExternalArtifacts(getSession(), children);
    }
 
    @Override
-   public List<ArtifactReadable> getDescendants()  {
+   public List<ArtifactReadable> getDescendants() {
       List<ArtifactReadable> descendants = new LinkedList<>();
       getDescendants(descendants);
       return descendants;
    }
 
    @Override
-   public void getDescendants(List<ArtifactReadable> descendants)  {
+   public void getDescendants(List<ArtifactReadable> descendants) {
       for (ArtifactReadable child : getChildren()) {
          descendants.add(child);
          child.getDescendants(descendants);
@@ -237,7 +237,7 @@ public class ArtifactReadOnlyImpl extends AbstractProxied<Artifact> implements A
    }
 
    @Override
-   public List<ArtifactReadable> getAncestors()  {
+   public List<ArtifactReadable> getAncestors() {
       List<ArtifactReadable> ancestors = new ArrayList<>();
       for (ArtifactReadable parent = getParent(); parent != null; parent = parent.getParent()) {
          ancestors.add(parent);
@@ -246,7 +246,7 @@ public class ArtifactReadOnlyImpl extends AbstractProxied<Artifact> implements A
    }
 
    @Override
-   public ResultSet<ArtifactReadable> getRelated(RelationTypeSide typeAndSide)  {
+   public ResultSet<ArtifactReadable> getRelated(RelationTypeSide typeAndSide) {
       return getRelated(typeAndSide, EXCLUDE_DELETED);
    }
 
@@ -257,7 +257,7 @@ public class ArtifactReadOnlyImpl extends AbstractProxied<Artifact> implements A
    }
 
    @Override
-   public ResultSet<ArtifactReadable> getRelated(RelationTypeSide typeAndSide, DeletionFlag deletionFlag)  {
+   public ResultSet<ArtifactReadable> getRelated(RelationTypeSide typeAndSide, DeletionFlag deletionFlag) {
       IRelationType type = typeAndSide.getRelationType();
       RelationSide side = whichSideAmIOn(typeAndSide);
       ResultSet<Artifact> related =
@@ -266,27 +266,27 @@ public class ArtifactReadOnlyImpl extends AbstractProxied<Artifact> implements A
    }
 
    @Override
-   public int getRelatedCount(RelationTypeSide typeAndSide)  {
+   public int getRelatedCount(RelationTypeSide typeAndSide) {
       IRelationType type = typeAndSide.getRelationType();
       RelationSide side = whichSideAmIOn(typeAndSide);
       return getRelationManager().getRelatedCount(getSession(), type, getProxiedObject(), side);
    }
 
    @Override
-   public boolean areRelated(RelationTypeSide typeAndSide, ArtifactReadable readable)  {
+   public boolean areRelated(RelationTypeSide typeAndSide, ArtifactReadable readable) {
       IRelationType type = typeAndSide.getRelationType();
       Pair<RelationNode, RelationNode> nodes = asABNodes(typeAndSide.getSide(), readable);
       return getRelationManager().areRelated(getSession(), nodes.getFirst(), type, nodes.getSecond());
    }
 
    @Override
-   public String getRationale(RelationTypeSide typeAndSide, ArtifactReadable readable)  {
+   public String getRationale(RelationTypeSide typeAndSide, ArtifactReadable readable) {
       IRelationType type = typeAndSide.getRelationType();
       Pair<RelationNode, RelationNode> nodes = asABNodes(typeAndSide.getSide(), readable);
       return getRelationManager().getRationale(getSession(), nodes.getFirst(), type, nodes.getSecond());
    }
 
-   private Pair<RelationNode, RelationNode> asABNodes(RelationSide side, ArtifactReadable readable)  {
+   private Pair<RelationNode, RelationNode> asABNodes(RelationSide side, ArtifactReadable readable) {
       Artifact thisArtifact = getProxiedObject();
       Artifact otherArtifact = getProxyManager().asInternalArtifact(readable);
 
