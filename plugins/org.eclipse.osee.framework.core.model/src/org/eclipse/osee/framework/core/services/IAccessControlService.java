@@ -18,9 +18,9 @@ import org.eclipse.osee.framework.core.model.access.AccessDataQuery;
 
 public interface IAccessControlService {
 
-   boolean hasPermission(Object object, PermissionEnum permission) ;
+   boolean hasPermission(Object object, PermissionEnum permission);
 
-   void removePermissions(BranchId branch) ;
+   void removePermissions(BranchId branch);
 
-   AccessDataQuery getAccessData(ArtifactToken userArtifact, Collection<?> itemsToCheck) ;
+   AccessDataQuery getAccessData(ArtifactToken userArtifact, Collection<?> itemsToCheck);
 }

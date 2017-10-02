@@ -48,7 +48,7 @@ public class ImportTraceUnitsOperation extends AbstractOperation {
    }
 
    @Override
-   protected void doWork(IProgressMonitor monitor)  {
+   protected void doWork(IProgressMonitor monitor) {
       if (isPersistChanges) {
          TraceUnitFromResourceOperation.importTraceFromTestUnits(monitor, sources, isRecursive, fileWithMultiPaths,
             importToBranch, addGuidToSourceFile, traceTypeIds);
