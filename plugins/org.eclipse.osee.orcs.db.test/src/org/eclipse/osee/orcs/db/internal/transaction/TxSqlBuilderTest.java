@@ -112,7 +112,7 @@ public class TxSqlBuilderTest {
    private final TransactionDataImpl tx = new TransactionDataImpl(EXPECTED_TX.getId());
 
    @Before
-   public void setUp() throws OseeCoreException {
+   public void setUp()  {
       MockitoAnnotations.initMocks(this);
 
       versionData = new VersionDataImpl();
@@ -157,7 +157,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAccept() throws OseeCoreException {
+   public void testAccept()  {
       builder.accept(tx, txData);
       verify(txData).accept(builder);
 
@@ -179,7 +179,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAcceptArtifactData() throws OseeCoreException {
+   public void testAcceptArtifactData()  {
       for (ModificationType modType : MODS_ITEMS_ROW) {
          builder.accept(tx, txData);
          artData.setModType(modType);
@@ -200,7 +200,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAcceptArtifactDataNoItemRow() throws OseeCoreException {
+   public void testAcceptArtifactDataNoItemRow()  {
       for (ModificationType modType : MODS_REUSE_ROW) {
          builder.accept(tx, txData);
          artData.setModType(modType);
@@ -222,7 +222,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAcceptArtifactDataNoRows() throws OseeCoreException {
+   public void testAcceptArtifactDataNoRows()  {
       builder.accept(tx, txData);
 
       // test new artData that is deleted adds no rows
@@ -249,7 +249,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAcceptRelationData() throws OseeCoreException {
+   public void testAcceptRelationData()  {
       for (ModificationType modType : MODS_ITEMS_ROW) {
          builder.accept(tx, txData);
          relData.setModType(modType);
@@ -270,7 +270,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAcceptRelationDataNoItemRow() throws OseeCoreException {
+   public void testAcceptRelationDataNoItemRow()  {
       for (ModificationType modType : MODS_REUSE_ROW) {
          builder.accept(tx, txData);
          relData.setModType(modType);
@@ -292,7 +292,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAcceptAttributeData() throws OseeCoreException {
+   public void testAcceptAttributeData()  {
       for (ModificationType modType : MODS_ITEMS_ROW) {
          when(dataProxy.getStorageString()).thenReturn(ATTR_VALUE);
          when(dataProxy.getUri()).thenReturn(ATTR_URI);
@@ -325,7 +325,7 @@ public class TxSqlBuilderTest {
    }
 
    @Test
-   public void testAcceptAttributeDataNoRow() throws OseeCoreException {
+   public void testAcceptAttributeDataNoRow()  {
       for (ModificationType modType : MODS_REUSE_ROW) {
          builder.accept(tx, txData);
          attrData.setModType(modType);

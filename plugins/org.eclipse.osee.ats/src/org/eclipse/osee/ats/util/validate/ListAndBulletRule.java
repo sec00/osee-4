@@ -30,7 +30,7 @@ public class ListAndBulletRule extends AbstractValidationRule {
    private static final Pattern NORMAL_LIST_BULLET_STYLE = Pattern.compile("<w:pPr><w:listPr>.+?</w:listPr></w:pPr>");
 
    @Override
-   protected ValidationResult validate(Artifact artToValidate, IProgressMonitor monitor) throws OseeCoreException {
+   protected ValidationResult validate(Artifact artToValidate, IProgressMonitor monitor)  {
       Collection<String> errorMessages = new ArrayList<>();
       boolean validationPassed = true;
       String wtc = artToValidate.getSoleAttributeValue(CoreAttributeTypes.WordTemplateContent, "");
