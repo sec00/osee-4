@@ -106,4 +106,6 @@ public interface IAgileService {
 
    IAgileTeam getAgileTeam(IAtsTeamDefinition teamDef);
 
+   IAgileTeam getAgileTeam(IAgileSprint sprint);
+
 }
