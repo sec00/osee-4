@@ -143,7 +143,7 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
                row[4] = correct(subSysReq.getSoleAttributeValue(CoreAttributeTypes.ParagraphNumber, ""));
                row[5] = subSysReq.getName();
                row[6] = subSysReq.getSoleAttributeValue(CoreAttributeTypes.Subsystem, "");
-               excelWriter.writeRow(row);
+               excelWriter.writeRow((Object[]) row);
             }
          } else {
             row[2] = lowLevelReq.getArtifactTypeName();
@@ -151,7 +151,7 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
 
          if (row[0] != null && !isRelated) { // if this requirement is not traced to any lower level req (i.e. the for loop didn't run)
             row[3] = row[4] = row[5] = row[6] = null;
-            excelWriter.writeRow(row);
+            excelWriter.writeRow((Object[]) row);
          }
       }
 
@@ -203,12 +203,12 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
                   if (lowLevelReqs.contains(lowerLevelReq)) {
                      row[2] = correct(lowerLevelReq.getSoleAttributeValue(CoreAttributeTypes.ParagraphNumber, ""));
                      row[3] = lowerLevelReq.getName();
-                     excelWriter.writeRow(row);
+                     excelWriter.writeRow((Object[]) row);
                   }
                }
                if (row[0] != null && !isRelated) { // if this requirement is not traced to any low level requirement(i.e. the for loop didn't run)
                   row[2] = row[3] = null;
-                  excelWriter.writeRow(row);
+                  excelWriter.writeRow((Object[]) row);
                }
             }
          }
