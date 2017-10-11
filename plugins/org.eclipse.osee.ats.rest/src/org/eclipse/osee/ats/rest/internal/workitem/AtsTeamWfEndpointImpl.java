@@ -5,7 +5,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import org.eclipse.osee.ats.api.IAtsServices;
+import org.eclipse.osee.ats.api.AtsApi;
 import org.eclipse.osee.ats.api.IAtsWorkItem;
 import org.eclipse.osee.ats.api.workflow.AtsTeamWfEndpointApi;
 import org.eclipse.osee.ats.api.workflow.IAtsTeamWorkflow;
@@ -19,10 +19,10 @@ import org.eclipse.osee.framework.core.model.change.CompareResults;
 @Path("teamwf")
 public class AtsTeamWfEndpointImpl implements AtsTeamWfEndpointApi {
 
-   private final IAtsServices services;
+   private final AtsApi atsApi;
 
-   public AtsTeamWfEndpointImpl(IAtsServices services) {
-      this.services = services;
+   public AtsTeamWfEndpointImpl(AtsApi atsApi) {
+      this.atsApi = atsApi;
    }
 
    @Override
@@ -30,18 +30,18 @@ public class AtsTeamWfEndpointImpl implements AtsTeamWfEndpointApi {
    @Path("{id}/changedata")
    @Produces({MediaType.APPLICATION_JSON})
    public CompareResults getChangeData(@PathParam("id") String id) {
-      IAtsWorkItem workItem = services.getWorkItemService().getWorkItemByAnyId(id);
+      IAtsWorkItem workItem = atsApi.getWorkItemService().getWorkItemByAnyId(id);
       if (!workItem.isTeamWorkflow()) {
          throw new UnsupportedOperationException();
       }
       IAtsTeamWorkflow teamWf = workItem.getParentTeamWorkflow();
-      TransactionToken trans = services.getBranchService().getEarliestTransactionId(teamWf);
+      TransactionToken trans = atsApi.getBranchService().getEarliestTransactionId(teamWf);
       if (trans.isValid()) {
-         return services.getBranchService().getChangeData(trans);
+         return atsApi.getBranchService().getChangeData(trans);
       }
-      BranchId branch = services.getBranchService().getWorkingBranch(teamWf);
+      BranchId branch = atsApi.getBranchService().getWorkingBranch(teamWf);
       if (branch.isValid()) {
-         return services.getBranchService().getChangeData(branch);
+         return atsApi.getBranchService().getChangeData(branch);
       }
       return new CompareResults();
    }
