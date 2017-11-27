@@ -22,6 +22,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.jaxrs.server.internal.security.oauth2.OAuthUtil;
+import org.eclipse.osee.logger.Log;
 
 /**
  * @author Angel Avila
@@ -35,21 +36,31 @@ public class OseeRootResource {
    @Context
    private ContainerRequestContext context;
 
-   public OseeRootResource() {
+   private final Log logger;
 
+   public OseeRootResource(Log logger) {
+      this.logger = logger;
    }
 
    @GET
    @Produces(MediaType.APPLICATION_JSON)
    public Response getRoot() {
       String forwardedServer = OAuthUtil.getForwarderServer();
-
+      if (logger != null) {
+         logger.trace("Forwarded Server [%s]", forwardedServer);
+      }
       String basePath;
       URI location = uriInfo.getRequestUri();
+      if (logger != null) {
+         logger.trace("URI Location [%s]", location.toString());
+      }
       if (Strings.isValid(forwardedServer)) {
          basePath = forwardedServer;
       } else {
          basePath = location.toString();
+      }
+      if (logger != null) {
+         logger.trace("Base Path [%s]", basePath);
       }
 
       String scheme = location.getScheme();
@@ -59,7 +70,9 @@ public class OseeRootResource {
          .path("/osee/ui/index.html")//
          .fragment(location.getRawFragment())//
          .buildFromEncoded();
-
+      if (logger != null) {
+         logger.trace("Final Uri [%s]", finalUri);
+      }
       return Response.seeOther(finalUri).build();
    }
 
