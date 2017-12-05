@@ -14,6 +14,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
+import org.eclipse.osee.framework.core.data.ArtifactTypeId;
 import org.eclipse.osee.framework.core.data.AttributeTypeToken;
 import org.eclipse.osee.framework.core.data.IArtifactType;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
@@ -205,7 +206,7 @@ public class RoughArtifact {
       return attributes.getSoleAttributeValue(attributeName);
    }
 
-   public IArtifactType getPrimaryArtifactType() {
+   public ArtifactTypeId getPrimaryArtifactType() {
       return primaryArtifactType;
    }
 
