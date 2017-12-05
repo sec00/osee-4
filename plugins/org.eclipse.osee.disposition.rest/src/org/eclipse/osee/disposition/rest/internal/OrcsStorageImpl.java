@@ -88,7 +88,7 @@ public class OrcsStorageImpl implements Storage {
 
    private ResultSet<ArtifactReadable> getDispoTypesArtifact() {
       return getQuery().fromBranch(COMMON).andUuid(DISPO_ARTIFACT.getUuid()).andTypeEquals(
-         DISPO_ARTIFACT.getArtifactType()).getResults();
+         DISPO_ARTIFACT.getArtifactTypeId()).getResults();
    }
 
    @Override
@@ -298,7 +298,6 @@ public class OrcsStorageImpl implements Storage {
    public void createDispoItems(ArtifactReadable author, BranchId branch, DispoSet parentSet, List<DispoItem> data) {
       ArtifactReadable parentSetArt = findDispoArtifact(branch, parentSet.getGuid(), DispoConstants.DispoSet);
       TransactionBuilder tx = getTxFactory().createTransaction(branch, author, "Create Dispoable Item");
-        
 
       for (DispoItem item : data) {
          ArtifactId createdItem = tx.createArtifact(DispoConstants.DispoItem, item.getName());
