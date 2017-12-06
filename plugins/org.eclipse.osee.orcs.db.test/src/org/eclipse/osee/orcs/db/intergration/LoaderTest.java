@@ -38,7 +38,6 @@ import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.AttributeId;
 import org.eclipse.osee.framework.core.data.GammaId;
-import org.eclipse.osee.framework.core.data.TokenFactory;
 import org.eclipse.osee.framework.core.data.TransactionId;
 import org.eclipse.osee.framework.core.enums.CoreArtifactTokens;
 import org.eclipse.osee.framework.core.enums.CoreArtifactTypes;
@@ -93,12 +92,10 @@ public class LoaderTest {
    @Captor private ArgumentCaptor<AttributeData> attributeCaptor;
    @Captor private ArgumentCaptor<RelationData> relationCaptor;
    @Mock private OrcsSession session;
+   private static final ArtifactToken AtsAdminToken = ArtifactToken.valueOf(136750, "AtsAdmin", CoreArtifactTypes.UserGroup);
+   private static final ArtifactToken AtsTempAdminToken = ArtifactToken.valueOf(5367074, "AtsTempAdmin", CoreArtifactTypes.UserGroup);
    // @formatter:on
 
-   private static final ArtifactToken AtsAdminToken =
-      TokenFactory.createArtifactToken(136750, "asdf", "AtsAdmin", CoreArtifactTypes.UserGroup);
-   private static final ArtifactToken AtsTempAdminToken =
-      TokenFactory.createArtifactToken(5367074, "qwerty", "AtsTempAdmin", CoreArtifactTypes.UserGroup);
    private HasCancellation cancellation;
    private DataLoaderFactory loaderFactory;
    private static ArtifactReadable OseeTypesFrameworkArt;
