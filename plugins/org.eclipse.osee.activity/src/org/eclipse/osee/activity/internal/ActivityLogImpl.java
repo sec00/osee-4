@@ -27,6 +27,7 @@ import static org.eclipse.osee.activity.internal.ActivityUtil.captureStackTrace;
 import static org.eclipse.osee.framework.core.data.CoreActivityTypes.DEFAULT_ROOT;
 import static org.eclipse.osee.framework.core.data.CoreActivityTypes.THREAD_ACTIVITY;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -168,7 +169,7 @@ public class ActivityLogImpl implements ActivityLog, Runnable {
    }
 
    private void continuouslyLogThreadActivity() {
-      String threadReport = getThreadActivityDelta(threadStats);
+      String threadReport = Collections.toString("\n", "", getThreadActivityDelta(threadStats));
       threadStats = getThreadActivity();
 
       if (!threadReport.isEmpty()) {
@@ -501,7 +502,7 @@ public class ActivityLogImpl implements ActivityLog, Runnable {
    }
 
    @Override
-   public String getThreadActivityDelta(ThreadStats[] threadStats) {
+   public List<String> getThreadActivityDelta(ThreadStats[] threadStats) {
       return threadActivity.getThreadActivityDelta(threadStats);
    }
 }
