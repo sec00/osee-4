@@ -14,17 +14,16 @@ package org.eclipse.osee.disposition.model;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.eclipse.osee.framework.jdk.core.type.Identifiable;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  * @author Angel Avila
  */
 
 @XmlRootElement(name = "DispoAnnotationData")
-public class DispoAnnotationData implements Identifiable<String> {
+public class DispoAnnotationData {
 
-   private static final String MODIFY_ = "Modify_";
-   private String id;
+   private String guid;
    private int index;
    private String developerNotes;
    private String customerNotes;
@@ -35,23 +34,23 @@ public class DispoAnnotationData implements Identifiable<String> {
    private boolean isResolutionValid;
    private String resolutionType;
    private boolean isDefault;
+   private boolean resolutionTypeValid;
+   private String resolutionMethodType;
 
    public DispoAnnotationData() {
-
+      idsOfCoveredDiscrepancies = new ArrayList<>();
    }
 
-   @Override
+   public void setName(String name) {
+      this.locationRefs = name;
+   }
+
    public String getGuid() {
-      return String.valueOf(id);
+      return guid;
    }
 
-   @Override
    public String getName() {
       return locationRefs;
-   }
-
-   public String getId() {
-      return id;
    }
 
    public int getIndex() {
@@ -94,6 +93,14 @@ public class DispoAnnotationData implements Identifiable<String> {
       return isDefault;
    }
 
+   public String getResolutionMethodType() {
+      return resolutionMethodType;
+   }
+
+   public boolean getResolutionTypeValid() {
+      return resolutionTypeValid;
+   }
+
    public void setLocationRefs(String locationRefs) {
       this.locationRefs = locationRefs;
    }
@@ -107,7 +114,7 @@ public class DispoAnnotationData implements Identifiable<String> {
    }
 
    public void setId(String id) {
-      this.id = id;
+      this.guid = id;
    }
 
    public void setIndex(int index) {
@@ -138,17 +145,18 @@ public class DispoAnnotationData implements Identifiable<String> {
       this.isDefault = isDefault;
    }
 
+   public void setResolutionMethodType(String resolutionMethodType) {
+      this.resolutionMethodType = resolutionMethodType;
+   }
+
+   @JsonIgnore
    public boolean isValid() {
       return (isConnected || isDefault) && isResolutionValid && isResolutionTypeValid();
    }
 
-   public boolean isResolutionTypeValid() {
+   private boolean isResolutionTypeValid() {
       return resolutionType != null && !resolutionType.isEmpty() && !resolutionType.equalsIgnoreCase(
          "None") && !resolutionType.equalsIgnoreCase("null");
-   }
-
-   public boolean isResolutionMethodType() {
-      return resolutionType.startsWith(MODIFY_);
    }
 
    public void disconnect() {
@@ -156,4 +164,7 @@ public class DispoAnnotationData implements Identifiable<String> {
       this.idsOfCoveredDiscrepancies = new ArrayList<String>();
    }
 
+   public void setResolutionTypeValid(boolean resolutionTypeValid) {
+      this.resolutionTypeValid = resolutionTypeValid;
+   }
 }
