@@ -169,6 +169,11 @@ public class ArtifactReadOnlyImpl extends AbstractProxied<Artifact> implements A
    }
 
    @Override
+   public Iterable<Collection<? extends AttributeReadable<Object>>> getAttributeIterable() {
+      return getProxiedObject().getAttributeIterable();
+   }
+
+   @Override
    public ResultSet<? extends AttributeReadable<Object>> getAttributes() {
       List<Attribute<Object>> attributes = getProxiedObject().getAttributes();
       return getProxyManager().asExternalAttributes(getSession(), attributes);
