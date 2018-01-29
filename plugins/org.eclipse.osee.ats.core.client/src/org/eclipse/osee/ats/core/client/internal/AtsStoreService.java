@@ -31,6 +31,7 @@ import org.eclipse.osee.ats.api.util.IAtsChangeSet;
 import org.eclipse.osee.ats.api.util.IAtsStoreService;
 import org.eclipse.osee.ats.api.workflow.IAtsTeamWorkflow;
 import org.eclipse.osee.ats.core.client.internal.store.AtsChangeSet;
+import org.eclipse.osee.framework.core.client.ClientSessionManager;
 import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.ArtifactTypeId;
@@ -97,11 +98,6 @@ public class AtsStoreService implements IAtsStoreService {
    @Override
    public boolean isDeleted(IAtsObject atsObject) {
       return AtsClientService.get().getArtifact(atsObject).isDeleted();
-   }
-
-   @Override
-   public String getGuid(IAtsObject atsObject) {
-      return AtsClientService.get().getArtifact(atsObject).getGuid();
    }
 
    /**
@@ -247,6 +243,11 @@ public class AtsStoreService implements IAtsStoreService {
          }
       }
       return cust;
+   }
+
+   @Override
+   public boolean isProductionDb() {
+      return ClientSessionManager.isProductionDataStore();
    }
 
 }
