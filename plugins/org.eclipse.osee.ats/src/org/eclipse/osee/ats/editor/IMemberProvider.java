@@ -31,7 +31,7 @@ public interface IMemberProvider {
 
    Artifact getArtifact();
 
-   String getGuid();
+   Long getId();
 
    void addMember(Artifact artifact);
 
