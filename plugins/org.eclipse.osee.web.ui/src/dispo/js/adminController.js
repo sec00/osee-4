@@ -36,7 +36,8 @@ app.controller('adminController', [
                 var newProgram = new Program;
                 newProgram.name = $scope.newProgramName;
                 newProgram.$save({
-                    name: $scope.newProgramName
+                    name: $scope.newProgramName,
+                    userName: $rootScope.cachedName
                 }, function() {
                     $scope.newProgramName = "";
                     $scope.addNew = false;
@@ -277,7 +278,8 @@ app.controller('adminController', [
         $scope.editSet = function editSet(set) {
             Set.update({
                 programId: $scope.programSelection,
-                setId: set.guid
+                setId: set.guid,
+                userName: $rootScope.cachedName
             }, set);
         };
 
@@ -291,7 +293,8 @@ app.controller('adminController', [
             multiItemEditOp.userName = $rootScope.cachedName;
             
             multiItemEditOp.$save({
-                programId: $scope.programSelection      		
+                programId: $scope.programSelection,
+                userName: $rootScope.cachedName
             }, function(data) {
                 $scope.isRunningOperation = false;
                 loadingModal.close();
@@ -323,7 +326,8 @@ app.controller('adminController', [
             set.processingImport = true;
             Set.update({
                 programId: $scope.programSelection,
-                setId: set.guid
+                setId: set.guid,
+                userName: $rootScope.cachedName
             }, newSet, function(data){
                 set.processingImport = false;
 		            	set.time = data.time;
@@ -356,7 +360,8 @@ app.controller('adminController', [
                 newSet.importPath = path;
                 newSet.dispoType = $rootScope.type;
                 newSet.$save({
-                    programId: $scope.programSelection
+                    programId: $scope.programSelection,
+                    userName: $rootScope.cachedName
                 }, function(data) {
                     $scope.sets.push(data);
                 });
@@ -378,6 +383,7 @@ app.controller('adminController', [
                 destinationSet: inputs.destinationSet,
                 sourceProgram: inputs.sourceProgram,
                 sourceSet: inputs.sourceSet,
+                userName: $rootScope.cachedName
             }, function(data) {
                 $scope.isRunningOperation = false;
                 $scope.getSetImportDetails($scope.getSetById(inputs.destinationSet));
@@ -397,6 +403,7 @@ app.controller('adminController', [
             Set.update({
             programId: $scope.programSelection,
             setId: inputs.ciDispositionSet,
+            userName: $rootScope.cachedName
             }, localSet, function(data) {
                 var message = "";
                 if (inputs.ciSet == "") {
@@ -424,7 +431,8 @@ app.controller('adminController', [
             newSet.operation = "MassSendDispoItemStatus";
             Set.update({
                 programId: $scope.programSelection,
-                setId: set.ciDispositionSet
+                setId: set.ciDispositionSet,
+                userName: $rootScope.cachedName
             }, newSet, function(data) {            	
                 $scope.isRunningOperation = false;		            			            	
                 $scope.getMassSendDispoItemStatus(newSet);
@@ -771,7 +779,8 @@ app.controller('adminController', [
                 if(inputs.isConfirmed) {
                     Set.delete({
                         programId: inputs.program,
-                        setId: inputs.set.guid
+                        setId: inputs.set.guid,
+                        userName: $rootScope.cachedName
                     }, function() {
                         var index = $scope.sets.indexOf(inputs.set);
                         if (index > -1) {
