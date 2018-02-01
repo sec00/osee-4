@@ -87,4 +87,5 @@ public interface IAtsStoreService {
    CustomizeData getCustomizationByGuid(String customize_guid);
 
    boolean isProductionDb();
+
 }
