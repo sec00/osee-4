@@ -51,7 +51,6 @@ import org.eclipse.osee.orcs.OrcsApi;
 import org.eclipse.osee.orcs.OrcsBranch;
 import org.eclipse.osee.orcs.data.ArtifactReadable;
 import org.eclipse.osee.orcs.data.AttributeReadable;
-import org.eclipse.osee.orcs.data.BranchReadable;
 import org.eclipse.osee.orcs.data.TransactionReadable;
 import org.eclipse.osee.orcs.search.QueryFactory;
 import org.eclipse.osee.orcs.transaction.TransactionBuilder;
@@ -65,6 +64,7 @@ import org.json.JSONObject;
 public class OrcsStorageImpl implements Storage {
    private final Log logger;
    private final OrcsApi orcsApi;
+   public static final IOseeBranch dispoParent = IOseeBranch.create(5781701693103907161L, "Dispo Parent");
 
    public OrcsStorageImpl(Log logger, OrcsApi orcsApi) {
       this.logger = logger;
@@ -130,9 +130,7 @@ public class OrcsStorageImpl implements Storage {
 
    @Override
    public boolean isUniqueProgramName(String name) {
-      ResultSet<BranchReadable> results = getQuery().branchQuery().andNameEquals(name).getResults();
-
-      return results.isEmpty();
+      return getQuery().branchQuery().andNameEquals(name).getResults().isEmpty();
    }
 
    @Override
@@ -206,11 +204,10 @@ public class OrcsStorageImpl implements Storage {
    @Override
    public Long createDispoProgram(ArtifactReadable author, String name) {
       String normalizedName = "(DISPO)" + name;
-      BranchReadable dispoBranch = getQuery().branchQuery().andNameEquals("Dispo Parent").getResults().getExactlyOne();
       IOseeBranch branch = IOseeBranch.create(normalizedName);
 
       try {
-         getBranchFactory().createWorkingBranch(branch, author, dispoBranch, ArtifactId.SENTINEL).call();
+         getBranchFactory().createWorkingBranch(branch, author, dispoParent, ArtifactId.SENTINEL).call();
       } catch (Exception ex) {
          throw OseeCoreException.wrap(ex);
       }
@@ -455,12 +452,11 @@ public class OrcsStorageImpl implements Storage {
    @Override
    public List<IOseeBranch> getDispoBranches() {
       List<IOseeBranch> dispoBranchesNormalized = new ArrayList<>();
-      BranchReadable dispoBranch = getQuery().branchQuery().andNameEquals("Dispo Parent").getResults().getExactlyOne();
 
-      ResultSet<BranchReadable> dispoBranches =
-         getQuery().branchQuery().andIsOfType(BranchType.WORKING).andIsChildOf(dispoBranch).getResults();
+      ResultSet<IOseeBranch> dispoBranches =
+         getQuery().branchQuery().andIsOfType(BranchType.WORKING).andIsChildOf(dispoParent).getResultsAsId();
 
-      for (BranchReadable branch : dispoBranches) {
+      for (IOseeBranch branch : dispoBranches) {
          IOseeBranch newName = IOseeBranch.create(branch, branch.getName().replaceFirst("\\(DISPO\\)", ""));
 
          dispoBranchesNormalized.add(newName);

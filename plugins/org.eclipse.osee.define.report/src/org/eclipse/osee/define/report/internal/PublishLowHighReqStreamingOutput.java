@@ -27,6 +27,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IArtifactType;
+import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.eclipse.osee.framework.core.enums.CoreArtifactTypes;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.CoreRelationTypes;
@@ -37,7 +38,6 @@ import org.eclipse.osee.orcs.OrcsApi;
 import org.eclipse.osee.orcs.OrcsTypes;
 import org.eclipse.osee.orcs.data.ArtifactReadable;
 import org.eclipse.osee.orcs.data.ArtifactTypes;
-import org.eclipse.osee.orcs.data.BranchReadable;
 import org.eclipse.osee.orcs.search.BranchQuery;
 import org.eclipse.osee.orcs.search.QueryBuilder;
 import org.eclipse.osee.orcs.search.QueryFactory;
@@ -49,7 +49,7 @@ import org.eclipse.osee.orcs.search.QueryFactory;
 public final class PublishLowHighReqStreamingOutput implements StreamingOutput {
    private final QueryFactory queryApi;
    private final OrcsTypes types;
-   private final BranchReadable branch;
+   private final IOseeBranch branch;
    private final Log logger;
    private final Map<String, Integer> summarySubsystemCounter = new HashMap<>();
    private final Map<String, Integer> summaryTraceCounter = new HashMap<>();
@@ -64,7 +64,7 @@ public final class PublishLowHighReqStreamingOutput implements StreamingOutput {
       this.logger = logger;
       this.queryApi = orcsApi.getQueryFactory();
       BranchQuery query = orcsApi.getQueryFactory().branchQuery();
-      this.branch = query.andId(branch).getResults().getExactlyOne();
+      this.branch = query.andId(branch).getResultsAsId().getExactlyOne();
       this.types = orcsApi.getOrcsTypes();
       includeOnlyArtifactTypes = convertStringTypes(selectedTypes);
    }
