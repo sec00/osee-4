@@ -102,6 +102,11 @@ public class AtsChangeSet extends AbstractAtsChangeSet {
          listener.changesStored(this);
       }
       notifier.sendNotifications(getNotifications());
+      for (IAtsObject atsObject : new ArrayList<>(atsObjects)) {
+         if (atsObject instanceof IAtsWorkItem) {
+            atsApi.getWorkDefinitionService().internalClearWorkDefinition((IAtsWorkItem) atsObject);
+         }
+      }
 
       /**
        * Commented out on 0.25.0 due to performance issues; No users are using this feature. Will be re-enabled on
