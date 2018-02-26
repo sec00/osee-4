@@ -28,7 +28,6 @@ import org.eclipse.osee.orcs.core.ds.IndexedResource;
 import org.eclipse.osee.orcs.core.ds.OrcsDataHandler;
 import org.eclipse.osee.orcs.data.AttributeTypes;
 import org.eclipse.osee.orcs.db.internal.search.indexer.IndexedResourceLoader;
-import org.eclipse.osee.orcs.db.internal.search.tagger.TagCollector;
 import org.eclipse.osee.orcs.db.internal.search.tagger.Tagger;
 import org.eclipse.osee.orcs.db.internal.search.tagger.TaggingEngine;
 import org.eclipse.osee.orcs.search.IndexerCollectorAdapter;
@@ -94,7 +93,7 @@ public class IndexingTaskDatabaseTxCallableTest {
 
       verify(logger, times(1)).error("Field has invalid tagger[%s] provider and cannot be tagged - [Gamma: %s]",
          TaggerTypeToken.SENTINEL, GammaId.valueOf(2L));
-      verify(tagger, times(1)).tagIt(Matchers.eq(resource1.getResourceInput()), Matchers.any(TagCollector.class));
+      verify(tagger, times(1)).tagIt(Matchers.eq(resource1.getResourceInput()), Matchers.any());
    }
 
 }
