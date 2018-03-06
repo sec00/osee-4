@@ -71,6 +71,7 @@ import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.type.OseeStateException;
 import org.eclipse.osee.framework.jdk.core.type.Pair;
 import org.eclipse.osee.framework.jdk.core.util.Collections;
+import org.eclipse.osee.framework.jdk.core.util.Conditions;
 import org.eclipse.osee.framework.jdk.core.util.GUID;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
@@ -993,6 +994,7 @@ public class Artifact extends NamedIdBase implements ArtifactToken, Adaptable, F
     * adds a new attribute of the type named attributeTypeName and assigns it the given value
     */
    public final <T> void addAttribute(AttributeTypeId attributeType, T value) {
+      Conditions.checkNotNull(value, "Attribute value", "attribute type [%s]", attributeType);
       initializeAttribute(attributeType, ModificationType.NEW, true, false).setValue(value);
    }
 
@@ -1016,6 +1018,7 @@ public class Artifact extends NamedIdBase implements ArtifactToken, Adaptable, F
     * adds a new attribute of the type named attributeTypeName and assigns it the given value
     */
    public final void addAttributeFromString(AttributeTypeId attributeType, String value) {
+      Conditions.checkNotNull(value, "Attribute value", "attribute type [%s]", attributeType);
       initializeAttribute(attributeType, ModificationType.NEW, true, false).setFromString(value);
    }
 
@@ -1024,6 +1027,7 @@ public class Artifact extends NamedIdBase implements ArtifactToken, Adaptable, F
     * enumerated and value is already present
     */
    private final <T> void setOrAddAttribute(AttributeTypeId attributeType, T value) {
+      Conditions.checkNotNull(value, "Attribute value", "attribute type [%s]", attributeType);
       List<Attribute<Object>> attributes = getAttributes(attributeType);
       for (Attribute<?> canidateAttribute : attributes) {
          if (canidateAttribute.getValue().equals(value)) {

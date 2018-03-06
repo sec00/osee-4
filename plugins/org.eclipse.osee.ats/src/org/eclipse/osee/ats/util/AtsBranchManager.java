@@ -280,8 +280,8 @@ public final class AtsBranchManager {
          archiveWorkingBranch);
    }
 
-   public static ChangeData getChangeDataFromEarliestTransactionId(TeamWorkFlowArtifact teamArt) {
-      return getChangeData(teamArt, null);
+   public static ChangeData getChangeDataFromEarliestTransactionId(IAtsTeamWorkflow teamWf) {
+      return getChangeData(teamWf, null);
    }
 
    /**
