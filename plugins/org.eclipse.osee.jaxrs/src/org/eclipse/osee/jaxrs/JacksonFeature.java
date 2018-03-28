@@ -25,6 +25,7 @@ import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.jaxrs.JsonMappingExceptionMapper;
 import org.codehaus.jackson.jaxrs.JsonParseExceptionMapper;
 import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.module.SimpleModule;
@@ -35,6 +36,8 @@ import org.eclipse.osee.framework.core.data.TransactionId;
 import org.eclipse.osee.framework.core.data.TransactionToken;
 import org.eclipse.osee.framework.core.data.TransactionTokenDeserializer;
 import org.eclipse.osee.framework.core.data.TransactionTokenSerializer;
+import org.eclipse.osee.framework.core.enums.BranchType;
+import org.eclipse.osee.framework.jdk.core.type.Id;
 import org.eclipse.osee.framework.jdk.core.type.IdDeserializer;
 import org.eclipse.osee.framework.jdk.core.type.IdSerializer;
 import org.eclipse.osee.framework.jdk.core.type.NamedIdDeserializer;
@@ -135,7 +138,9 @@ public class JacksonFeature implements Feature {
       module.addDeserializer(ArtifactId.class, new IdDeserializer<ArtifactId>(ArtifactId::valueOf));
       module.addDeserializer(TransactionToken.class, new TransactionTokenDeserializer());
       module.addSerializer(new TransactionTokenSerializer());
-      module.addSerializer(TransactionId.class, new IdSerializer());
+      JsonSerializer<Id> idSerializer = new IdSerializer();
+      module.addSerializer(TransactionId.class, idSerializer);
+      module.addSerializer(BranchType.class, idSerializer);
       module.addDeserializer(TransactionId.class, new IdDeserializer<TransactionId>(TransactionId::valueOf));
 
       objectMapper.registerModule(module);
