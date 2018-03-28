@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.logging.Level;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.UserId;
+import org.eclipse.osee.framework.core.enums.TransactionDetailsType;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.logging.OseeLog;
 import org.eclipse.osee.framework.skynet.core.artifact.BranchManager;
@@ -146,8 +147,8 @@ public class GraphLoader {
          while (chStmt.next()) {
             BranchId branch = BranchId.valueOf(chStmt.getLong("branch_id"));
             TxData txData = new TxData(branch, UserId.valueOf(chStmt.getLong("author")), chStmt.getTimestamp("time"),
-               chStmt.getString("osee_comment"), chStmt.getInt("tx_type"), chStmt.getInt("commit_art_id"),
-               chStmt.getLong("transaction_id"));
+               chStmt.getString("osee_comment"), TransactionDetailsType.valueOf(chStmt.getInt("tx_type")),
+               chStmt.getInt("commit_art_id"), chStmt.getLong("transaction_id"));
             txDatas.add(txData);
          }
       } finally {
