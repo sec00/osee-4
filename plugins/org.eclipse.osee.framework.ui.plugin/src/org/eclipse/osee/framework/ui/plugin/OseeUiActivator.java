@@ -34,6 +34,7 @@ import org.osgi.framework.BundleContext;
  * @author Ryan D. Brooks
  */
 public abstract class OseeUiActivator extends AbstractUIPlugin {
+
    private PluginUtil helper;
    private final String pluginId;
 
@@ -52,7 +53,7 @@ public abstract class OseeUiActivator extends AbstractUIPlugin {
 
    /**
     * finds a resource in the plugin bundle and writes it out to the default persistent storage area as a regualar file
-    * 
+    *
     * @return Return plugin file reference
     */
    public File getPluginFile(String path) throws IOException {
@@ -102,7 +103,7 @@ public abstract class OseeUiActivator extends AbstractUIPlugin {
 
    /**
     * Returns the workspace instance.
-    * 
+    *
     * @return the workspace instance
     */
    public static IWorkspace getWorkspace() {
@@ -119,7 +120,7 @@ public abstract class OseeUiActivator extends AbstractUIPlugin {
 
    /**
     * Returns Returns the root resource of this workspace
-    * 
+    *
     * @return the workspace root
     */
    public static IWorkspaceRoot getWorkspaceRoot() {
@@ -138,7 +139,7 @@ public abstract class OseeUiActivator extends AbstractUIPlugin {
 
    /**
     * Checks that OSEE is connected to all necessary application services
-    * 
+    *
     * @return Result.isFalse if not connected with getText() of problem
     */
    public static Result areOSEEServicesAvailable() {
@@ -167,4 +168,5 @@ public abstract class OseeUiActivator extends AbstractUIPlugin {
       }
       return imageDescriptor;
    }
+
 }
