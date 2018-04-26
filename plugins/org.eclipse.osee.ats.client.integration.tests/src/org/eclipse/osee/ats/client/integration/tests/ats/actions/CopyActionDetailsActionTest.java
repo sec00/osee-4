@@ -11,7 +11,7 @@
 package org.eclipse.osee.ats.client.integration.tests.ats.actions;
 
 import org.eclipse.osee.ats.actions.CopyActionDetailsAction;
-import org.eclipse.osee.ats.client.integration.tests.ats.workflow.AtsTestUtil;
+import org.eclipse.osee.ats.client.integration.tests.ats.core.client.AtsTestUtil;
 
 /**
  * @author Donald G. Dunne

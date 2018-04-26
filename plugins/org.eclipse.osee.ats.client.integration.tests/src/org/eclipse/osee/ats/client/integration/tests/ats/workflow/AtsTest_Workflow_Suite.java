@@ -10,11 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.ats.client.integration.tests.ats.workflow;
 
-import org.eclipse.osee.ats.client.integration.tests.ats.workflow.action.AtsTest_Workflow_Action_Suite;
-import org.eclipse.osee.ats.client.integration.tests.ats.workflow.review.AtsTest_Workflow_Review_Suite;
-import org.eclipse.osee.ats.client.integration.tests.ats.workflow.task.AtsTest_Workflow_Task_Suite;
-import org.eclipse.osee.ats.client.integration.tests.ats.workflow.transition.AtsTest_Workflow_Transition_Suite;
-import org.eclipse.osee.ats.client.integration.tests.ats.workflow.util.AtsTest_Workflow_Util_Suite;
+import org.eclipse.osee.ats.client.integration.tests.ats.workflow.util.AtsTest_WorkflowUtil_Suite;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -26,19 +22,12 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    TeamWorkflowTest.class,
+   AtsTest_WorkflowUtil_Suite.class,
+   TaskRelatedToChangedArtifactTest.class,
+   AtsTaskEndpointImplTest.class,
    WfePromptChangeStatusTest.class,
    TeamWorkflowProvidersTest.class,
-   AtsRelationResolverServiceTest.class,
-   AtsArtifactFactoryTest.class,
-   WorkItemsJsonReaderWriterTest.class,
-   ConvertWorkflowStatesOperationTest.class,
-   // suites
-   AtsTest_Workflow_Action_Suite.class,
-   AtsTest_Workflow_Review_Suite.class,
-   AtsTest_Workflow_Task_Suite.class,
-   AtsTest_Workflow_Transition_Suite.class,
-   AtsTest_Workflow_Util_Suite.class
-   //
+   AtsRelationResolverServiceTest.class //
 })
 public class AtsTest_Workflow_Suite {
 

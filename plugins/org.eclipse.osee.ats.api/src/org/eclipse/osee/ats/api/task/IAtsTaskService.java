@@ -58,8 +58,4 @@ public interface IAtsTaskService {
     */
    ArtifactId getTaskToRelatedArtifactChanged(IAtsTask task);
 
-   default void decache(IAtsTeamWorkflow teamWf) {
-      throw new UnsupportedOperationException();
-   }
-
 }

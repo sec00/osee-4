@@ -20,7 +20,6 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
    ProgramEndpointImplTest.class,
    AtsConfigEndpointImplClientIntegrationTest.class,
-   AtsActionableItemToTeamDefinitionTest.class,
    TeamResourceTest.class,
    VersionResourceTest.class,
    CountryResourceTest.class,
