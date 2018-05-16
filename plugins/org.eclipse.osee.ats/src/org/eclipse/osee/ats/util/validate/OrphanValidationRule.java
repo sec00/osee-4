@@ -25,7 +25,7 @@ import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 public class OrphanValidationRule extends AbstractValidationRule {
 
    @Override
-   protected ValidationResult validate(Artifact artToValidate, IProgressMonitor monitor) throws OseeCoreException {
+   protected ValidationResult validate(Artifact artToValidate, IProgressMonitor monitor) {
       Collection<String> errorMessages = new ArrayList<>();
       boolean validationPassed = true;
 

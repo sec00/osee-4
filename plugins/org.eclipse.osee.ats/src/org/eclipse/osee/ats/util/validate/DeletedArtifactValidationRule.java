@@ -23,7 +23,7 @@ import org.eclipse.osee.framework.skynet.core.artifact.Artifact;
 public class DeletedArtifactValidationRule extends AbstractValidationRule {
 
    @Override
-   protected ValidationResult validate(Artifact artToValidate, IProgressMonitor monitor) throws OseeCoreException {
+   protected ValidationResult validate(Artifact artToValidate, IProgressMonitor monitor) {
       Collection<String> errorMessages = new ArrayList<>();
       boolean validationPassed = true;
       if (artToValidate.isDeleted()) {

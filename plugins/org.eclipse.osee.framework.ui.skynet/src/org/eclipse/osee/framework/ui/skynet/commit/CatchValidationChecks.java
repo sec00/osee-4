@@ -42,7 +42,7 @@ public class CatchValidationChecks implements CommitAction {
    private static final String ATS_ADMIN = "AtsAdmin";
 
    @Override
-   public void runCommitAction(BranchId sourceBranch, BranchId destinationBranch) throws OseeCoreException {
+   public void runCommitAction(BranchId sourceBranch, BranchId destinationBranch) {
       Set<Artifact> changedArtifacts = new HashSet<>();
       Collection<Change> changes = new ArrayList<>();
       IOperation operation = ChangeManager.compareTwoBranchesHead(sourceBranch, destinationBranch, changes);
