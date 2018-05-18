@@ -16,6 +16,7 @@ import org.eclipse.osee.framework.core.data.ArtifactToken;
 public final class CoreArtifactTokens {
 
    // @formatter:off
+   public static ArtifactToken AccessIdMap = ArtifactToken.valueOf(9885202, "Access Id Map - 0.26", COMMON, CoreArtifactTypes.GeneralData);
    public static ArtifactToken DefaultHierarchyRoot = ArtifactToken.valueOf(197818, "Default Hierarchy Root", CoreArtifactTypes.RootArtifact);
    public static ArtifactToken UniversalGroupRoot = ArtifactToken.valueOf(60807, "Root Artifact", CoreArtifactTypes.UniversalGroup);
    public static ArtifactToken Everyone = ArtifactToken.valueOf(48656, "AAABEbn4DKoAaR82FZsL3A", "Everyone", COMMON, CoreArtifactTypes.UserGroup);
@@ -25,6 +26,7 @@ public final class CoreArtifactTokens {
    public static ArtifactToken OseeTypesFolder = ArtifactToken.valueOf(7911256, "AKsESORrehN02WEfF9gA", "OSEE Types and Access Control", COMMON, CoreArtifactTypes.Folder);
    public static ArtifactToken DataRightsFooters = ArtifactToken.valueOf(5443258, null, "DataRightsFooters",  COMMON,CoreArtifactTypes.GeneralData);
    public static ArtifactToken DocumentTemplates = ArtifactToken.valueOf(64970, null, "Document Templates", COMMON, CoreArtifactTypes.Folder);
+   public static ArtifactToken FrameworkAccessModel = ArtifactToken.valueOf(35975422L, null, "Framework Access Model", COMMON, CoreArtifactTypes.AccessControlModel);
    // @formatter:on
 
    private CoreArtifactTokens() {
