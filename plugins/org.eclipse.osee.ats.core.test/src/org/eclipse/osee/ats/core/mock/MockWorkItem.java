@@ -253,4 +253,9 @@ public class MockWorkItem implements IAtsWorkItem {
    public void setStateMgr(IAtsStateManager stateMgr) {
       this.stateMgr = stateMgr;
    }
+
+   @Override
+   public boolean isOfType(ArtifactTypeId... artifactType) {
+      return false;
+   }
 }
