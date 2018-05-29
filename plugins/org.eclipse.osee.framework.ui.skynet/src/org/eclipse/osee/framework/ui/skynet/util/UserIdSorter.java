@@ -14,8 +14,8 @@ import java.util.Collection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.osee.framework.core.data.UserId;
+import org.eclipse.osee.framework.jdk.core.type.NamedId;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
-import org.eclipse.osee.framework.skynet.core.User;
 import org.eclipse.osee.framework.skynet.core.UserManager;
 
 /**
@@ -34,8 +34,8 @@ public class UserIdSorter extends ViewerSorter {
 
    @Override
    public int compare(Viewer viewer, Object e1, Object e2) {
-      User user1 = (User) e1;
-      User user2 = (User) e2;
+      NamedId user1 = (NamedId) e1;
+      NamedId user2 = (NamedId) e2;
       try {
          if (UserManager.getUser().equals(user1)) {
             return -1;
