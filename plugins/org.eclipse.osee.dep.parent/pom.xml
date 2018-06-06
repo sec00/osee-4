@@ -44,6 +44,7 @@
 		<eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
 		<eclipse-ip-site>https://github.com/osee-dev/osee.external.releases/raw/master/org.eclipse.ip</eclipse-ip-site>
 		<nebula-site>http://download.eclipse.org/nebula/snapshot</nebula-site>
+		<papyrus-site>http://download.eclipse.org/modeling/mdt/papyrus/updates/releases/${platform-version-name}</papyrus-site>
 	</properties>
 
 	<licenses>
@@ -85,6 +86,11 @@
 			<id>nebula</id>
 			<layout>p2</layout>
 			<url>${nebula-site}</url>
+		</repository>
+		<repository>
+			<id>papyrus</id>
+			<layout>p2</layout>
+			<url>${papyrus-site}</url>
 		</repository>
 	</repositories>
 	<build>

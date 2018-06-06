@@ -50,6 +50,7 @@
 								<plugin id="org.jsoup" />
 								<plugin id="org.eclipse.swt" />
 								<plugin id="org.eclipse.wst.common.project.facet.core" />
+								<plugin id="org.eclipse.papyrus.ui" />
 								<feature id="org.eclipse.graphiti.feature" />
 								<feature id="org.eclipse.graphiti.source.feature" />
 								<feature id="org.eclipse.equinox.server.jetty" />
@@ -83,6 +84,8 @@
 								<feature id="org.eclipse.ecf.filetransfer.httpclient4.source.feature" />
 								<feature id="org.eclipse.ecf.filetransfer.httpclient4.ssl.feature" />
 								<feature id="org.eclipse.ecf.filetransfer.httpclient4.ssl.source.feature" />
+								<feature id="org.eclipse.papyrus.uml.feature" />
+								<feature id="org.eclipse.papyrus.uml.diagram.feature" />
 							</excludes>
 						</configuration>
 					</execution>
