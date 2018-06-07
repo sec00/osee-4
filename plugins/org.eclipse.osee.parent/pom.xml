@@ -524,7 +524,7 @@
 			</activation>
 			<properties>
 				<eclipse-ip-site>${git-repo-root}/org.eclipse.ip/org.eclipse.ip.p2/target/repository</eclipse-ip-site>
-				<osee-xserver-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.x.server.p2/target/repository</osee-xserver-site>
+				<osee-xserver-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.server.p2/target/repository</osee-xserver-site>
 			</properties>
 			<repositories>
 				<repository>
@@ -724,7 +724,7 @@
 			</activation>
 			<properties>
 				<eclipse-ip-site>${git-repo-root}/org.eclipse.ip/org.eclipse.ip.p2/target/repository</eclipse-ip-site>
-				<osee-xserver-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.x.server.p2/target/repository</osee-xserver-site>
+				<osee-xserver-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.server.p2/target/repository</osee-xserver-site>
 			</properties>
 			<repositories>
 				<repository>
@@ -750,7 +750,7 @@
 			</activation>
 			<properties>
 				<eclipse-ip-site>${git-repo-root}/org.eclipse.ip/org.eclipse.ip.p2/target/repository</eclipse-ip-site>
-				<osee-xserver-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.x.server.p2/target/repository</osee-xserver-site>
+				<osee-xserver-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.server.p2/target/repository</osee-xserver-site>
 				<osee-runtime-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.runtime.p2/target/repository</osee-runtime-site>
 			</properties>
 			<repositories>
@@ -782,7 +782,7 @@
 			</activation>
 			<properties>
 				<eclipse-ip-site>${git-repo-root}/org.eclipse.ip/org.eclipse.ip.p2/target/repository</eclipse-ip-site>
-				<osee-xserver-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.x.server.p2/target/repository</osee-xserver-site>
+				<osee-xserver-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.server.p2/target/repository</osee-xserver-site>
 				<osee-runtime-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.runtime.p2/target/repository</osee-runtime-site>
 				<osee-client-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.client.p2/target/repository</osee-client-site>
 				<osee-ats-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.ats.p2/target/repository</osee-ats-site>
@@ -826,7 +826,7 @@
 			</activation>
 			<properties>
 				<eclipse-ip-site>${git-repo-root}/org.eclipse.ip/org.eclipse.ip.p2/target/repository</eclipse-ip-site>
-				<osee-xserver-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.x.server.p2/target/repository</osee-xserver-site>
+				<osee-xserver-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.server.p2/target/repository</osee-xserver-site>
 				<osee-runtime-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.runtime.p2/target/repository</osee-runtime-site>
 				<osee-client-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.client.p2/target/repository</osee-client-site>
 			</properties>
@@ -864,7 +864,7 @@
 			</activation>
 			<properties>
 				<eclipse-ip-site>${git-repo-root}/org.eclipse.ip/org.eclipse.ip.p2/target/repository</eclipse-ip-site>
-				<osee-xserver-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.x.server.p2/target/repository</osee-xserver-site>
+				<osee-xserver-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.server.p2/target/repository</osee-xserver-site>
 				<osee-runtime-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.runtime.p2/target/repository</osee-runtime-site>
 
 				<osee-client-site>${git-repo-root}/org.eclipse.osee/plugins/org.eclipse.osee.client.p2/target/repository</osee-client-site>
