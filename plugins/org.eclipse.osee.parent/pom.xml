@@ -467,7 +467,6 @@
 			</properties>
 			<repositories>
 			     <repository>
-					<id>papyrus</id>
 					<layout>p2</layout>
 					<url>$<papyrus-site></url>
 				</repository>
