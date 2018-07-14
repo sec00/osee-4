@@ -134,7 +134,7 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
 
             List<Artifact> relatedArtifacts =
                lowLevelReq.getRelatedArtifacts(CoreRelationTypes.Requirement_Trace__Higher_Level);
-            if (relatedArtifacts != null && !relatedArtifacts.isEmpty()) {
+            if (!relatedArtifacts.isEmpty()) {
                ViewIdUtility.removeExcludedArtifacts(relatedArtifacts.iterator(), excludedArtifactIdMap);
                isRelated = true;
             }
@@ -195,7 +195,7 @@ public class SubsystemToLowLevelReqTraceReport extends AbstractBlam {
                List<Artifact> relatedArtifacts =
                   higherLevelReq.getRelatedArtifacts(CoreRelationTypes.Requirement_Trace__Lower_Level);
                boolean isRelated = false;
-               if (relatedArtifacts != null && !relatedArtifacts.isEmpty()) {
+               if (!relatedArtifacts.isEmpty()) {
                   ViewIdUtility.removeExcludedArtifacts(relatedArtifacts.iterator(), excludedArtifactIdMap);
                   isRelated = true;
                }
