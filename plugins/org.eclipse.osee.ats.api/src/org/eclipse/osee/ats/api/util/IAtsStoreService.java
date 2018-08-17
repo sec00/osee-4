@@ -71,7 +71,7 @@ public interface IAtsStoreService {
 
    boolean isOfType(IAtsObject atsObject, IArtifactType artifactType);
 
-   AttributeTypeId getAttributeType(Long attrTypeId);
+   AttributeTypeToken getAttributeType(Long attrTypeId);
 
    boolean isArtifactTypeInheritsFrom(IArtifactType artifactType, IArtifactType baseArtifactType);
 
