@@ -45,6 +45,7 @@
 								<plugin id="org.eclipse.jetty.servlet" />
 								<plugin id="org.eclipse.jetty.util" />
 								<plugin id="ch.qos.logback.slf4j" />
+								<plugin id="com.google.guava" />
 							</excludes>
 						</configuration>
 					</execution>

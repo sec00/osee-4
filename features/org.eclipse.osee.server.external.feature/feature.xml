@@ -25,6 +25,7 @@
       <import plugin="org.apache.mina.core"/>
       <import plugin="javax.xml"/>
       <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.osgi.util"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.jobs"/>
       <import plugin="org.eclipse.core.contenttype"/>
@@ -553,6 +554,34 @@
 
    <plugin
          id="org.eclipse.osee.server.application"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.osgi.services"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.osgi.util"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.ds"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.felix.scr"
          download-size="0"
          install-size="0"
          version="0.0.0"

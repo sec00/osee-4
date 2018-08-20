@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.orcs.db.internal.search.indexer.data;
 
+import com.google.common.io.ByteSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +29,7 @@ import org.eclipse.osee.orcs.db.internal.resource.ResourceConstants;
 /**
  * @author Roberto E. Escobar
  */
-public class IndexerDataSourceImpl implements IndexedResource {
+public class IndexerDataSourceImpl extends ByteSource implements IndexedResource {
 
    private final IResourceManager resourceManager;
 
@@ -84,25 +85,6 @@ public class IndexerDataSourceImpl implements IndexedResource {
    }
 
    @Override
-   public InputStream getInput() throws IOException {
-      InputStream toReturn = null;
-      if (isUriValid()) {
-         try {
-            PropertyStore options = new PropertyStore();
-            options.put(StandardOptions.DecompressOnAquire.name(), true);
-            IResourceLocator locator = resourceManager.getResourceLocator(getUri());
-            IResource resource = resourceManager.acquire(locator, options);
-            toReturn = resource.getContent();
-         } catch (OseeCoreException ex) {
-            throw new IOException(ex);
-         }
-      } else if (Strings.isValid(getStringValue())) {
-         toReturn = new ByteArrayInputStream(getStringValue().getBytes("UTF-8"));
-      }
-      return toReturn;
-   }
-
-   @Override
    public int hashCode() {
       final int prime = 31;
       int result = 1;
@@ -133,6 +115,30 @@ public class IndexerDataSourceImpl implements IndexedResource {
    @Override
    public String toString() {
       return "IndexerDataSourceImpl [id=" + id + ", typeUuid=" + typeUuid + ", gammaId=" + gammaId + ", uri=" + uri + ", value=" + value + "]";
+   }
+
+   @Override
+   public InputStream getResourceInput() throws IOException {
+      return openStream();
+   }
+
+   @Override
+   public InputStream openStream() throws IOException {
+      InputStream toReturn = null;
+      if (isUriValid()) {
+         try {
+            PropertyStore options = new PropertyStore();
+            options.put(StandardOptions.DecompressOnAquire.name(), true);
+            IResourceLocator locator = resourceManager.getResourceLocator(getUri());
+            IResource resource = resourceManager.acquire(locator, options);
+            toReturn = resource.getContent();
+         } catch (OseeCoreException ex) {
+            throw new IOException(ex);
+         }
+      } else if (Strings.isValid(getStringValue())) {
+         toReturn = new ByteArrayInputStream(getStringValue().getBytes("UTF-8"));
+      }
+      return toReturn;
    }
 
 }

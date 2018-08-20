@@ -34,17 +34,21 @@
 
 		<jaxdoclet-version>0.9.0</jaxdoclet-version>
 		<maven-clean-version>2.5</maven-clean-version>
-		<platform-version-name>neon</platform-version-name>
+		<platform-version-name>photon</platform-version-name>
 <!-- 		<orbit-version>R20150124073747</orbit-version> -->
 		<orbit-version>R20160520211859</orbit-version>
-		<subversive-version>1.0</subversive-version>
+<!-- 		<orbit-version>R20180606145124</orbit-version> -->
+		<subversive-version>4.0</subversive-version>
 		<polarion-version>3.0</polarion-version>
 
 		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit-version}/repository</orbit-site>
-		<eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
+		<!-- <eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site> -->
+		<eclipse-site> http://mirror.switch.ch/eclipse/releases/${platform-version-name}</eclipse-site>
 		<eclipse-ip-site>https://github.com/osee-dev/osee.external.releases/raw/master/org.eclipse.ip</eclipse-ip-site>
-		<nebula-site>http://download.eclipse.org/nebula/snapshot</nebula-site>
-		<papyrus-site>http://download.eclipse.org/modeling/mdt/papyrus/updates/releases/${platform-version-name}</papyrus-site>
+<!-- 		<nebula-site>http://download.eclipse.org/nebula/snapshot</nebula-site> -->
+		<nebula-site>http://download.eclipse.org/nebula/releases/2.0.0</nebula-site>
+		<papyrus-site>http://download.eclipse.org/modeling/mdt/papyrus/updates/releases/${platform-version-name}</papyrus-site> 
+		<subversive-site>http://download.eclipse.org/technology/subversive/${subversive-version}/update-site</subversive-site>
 	</properties>
 
 	<licenses>
@@ -87,10 +91,15 @@
 			<layout>p2</layout>
 			<url>${nebula-site}</url>
 		</repository>
-		<repository>
+	  	<repository>
 			<id>papyrus</id>
 			<layout>p2</layout>
 			<url>${papyrus-site}</url>
+		</repository> 
+		<repository>
+			<id>subversive</id>
+			<layout>p2</layout>
+			<url>${subversive-site}</url>
 		</repository>
 	</repositories>
 	<build>

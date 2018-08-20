@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.framework.core.mocks;
 
+import java.util.Dictionary;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 
@@ -43,6 +44,11 @@ public class MockServiceReference implements ServiceReference {
    @Override
    public int compareTo(Object reference) {
       return 0;
+   }
+
+   @Override
+   public Dictionary getProperties() {
+      return null;
    }
 
 }

@@ -89,6 +89,17 @@ public class CreateSystemBranches {
          CoreArtifactTypes.XViewerGlobalCustomization.getName());
 
       ArtifactId dataRightsArt = tx.createArtifact(CoreArtifactTokens.DataRightsFooters);
+      
+      
+      
+      try {
+         Thread.sleep(5000);
+         String resourceContents = OseeInf.getResourceContents("Unspecified.xml", getClass());
+         System.out.println("QQQQQQQQQQQQQQQQQQ " + resourceContents);
+      } catch (Exception ex) {
+         System.out.println("QQQQQQQQQQQQQQQQQQa " + ex);
+      }
+      
       tx.createAttribute(dataRightsArt, CoreAttributeTypes.GeneralStringData,
          OseeInf.getResourceContents("Unspecified.xml", getClass()));
       tx.createAttribute(dataRightsArt, CoreAttributeTypes.GeneralStringData,

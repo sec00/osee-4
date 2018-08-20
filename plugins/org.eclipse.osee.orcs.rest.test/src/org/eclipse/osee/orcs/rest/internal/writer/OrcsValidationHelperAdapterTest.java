@@ -24,15 +24,19 @@ import org.eclipse.osee.orcs.db.mock.OsgiService;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
+import org.junit.runners.MethodSorters;
 
 /**
  * Test case for {@link OrcsValidationHelperAdapter}
  *
  * @author Donald G. Dunne
  */
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class OrcsValidationHelperAdapterTest {
 
    @Rule
@@ -52,7 +56,7 @@ public class OrcsValidationHelperAdapterTest {
    public static void cleanup() throws Exception {
       OseeClassDatabase.cleanup();
    }
-
+   
    @Test
    public void testIsBranchExists() {
       Assert.assertTrue(helper.isBranchExists(COMMON));
@@ -78,6 +82,7 @@ public class OrcsValidationHelperAdapterTest {
 
    @Test
    public void testIsArtifactTypeExist() {
+      System.out.println("testIsArtifactTypeExist ");
       Assert.assertTrue(helper.isArtifactTypeExist(CoreArtifactTypes.User.getGuid()));
 
       Assert.assertFalse(helper.isArtifactTypeExist(999999L));
@@ -85,6 +90,7 @@ public class OrcsValidationHelperAdapterTest {
 
    @Test
    public void testIsRelationTypeExist() {
+      System.out.println("testIsRelationTypeExist ");
       Assert.assertTrue(helper.isRelationTypeExist(CoreRelationTypes.Default_Hierarchical__Child.getGuid()));
 
       Assert.assertFalse(helper.isRelationTypeExist(999999L));
@@ -92,6 +98,7 @@ public class OrcsValidationHelperAdapterTest {
 
    @Test
    public void testIsAttributeTypeExists() {
+      System.out.println("testIsAttributeTypeExists ");
       Assert.assertTrue(helper.isAttributeTypeExists(CoreAttributeTypes.StaticId.getId()));
 
       Assert.assertFalse(helper.isAttributeTypeExists(999999L));

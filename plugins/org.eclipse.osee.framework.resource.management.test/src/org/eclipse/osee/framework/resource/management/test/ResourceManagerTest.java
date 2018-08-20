@@ -62,14 +62,6 @@ public class ResourceManagerTest {
    //      testFileURL =
    //            getClass().getClassLoader().getResource("org/eclipse/osee/framework/resource/management/test/TestFile.txt");
    //   }
-   @Test
-   public void testAddRemoveProvider() {
-      ResourceManager resourceManagerX = new ResourceManager();
-      IResourceProvider provider1 = new ResourceProviderAdaptor();
-      Assert.assertTrue(resourceManagerX.addResourceProvider(provider1));
-      Assert.assertFalse(resourceManagerX.addResourceProvider(provider1)); // Add again
-      Assert.assertTrue(resourceManagerX.removeResourceProvider(provider1));
-   }
 
    @Test
    public void testExists() {
@@ -114,21 +106,21 @@ public class ResourceManagerTest {
    public void testAddAndRemove() {
       ResourceManager testManager = new ResourceManager();
 
-      Assert.assertTrue(testManager.addResourceLocatorProvider(provider1));
-      Assert.assertTrue(testManager.addResourceLocatorProvider(provider2));
+      testManager.addResourceLocatorProvider(provider1);
+      testManager.addResourceLocatorProvider(provider2);
 
       Assert.assertEquals(2, testManager.getProtocols().size());
 
-      Assert.assertFalse(testManager.addResourceLocatorProvider(provider2)); // Add the same one again
+      testManager.addResourceLocatorProvider(provider2);
       Assert.assertEquals(2, testManager.getProtocols().size());
 
-      Assert.assertTrue(testManager.removeResourceLocatorProvider(provider1));
+      testManager.removeResourceLocatorProvider(provider1);
       Assert.assertEquals(1, testManager.getProtocols().size());
 
-      Assert.assertFalse(testManager.removeResourceLocatorProvider(provider1));// Remove the same one again
+      testManager.removeResourceLocatorProvider(provider1);
       Assert.assertEquals(1, testManager.getProtocols().size());
 
-      Assert.assertTrue(testManager.removeResourceLocatorProvider(provider2));
+      testManager.removeResourceLocatorProvider(provider2);
       Assert.assertEquals(0, testManager.getProtocols().size());
    }
 

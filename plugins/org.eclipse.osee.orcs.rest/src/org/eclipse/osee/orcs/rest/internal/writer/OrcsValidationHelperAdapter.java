@@ -27,8 +27,8 @@ public class OrcsValidationHelperAdapter implements IOrcsValidationHelper {
    private final OrcsTypes orcsTypes;
 
    public OrcsValidationHelperAdapter(OrcsApi orcsApi) {
-      queryFactory = orcsApi.getQueryFactory();
-      orcsTypes = orcsApi.getOrcsTypes();
+         queryFactory = orcsApi.getQueryFactory();
+         orcsTypes = orcsApi.getOrcsTypes();
    }
 
    @Override

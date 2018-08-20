@@ -22,7 +22,7 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.graphiti.source.feature"
+         id="org.eclipse.graphiti.feature.source"
          version="0.0.0"/>
 
    <includes
@@ -266,7 +266,7 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ecf.core.source.feature"
+         id="org.eclipse.ecf.core.feature.source"
          version="0.0.0"/>
 
    <includes
@@ -274,7 +274,7 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ecf.core.ssl.source.feature"
+         id="org.eclipse.ecf.core.ssl.feature.source"
          version="0.0.0"/>
 
    <includes
@@ -282,7 +282,7 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ecf.filetransfer.source.feature"
+         id="org.eclipse.ecf.filetransfer.feature.source"
          version="0.0.0"/>
 
    <includes
@@ -290,7 +290,7 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ecf.filetransfer.ssl.source.feature"
+         id="org.eclipse.ecf.filetransfer.ssl.feature.source"
          version="0.0.0"/>
 
    <includes
@@ -298,7 +298,7 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ecf.filetransfer.httpclient4.source.feature"
+         id="org.eclipse.ecf.filetransfer.httpclient4.feature.source"
          version="0.0.0"/>
 
    <includes
@@ -306,7 +306,7 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ecf.filetransfer.httpclient4.ssl.source.feature"
+         id="org.eclipse.ecf.filetransfer.httpclient4.ssl.feature.source"
          version="0.0.0"/>
 
    <includes
@@ -322,6 +322,8 @@
       <import plugin="javax.xml"/>
       <import plugin="javax.servlet" version="3.0.0" match="equivalent"/>
       <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.osgi.util"/>
+      <import plugin="org.eclipse.osgi.compatibility.state"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.jobs"/>
       <import plugin="org.eclipse.core.contenttype"/>
@@ -369,6 +371,34 @@
 
    <plugin
          id="com.google.inject"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.inject.multibindings"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.gwt.servlet"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.gwtjsonrpc"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.gwtorm"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -593,13 +623,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.team.svn.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.xtext"
          download-size="0"
          install-size="0"
@@ -629,13 +652,6 @@
 
    <plugin
          id="org.eclipse.xtext.generator"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.xtext.junit4"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -1011,12 +1027,6 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-
-   <plugin
-         id="org.junit"
-         download-size="0"
-         install-size="0"
-         version="4.11.0"/>
 
    <plugin
          id="org.eclipse.emf.transaction"
@@ -1572,13 +1582,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.gmf.tooling.runtime"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.gmf.runtime.common.ui.action.ide"
          download-size="0"
          install-size="0"
@@ -1594,6 +1597,20 @@
 
    <plugin
          id="org.eclipse.ocl.ecore"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ocl.examples.emf.validation.validity.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ocl.examples.emf.validation.validity"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -1853,6 +1870,34 @@
 
    <plugin
          id="org.eclipse.wst.common.emf"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.nebula.widgets.cdatetime"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.osgi"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.osgi.services"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.osgi.util"
          download-size="0"
          install-size="0"
          version="0.0.0"
