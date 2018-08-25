@@ -41,6 +41,10 @@ public interface Id {
 
    Long getId();
 
+   default int getIdIntValue() {
+      return getId().intValue();
+   }
+
    default String getIdString() {
       return String.valueOf(getId());
    }
