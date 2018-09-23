@@ -79,8 +79,6 @@ public interface IAtsStoreService {
 
    Result setTransactionAssociatedArtifact(TransactionId trans, IAtsTeamWorkflow teamWf);
 
-   AttributeTypeId getAttributeType(Long attrTypeId);
-
    boolean isDeleted(ArtifactId artifact);
 
    TransactionId getTransactionId(IAtsWorkItem workItem);
