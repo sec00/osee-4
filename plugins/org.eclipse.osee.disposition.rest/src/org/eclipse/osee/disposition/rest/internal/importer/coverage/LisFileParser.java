@@ -40,6 +40,7 @@ import org.eclipse.osee.disposition.rest.DispoImporterApi;
 import org.eclipse.osee.disposition.rest.internal.DispoConnector;
 import org.eclipse.osee.disposition.rest.internal.DispoDataFactory;
 import org.eclipse.osee.disposition.rest.internal.importer.DispoSetCopier;
+import org.eclipse.osee.disposition.rest.internal.importer.MultiEnvCopier;
 import org.eclipse.osee.disposition.rest.util.DispoUtil;
 import org.eclipse.osee.framework.core.util.Result;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
@@ -80,6 +81,10 @@ public class LisFileParser implements DispoImporterApi {
    private final Set<String> datIdsCoveredByException = new HashSet<>();
    private final Set<String> alreadyUsedDatIds = new HashSet<>();
    private final Set<String> alreadyUsedFileNames = new HashSet<>();
+   // Multi Env
+   private final Map<String, Set<DispoItemData>> nameToMultiEnvItems = new HashMap<>();
+   private final Map<DispoItemData, Set<DispoItemData>> itemsToMultiEnvItems = new HashMap<>();
+   private final Set<String> alreadyLinkedMultiEnvItems = new HashSet<>();
 
    private final DispoConnector dispoConnector;
    private final DispoApiConfiguration config;
@@ -111,7 +116,7 @@ public class LisFileParser implements DispoImporterApi {
       Collection<VCastResult> results = getResultFiles(dataStore);
       for (VCastResult result : results) {
          try {
-            processResult(result, report);
+            processResults(result, report);
          } catch (Exception ex) {
             report.addEntry("FAILURE", "VCast Error", ERROR);
          }
@@ -124,44 +129,54 @@ public class LisFileParser implements DispoImporterApi {
 
    private List<DispoItem> createItems(Map<String, DispoItem> exisitingItems, OperationReport report) {
       List<DispoItem> toReturn;
-      Collection<DispoItemData> values = datIdToItem.values();
+      Collection<DispoItemData> items = datIdToItem.values();
 
-      for (DispoItemData item : values) {
+      for (DispoItemData item : items) {
          dataFactory.initDispoItem(item);
          item.setTotalPoints(String.valueOf(item.getAnnotationsList().size() + item.getDiscrepanciesList().size()));
       }
 
       if (!exisitingItems.isEmpty()) {
          // This is a reimport so we'll need to copy all the annotations
-         DispoSetCopier copier = new DispoSetCopier(dispoConnector);
-         List<DispoItemData> itemsFromImport = new ArrayList<>();
-         itemsFromImport.addAll(values);
-
-         Map<String, Set<DispoItemData>> namesToDestItems = new HashMap<>();
-         for (DispoItemData item : itemsFromImport) {
-            String name = item.getName();
-            Set<DispoItemData> itemsWithSameName = namesToDestItems.get(name);
-            if (itemsWithSameName == null) {
-               Set<DispoItemData> set = new HashSet<>();
-               set.add(item);
-               namesToDestItems.put(name, set);
-            } else {
-               itemsWithSameName.add(item);
-               namesToDestItems.put(name, itemsWithSameName);
-            }
-         }
-
-         toReturn = copier.copyAllDispositions(namesToDestItems, exisitingItems.values(), false, null, report);
+         toReturn = runCopier(exisitingItems, report, items);
       } else {
          toReturn = new ArrayList<>();
-         toReturn.addAll(values);
+         toReturn.addAll(items);
       }
+
+      // make a flag for multi env operation, could be time consuming
+      MultiEnvCopier multiEnvCopier = new MultiEnvCopier();
+      multiEnvCopier.copy(itemsToMultiEnvItems, report);
 
       for (DispoItem item : toReturn) {
          if (item.getStatus().equalsIgnoreCase("incomplete")) {
             createPlaceHolderAnnotations((DispoItemData) item, report);
          }
       }
+      return toReturn;
+   }
+
+   private List<DispoItem> runCopier(Map<String, DispoItem> exisitingItems, OperationReport report, Collection<DispoItemData> items) {
+      List<DispoItem> toReturn;
+      DispoSetCopier copier = new DispoSetCopier(dispoConnector);
+      List<DispoItemData> itemsFromImport = new ArrayList<>();
+      itemsFromImport.addAll(items);
+
+      Map<String, Set<DispoItemData>> namesToDestItems = new HashMap<>();
+      for (DispoItemData item : itemsFromImport) {
+         String name = item.getName();
+         Set<DispoItemData> itemsWithSameName = namesToDestItems.get(name);
+         if (itemsWithSameName == null) {
+            Set<DispoItemData> set = new HashSet<>();
+            set.add(item);
+            namesToDestItems.put(name, set);
+         } else {
+            itemsWithSameName.add(item);
+            namesToDestItems.put(name, itemsWithSameName);
+         }
+      }
+
+      toReturn = copier.copyAllDispositions(namesToDestItems, exisitingItems.values(), false, null, report);
       return toReturn;
    }
 
@@ -184,6 +199,7 @@ public class LisFileParser implements DispoImporterApi {
          matcher.find();
          String itemDatId = matcher.group();
          DispoItemData item = datIdToItem.get(itemDatId);
+         // here look for additional items with same name
 
          String line = datId.replaceAll("\\d*:\\d*:", "");
          line = line.replaceAll(":", "");
@@ -279,6 +295,16 @@ public class LisFileParser implements DispoImporterApi {
 
       String datId = generateDatId(fileNum, functionNum);
       datIdToItem.put(datId, newItem);
+
+      // Muli Env
+      String name = newItem.getName();
+      Set<DispoItemData> set = nameToMultiEnvItems.get(name);
+      if (set == null) {
+         set = new HashSet<>();
+      }
+      set.add(newItem);
+      nameToMultiEnvItems.put(name, set);
+      // end
 
       Collection<VCastStatementCoverage> statementCoverageItems = Collections.emptyList();
 
@@ -382,7 +408,7 @@ public class LisFileParser implements DispoImporterApi {
       return sb.toString();
    }
 
-   private void processResult(VCastResult result, OperationReport report) throws Exception {
+   private void processResults(VCastResult result, OperationReport report) throws Exception {
       String resultPath = result.getPath();
       String resultPathAbs = vCastDir + File.separator + resultPath;
       File resultsFile = new File(resultPathAbs);
@@ -432,30 +458,7 @@ public class LisFileParser implements DispoImporterApi {
                         resultsLine, resultsFile.getName()), WARNING);
                   } else {
                      if (!alreadyUsedDatIds.contains(resultsLine)) {
-                        alreadyUsedDatIds.add(resultsLine);
-                        StringTokenizer st = new StringTokenizer(resultsLine);
-                        int count = st.countTokens();
-                        if (count == 3) {
-                           Matcher m = fileMethod3LineNumberPattern.matcher(resultsLine);
-                           if (m.find()) {
-                              processSingleResult(resultPath, m);
-                           }
-                        } else if (count == 4) {
-                           Matcher m = fileMethod4LineNumberPlusTokenPattern.matcher(resultsLine);
-                           if (m.find()) {
-                              processSingleResultBranch(resultPath, m);
-                           }
-                        } else if (count == 5) {
-                           Matcher m = fileMethod5LineNumberPattern.matcher(resultsLine);
-                           if (m.find()) {
-                              processMultiResultMCDC(resultPath, m);
-                           }
-                        } else {
-                           report.addEntry("RESULTS FILE PARSE",
-                              String.format("This line [%s] could not be parsed. In DAT file [%s]", resultsLine,
-                                 resultsFile.getName()),
-                              WARNING);
-                        }
+                        processDatFileLine(report, resultPath, resultsFile, resultsLine);
                      }
                   }
                }
@@ -465,6 +468,32 @@ public class LisFileParser implements DispoImporterApi {
          } finally {
             Lib.close(br);
          }
+      }
+   }
+
+   private void processDatFileLine(OperationReport report, String resultPath, File resultsFile, String resultsLine) {
+      alreadyUsedDatIds.add(resultsLine);
+      StringTokenizer st = new StringTokenizer(resultsLine);
+      int count = st.countTokens();
+      if (count == 3) {
+         Matcher m = fileMethod3LineNumberPattern.matcher(resultsLine);
+         if (m.find()) {
+            processSingleResult(resultPath, m);
+         }
+      } else if (count == 4) {
+         Matcher m = fileMethod4LineNumberPlusTokenPattern.matcher(resultsLine);
+         if (m.find()) {
+            processSingleResultBranch(resultPath, m);
+         }
+      } else if (count == 5) {
+         Matcher m = fileMethod5LineNumberPattern.matcher(resultsLine);
+         if (m.find()) {
+            processMultiResultMCDC(resultPath, m);
+         }
+      } else {
+         report.addEntry("RESULTS FILE PARSE",
+            String.format("This line [%s] could not be parsed. In DAT file [%s]", resultsLine, resultsFile.getName()),
+            WARNING);
       }
    }
 
@@ -481,23 +510,36 @@ public class LisFileParser implements DispoImporterApi {
 
    private void processSingleResult(String resultPath, Matcher m) {
       DispoItemData item = datIdToItem.get(generateDatId(m.group(1), m.group(2)));
+
       if (item != null) {
          String location = m.group(3);
-         String text = "";
+         String discrepancyText = "";
          Discrepancy matchingDiscrepancy = matchDiscrepancy(location, item.getDiscrepanciesList());
          if (matchingDiscrepancy != null) {
-            text = matchingDiscrepancy.getText();
+            discrepancyText = matchingDiscrepancy.getText();
             Map<String, Discrepancy> discrepancies = item.getDiscrepanciesList();
             discrepancies.remove(matchingDiscrepancy.getId());
             item.setDiscrepanciesList(discrepancies);
-            addAnnotationForCoveredLine(item, location, Test_Unit_Resolution, resultPath, text);
+            addAnnotationForCoveredLine(item, location, Test_Unit_Resolution, resultPath, discrepancyText);
          }
+
+         tryMultiEnv(item);
       }
 
    }
 
+   private void tryMultiEnv(DispoItemData itemFromDatMatch) {
+      if (!alreadyLinkedMultiEnvItems.contains(itemFromDatMatch.getName())) {
+         Set<DispoItemData> multiEnvItems = new HashSet<>();
+         multiEnvItems.addAll(nameToMultiEnvItems.get(itemFromDatMatch.getName()));
+
+         itemsToMultiEnvItems.put(itemFromDatMatch, multiEnvItems);
+      }
+   }
+
    private void processSingleResultBranch(String resultPath, Matcher m) {
       DispoItemData item = datIdToItem.get(generateDatId(m.group(1), m.group(2)));
+
       if (item != null) {
          String location = m.group(3) + "." + m.group(4);
          Discrepancy matchingDiscrepancy = matchDiscrepancy(location, item.getDiscrepanciesList());
@@ -508,6 +550,8 @@ public class LisFileParser implements DispoImporterApi {
             item.setDiscrepanciesList(discrepancies);
             addAnnotationForCoveredLine(item, location, Test_Unit_Resolution, resultPath, text);
          }
+
+         tryMultiEnv(item);
       }
    }
 
@@ -534,6 +578,7 @@ public class LisFileParser implements DispoImporterApi {
                addAnnotationForCoveredLine(item, location, Test_Unit_Resolution, resultPath, text);
             }
          }
+         tryMultiEnv(item);
       }
    }
 
