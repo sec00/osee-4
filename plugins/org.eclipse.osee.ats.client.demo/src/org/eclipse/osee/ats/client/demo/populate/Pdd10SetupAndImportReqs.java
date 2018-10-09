@@ -12,6 +12,7 @@ package org.eclipse.osee.ats.client.demo.populate;
 
 import static org.eclipse.osee.framework.core.enums.DemoBranches.SAW_Bld_1;
 import static org.eclipse.osee.framework.core.enums.DemoBranches.SAW_Bld_2;
+import static org.eclipse.osee.framework.core.enums.DemoBranches.SAW_Bld_3;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import org.eclipse.osee.ats.util.AtsUtilClient;
 import org.eclipse.osee.framework.access.AccessControlManager;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IArtifactType;
+import org.eclipse.osee.framework.core.data.IOseeBranch;
 import org.eclipse.osee.framework.core.data.RelationTypeSide;
 import org.eclipse.osee.framework.core.enums.BranchType;
 import org.eclipse.osee.framework.core.enums.CoreArtifactTypes;
@@ -93,7 +95,8 @@ public class Pdd10SetupAndImportReqs implements IPopulateDemoDatabase {
       demoDbTraceability.execute();
 
       // Create SAW_Bld_2 Child Main Working Branch off SAW_Bld_1
-      createMainWorkingBranchTx();
+      BranchId sawBld2Branch = createNewBaselineBranch(SAW_Bld_1, SAW_Bld_2);
+      BranchId sawBld3Branch = createNewBaselineBranch(SAW_Bld_2, SAW_Bld_3);
    }
 
    private static void validateArtifactCache() {
@@ -109,20 +112,24 @@ public class Pdd10SetupAndImportReqs implements IPopulateDemoDatabase {
 
    }
 
-   private void createMainWorkingBranchTx() {
+   private BranchId createNewBaselineBranch(IOseeBranch srcBranch, IOseeBranch destBranch) {
+      BranchId childBranch = BranchId.SENTINEL;
       try {
          // Create SAW_Bld_2 branch off SAW_Bld_1
-         BranchId childBranch = BranchManager.createBaselineBranch(SAW_Bld_1, SAW_Bld_2);
+         childBranch = BranchManager.createBaselineBranch(srcBranch, destBranch);
 
-         AccessControlManager.setPermission(UserManager.getUser(DemoUsers.Joe_Smith), SAW_Bld_2,
+         AccessControlManager.setPermission(UserManager.getUser(DemoUsers.Joe_Smith), childBranch,
             PermissionEnum.FULLACCESS);
 
+         //         DemoDbUtil.sleep(5000);
+
          // need to update the branch type;
-         ConnectionHandler.runPreparedUpdate(UPDATE_BRANCH_TYPE, BranchType.BASELINE, childBranch);
+         ConnectionHandler.runPreparedUpdate(UPDATE_BRANCH_TYPE, BranchType.BASELINE.getIdString(), childBranch);
          BranchManager.refreshBranches();
       } catch (Exception ex) {
-         OseeLog.log(Activator.class, Level.SEVERE, Lib.exceptionToString(ex));
+         OseeLog.log(Activator.class, Level.SEVERE, ex);
       }
+      return childBranch;
    }
 
    private void demoDbTraceabilityTx(SkynetTransaction transaction, BranchId branch) {
