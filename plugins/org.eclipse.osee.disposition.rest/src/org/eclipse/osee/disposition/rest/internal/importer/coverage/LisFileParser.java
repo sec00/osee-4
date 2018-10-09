@@ -297,13 +297,22 @@ public class LisFileParser implements DispoImporterApi {
       datIdToItem.put(datId, newItem);
 
       // Muli Env
-      String name = newItem.getName();
-      Set<DispoItemData> set = nameToMultiEnvItems.get(name);
-      if (set == null) {
-         set = new HashSet<>();
+      String n = instrumentedFile.getLISFile();
+      if (n.contains("49")) {
+         System.out.println();
       }
-      set.add(newItem);
-      nameToMultiEnvItems.put(name, set);
+      if (instrumentedFile.getLISFile().matches(".*?/vcast/.*?\\d+\\.2\\.lis")) {
+         // Making assumption here that the only time we wanna collect these duplicate "twin" files is when vcast tags them with the name
+         // syntax filename.id.2.lis
+
+         String name = newItem.getName();
+         Set<DispoItemData> set = nameToMultiEnvItems.get(name);
+         if (set == null) {
+            set = new HashSet<>();
+         }
+         set.add(newItem);
+         nameToMultiEnvItems.put(name, set);
+      }
       // end
 
       Collection<VCastStatementCoverage> statementCoverageItems = Collections.emptyList();
@@ -529,11 +538,14 @@ public class LisFileParser implements DispoImporterApi {
    }
 
    private void tryMultiEnv(DispoItemData itemFromDatMatch) {
-      if (!alreadyLinkedMultiEnvItems.contains(itemFromDatMatch.getName())) {
-         Set<DispoItemData> multiEnvItems = new HashSet<>();
-         multiEnvItems.addAll(nameToMultiEnvItems.get(itemFromDatMatch.getName()));
-
-         itemsToMultiEnvItems.put(itemFromDatMatch, multiEnvItems);
+      if (itemFromDatMatch.getName().contains("pcie")) {
+         System.out.println();
+      }
+      Set<DispoItemData> twinItems = nameToMultiEnvItems.get(itemFromDatMatch.getName());
+      if (twinItems != null) {
+         if (!alreadyLinkedMultiEnvItems.contains(itemFromDatMatch.getName())) {
+            itemsToMultiEnvItems.put(itemFromDatMatch, twinItems);
+         }
       }
    }
 

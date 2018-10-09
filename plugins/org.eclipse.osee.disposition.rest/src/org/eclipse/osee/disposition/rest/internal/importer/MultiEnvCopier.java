@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import org.eclipse.osee.disposition.model.Discrepancy;
 import org.eclipse.osee.disposition.model.DispoAnnotationData;
@@ -25,7 +24,6 @@ public class MultiEnvCopier {
    public List<DispoItem> copy(Map<DispoItemData, Set<DispoItemData>> itemToMultiEnvTwins, OperationReport rerpot) {
       List<DispoItem> modifiedItems = new ArrayList<>();
 
-      Set<Entry<DispoItemData, Set<DispoItemData>>> entrySet = itemToMultiEnvTwins.entrySet();
       for (DispoItemData origItem : itemToMultiEnvTwins.keySet()) {
          Set<DispoItemData> twinItems = itemToMultiEnvTwins.get(origItem);
 
