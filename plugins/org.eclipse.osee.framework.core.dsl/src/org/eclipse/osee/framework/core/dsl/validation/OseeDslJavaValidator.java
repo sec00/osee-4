@@ -44,7 +44,7 @@ import org.eclipse.xtext.validation.ComposedChecks;
  * @author Donald G. Dunne
  */
 //Override the checks in AbstractAtsDslJavaValidator to provide own Name validator
-@ComposedChecks(validators = {org.eclipse.xtext.validation.ImportUriValidator.class, OseeNamesAreUniqueValidator.class})
+@ComposedChecks(validators = {org.eclipse.xtext.validation.ImportUriValidator.class})
 public class OseeDslJavaValidator extends AbstractOseeDslJavaValidator {
 
    private static final String UNLIMITED = "unlimited";

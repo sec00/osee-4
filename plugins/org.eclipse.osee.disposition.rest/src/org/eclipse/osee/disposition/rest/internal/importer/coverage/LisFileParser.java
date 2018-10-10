@@ -200,6 +200,9 @@ public class LisFileParser implements DispoImporterApi {
          String itemDatId = matcher.group();
          DispoItemData item = datIdToItem.get(itemDatId);
          // here look for additional items with same name
+         if (item.getName().contains("UPDATE_HEALTH_STATUS_FROM_TASK_TPM")) {
+            System.out.println();
+         }
 
          String line = datId.replaceAll("\\d*:\\d*:", "");
          line = line.replaceAll(":", "");
@@ -297,21 +300,23 @@ public class LisFileParser implements DispoImporterApi {
       datIdToItem.put(datId, newItem);
 
       // Muli Env
-      String n = instrumentedFile.getLISFile();
-      if (n.contains("49")) {
+      if (newItem.getName().contains("UPDATE_HEALTH_STATUS_FROM_TASK_TPM")) {
          System.out.println();
       }
       if (instrumentedFile.getLISFile().matches(".*?/vcast/.*?\\d+\\.2\\.lis")) {
          // Making assumption here that the only time we wanna collect these duplicate "twin" files is when vcast tags them with the name
          // syntax filename.id.2.lis
 
-         String name = newItem.getName();
-         Set<DispoItemData> set = nameToMultiEnvItems.get(name);
+         String nameWithoutId = newItem.getName();
+         Set<DispoItemData> set = nameToMultiEnvItems.get(nameWithoutId);
          if (set == null) {
             set = new HashSet<>();
          }
+         String regex = "\\.2\\.";
+         String nameWithId = nameWithoutId.replaceAll(regex, String.format(".%s.2.", fileNum));
+         newItem.setName(nameWithId);
          set.add(newItem);
-         nameToMultiEnvItems.put(name, set);
+         nameToMultiEnvItems.put(nameWithoutId, set);
       }
       // end
 
@@ -538,13 +543,14 @@ public class LisFileParser implements DispoImporterApi {
    }
 
    private void tryMultiEnv(DispoItemData itemFromDatMatch) {
-      if (itemFromDatMatch.getName().contains("pcie")) {
+      if (itemFromDatMatch.getName().contains("UPDATE_HEALTH_STATUS_FROM_TASK_TPM")) {
          System.out.println();
       }
       Set<DispoItemData> twinItems = nameToMultiEnvItems.get(itemFromDatMatch.getName());
       if (twinItems != null) {
          if (!alreadyLinkedMultiEnvItems.contains(itemFromDatMatch.getName())) {
             itemsToMultiEnvItems.put(itemFromDatMatch, twinItems);
+            alreadyLinkedMultiEnvItems.add(itemFromDatMatch.getName());
          }
       }
    }
