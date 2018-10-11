@@ -42,6 +42,7 @@ import org.eclipse.osee.disposition.rest.DispoImporterApi;
 import org.eclipse.osee.disposition.rest.internal.DispoConnector;
 import org.eclipse.osee.disposition.rest.internal.DispoDataFactory;
 import org.eclipse.osee.disposition.rest.internal.importer.DispoSetCopier;
+import org.eclipse.osee.disposition.rest.internal.importer.MultiEnvCopier;
 import org.eclipse.osee.disposition.rest.util.DispoUtil;
 import org.eclipse.osee.framework.core.util.Result;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
@@ -82,6 +83,10 @@ public class LisFileParser implements DispoImporterApi {
    private final Set<String> datIdsCoveredByException = new HashSet<>();
    private final Set<String> alreadyUsedDatIds = new HashSet<>();
    private final Set<String> alreadyUsedFileNames = new HashSet<>();
+   // Multi Env
+   private final Map<String, Set<DispoItemData>> nameToMultiEnvItems = new HashMap<>();
+   private final Map<DispoItemData, Set<DispoItemData>> itemsToMultiEnvItems = new HashMap<>();
+   private final Set<String> alreadyLinkedMultiEnvItems = new HashSet<>();
 
    private final DispoConnector dispoConnector;
    private final DispoApiConfiguration config;
@@ -166,6 +171,10 @@ public class LisFileParser implements DispoImporterApi {
          toReturn.addAll(items);
       }
 
+      // make a flag for multi env operation, could be time consuming
+      MultiEnvCopier multiEnvCopier = new MultiEnvCopier();
+      multiEnvCopier.copy(itemsToMultiEnvItems, report);
+
       for (DispoItem item : toReturn) {
          if (item.getStatus().equalsIgnoreCase("incomplete")) {
             createPlaceHolderAnnotations((DispoItemData) item, report);
@@ -217,6 +226,10 @@ public class LisFileParser implements DispoImporterApi {
          matcher.find();
          String itemDatId = matcher.group();
          DispoItemData item = datIdToItem.get(itemDatId);
+         // here look for additional items with same name
+         if (item.getName().contains("UPDATE_HEALTH_STATUS_FROM_TASK_TPM")) {
+            System.out.println();
+         }
          String line = datId.replaceAll("\\d*:\\d*:", "");
          line = line.replaceAll(":", "");
          String text = "";
@@ -551,8 +564,23 @@ public class LisFileParser implements DispoImporterApi {
             item.setDiscrepanciesList(discrepancies);
             addAnnotationForCoveredLine(item, location, Test_Unit_Resolution, resultPath, discrepancyText);
          }
+
+         tryMultiEnv(item);
       }
 
+   }
+
+   private void tryMultiEnv(DispoItemData itemFromDatMatch) {
+      if (itemFromDatMatch.getName().contains("UPDATE_HEALTH_STATUS_FROM_TASK_TPM")) {
+         System.out.println();
+      }
+      Set<DispoItemData> twinItems = nameToMultiEnvItems.get(itemFromDatMatch.getName());
+      if (twinItems != null) {
+         if (!alreadyLinkedMultiEnvItems.contains(itemFromDatMatch.getName())) {
+            itemsToMultiEnvItems.put(itemFromDatMatch, twinItems);
+            alreadyLinkedMultiEnvItems.add(itemFromDatMatch.getName());
+         }
+      }
    }
 
    private void processSingleResultBranch(String resultPath, Matcher m) {
@@ -569,6 +597,8 @@ public class LisFileParser implements DispoImporterApi {
             item.setDiscrepanciesList(discrepancies);
             addAnnotationForCoveredLine(item, location, Test_Unit_Resolution, resultPath, text);
          }
+
+         tryMultiEnv(item);
       }
    }
 
@@ -597,6 +627,7 @@ public class LisFileParser implements DispoImporterApi {
                addAnnotationForCoveredLine(item, location, Test_Unit_Resolution, resultPath, text);
             }
          }
+         tryMultiEnv(item);
       }
    }
 
