@@ -65,7 +65,6 @@ import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.CoreBranches;
 import org.eclipse.osee.framework.core.executor.ExecutorAdmin;
 import org.eclipse.osee.framework.core.server.OseeInfo;
-import org.eclipse.osee.framework.core.util.JsonUtil;
 import org.eclipse.osee.framework.jdk.core.type.OseeArgumentException;
 import org.eclipse.osee.orcs.OrcsApi;
 import org.eclipse.osee.orcs.data.ArtifactReadable;
@@ -342,7 +341,7 @@ public class AtsServerImpl extends AtsApiImpl implements IAtsServer {
    @Override
    public AtsActionEndpointApi getActionEndpoint() {
       if (actionEndpoint == null) {
-         actionEndpoint = new AtsActionEndpointImpl(this, orcsApi, JsonUtil.getFactory());
+         actionEndpoint = new AtsActionEndpointImpl(this, orcsApi);
       }
       return actionEndpoint;
    }
