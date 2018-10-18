@@ -6,7 +6,6 @@
 package org.eclipse.osee.disposition.rest.internal.importer;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,18 +18,17 @@ import org.eclipse.osee.disposition.rest.internal.DispoDataFactory;
 
 public class MultiEnvCopier {
 
-   public void copy(Map<DispoItemData, Set<DispoItemData>> itemToMultiEnvTwins, OperationReport rerpot) {
-      for (DispoItemData origItem : itemToMultiEnvTwins.keySet()) {
-         if (origItem.getName().contains("UPDATE_HEALTH_STATUS_FROM_PARTITION_HEALTH_REPORT")) {
-            System.out.println();
-         }
-         Set<DispoItemData> twinItems = itemToMultiEnvTwins.get(origItem);
+   public void copy(Map<String, Set<DispoItemData>> itemToMultiEnvTwins, Set<String> foundItems, OperationReport rerpot) {
+      for (String origItemName : foundItems) {
+         Set<DispoItemData> twinItems = itemToMultiEnvTwins.get(origItemName);
 
-         copyCoveredLinesToTwins(origItem, twinItems);
+         if (twinItems != null) {
+            copyCoveredLinesToTwins(twinItems);
+         }
       }
    }
 
-   private void copyCoveredLinesToTwins(DispoItemData origItem, Set<DispoItemData> twinItems) {
+   private void copyCoveredLinesToTwins(Set<DispoItemData> twinItems) {
       DispoDataFactory factory = new DispoDataFactory();
       DispoConnector connector = new DispoConnector();
 
@@ -52,13 +50,4 @@ public class MultiEnvCopier {
       }
 
    }
-
-   private Map<String, Discrepancy> buildMap(DispoItemData item) {
-      Map<String, Discrepancy> toReturn = new HashMap<>();
-      for (Discrepancy discrepancy : item.getDiscrepanciesList().values()) {
-         toReturn.put(discrepancy.getText(), discrepancy);
-      }
-      return toReturn;
-   }
-
 }

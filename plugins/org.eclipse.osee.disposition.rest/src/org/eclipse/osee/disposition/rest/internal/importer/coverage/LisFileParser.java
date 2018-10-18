@@ -85,10 +85,9 @@ public class LisFileParser implements DispoImporterApi {
    private final Set<String> datIdsCoveredByException = new HashSet<>();
    private final Set<String> alreadyUsedDatIds = new HashSet<>();
    private final Set<String> alreadyUsedFileNames = new HashSet<>();
-   // Multi Env
-   private final Map<String, Set<DispoItemData>> nameToMultiEnvItems = new HashMap<>();
-   private final Map<DispoItemData, Set<DispoItemData>> itemsToMultiEnvItems = new HashMap<>();
-   private final Set<String> alreadyLinkedMultiEnvItems = new HashSet<>();
+   // multi env
+   private final Map<String, Set<DispoItemData>> origNameToTwinItems = new HashMap<>();
+   private final Set<String> itemsFoundInDatFiles = new HashSet<>();
 
    private final DispoConnector dispoConnector;
    private final DispoApiConfiguration config;
@@ -177,7 +176,7 @@ public class LisFileParser implements DispoImporterApi {
 
       // make a flag for multi env operation, could be time consuming
       MultiEnvCopier multiEnvCopier = new MultiEnvCopier();
-      multiEnvCopier.copy(itemsToMultiEnvItems, report);
+      multiEnvCopier.copy(origNameToTwinItems, itemsFoundInDatFiles, report);
 
       for (DispoItem item : toReturn) {
          if (item.getStatus().equalsIgnoreCase("incomplete")) {
@@ -351,7 +350,6 @@ public class LisFileParser implements DispoImporterApi {
       datIdToItem.put(datId, newItem);
 
       checkForMultiEnvRename(fileNum, instrumentedFile, newItem);
-
       Collection<VCastStatementCoverage> statementCoverageItems = Collections.emptyList();
 
       try {
@@ -576,6 +574,7 @@ public class LisFileParser implements DispoImporterApi {
       DispoItemData item = datIdToItem.get(generateDatId(m.group(1), m.group(2)));
 
       if (item != null) {
+         itemsFoundInDatFiles.add(item.getName());
          String location = m.group(3);
          String discrepancyText = "";
          Discrepancy matchingDiscrepancy = matchDiscrepancy(location, item.getDiscrepanciesList());
@@ -587,29 +586,15 @@ public class LisFileParser implements DispoImporterApi {
             item.setDiscrepanciesList(discrepancies);
             addAnnotationForCoveredLine(item, location, Test_Unit_Resolution, resultPath, discrepancyText);
          }
-
-         tryMultiEnv(item);
       }
 
-   }
-
-   private void tryMultiEnv(DispoItemData itemFromDatMatch) {
-      if (itemFromDatMatch.getName().contains("UPDATE_HEALTH_STATUS_FROM_TASK_TPM")) {
-         System.out.println();
-      }
-      Set<DispoItemData> twinItems = nameToMultiEnvItems.get(itemFromDatMatch.getName());
-      if (twinItems != null) {
-         if (!alreadyLinkedMultiEnvItems.contains(itemFromDatMatch.getName())) {
-            itemsToMultiEnvItems.put(itemFromDatMatch, twinItems);
-            alreadyLinkedMultiEnvItems.add(itemFromDatMatch.getName());
-         }
-      }
    }
 
    private void processSingleResultBranch(String resultPath, Matcher m) {
       DispoItemData item = datIdToItem.get(generateDatId(m.group(1), m.group(2)));
 
       if (item != null) {
+         itemsFoundInDatFiles.add(item.getName());
          String location = m.group(3) + "." + m.group(4);
          Discrepancy matchingDiscrepancy = matchDiscrepancy(location, item.getDiscrepanciesList());
          if (matchingDiscrepancy != null) {
@@ -620,8 +605,6 @@ public class LisFileParser implements DispoImporterApi {
             item.setDiscrepanciesList(discrepancies);
             addAnnotationForCoveredLine(item, location, Test_Unit_Resolution, resultPath, text);
          }
-
-         tryMultiEnv(item);
       }
    }
 
@@ -629,6 +612,7 @@ public class LisFileParser implements DispoImporterApi {
       DispoItemData item = datIdToItem.get(generateDatId(m.group(1), m.group(2)));
 
       if (item != null) {
+         itemsFoundInDatFiles.add(item.getName());
          Integer lineNumber = Integer.valueOf(m.group(3));
          Integer bitsTrue = Integer.valueOf(m.group(4));
          Integer bitsUsed = Integer.valueOf(m.group(5));
@@ -650,7 +634,6 @@ public class LisFileParser implements DispoImporterApi {
                addAnnotationForCoveredLine(item, location, Test_Unit_Resolution, resultPath, text);
             }
          }
-         tryMultiEnv(item);
       }
    }
 
