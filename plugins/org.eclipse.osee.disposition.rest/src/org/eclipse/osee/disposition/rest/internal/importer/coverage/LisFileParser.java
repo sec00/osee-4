@@ -350,6 +350,12 @@ public class LisFileParser implements DispoImporterApi {
       datIdToItem.put(datId, newItem);
 
       checkForMultiEnvRename(fileNum, instrumentedFile, newItem);
+         Set<DispoItemData> twinItems = origNameToTwinItems.get(nameWithoutId);
+         if (twinItems == null) {
+            twinItems = new HashSet<>();
+         }
+         twinItems.add(newItem);
+         origNameToTwinItems.put(nameWithoutId, twinItems);
       Collection<VCastStatementCoverage> statementCoverageItems = Collections.emptyList();
 
       try {

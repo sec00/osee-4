@@ -21,7 +21,6 @@ public class MultiEnvCopier {
    public void copy(Map<String, Set<DispoItemData>> itemToMultiEnvTwins, Set<String> foundItems, OperationReport rerpot) {
       for (String origItemName : foundItems) {
          Set<DispoItemData> twinItems = itemToMultiEnvTwins.get(origItemName);
-
          if (twinItems != null) {
             copyCoveredLinesToTwins(twinItems);
          }
