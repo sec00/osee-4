@@ -13,7 +13,6 @@ import org.eclipse.osee.disposition.model.Discrepancy;
 import org.eclipse.osee.disposition.model.DispoAnnotationData;
 import org.eclipse.osee.disposition.model.DispoItemData;
 import org.eclipse.osee.disposition.model.OperationReport;
-import org.eclipse.osee.disposition.rest.internal.DispoConnector;
 import org.eclipse.osee.disposition.rest.internal.DispoDataFactory;
 
 public class MultiEnvCopier {
@@ -28,25 +27,34 @@ public class MultiEnvCopier {
    }
 
    private void copyCoveredLinesToTwins(Set<DispoItemData> twinItems) {
-      DispoDataFactory factory = new DispoDataFactory();
-      DispoConnector connector = new DispoConnector();
-
       for (DispoItemData twinItem : twinItems) {
          Collection<Discrepancy> discrepancies = twinItem.getDiscrepanciesList().values();
          for (Discrepancy discrepancy : discrepancies) {
-            DispoAnnotationData annotation = new DispoAnnotationData();
-            factory.initAnnotation(annotation);
-            annotation.setResolutionType("Deactivated_Compile_Time");
-            annotation.setResolution("MULTI ENV");
-            annotation.setLocationRefs(discrepancy.getLocation());
-            connector.connectAnnotation(annotation, twinItem.getDiscrepanciesList());
-
-            List<DispoAnnotationData> annotationsList = twinItem.getAnnotationsList();
-            int newIndex = annotationsList.size();
-            annotation.setIndex(newIndex);
-            annotationsList.add(newIndex, annotation);
+            addAnnotation(twinItem, discrepancy);
+            discrepancies.remove(discrepancy);
          }
       }
 
+   }
+
+   private void addAnnotation(DispoItemData item, Discrepancy discrepancy) {
+      DispoDataFactory factory = new DispoDataFactory();
+
+      DispoAnnotationData newAnnotation = new DispoAnnotationData();
+      factory.initAnnotation(newAnnotation);
+      String idOfNewAnnotation = factory.getNewId();
+      newAnnotation.setId(idOfNewAnnotation);
+
+      newAnnotation.setIsDefault(true);
+      newAnnotation.setLocationRefs(discrepancy.getLocation());
+      newAnnotation.setResolutionType("Deactivated_Compile_Time");
+      newAnnotation.setResolution("MULTI ENV");
+      newAnnotation.setIsResolutionValid(true);
+      newAnnotation.setCustomerNotes(discrepancy.getText());
+
+      List<DispoAnnotationData> annotationsList = item.getAnnotationsList();
+      int newIndex = annotationsList.size();
+      newAnnotation.setIndex(newIndex);
+      annotationsList.add(newIndex, newAnnotation);
    }
 }
