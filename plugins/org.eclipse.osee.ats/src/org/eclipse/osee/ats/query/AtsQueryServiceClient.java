@@ -192,7 +192,7 @@ public class AtsQueryServiceClient {
    }
 
    public Artifact getArtifact(TreeItem item) {
-      return getArtifact(item);
+      return getArtifact(item.getData());
    }
 
 }
