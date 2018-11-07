@@ -15,6 +15,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
 
+/**
+ * @author Donald G. Dunne
+ */
 public class ArtifactNameComparator implements Comparator<ArtifactToken> {
    private static final Pattern numberPattern = Pattern.compile("[+-]?\\d+");
    private final Matcher numberMatcher = numberPattern.matcher("");

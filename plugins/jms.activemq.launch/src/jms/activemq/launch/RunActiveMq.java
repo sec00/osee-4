@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Boeing.
+ * Copyright (c) 2018 Boeing.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,9 @@ import org.apache.activemq.broker.BrokerService;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 
+/**
+ * @author Roberto E. Escobar
+ */
 public class RunActiveMq implements IApplication {
    private static String BROKER_URI;
    private BrokerService broker;
@@ -43,9 +46,8 @@ public class RunActiveMq implements IApplication {
       broker.start();
 
       if (isKillable) {
-         ActiveMQConnectionFactory factory =
-            new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_USER, ActiveMQConnection.DEFAULT_PASSWORD,
-               BROKER_URI);
+         ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_USER,
+            ActiveMQConnection.DEFAULT_PASSWORD, BROKER_URI);
          connection = factory.createConnection();
          connection.start();
          session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
@@ -88,6 +90,9 @@ public class RunActiveMq implements IApplication {
       new Thread(new StopIt()).start();
    }
 
+   /**
+    * @author Roberto E. Escobar
+    */
    private class StopIt implements Runnable {
       @Override
       public void run() {
