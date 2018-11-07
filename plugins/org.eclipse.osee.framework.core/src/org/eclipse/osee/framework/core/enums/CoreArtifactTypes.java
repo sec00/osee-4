@@ -37,6 +37,7 @@ public final class CoreArtifactTypes {
    public static final ArtifactTypeToken AccessControlModel = add(ArtifactTypeToken.valueOf(2L, false, "Access Control Model", GeneralData));
    public static final ArtifactTypeToken BranchView = add(ArtifactTypeToken.valueOf(5849078277209560034L, false, "Branch View", Artifact));
    public static final ArtifactTypeToken Breaker = add(ArtifactTypeToken.valueOf(188458869981236L, false, "Breaker", Artifact));
+   public static final ArtifactTypeToken CertificationBaselineEvent = add(ArtifactTypeToken.valueOf(99L, false, "Certification Baseline Event", Artifact));
    public static final ArtifactTypeToken CodeUnit = add(ArtifactTypeToken.valueOf(58L, false, "Code Unit", Artifact));
    public static final ArtifactTypeToken Component = add(ArtifactTypeToken.valueOf(57L, false, "Component", Artifact));
    public static final ArtifactTypeToken MSWord = add(ArtifactTypeToken.valueOf(16L, true, "MS Word", Artifact));

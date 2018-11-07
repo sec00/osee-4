@@ -49,7 +49,7 @@ import org.eclipse.osee.orcs.transaction.TransactionBuilder;
 /**
  * @author Roberto E. Escobar
  */
-public class OrcsBranchImpl implements OrcsBranch {
+public final class OrcsBranchImpl implements OrcsBranch {
    private final OrcsApi orcsApi;
    private final Log logger;
    private final OrcsSession session;
