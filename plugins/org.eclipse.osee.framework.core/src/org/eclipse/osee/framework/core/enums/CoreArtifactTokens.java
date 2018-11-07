@@ -39,6 +39,7 @@ public final class CoreArtifactTokens {
    public static ArtifactToken ProductLineFolder = ArtifactToken.valueOf(8255179, "Product Line", CoreArtifactTypes.Folder);
    public static ArtifactToken VariantsFolder = ArtifactToken.valueOf(10039752, "Variants", CoreArtifactTypes.Folder);
    public static ArtifactToken FeaturesFolder = ArtifactToken.valueOf(239420307, "Features", CoreArtifactTypes.Folder);
+   public static ArtifactToken BaselineEventsFolder = ArtifactToken.valueOf(10205901, "Baseline Events", CoreArtifactTypes.Folder);
 
    // @formatter:on
 

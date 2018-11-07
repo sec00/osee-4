@@ -20,5 +20,6 @@ Import-Package: javax.ws.rs,
  org.eclipse.osee.framework.logging,
  org.eclipse.osee.orcs,
  org.eclipse.osee.orcs.data,
+ org.eclipse.osee.orcs.transaction,
  org.json
 Require-Bundle: org.eclipse.osee.framework.core

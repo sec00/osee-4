@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.osee.orcs.core.internal;
 
+import static org.eclipse.osee.framework.core.enums.CoreArtifactTokens.BaselineEventsFolder;
 import static org.eclipse.osee.framework.core.enums.CoreArtifactTokens.DefaultHierarchyRoot;
 import static org.eclipse.osee.framework.core.enums.CoreArtifactTypes.Folder;
 import java.net.URI;
@@ -254,6 +255,7 @@ public class OrcsBranchImpl implements OrcsBranch {
          tx.createArtifact(DefaultHierarchyRoot, Folder, name);
       }
 
+      tx.createArtifact(DefaultHierarchyRoot, BaselineEventsFolder);
       tx.commit();
       return newBranch;
    }

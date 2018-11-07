@@ -56,6 +56,10 @@ public final class CoreTupleTypes {
    public static final Tuple4Type<ArtifactId, ArtifactId, ArtifactId, String> GitCommitFile = Tuple4Type.valueOf(
       GitFamily, 11L, ArtifactId::valueOf, ArtifactId::valueOf, ArtifactId::valueOf, TupleTypeImpl.KeyedString);
 
+   // repository, code unit, latest commitArtId, latest baseline commitArtId
+   public static final Tuple4Type<ArtifactId, ArtifactId, ArtifactId, ArtifactId> GitLatest = Tuple4Type.valueOf(
+      GitFamily, 12L, ArtifactId::valueOf, ArtifactId::valueOf, ArtifactId::valueOf, ArtifactId::valueOf);
+
    private CoreTupleTypes() {
       // Constants
    }

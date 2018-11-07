@@ -11,17 +11,41 @@
 package org.eclipse.osee.define.api;
 
 import java.io.Writer;
+import java.util.List;
+import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactTypeId;
 import org.eclipse.osee.framework.core.data.AttributeTypeToken;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IArtifactType;
+import org.eclipse.osee.framework.core.data.UserId;
+import org.eclipse.osee.orcs.data.ArtifactReadable;
 
 /**
  * @author Morgan E. Cook
  */
 public interface TraceabilityOperations {
 
-   public void generateTraceReport(BranchId branchId, String codeRoot, String traceRoot, Writer providedWriter, IArtifactType artifactType, AttributeTypeToken attributeType);
+   void generateTraceReport(BranchId branchId, String codeRoot, String traceRoot, Writer providedWriter, IArtifactType artifactType, AttributeTypeToken attributeType);
 
-   public TraceData getSrsToImpd(BranchId branch, ArtifactTypeId excludeType);
+   TraceData getSrsToImpd(BranchId branch, ArtifactTypeId excludeType);
+
+   void parseGitHistory(String repositoryName, String gitHistory, BranchId branch, UserId account);
+
+   void parseGitHistory(ArtifactId repository, String gitHistory, BranchId branch, UserId account);
+
+   ArtifactId baselineFiles(BranchId branch, String repositoryName, CertBaselineData baselineData, UserId account);
+
+   ArtifactId getRepoId(BranchId branch, String repositoryName);
+
+   ArtifactReadable getRepo(BranchId branch, String repositoryName);
+
+   CertBaselineData getBaselineData(ArtifactReadable baselineArtifact);
+
+   List<CertBaselineData> getBaselineData(BranchId branch, String repositoryName);
+
+   /**
+    * @return list of current files (excluding deleted) in given Git repository with their latest change and baselined
+    * data
+    */
+   List<CertFileData> getCertFileData(BranchId branch, String repositoryName);
 }

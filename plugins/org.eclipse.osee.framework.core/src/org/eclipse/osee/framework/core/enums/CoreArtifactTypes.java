@@ -27,15 +27,20 @@ public final class CoreArtifactTypes {
    public static final IArtifactType Artifact = TokenFactory.createArtifactType(1, "Artifact");
    public static final IArtifactType Breaker = TokenFactory.createArtifactType(188458869981236L, "Breaker");
    public static final IArtifactType BranchView = TokenFactory.createArtifactType(5849078277209560034L, "Branch View");
+   public static final IArtifactType CertificationBaselineEvent = TokenFactory.createArtifactType(99, "Certification Baseline Event");
    public static final IArtifactType CodeUnit = TokenFactory.createArtifactType(58, "Code Unit");
    public static final IArtifactType Component = TokenFactory.createArtifactType(57, "Component");
    public static final IArtifactType Design = TokenFactory.createArtifactType(346, "Design");
+   public static final IArtifactType DesignDescriptionMSWord = TokenFactory.createArtifactType(807, "Design Description - MS Word");
    public static final IArtifactType DirectSoftwareRequirement = TokenFactory.createArtifactType(22, "Direct Software Requirement");
+   public static final IArtifactType DocumentDescriptionMSWord = TokenFactory.createArtifactType(806, "Document Description - MS Word");
    public static final IArtifactType Feature = TokenFactory.createArtifactType(87, "Feature");
    public static final IArtifactType FeatureDefinition = TokenFactory.createArtifactType(5849078290088170402L, "Feature Definition");
    public static final IArtifactType Folder = TokenFactory.createArtifactType(11, "Folder");
    public static final IArtifactType GeneralData = TokenFactory.createArtifactType(12, "General Data");
    public static final IArtifactType GeneralDocument = TokenFactory.createArtifactType(14, "General Document");
+   public static final IArtifactType GitCommit = TokenFactory.createArtifactType(100, "Git Commit");
+   public static final IArtifactType GitRepository = TokenFactory.createArtifactType(97, "Git Repository");
    public static final IArtifactType GlobalPreferences = TokenFactory.createArtifactType(3, "Global Preferences");
    public static final IArtifactType HardwareRequirement = TokenFactory.createArtifactType(33, "Hardware Requirement");
    public static final IArtifactType HeadingMSWord = TokenFactory.createArtifactType(56, "Heading - MS Word");
@@ -97,9 +102,6 @@ public final class CoreArtifactTypes {
    public static final IArtifactType User = TokenFactory.createArtifactType(5, "User");
    public static final IArtifactType UserGroup = TokenFactory.createArtifactType(7, "User Group");
    public static final IArtifactType XViewerGlobalCustomization = TokenFactory.createArtifactType(55, "XViewer Global Customization");
-
-   public static final IArtifactType DocumentDescriptionMSWord = TokenFactory.createArtifactType(806, "Document Description - MS Word");
-   public static final IArtifactType DesignDescriptionMSWord = TokenFactory.createArtifactType(807, "Design Description - MS Word");
    // @formatter:on
 
    private CoreArtifactTypes() {

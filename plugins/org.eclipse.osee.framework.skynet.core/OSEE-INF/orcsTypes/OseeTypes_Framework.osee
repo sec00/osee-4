@@ -286,7 +286,6 @@ attributeType "Web Preferences" extends StringAttribute {
 	mediaType "text/plain"
 }
 
-
 attributeType "XViewer Customization" extends StringAttribute {
 	id 1152921504606847077
 	dataProvider DefaultAttributeDataProvider
@@ -410,12 +409,13 @@ attributeType "Template Match Criteria" extends StringAttribute {
 
 attributeType "Renderer Options" extends StringAttribute {
 	id 904
-   dataProvider DefaultAttributeDataProvider
-   min 1
-   max 1
+	dataProvider DefaultAttributeDataProvider
+	min 1
+	max 1
 	taggerId DefaultAttributeTaggerProvider
-   defaultValue "{\"ElementType\" : \"Artifact\", \"OutliningOptions\" : [ {\"Outlining\" : true, \"RecurseChildren\" : false, \"HeadingAttributeType\" : \"Name\", \"ArtifactName\" : \"Default\", \"OutlineNumber\" : \"\" }], \"AttributeOptions\" : [{\"AttrType\" : \"*\",  \"Label\" : \"\", \"FormatPre\" : \"\", \"FormatPost\" : \"\"}]}"
-   fileExtension "txt"
+	defaultValue
+	"{\"ElementType\" : \"Artifact\", \"OutliningOptions\" : [ {\"Outlining\" : true, \"RecurseChildren\" : false, \"HeadingAttributeType\" : \"Name\", \"ArtifactName\" : \"Default\", \"OutlineNumber\" : \"\" }], \"AttributeOptions\" : [{\"AttrType\" : \"*\",  \"Label\" : \"\", \"FormatPre\" : \"\", \"FormatPost\" : \"\"}]}"
+	fileExtension "txt"
 	mediaType "application/json"
 }
 
@@ -568,7 +568,7 @@ attributeType "Image Content" extends CompressedContentAttribute {
 	fileExtension "bin"
 	mediaType "image"
 }
-   
+
 attributeType "Plain Text Content" extends StringAttribute {
 	id 1152921504606847866
 	dataProvider UriAttributeDataProvider
@@ -645,7 +645,6 @@ abstract artifactType "Abstract Access Controlled" extends "Artifact" {
 	id 17
 	attribute "Access Context Id"
 }
-
 
 artifactType "MS Word Whole Document" extends "MS Word" {
 	id 18
@@ -729,7 +728,7 @@ artifactType "Abstract Spec Requirement" extends "Requirement" {
 	attribute "Software Control Category"
 	attribute "Software Control Category Rationale"
 	attribute "Safety Severity"
-	attribute "Potential Security Impact"	
+	attribute "Potential Security Impact"
 	attribute "Doors ID"
 	attribute "Doors Hierarchy"
 }
@@ -757,7 +756,8 @@ attributeType "Data Rights Classification" extends EnumeratedAttribute {
 	max 1
 	taggerId DefaultAttributeTaggerProvider
 	enumType "enum.data.rights.classification"
-	description "Restricted Rights:  Rights are retained by the company\n\nRestricted Rights Mixed:  contains some Restricted Rights that need separation of content with other rights\n\nOther:  does not contain content with Restricted Rights\n\nUnspecified: not yet specified"
+	description
+	"Restricted Rights:  Rights are retained by the company\n\nRestricted Rights Mixed:  contains some Restricted Rights that need separation of content with other rights\n\nOther:  does not contain content with Restricted Rights\n\nUnspecified: not yet specified"
 	defaultValue "Unspecified"
 	mediaType "text/plain"
 }
@@ -809,7 +809,7 @@ artifactType "Software Requirement" extends "MS Word Template" , "Direct Softwar
 	attribute "IA Plan"
 }
 
-artifactType "Software Requirement - HTML" extends "Abstract Software Requirement", "HTML Artifact" {
+artifactType "Software Requirement - HTML" extends "Abstract Software Requirement" , "HTML Artifact" {
 	id 42
 }
 
@@ -831,17 +831,17 @@ abstract artifactType "Abstract Implementation Details" extends "Artifact" {
 	id 921211884
 	attribute "Data Rights Classification"
 	attribute "Data Rights Basis"
-	attribute "Subject Matter Expert"	
-	attribute "Subsystem"	
+	attribute "Subject Matter Expert"
+	attribute "Subsystem"
 	attribute "Partition"
 	attribute "Potential Security Impact"
 }
 
-artifactType "Implementation Details" extends "Abstract Implementation Details", "MS Word Template" {
-	id 26				
+artifactType "Implementation Details" extends "Abstract Implementation Details" , "MS Word Template" {
+	id 26
 }
 
-artifactType "Implementation Details Plain Text" extends "Abstract Implementation Details", "Plain Text" {
+artifactType "Implementation Details Plain Text" extends "Abstract Implementation Details" , "Plain Text" {
 	id 638269899
 }
 
@@ -1141,7 +1141,8 @@ oseeEnumType "enum.req.qualification.method" {
 	entry "Analysis"
 	entry "Inspection"
 	entry "Similarity"
-	 // same as Legacy
+	// same as Legacy
+
 	entry "Special Qualification"
 	entry "Legacy"
 	entry "Unspecified"
@@ -1382,7 +1383,6 @@ attributeType "Technical Performance Parameter" extends BooleanAttribute {
 oseeEnumType "enum.req.verification.event" {
 	id 3458764513820541317
 	entry "Unspecified"
-	
 }
 
 attributeType "Verification Event" extends EnumeratedAttribute {
@@ -1730,37 +1730,37 @@ relationType "Supporting Info" {
 }
 
 relationType "Supporting Requirement" {
-    id 2305843009213694332
-    sideAName "higher-level requirement"
-    sideAArtifactType "Requirement"
-    sideBName "lower-level requirement"
-    sideBArtifactType "Requirement"
-    defaultOrderType Unordered
-    multiplicity MANY_TO_MANY
+	id 2305843009213694332
+	sideAName "higher-level requirement"
+	sideAArtifactType "Requirement"
+	sideBName "lower-level requirement"
+	sideBArtifactType "Requirement"
+	defaultOrderType Unordered
+	multiplicity MANY_TO_MANY
 }
 
-artifactType "Heading - MS Word" extends "Abstract Heading", "MS Word Template" {
+artifactType "Heading - MS Word" extends "Abstract Heading" , "MS Word Template" {
 	id 56
 }
 
-artifactType "Document Description - MS Word" extends "Abstract Heading", "MS Word Template" {
+artifactType "Document Description - MS Word" extends "Abstract Heading" , "MS Word Template" {
 	id 806
 }
 
-artifactType "Design Description - MS Word" extends "Abstract Heading", "MS Word Template" {
+artifactType "Design Description - MS Word" extends "Abstract Heading" , "MS Word Template" {
 	id 807
 }
 
-artifactType "Heading - HTML" extends "Abstract Heading", "HTML Artifact" {  
- 	id 804
-}  
-    
-abstract artifactType "Abstract Heading" extends "Artifact" {   
+artifactType "Heading - HTML" extends "Abstract Heading" , "HTML Artifact" {
+	id 804
+}
+
+abstract artifactType "Abstract Heading" extends "Artifact" {
 	id 805
 	attribute "Doors ID"
 	attribute "Doors Hierarchy"	
-}  
-   
+}
+
 artifactType "Component" extends "Artifact" {
 	id 57
 	attribute "Developmental"
@@ -1772,6 +1772,7 @@ artifactType "Code Unit" extends "Artifact" {
 	attribute "Data Rights Classification"
 	attribute "Data Rights Basis"
 	attribute "Subject Matter Expert"
+	attribute "Git Repository Reference"
 }
 
 artifactType "Safety Assessment" extends "Artifact" {
@@ -1989,10 +1990,11 @@ attributeType "Osee App Definition" extends StringAttribute {
 }
 
 artifactType "Breaker" extends "Artifact" {
-   id 188458869981236
-   attribute "Display Text"
-   attribute "Circuit Breaker ID"
-   attribute "Require Confirmation"
+	id 188458869981236
+	attribute "Display Text"
+	attribute "Description"
+	attribute "Circuit Breaker ID"
+	attribute "Require Confirmation"
 }
 
 attributeType "Display Text" extends StringAttribute {
@@ -2004,14 +2006,13 @@ attributeType "Display Text" extends StringAttribute {
 	mediaType "text/plain"
 }
 
-
 attributeType "Circuit Breaker ID" extends IntegerAttribute {
 	id 188458869981238
-   dataProvider DefaultAttributeDataProvider
+	dataProvider DefaultAttributeDataProvider
 	min 1
 	max 1
- 	defaultValue "0"
-  	mediaType "text/plain"
+	defaultValue "0"
+	mediaType "text/plain"
 }
 
 attributeType "Require Confirmation" extends BooleanAttribute {
@@ -2024,8 +2025,8 @@ attributeType "Require Confirmation" extends BooleanAttribute {
 }
 
 artifactType "Model Diagram" extends "Artifact" {
-   id 98
-   attribute "Graphiti Diagram"
+	id 98
+	attribute "Graphiti Diagram"
 }
 
 attributeType "Graphiti Diagram" extends StringAttribute {
@@ -2036,5 +2037,129 @@ attributeType "Graphiti Diagram" extends StringAttribute {
 	description "xml definition of an Eclipse Graphiti Diagram"
 	fileExtension "diagram"
 	mediaType "text/xml"
-	defaultValue "<?xml version=\"1.0\" encoding=\"ASCII\"?><pi:Diagram xmi:version=\"2.0\" xmlns:xmi=\"http://www.omg.org/XMI\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:al=\"http://eclipse.org/graphiti/mm/algorithms\" xmlns:pi=\"http://eclipse.org/graphiti/mm/pictograms\" visible=\"true\" gridUnit=\"10\" diagramTypeId=\"mbse\" name=\"mbse basic\" snapToGrid=\"true\" version=\"0.11.0\"><graphicsAlgorithm xsi:type=\"al:Rectangle\" background=\"//@colors.1\" foreground=\"//@colors.0\" lineWidth=\"1\" transparency=\"0.0\" width=\"1000\" height=\"1000\"/><colors red=\"227\" green=\"238\" blue=\"249\"/><colors red=\"255\" green=\"255\" blue=\"255\"/></pi:Diagram>"
+	defaultValue
+	"<?xml version=\"1.0\" encoding=\"ASCII\"?><pi:Diagram xmi:version=\"2.0\" xmlns:xmi=\"http://www.omg.org/XMI\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:al=\"http://eclipse.org/graphiti/mm/algorithms\" xmlns:pi=\"http://eclipse.org/graphiti/mm/pictograms\" visible=\"true\" gridUnit=\"10\" diagramTypeId=\"mbse\" name=\"mbse basic\" snapToGrid=\"true\" version=\"0.11.0\"><graphicsAlgorithm xsi:type=\"al:Rectangle\" background=\"//@colors.1\" foreground=\"//@colors.0\" lineWidth=\"1\" transparency=\"0.0\" width=\"1000\" height=\"1000\"/><colors red=\"227\" green=\"238\" blue=\"249\"/><colors red=\"255\" green=\"255\" blue=\"255\"/></pi:Diagram>"
+}
+
+artifactType "Git Repository" extends "Artifact" {
+	id 97
+	attribute "Repository URL"
+}
+
+attributeType "Repository URL" extends StringAttribute {
+	id 1152921504606847700
+	dataProvider DefaultAttributeDataProvider
+	min 0
+	max 1
+	taggerId DefaultAttributeTaggerProvider
+}
+
+artifactType "Git Commit" extends "Artifact" {
+	id 100
+	attribute "Git Repository Reference"
+	attribute "Git Commit SHA"
+	attribute "User Artifact Id"
+	attribute "Git Commit Author Date"
+	attribute "Git Commit Message"
+	attribute "Git Change-Id"
+}
+
+attributeType "Git Repository Reference" extends StringAttribute {
+	id 1152921504606847706
+	dataProvider DefaultAttributeDataProvider
+	min 0
+	max 1
+	taggerId DefaultAttributeTaggerProvider
+}
+
+attributeType "User Artifact Id" extends ArtifactReferenceAttribute {
+	id 1152921504606847701
+	dataProvider DefaultAttributeDataProvider
+	min 0
+	max 1
+	description "Artifact id of an artifact of type User"
+	mediaType "text/plain"
+}
+
+attributeType "Git Change-Id" extends StringAttribute {
+	id 1152921504606847702
+	dataProvider DefaultAttributeDataProvider
+	min 0
+	max 1
+	description
+	"Change-Id embedded in Git commit message that is intended to be immutable even during rebase and amending the commit"
+	taggerId DefaultAttributeTaggerProvider
+	mediaType "text/plain"
+}
+
+attributeType "Git Commit SHA" extends StringAttribute {
+	id 1152921504606847703
+	dataProvider DefaultAttributeDataProvider
+	min 0
+	max 1
+	description "SHA-1 checksum of the Git commit's content and header"
+	taggerId DefaultAttributeTaggerProvider
+	mediaType "text/plain"
+}
+
+attributeType "Git Commit Author Date" extends DateAttribute {
+	id 1152921504606847704
+	dataProvider DefaultAttributeDataProvider
+	min 0
+	max 1
+	description "when this commit was originally made"
+	taggerId DefaultAttributeTaggerProvider
+	mediaType "text/plain"
+}
+
+attributeType "Git Commit Message" extends StringAttribute {
+	id 1152921504606847705
+	dataProvider DefaultAttributeDataProvider
+	min 0
+	max 1
+	description "Full message minus Change-Id"
+	taggerId DefaultAttributeTaggerProvider
+	mediaType "text/plain"
+}
+
+artifactType "Certification Baseline Event" extends "Artifact" {
+	id 99
+	attribute "Git Change-Id"
+	attribute "Baselined By"
+	attribute "Baselined Timestamp"
+	attribute "Review Id"
+	attribute "Review Story Id"
+}
+
+attributeType "Baselined By" extends ArtifactReferenceAttribute {
+	id 1152921504606847247
+	dataProvider DefaultAttributeDataProvider
+	min 0
+	max 1
+	mediaType "text/plain"
+}
+
+attributeType "Baselined Timestamp" extends DateAttribute {
+	id 1152921504606847244
+	dataProvider DefaultAttributeDataProvider
+	min 0
+	max 1
+	mediaType "text/calendar"
+}
+
+attributeType "Review Id" extends IntegerAttribute {
+	id 1152921504606847245
+	dataProvider DefaultAttributeDataProvider
+	min 0
+	max 1
+	mediaType "text/plain"
+}
+
+attributeType "Review Story Id" extends StringAttribute {
+	id 1152921504606847246
+	dataProvider DefaultAttributeDataProvider
+	min 0
+	max 1
+	taggerId DefaultAttributeTaggerProvider
+	mediaType "text/plain"
 }
