@@ -232,6 +232,7 @@ public final class DispoUtil {
    public static DispoConfigData configArtToConfigData(DispoConfig config) {
       DispoConfigData configData = new DispoConfigData();
       configData.setValidResolutions(config.getValidResolutions());
+      configData.setMultiEnvTargets(config.getMultiEnvTargets());
 
       return configData;
    }
@@ -243,6 +244,7 @@ public final class DispoUtil {
       defaultMethod.setValue("INVALID");
       defaultMethod.setIsDefault(true);
       configData.setValidResolutions(Collections.singletonList(defaultMethod));
+      configData.setMultiEnvTargets(Collections.emptyList());
 
       return configData;
    }

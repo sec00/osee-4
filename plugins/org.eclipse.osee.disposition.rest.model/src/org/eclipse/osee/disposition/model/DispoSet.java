@@ -36,4 +36,8 @@ public interface DispoSet extends Identifiable<String> {
    String getRerunList();
 
    Date getTime();
+
+   Boolean getIsMultiEnv();
+
+   MultiEnvSettings getMultiEnvSettings();
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Boeing.
+ * Copyright (c) 2018 Boeing.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,20 +8,30 @@
  * Contributors:
  *     Boeing - initial API and implementation
  *******************************************************************************/
-package org.eclipse.osee.disposition.rest;
-
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-import org.eclipse.osee.disposition.model.DispoItem;
-import org.eclipse.osee.disposition.model.DispoSet;
-import org.eclipse.osee.disposition.model.OperationReport;
+package org.eclipse.osee.disposition.model;
 
 /**
  * @author Angel Avila
  */
-public interface DispoImporterApi {
+public class MultiEnvTarget {
 
-   List<DispoItem> importDirectory(DispoSet set, Map<String, DispoItem> exisitingItems, File filesDir, OperationReport report);
+   private String name;
+   private String path;
+
+   public String getName() {
+      return name;
+   }
+
+   public void setName(String name) {
+      this.name = name;
+   }
+
+   public String getPath() {
+      return path;
+   }
+
+   public void setPath(String value) {
+      this.path = value;
+   }
 
 }

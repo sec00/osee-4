@@ -20,4 +20,5 @@ public interface DispoConfig {
 
    List<ResolutionMethod> getValidResolutions();
 
+   List<MultiEnvTarget> getMultiEnvTargets();
 }

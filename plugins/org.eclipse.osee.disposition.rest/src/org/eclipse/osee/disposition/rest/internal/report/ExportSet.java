@@ -234,7 +234,6 @@ public class ExportSet {
 
       // Init map needed for Cover Sheet aka Resolution Types to Coverage %s
       DispoConfig config = dispoApi.getDispoConfig(branch);
-      config.getValidResolutions();
       for (CoverageLevel level : CoverageLevel.values()) {
          Map<String, WrapInt> innerMap = new HashMap<>();
          for (ResolutionMethod resolutionType : config.getValidResolutions()) {

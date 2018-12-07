@@ -71,3 +71,10 @@ button#mergetAnnotationsBtn {
 .ngHeaderScroller {
     max-width: 0px;
 }
+
+.config-json-invalid{
+	background-color: pink;
+}
+
+input#multiEnvTargePathInput {
+    border: none;

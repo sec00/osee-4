@@ -18,6 +18,7 @@ import java.util.List;
 public class DispoConfigData implements DispoConfig {
 
    List<ResolutionMethod> validResolutions;
+   List<MultiEnvTarget> multiEnvTargets;
 
    public DispoConfigData() {
 
@@ -27,9 +28,17 @@ public class DispoConfigData implements DispoConfig {
       this.validResolutions = validResolutions;
    }
 
+   public void setMultiEnvTargets(List<MultiEnvTarget> multiEnvTargets) {
+      this.multiEnvTargets = multiEnvTargets;
+   }
+
    @Override
    public List<ResolutionMethod> getValidResolutions() {
       return validResolutions;
    }
 
+   @Override
+   public List<MultiEnvTarget> getMultiEnvTargets() {
+      return multiEnvTargets;
+   }
 }
