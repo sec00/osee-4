@@ -81,6 +81,8 @@ public interface DispoApi {
 
    void copyDispoSetCoverage(BranchId sourceBranch, Long sourceCoverageUuid, BranchId destBranch, String destSetId, CopySetParams params, String userName);
 
+   boolean editDispoConfig(BranchId branch, DispoConfig config, String userName);
+
    // Deletes
 
    boolean deleteDispoSet(BranchId branch, String dispoSetId, String userName);

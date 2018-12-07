@@ -35,7 +35,9 @@ import org.eclipse.osee.disposition.model.Discrepancy;
 import org.eclipse.osee.disposition.model.DispoAnnotationData;
 import org.eclipse.osee.disposition.model.DispoItem;
 import org.eclipse.osee.disposition.model.DispoItemData;
+import org.eclipse.osee.disposition.model.DispoSet;
 import org.eclipse.osee.disposition.model.DispoSummarySeverity;
+import org.eclipse.osee.disposition.model.MultiEnvSettings;
 import org.eclipse.osee.disposition.model.OperationReport;
 import org.eclipse.osee.disposition.rest.DispoApiConfiguration;
 import org.eclipse.osee.disposition.rest.DispoImporterApi;
@@ -84,8 +86,9 @@ public class LisFileParser implements DispoImporterApi {
    private final Set<String> alreadyUsedDatIds = new HashSet<>();
    private final Set<String> alreadyUsedFileNames = new HashSet<>();
    // multi env
-   private final Map<String, Set<DispoItemData>> origNameToTwinItems = new HashMap<>();
+   private final Map<String, String> origNameToTwinItemNames = new HashMap<>();
    private final Set<String> itemsFoundInDatFiles = new HashSet<>();
+   private final Map<String, String> itemNameToDatId = new HashMap<>();
 
    private final DispoConnector dispoConnector;
    private final DispoApiConfiguration config;
@@ -99,7 +102,8 @@ public class LisFileParser implements DispoImporterApi {
    }
 
    @Override
-   public List<DispoItem> importDirectory(Map<String, DispoItem> exisitingItems, File filesDir, OperationReport report) {
+   public List<DispoItem> importDirectory(DispoSet set, Map<String, DispoItem> exisitingItems, File filesDir, OperationReport report) {
+      MultiEnvSettings multiEnvSettings = set.getMultiEnvSettings();
       vCastDir = filesDir.getAbsolutePath() + File.separator + "vcast";
       File f = new File(vCastDir + File.separator + "cover.db");
 
@@ -113,7 +117,7 @@ public class LisFileParser implements DispoImporterApi {
       HashMap<String, File> nameToFileMap = createNameToFileMap(report);
 
       for (VCastInstrumentedFile instrumentedFile : instrumentedFiles) {
-         processInstrumented(dataStore, instrumentedFile, nameToFileMap, report);
+         processInstrumented(multiEnvSettings, dataStore, instrumentedFile, nameToFileMap, report);
       }
 
       Collection<VCastResult> results = getResultFiles(dataStore);
@@ -172,7 +176,7 @@ public class LisFileParser implements DispoImporterApi {
 
       // make a flag for multi env operation, could be time consuming
       MultiEnvCopier multiEnvCopier = new MultiEnvCopier();
-      multiEnvCopier.copy(origNameToTwinItems, itemsFoundInDatFiles, report);
+      multiEnvCopier.copy(origNameToTwinItemNames, itemsFoundInDatFiles, report);
 
       for (DispoItem item : toReturn) {
          if (item.getStatus().equalsIgnoreCase("incomplete")) {
@@ -257,7 +261,7 @@ public class LisFileParser implements DispoImporterApi {
       return instrumentedFiles;
    }
 
-   private void processInstrumented(VCastDataStore dataStore, VCastInstrumentedFile instrumentedFile, HashMap<String, File> nameToFileMap, OperationReport report) {
+   private void processInstrumented(MultiEnvSettings multiEnvSettings, VCastDataStore dataStore, VCastInstrumentedFile instrumentedFile, HashMap<String, File> nameToFileMap, OperationReport report) {
       VCastSourceFileJoin sourceFile = null;
       try {
          sourceFile = dataStore.getSourceFileJoin(instrumentedFile);
@@ -299,8 +303,8 @@ public class LisFileParser implements DispoImporterApi {
             }
 
             for (VCastFunction function : functions) {
-               processFunction(instrumentedFile, lisFileParser, fileNum, dataStore, instrumentedFile, function,
-                  dataStore.getIsMCDC(), report);
+               processFunction(multiEnvSettings, instrumentedFile, lisFileParser, fileNum, dataStore, instrumentedFile,
+                  function, dataStore.getIsMCDC(), report);
             }
          } else {
             report.addEntry("VCast", String.format("Could not find file: %s", normalizedName), ERROR);
@@ -309,7 +313,7 @@ public class LisFileParser implements DispoImporterApi {
       }
    }
 
-   private void processFunction(VCastInstrumentedFile lisFile, VCastLisFileParser lisFileParser, int fileNum, VCastDataStore dataStore, VCastInstrumentedFile instrumentedFile, VCastFunction function, boolean isMCDCFile, OperationReport report) {
+   private void processFunction(MultiEnvSettings multiEnvSettings, VCastInstrumentedFile lisFile, VCastLisFileParser lisFileParser, int fileNum, VCastDataStore dataStore, VCastInstrumentedFile instrumentedFile, VCastFunction function, boolean isMCDCFile, OperationReport report) {
       int functionNum = function.getFindex();
       DispoItemData newItem = new DispoItemData();
       newItem.setAnnotationsList(new ArrayList<DispoAnnotationData>());
@@ -332,14 +336,10 @@ public class LisFileParser implements DispoImporterApi {
 
       String datId = generateDatId(fileNum, functionNum);
       datIdToItem.put(datId, newItem);
+      //      checkForMultiEnvRename(fileNum, instrumentedFile, newItem);
+      checkForMultiEnv(multiEnvSettings, fileNum, instrumentedFile, newItem);
+      itemNameToDatId.put(newItem.getName(), datId);
 
-      checkForMultiEnvRename(fileNum, instrumentedFile, newItem);
-         Set<DispoItemData> twinItems = origNameToTwinItems.get(nameWithoutId);
-         if (twinItems == null) {
-            twinItems = new HashSet<>();
-         }
-         twinItems.add(newItem);
-         origNameToTwinItems.put(nameWithoutId, twinItems);
       Collection<VCastStatementCoverage> statementCoverageItems = Collections.emptyList();
 
       try {
@@ -360,6 +360,22 @@ public class LisFileParser implements DispoImporterApi {
 
       // add discrepancies to item
       newItem.setDiscrepanciesList(discrepancies);
+   }
+
+   private void checkForMultiEnv(MultiEnvSettings settings, int fileNum, VCastInstrumentedFile instrumentedFile, DispoItemData item) {
+      String nameWithouId = item.getName();
+      checkForMultiEnvRename(fileNum, instrumentedFile, item);
+      String pathToCheck = translateToRegex(settings.getMultiEnvTarget().getPath());
+      if (instrumentedFile.getLISFile().matches(pathToCheck)) {
+         origNameToTwinItemNames.put(item.getName(), nameWithouId);
+      } else {
+         origNameToTwinItemNames.put(nameWithouId, item.getName());
+      }
+   }
+
+   private String translateToRegex(String s) {
+      String directorySlash = s.replaceAll("(\\\\|/)", "(\\\\\\\\|/)");
+      return String.format(".*?%s.*", directorySlash);
    }
 
    private void checkForMultiEnvRename(int fileNum, VCastInstrumentedFile instrumentedFile, DispoItemData newItem) {

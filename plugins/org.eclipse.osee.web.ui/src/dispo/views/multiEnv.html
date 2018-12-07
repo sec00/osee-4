@@ -1,0 +1,24 @@
+<div class="modal-header">
+    <h3 class="modal-title">Copy From Coverage</h3>
+</div>
+<div class="modal-body" overflow: auto;>
+    <div class="form-group">
+        Select a Set to Configure for Multi Env
+        <select class="form-control" ng-change="initTargetsSelect()" ng-model="selectedSet" ng-options="obj as obj.name for obj in setsLocal"></select>
+    </div>
+    <div ng-show="selectedSet != null">
+        <div class="form-group">
+            Enable
+            <input type="checkbox" class="form-control" ng-model="selectedSet.isMultiEnv">
+        </div>
+        <div class="form-group">
+            Select Multi Environment Target
+            <select class="form-control" ng-model="selectedSet.multiEnvSettings.multiEnvTarget" ng-options="obj as obj.name for obj in multiEnvTargets"></select>
+        </div>
+        Path: <input id="multiEnvTargePathInput" readonly type="text" ng-model="selectedSet.multiEnvSettings.multiEnvTarget.path">
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()">OK</button>
+    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>

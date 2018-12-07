@@ -12,9 +12,12 @@ package org.eclipse.osee.disposition.rest.internal;
 
 import java.util.List;
 import org.eclipse.osee.disposition.model.DispoConfig;
+import org.eclipse.osee.disposition.model.DispoConfigData;
+import org.eclipse.osee.disposition.model.MultiEnvTarget;
 import org.eclipse.osee.disposition.model.ResolutionMethod;
 import org.eclipse.osee.disposition.rest.util.DispoUtil;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
+import org.eclipse.osee.framework.core.util.JsonUtil;
 import org.eclipse.osee.orcs.data.ArtifactReadable;
 
 /**
@@ -33,11 +36,26 @@ public class DispoConfigArtifact implements DispoConfig {
       List<String> attributes = artifact.getAttributeValues(CoreAttributeTypes.GeneralStringData);
       String resolutions = "";
       for (String attribute : attributes) {
-         if (attribute.startsWith("RESOLUTION_METHODS")) {
+         if (attribute.startsWith("{")) {
+            return JsonUtil.readValue(attribute, DispoConfigData.class).getValidResolutions();
+         } else if (attribute.startsWith("RESOLUTION_METHODS")) {
             resolutions = attribute.replaceFirst("RESOLUTION_METHODS=", "");
-            break;
          }
       }
       return DispoUtil.jsonStringToList(resolutions, ResolutionMethod.class);
+   }
+
+   @Override
+   public List<MultiEnvTarget> getMultiEnvTargets() {
+      List<String> attributes = artifact.getAttributeValues(CoreAttributeTypes.GeneralStringData);
+      String resolutionsJson = "";
+      for (String attribute : attributes) {
+         if (attribute.startsWith("{")) {
+            return JsonUtil.readValue(attribute, DispoConfigData.class).getMultiEnvTargets();
+         } else if (attribute.startsWith("RESOLUTION_METHODS")) {
+            resolutionsJson = "[]";
+         }
+      }
+      return DispoUtil.jsonStringToList(resolutionsJson, MultiEnvTarget.class);
    }
 }

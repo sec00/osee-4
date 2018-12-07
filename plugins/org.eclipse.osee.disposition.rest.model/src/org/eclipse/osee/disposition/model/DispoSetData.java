@@ -14,12 +14,14 @@ package org.eclipse.osee.disposition.model;
 import java.util.Date;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 /**
  * @author Angel Avila
  */
 
 @XmlRootElement(name = "DispoSetData")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DispoSetData extends DispoSetDescriptorData implements DispoSet {
 
    private String guid;
@@ -30,6 +32,8 @@ public class DispoSetData extends DispoSetDescriptorData implements DispoSet {
    private String ciSet;
    private String rerunList;
    private Date time;
+   private Boolean isMultiEnv;
+   private MultiEnvSettings multiEnvSetting;
 
    public DispoSetData() {
 
@@ -104,5 +108,23 @@ public class DispoSetData extends DispoSetDescriptorData implements DispoSet {
 
    public void setTime(Date time) {
       this.time = time;
+   }
+
+   @Override
+   public Boolean getIsMultiEnv() {
+      return isMultiEnv;
+   }
+
+   public void setIsMultiEnv(boolean isMultiEnv) {
+      this.isMultiEnv = isMultiEnv;
+   }
+
+   @Override
+   public MultiEnvSettings getMultiEnvSettings() {
+      return multiEnvSetting;
+   }
+
+   public void setMultiEnvSettings(MultiEnvSettings multiEnvSetting) {
+      this.multiEnvSetting = multiEnvSetting;
    }
 }

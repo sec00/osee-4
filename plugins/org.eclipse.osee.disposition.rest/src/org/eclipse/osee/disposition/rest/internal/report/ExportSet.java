@@ -117,7 +117,6 @@ public class ExportSet {
       Map<String, Integer> resolutionToCount = new HashMap<>();
       Map<String, Pair<Integer, Integer>> unitToCovered = new HashMap<>();
       DispoConfig config = dispoApi.getDispoConfig(branch);
-      config.getValidResolutions();
       for (ResolutionMethod resolution : config.getValidResolutions()) {
          resolutionToCount.put(resolution.getText(), 0);
       }

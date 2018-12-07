@@ -13,6 +13,8 @@ package org.eclipse.osee.disposition.rest.internal;
 import java.util.Date;
 import java.util.List;
 import org.eclipse.osee.disposition.model.DispoSet;
+import org.eclipse.osee.disposition.model.MultiEnvSettings;
+import org.eclipse.osee.disposition.model.MultiEnvTarget;
 import org.eclipse.osee.disposition.model.Note;
 import org.eclipse.osee.disposition.model.OperationReport;
 import org.eclipse.osee.disposition.rest.DispoConstants;
@@ -82,5 +84,22 @@ public class DispoSetArtifact extends BaseIdentity<String> implements DispoSet {
    @Override
    public Date getTime() {
       return artifact.getSoleAttributeValue(DispoConstants.DispoTime, null);
+   }
+
+   @Override
+   public Boolean getIsMultiEnv() {
+      return true;
+      // need to create attribute
+   }
+
+   @Override
+   public MultiEnvSettings getMultiEnvSettings() {
+      MultiEnvSettings t = new MultiEnvSettings();
+      MultiEnvTarget m = new MultiEnvTarget();
+      m.setName("ARINC");
+      m.setPath("src_host/vx_4080_653");
+      t.setMultiEnvTarget(m);
+      return t;
+      // need to create attribute
    }
 }

@@ -72,6 +72,10 @@ button#mergetAnnotationsBtn {
     max-width: 0px;
 }
 
-.state-btn {
-	'btn btn-default';
+.config-json-invalid{
+	background-color: pink;
+}
+
+input#multiEnvTargePathInput {
+    border: none;
 }

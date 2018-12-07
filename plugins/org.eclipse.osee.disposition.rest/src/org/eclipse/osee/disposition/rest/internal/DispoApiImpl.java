@@ -139,6 +139,12 @@ public class DispoApiImpl implements DispoApi {
    }
 
    @Override
+   public boolean editDispoConfig(BranchId branch, DispoConfig config, String userName) {
+      ArtifactReadable author = getQuery().findUserByName(userName);
+      return getWriter().editDispoConfig(author, branch, config);
+   }
+
+   @Override
    public Long createDispoProgram(String name, String userName) {
       ArtifactReadable author = getQuery().findUserByName(userName);
       return getWriter().createDispoProgram(author, name);
@@ -553,7 +559,7 @@ public class DispoApiImpl implements DispoApi {
             }
 
             List<DispoItem> itemsFromParse =
-               importer.importDirectory(nameToItemMap, new File(setToEdit.getImportPath()), report);
+               importer.importDirectory(setToEdit, nameToItemMap, new File(setToEdit.getImportPath()), report);
 
             List<DispoItem> itemsToCreate = new ArrayList<>();
             List<DispoItem> itemsToEdit = new ArrayList<>();

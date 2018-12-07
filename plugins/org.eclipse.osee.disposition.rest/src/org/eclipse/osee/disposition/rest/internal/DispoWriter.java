@@ -12,6 +12,7 @@ package org.eclipse.osee.disposition.rest.internal;
 
 import java.util.Collection;
 import java.util.List;
+import org.eclipse.osee.disposition.model.DispoConfig;
 import org.eclipse.osee.disposition.model.DispoItem;
 import org.eclipse.osee.disposition.model.DispoSet;
 import org.eclipse.osee.disposition.model.DispoStorageMetadata;
@@ -43,5 +44,7 @@ public interface DispoWriter {
    void updateOperationSummary(ArtifactReadable author, BranchId branch, String setId, OperationReport summary);
 
    String createDispoReport(BranchId branch, ArtifactReadable author, String contens, String operationTitle);
+
+   boolean editDispoConfig(ArtifactReadable author, BranchId branch, DispoConfig config);
 
 }

@@ -30,12 +30,15 @@ import org.eclipse.osee.disposition.model.DispoConfig;
 import org.eclipse.osee.disposition.model.DispoItem;
 import org.eclipse.osee.disposition.model.DispoSet;
 import org.eclipse.osee.disposition.model.DispoStorageMetadata;
+import org.eclipse.osee.disposition.model.DispoStrings;
+import org.eclipse.osee.disposition.model.MultiEnvSettings;
 import org.eclipse.osee.disposition.model.Note;
 import org.eclipse.osee.disposition.model.OperationReport;
 import org.eclipse.osee.disposition.rest.DispoConstants;
 import org.eclipse.osee.disposition.rest.internal.importer.coverage.CoverageUtil;
 import org.eclipse.osee.disposition.rest.util.DispoUtil;
 import org.eclipse.osee.framework.core.data.ArtifactId;
+import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.Branch;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.IArtifactType;
@@ -207,6 +210,46 @@ public class OrcsStorageImpl implements Storage {
    }
 
    @Override
+   public boolean editDispoConfig(ArtifactReadable author, BranchId branch, DispoConfig config) {
+      boolean doesConfigExist = false;
+      ArtifactReadable configArt =
+         getQuery().fromBranch(branch).andNameEquals("Program Config").getResults().getOneOrDefault(
+            ArtifactReadable.SENTINEL);
+      if (configArt.isValid()) {
+         doesConfigExist = true;
+      }
+
+      TransactionBuilder tx = getTxFactory().createTransaction(branch, author, "Update Dispo Set");
+      if (doesConfigExist) {
+         List<String> attributes = configArt.getAttributeValues(CoreAttributeTypes.GeneralStringData);
+         if (attributes.isEmpty()) {
+            tx.createAttribute(configArt, CoreAttributeTypes.GeneralStringData, JsonUtil.toJson(config));
+         } else {
+            String legacyConfigString = "";
+            for (String attribute : attributes) {
+               if (attribute.startsWith(DispoStrings.CONFIG_RESOLUTION_METHODS_KEY)) {
+                  legacyConfigString = attribute;
+                  break;
+               }
+            }
+            if (Strings.isValid(legacyConfigString)) {
+               tx.setAttributesFromStrings(configArt, CoreAttributeTypes.GeneralStringData, legacyConfigString,
+                  JsonUtil.toJson(config));
+            } else {
+               tx.setAttributesFromStrings(configArt, CoreAttributeTypes.GeneralStringData, JsonUtil.toJson(config));
+            }
+         }
+      } else {
+         ArtifactToken createArtifact = tx.createArtifact(CoreArtifactTypes.GeneralData, DispoStrings.Dispo_Config_Art);
+         tx.createAttribute(createArtifact, CoreAttributeTypes.GeneralStringData, JsonUtil.toJson(config));
+      }
+      tx.commit();
+
+      return true;
+
+   }
+
+   @Override
    public Long createDispoProgram(ArtifactReadable author, String name) {
       String normalizedName = "(DISPO)" + name;
       IOseeBranch branch = IOseeBranch.create(normalizedName);
@@ -275,6 +318,8 @@ public class OrcsStorageImpl implements Storage {
       String ciSet = newData.getCiSet();
       String rerunList = newData.getRerunList();
       Date time = newData.getTime();
+      MultiEnvSettings multiEnvSettings = newData.getMultiEnvSettings();
+      boolean isMuliEnv = newData.getIsMultiEnv();
 
       List<Note> notesList = new LinkedList<>();
       if (newData.getNotesList() != null) {
@@ -300,6 +345,14 @@ public class OrcsStorageImpl implements Storage {
       }
       if (time != null && !time.equals(origSetAs.getTime())) {
          tx.setSoleAttributeValue(dispoSet, DispoConstants.DispoTime, time);
+      }
+      if (multiEnvSettings != null && !multiEnvSettings.equals(origSetAs.getMultiEnvSettings())) {
+         System.out.println(multiEnvSettings);
+         //         tx.setSoleAttributeFromStream(dispoSet, attributeType, stream);
+      }
+      if (isMuliEnv != origSetAs.getIsMultiEnv()) {
+         System.out.println(isMuliEnv);
+         //         tx.setSoleAttributeFromStream(dispoSet, attributeType, stream);
       }
       tx.commit();
    }
@@ -502,7 +555,7 @@ public class OrcsStorageImpl implements Storage {
    @Override
    public DispoConfig findDispoConfig(BranchId branch) {
       ArtifactReadable config =
-         getQuery().fromBranch(branch).andNameEquals("Program Config").getResults().getOneOrDefault(
+         getQuery().fromBranch(branch).andNameEquals(DispoStrings.Dispo_Config_Art).getResults().getOneOrDefault(
             ArtifactReadable.SENTINEL);
 
       if (config.isInvalid()) {

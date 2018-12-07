@@ -54,7 +54,7 @@ public class DispoStrings {
 
    public static final String DeletedDiscrepancy = "Deleted Discrepancy";
 
-   public static final String Dispo_Config_Art = "Dispo_Config";
+   public static final String Dispo_Config_Art = "Program Config";
 
    public static final String Test_Unit_Resolution = "Test_Script";
    public static final String Exception_Handling_Resolution = "Exception_Handling";
@@ -82,5 +82,8 @@ public class DispoStrings {
    public static final String STATE_OK = "OK";
    public static final String STATE_WARNING = "Warnings";
    public static final String STATE_FAIL = "Failed";
+
+   public static final String CONFIG_RESOLUTION_METHODS_KEY = "RESOLUTION_METHODS";
+   public static final String CONFIG_MULTI_ENV_OPTION_KEY = "MULTI_ENV_OPTIONS";
 
 }

@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import org.eclipse.osee.disposition.model.DispoAnnotationData;
 import org.eclipse.osee.disposition.model.DispoItem;
 import org.eclipse.osee.disposition.model.DispoItemData;
+import org.eclipse.osee.disposition.model.DispoSet;
 import org.eclipse.osee.disposition.model.DispoSummarySeverity;
 import org.eclipse.osee.disposition.model.OperationReport;
 import org.eclipse.osee.disposition.rest.DispoImporterApi;
@@ -50,7 +51,7 @@ public class TmoImporter implements DispoImporterApi {
    }
 
    @Override
-   public List<DispoItem> importDirectory(Map<String, DispoItem> exisitingItems, File tmoDirectory, OperationReport report) {
+   public List<DispoItem> importDirectory(DispoSet set, Map<String, DispoItem> exisitingItems, File tmoDirectory, OperationReport report) {
       List<DispoItem> toReturn = new LinkedList<>();
       if (tmoDirectory.isDirectory()) {
 

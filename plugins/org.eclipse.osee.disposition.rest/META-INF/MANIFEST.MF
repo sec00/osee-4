@@ -13,6 +13,7 @@ Import-Package:
  javax.ws.rs,
  javax.ws.rs.core,
  javax.ws.rs.ext,
+ org.codehaus.groovy.util;version="2.4.6",
  org.codehaus.jackson,
  org.codehaus.jackson.annotate,
  org.codehaus.jackson.map,

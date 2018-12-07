@@ -28,6 +28,7 @@ import org.codehaus.jackson.type.TypeReference;
 import org.eclipse.osee.disposition.model.Discrepancy;
 import org.eclipse.osee.disposition.model.DispoItem;
 import org.eclipse.osee.disposition.model.DispoItemData;
+import org.eclipse.osee.disposition.model.DispoSet;
 import org.eclipse.osee.disposition.model.OperationReport;
 import org.eclipse.osee.disposition.rest.DispoImporterApi;
 import org.eclipse.osee.disposition.rest.internal.DispoDataFactory;
@@ -54,7 +55,7 @@ public class TmzImporter implements DispoImporterApi {
    }
 
    @Override
-   public List<DispoItem> importDirectory(Map<String, DispoItem> exisitingItems, File filesDir, OperationReport report) {
+   public List<DispoItem> importDirectory(DispoSet set, Map<String, DispoItem> exisitingItems, File filesDir, OperationReport report) {
       List<DispoItem> toReturn = new LinkedList<>();
       if (!filesDir.exists() || !filesDir.isDirectory()) {
          throw new OseeArgumentException("Input directory does not exists or is not a directory [%s]",

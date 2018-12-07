@@ -231,6 +231,12 @@ app.provider('Config', function() {
     this.$get = ['$resource',
         function($resource) {
             var Config = $resource('/dispo/program/:programId/config', {}, {
+                update: {
+                    method: 'PUT',
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }
             });
             return Config;
         }
