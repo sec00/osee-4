@@ -262,6 +262,9 @@ public class OrcsStorageImpl implements Storage {
                tx.setAttributesFromStrings(configArt, CoreAttributeTypes.GeneralStringData, legacyConfigString,
                   JsonUtil.toJson(config));
             } else {
+               // Needed to appease legacy code. Can remove when all Dispo Configs use proper json and code is pushed to release
+               legacyConfigString = String.format("%s=%s", DispoStrings.CONFIG_RESOLUTION_METHODS_KEY,
+                  JsonUtil.toJson(config.getValidResolutions()));
                tx.setAttributesFromStrings(configArt, CoreAttributeTypes.GeneralStringData, JsonUtil.toJson(config));
             }
          }
