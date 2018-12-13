@@ -17,8 +17,10 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.eclipse.osee.disposition.model.Discrepancy;
@@ -43,24 +45,52 @@ import org.eclipse.osee.framework.jdk.core.util.io.xml.ExcelXmlWriter;
  */
 public class ExportSet {
    private final DispoApi dispoApi;
-   private int totalStatementCount;
-   private int totalBranchCount;
-   private int totalMCDCPairCount;
-   private int totalStatementCoveredCount;
-   private final CoverageLevel coverageLevel = CoverageLevel.Unset;
+   Map<CoverageLevel, Integer> levelToTotalCount = new HashMap<>();
+   Map<CoverageLevel, Integer> levelToCoveredTotalCount = new HashMap<>();
+   //   private int totalStatementCount;
+   //   private int totalBranchCount;
+   //   private int totalMCDCPairCount;
+   //   private int coveredStatementCount;
+   //   private int coveredBranchCount;
+   //   private int coveredMCDCPairCount;
+
+   private final Set<CoverageLevel> coverageLevels = new HashSet<>();
+
+   private final int TRUE_PRESENT_INT_VALUE = 2;
+   private final int FALSE_PRESENT_INT_VALUE = 1;
+   private final int BOTH_PRESENT_INT_VALUE = 3;
 
    private enum CoverageLevel {
       A,
       B,
       C,
-      Unset
+   }
+
+   private class WrapInt {
+      private int value;
+      
+      private WrapInt(int initValue) {
+         value = initValue;
+      }
+      
+      private void inc() {
+         value++;
+      }
+       
+      private void inc(int incAmt) {
+         value += incAmt;
+      }
+      
+      private int getValue() {
+         return value;
+      }
    }
 
    public ExportSet(DispoApi dispoApi) {
       this.dispoApi = dispoApi;
    }
 
-   public void runReport(BranchId branch, DispoSet setPrimary, String option, OutputStream outputStream) {
+   public void runDispoReport(BranchId branch, DispoSet setPrimary, String option, OutputStream outputStream) {
       List<DispoItem> items = dispoApi.getDispoItems(branch, setPrimary.getGuid(), true);
 
       try {
@@ -120,23 +150,29 @@ public class ExportSet {
    }
 
    public void runCoverageReport(BranchId branch, DispoSet setPrimary, String option, OutputStream outputStream) {
-      totalStatementCount = 0;
-      totalStatementCoveredCount = 0;
+      // For now, always safe to assume there will at least be level c coverage. Other levels are determined later
+      coverageLevels.add(CoverageLevel.C);
+
+      for (CoverageLevel level : CoverageLevel.values()) {
+         levelToTotalCount.put(level, 0);
+         levelToCoveredTotalCount.put(level, 0);
+      }
+
       List<DispoItem> items = dispoApi.getDispoItems(branch, setPrimary.getGuid(), true);
 
       Map<CoverageLevel, Map<String, Integer>> levelToResolutionToCount = new HashMap<>();
 
       Map<CoverageLevel, Map<String, Pair<Integer, Integer>>> leveltoUnitToCovered = new HashMap<>();
 
+      // Init map needed for Cover Sheet aka Resolution Types to Coverage %s
       DispoConfig config = dispoApi.getDispoConfig(branch);
       config.getValidResolutions();
       for (CoverageLevel level : CoverageLevel.values()) {
          Map<String, Integer> innerMap = new HashMap<>();
-         // TODO: update
          for (ResolutionMethod resolution : config.getValidResolutions()) {
             innerMap.put(resolution.getText(), 0);
          }
-
+         levelToResolutionToCount.put(level, innerMap);
       }
 
       try {
@@ -153,50 +189,70 @@ public class ExportSet {
             Map<String, Map<String, Integer>> MCDCCountMap = new HashMap<>();
             List<DispoAnnotationData> annotations = item.getAnnotationsList();
             for (DispoAnnotationData annotation : annotations) {
-               writeRowAnnotation(sheetWriter, columns, item, annotation, setPrimary.getName(), resolutionToCount,
-                  leveltoUnitToCovered, branchCountMap, MCDCCountMap);
+               writeRowAnnotation(sheetWriter, columns, item, annotation, setPrimary.getName(),
+                  levelToResolutionToCount, leveltoUnitToCovered, branchCountMap, MCDCCountMap);
             }
          }
 
          sheetWriter.endSheet();
 
-         // Write Cover Sheet
+         // START COVER SHEET
          sheetWriter.startSheet("Cover Sheet", headers.length);
          Object[] coverSheetHeaders = {" ", "statement", "brach", "MCDC", "Total"};
          sheetWriter.writeRow(coverSheetHeaders);
-         Object[] row = new String[5];
+         Object[] row = new String[CoverageLevel.values().length + 1];
          row[0] = "All Coverage Methods";
 
          // send correct numbers according to level for second param
-         row[1] = getPercent(totalStatementCount, totalCoveredCount, false);
+         int index = 1;
+         for (CoverageLevel level : CoverageLevel.values()) {
+            row[index++] = getPercent(levelToTotalCount.get(level), levelToCoveredTotalCount.get(level), false);
+         }
 
          sheetWriter.writeRow(row);
-         for (String resolution : resolutionToCount.keySet()) {
+         // $%$
+         // Bit of an assumption here but since we're assuming there will be at least level C coverage we'll use those resolution to iterate over
+         // also assuming that the resolutions are the same for all levels
+         Set<String> resolutions = levelToResolutionToCount.get(CoverageLevel.C).keySet();
+
+         for (String resolution : resolutions) {
             row[0] = resolution;
-
-            // send correct number according to level for second param
-            row[1] = getPercent(totalStatementCount, resolutionToCount.get(resolution), false);
-
+            index = 1;
+            for (CoverageLevel level : CoverageLevel.values()) {
+               Map<String, Integer> resolutionToCovered = levelToResolutionToCount.get(level);
+               row[index++] = getPercent(levelToTotalCount.get(level), resolutionToCovered.get(resolution), false);
+            }
             sheetWriter.writeRow(row);
          }
+
          sheetWriter.endSheet();
+         // END COVER SHEET
 
          // Write Summary Sheet
-         Object[] summarySheetHeaders = {"Unit", "Lines Covered", "Total Lines", "Percent Coverage"};
-         sheetWriter.startSheet("Summary Sheet", summarySheetHeaders.length);
+         Object[] summarySheetHeaders = getHeadersSummarySheet();
+         columns = summarySheetHeaders.length;
+         sheetWriter.startSheet("Summary Sheet", columns);
          sheetWriter.writeRow(summarySheetHeaders);
-         Object[] row2 = new String[4];
-         for (String unit : unitToCovered.keySet()) {
-            row2[0] = unit;
-            Pair<Integer, Integer> coveredOverTotal = unitToCovered.get(unit);
-            int covered = coveredOverTotal.getFirst();
-            int total = coveredOverTotal.getSecond();
-            row2[1] = String.valueOf(covered);
-            row2[2] = String.valueOf(total);
-            Double percent = (((double) covered / total) * 100);
-            row2[3] = String.format("%2.2f%%", percent);
-            sheetWriter.writeRow(row2);
+
+         Object[] row2 = new String[columns];
+         // Similar assumption here as above
+         Set<String> units = leveltoUnitToCovered.get(CoverageLevel.C).keySet();
+         for (String unit : units) {
+            index = 0;
+            row2[index++] = unit;
+            for (CoverageLevel level : CoverageLevel.values()) {
+               Map<String, Pair<Integer, Integer>> unitToCovered = leveltoUnitToCovered.get(level);
+               Pair<Integer, Integer> coveredOverTotal = unitToCovered.get(unit);
+               int covered = coveredOverTotal.getFirst();
+               int total = coveredOverTotal.getSecond();
+               row2[index++] = String.valueOf(covered);
+               row2[index++] = String.valueOf(total);
+               Double percent = (((double) covered / total) * 100);
+               row2[index++] = String.format("%2.2f%%", percent);
+               sheetWriter.writeRow(row2);
+            }
          }
+
          sheetWriter.endSheet();
 
          // Write Test_Script Sheet
@@ -263,7 +319,7 @@ public class ExportSet {
       return String.format("%2.2f%% - %d / %d", percent, complete, total);
    }
 
-   private void writeRowAnnotation(ExcelXmlWriter sheetWriter, int columns, DispoItem item, DispoAnnotationData annotation, String setName, Map<String, Integer> resolutionToCount, Map<String, Map<String, Pair<Integer, Integer>>> levelToUnitsToCovered, Map<String, Integer> branchCountMap, Map<String, Map<String, Integer>> MCDCCountMap) throws IOException {
+   private void writeRowAnnotation(ExcelXmlWriter sheetWriter, int columns, DispoItem item, DispoAnnotationData annotation, String setName, Map<CoverageLevel, Map<String, Integer>> levelToResolutionToCount, Map<CoverageLevel, Map<String, Pair<Integer, Integer>>> levelToUnitsToCovered, Map<String, Integer> branchCountMap, Map<String, Map<String, Integer>> MCDCCountMap) throws IOException {
       String[] row = new String[columns];
       int index = 0;
       row[index++] = getNameSpace(item, setName);
@@ -288,15 +344,29 @@ public class ExportSet {
 
       sheetWriter.writeRow((Object[]) row);
 
-      extracted(resolutionToCount, levelToUnitsToCovered, unit, coverageMethod);
+      // location ex. 24, 24.T, 24.A.RESULT
+
+      extracted(levelToResolutionToCount, levelToUnitsToCovered, unit, coverageMethod, branchCountMap, MCDCCountMap,
+         annotation.getLocationRefs());
    }
 
-   private void extracted(Map<String, Integer> resolutionToCount, Map<String, Map<String, Pair<Integer, Integer>>> levelToUnitsToCovered, String unit, String coverageMethod) {
-      totalStatementCount++;
-      // determine level to dtermine which count to update
+   private void extracted(Map<CoverageLevel, Map<String, Integer>> levelToResolutionToCount, Map<CoverageLevel, Map<String, Pair<Integer, Integer>>> levelToUnitsToCovered, String unit, String coverageMethod, Map<String, Integer> branchCountMap, Map<String, Map<String, Integer>> MCDCCountMap, String location) {
+      // Safe to increment total count for level C since it's just by line
+      levelToTotalCount.put(CoverageLevel.C, levelToTotalCount.get(CoverageLevel.C) + 1);
 
-      // DO MATH FOR NUMBERS
-      // Update Coverage Resolution Count
+      // if location matches level b (branch)
+      String branchName = ""; // Basically strip out the .T or .F out of location
+      // TODO get from the .T or .F part of location string
+      int branchPathValue = true ? TRUE_PRESENT_INT_VALUE : FALSE_PRESENT_INT_VALUE;
+      Integer integer = branchCountMap.get(branchName);
+      if (integer != null) {
+         branchCountMap.put(branchName, integer + branchPathValue);
+      } else {
+         branchCountMap.put(branchName, branchPathValue);
+      }
+
+      // Update Coverage Resolution Count for level C here, level a and be will be done once all the item's annotations have been processed
+      Map<String, Integer> resolutionToCount = levelToResolutionToCount.get(CoverageLevel.C);
       Integer count = resolutionToCount.get(coverageMethod);
       if (Strings.isValid(coverageMethod)) {
          if (count == null) {
@@ -305,27 +375,33 @@ public class ExportSet {
             resolutionToCount.put(coverageMethod, ++count);
          }
       }
+      // Might do away with this line because of changing by reference above
+      levelToResolutionToCount.put(CoverageLevel.C, resolutionToCount);
 
-      // Update
-      Map<String, Pair<Integer, Integer>> unitToCovered = levelToUnitsToCovered.get(coverageLevel);
+      // Update unit count for level C here level a and b will also be done after all item's annotations have been processed
+      Map<String, Pair<Integer, Integer>> unitToCovered = levelToUnitsToCovered.get(CoverageLevel.C);
       Pair<Integer, Integer> coveredOverTotal = unitToCovered.get(unit);
 
-      int coveredCount;
+      int thisUnitsCoveredCount;
       if (Strings.isValid(coverageMethod)) {
-         coveredCount = 1;
-         totalStatementCoveredCount++;
+         thisUnitsCoveredCount = 1;
+         int temp = levelToCoveredTotalCount.get(CoverageLevel.C);
+         levelToCoveredTotalCount.put(CoverageLevel.C, temp++);
       } else {
-         coveredCount = 0;
+         thisUnitsCoveredCount = 0;
       }
       if (coveredOverTotal == null) {
-         Pair<Integer, Integer> newCount = new Pair<Integer, Integer>(coveredCount, 1);
+         Pair<Integer, Integer> newCount = new Pair<Integer, Integer>(thisUnitsCoveredCount, 1);
          unitToCovered.put(unit, newCount);
       } else {
          Integer currentCovered = coveredOverTotal.getFirst();
          Integer currentTotal = coveredOverTotal.getSecond();
-         Pair<Integer, Integer> newCount = new Pair<Integer, Integer>(currentCovered + coveredCount, ++currentTotal);
+         Pair<Integer, Integer> newCount =
+            new Pair<Integer, Integer>(currentCovered + thisUnitsCoveredCount, ++currentTotal);
          unitToCovered.put(unit, newCount);
       }
+      // Might do away with this line because of changing by reference above
+      levelToUnitsToCovered.put(CoverageLevel.C, unitToCovered);
    }
 
    private String getNormalizedName(String fullName) {
@@ -400,7 +476,21 @@ public class ExportSet {
          "Execution Line Number", //
          "Coverage Method", //
          "Coverage Rationale"}; //
-      //         "Text"};
+      return toReturn;
+   }
+
+   private static String[] getHeadersSummarySheet() {
+      String[] toReturn = {//
+         "Unit", //
+         "Statement Lines Covered", //
+         "Statement Lines Total", //
+         "Statement Lines % Coverage", //
+         "Branches Covered", //
+         "Branches Total",
+         "Branches % Coverage",
+         "MCDC Pairs Covered", //
+         "MCDC Pairs Total",
+         "MCDC Pairs % Coverage"}; //
       return toReturn;
    }
 }
