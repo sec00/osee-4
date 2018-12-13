@@ -44,7 +44,17 @@ import org.eclipse.osee.framework.jdk.core.util.io.xml.ExcelXmlWriter;
 public class ExportSet {
    private final DispoApi dispoApi;
    private int totalStatementCount;
-   private int totalCoveredCount;
+   private int totalBranchCount;
+   private int totalMCDCPairCount;
+   private int totalStatementCoveredCount;
+   private final CoverageLevel coverageLevel = CoverageLevel.Unset;
+
+   private enum CoverageLevel {
+      A,
+      B,
+      C,
+      Unset
+   }
 
    public ExportSet(DispoApi dispoApi) {
       this.dispoApi = dispoApi;
@@ -111,15 +121,22 @@ public class ExportSet {
 
    public void runCoverageReport(BranchId branch, DispoSet setPrimary, String option, OutputStream outputStream) {
       totalStatementCount = 0;
-      totalCoveredCount = 0;
+      totalStatementCoveredCount = 0;
       List<DispoItem> items = dispoApi.getDispoItems(branch, setPrimary.getGuid(), true);
 
-      Map<String, Integer> resolutionToCount = new HashMap<>();
-      Map<String, Pair<Integer, Integer>> unitToCovered = new HashMap<>();
+      Map<CoverageLevel, Map<String, Integer>> levelToResolutionToCount = new HashMap<>();
+
+      Map<CoverageLevel, Map<String, Pair<Integer, Integer>>> leveltoUnitToCovered = new HashMap<>();
+
       DispoConfig config = dispoApi.getDispoConfig(branch);
       config.getValidResolutions();
-      for (ResolutionMethod resolution : config.getValidResolutions()) {
-         resolutionToCount.put(resolution.getText(), 0);
+      for (CoverageLevel level : CoverageLevel.values()) {
+         Map<String, Integer> innerMap = new HashMap<>();
+         // TODO: update
+         for (ResolutionMethod resolution : config.getValidResolutions()) {
+            innerMap.put(resolution.getText(), 0);
+         }
+
       }
 
       try {
@@ -132,10 +149,12 @@ public class ExportSet {
          sheetWriter.writeRow((Object[]) headers);
 
          for (DispoItem item : items) {
+            Map<String, Integer> branchCountMap = new HashMap<>();
+            Map<String, Map<String, Integer>> MCDCCountMap = new HashMap<>();
             List<DispoAnnotationData> annotations = item.getAnnotationsList();
             for (DispoAnnotationData annotation : annotations) {
                writeRowAnnotation(sheetWriter, columns, item, annotation, setPrimary.getName(), resolutionToCount,
-                  unitToCovered, totalStatementCount);
+                  leveltoUnitToCovered, branchCountMap, MCDCCountMap);
             }
          }
 
@@ -143,15 +162,21 @@ public class ExportSet {
 
          // Write Cover Sheet
          sheetWriter.startSheet("Cover Sheet", headers.length);
-         Object[] coverSheetHeaders = {" ", setPrimary.getName()};
+         Object[] coverSheetHeaders = {" ", "statement", "brach", "MCDC", "Total"};
          sheetWriter.writeRow(coverSheetHeaders);
-         Object[] row = new String[2];
+         Object[] row = new String[5];
          row[0] = "All Coverage Methods";
-         row[1] = getPercent(totalCoveredCount, totalStatementCount, false);
+
+         // send correct numbers according to level for second param
+         row[1] = getPercent(totalStatementCount, totalCoveredCount, false);
+
          sheetWriter.writeRow(row);
          for (String resolution : resolutionToCount.keySet()) {
             row[0] = resolution;
-            row[1] = getPercent(resolutionToCount.get(resolution), totalStatementCount, false);
+
+            // send correct number according to level for second param
+            row[1] = getPercent(totalStatementCount, resolutionToCount.get(resolution), false);
+
             sheetWriter.writeRow(row);
          }
          sheetWriter.endSheet();
@@ -238,9 +263,7 @@ public class ExportSet {
       return String.format("%2.2f%% - %d / %d", percent, complete, total);
    }
 
-   private void writeRowAnnotation(ExcelXmlWriter sheetWriter, int columns, DispoItem item, DispoAnnotationData annotation, String setName, Map<String, Integer> resolutionToCount, Map<String, Pair<Integer, Integer>> unitToCovered, Integer totalNumber) throws IOException {
-      totalStatementCount++;
-
+   private void writeRowAnnotation(ExcelXmlWriter sheetWriter, int columns, DispoItem item, DispoAnnotationData annotation, String setName, Map<String, Integer> resolutionToCount, Map<String, Map<String, Pair<Integer, Integer>>> levelToUnitsToCovered, Map<String, Integer> branchCountMap, Map<String, Map<String, Integer>> MCDCCountMap) throws IOException {
       String[] row = new String[columns];
       int index = 0;
       row[index++] = getNameSpace(item, setName);
@@ -265,6 +288,14 @@ public class ExportSet {
 
       sheetWriter.writeRow((Object[]) row);
 
+      extracted(resolutionToCount, levelToUnitsToCovered, unit, coverageMethod);
+   }
+
+   private void extracted(Map<String, Integer> resolutionToCount, Map<String, Map<String, Pair<Integer, Integer>>> levelToUnitsToCovered, String unit, String coverageMethod) {
+      totalStatementCount++;
+      // determine level to dtermine which count to update
+
+      // DO MATH FOR NUMBERS
       // Update Coverage Resolution Count
       Integer count = resolutionToCount.get(coverageMethod);
       if (Strings.isValid(coverageMethod)) {
@@ -276,11 +307,13 @@ public class ExportSet {
       }
 
       // Update
+      Map<String, Pair<Integer, Integer>> unitToCovered = levelToUnitsToCovered.get(coverageLevel);
       Pair<Integer, Integer> coveredOverTotal = unitToCovered.get(unit);
+
       int coveredCount;
       if (Strings.isValid(coverageMethod)) {
          coveredCount = 1;
-         totalCoveredCount++;
+         totalStatementCoveredCount++;
       } else {
          coveredCount = 0;
       }
