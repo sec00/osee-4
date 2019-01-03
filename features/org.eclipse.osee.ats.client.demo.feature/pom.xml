@@ -5,13 +5,13 @@
 
 	<parent>
 		<groupId>org.eclipse.osee</groupId>
-		<artifactId>org.eclipse.osee.ats.parent</artifactId>
+		<artifactId>org.eclipse.osee.ats.ide.parent</artifactId>
 		<version>0.26.0-SNAPSHOT</version>
-		<relativePath>../../plugins/org.eclipse.osee.ats.parent</relativePath>
+		<relativePath>../../plugins/org.eclipse.osee.ats.ide.parent</relativePath>
 	</parent>
 
-	<artifactId>org.eclipse.osee.ats.client.demo.feature</artifactId>
+	<artifactId>org.eclipse.osee.ats.ide.demo.feature</artifactId>
 	<packaging>eclipse-feature</packaging>
-	<name>OSEE ATS Client Demo Feature (Incubation)</name>
+	<name>OSEE ATS IDE Demo Feature (Incubation)</name>
 
 </project>
