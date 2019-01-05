@@ -25,30 +25,30 @@
          <extension
          point="org.eclipse.ui.editors">
          <editor
-            class="org.eclipse.osee.ats.editor.WorkflowEditor"
+            class="org.eclipse.osee.ats.ide.editor.WorkflowEditor"
             icon="OSEE-INF/images/workflow.gif"
             default="false"            
-            contributorClass="org.eclipse.osee.ats.editor.WfeContributor"
-            id="org.eclipse.osee.ats.editor.WorkflowEditor"
+            contributorClass="org.eclipse.osee.ats.ide.editor.WfeContributor"
+            id="org.eclipse.osee.ats.ide.editor.WorkflowEditor"
             name="ATS Workflow Editor"/>
          <editor
-               class="org.eclipse.osee.ats.workflow.task.TaskEditor"
+               class="org.eclipse.osee.ats.ide.workflow.task.TaskEditor"
                default="false"
                icon="OSEE-INF/images/task.gif"
-               id="org.eclipse.osee.ats.editor.TaskEditor"
+               id="org.eclipse.osee.ats.ide.editor.TaskEditor"
                name="ATS Task Editor"/>
          <editor
-               class="org.eclipse.osee.ats.world.WorldEditor"
+               class="org.eclipse.osee.ats.ide.world.WorldEditor"
                default="false"
                icon="OSEE-INF/images/globe.gif"
-               id="org.eclipse.osee.ats.world.WorldEditor"
+               id="org.eclipse.osee.ats.ide.world.WorldEditor"
                name="ATS World Editor">
          </editor>
          <editor
-               class="org.eclipse.osee.ats.workdef.viewer.AtsWorkDefConfigEditor"
+               class="org.eclipse.osee.ats.ide.workdef.viewer.AtsWorkDefConfigEditor"
                default="false"
                icon="OSEE-INF/images/workDef.gif"
-               id="org.eclipse.osee.ats.workdef.viewer.AtsWorkflowConfigEditor"
+               id="org.eclipse.osee.ats.ide.workdef.viewer.AtsWorkflowConfigEditor"
                name="ATS Work Definition Viewer">
          </editor>
    </extension>
@@ -61,32 +61,32 @@
       <wizard
             canFinishEarly="false"
             category="org.eclipse.osee.category"
-            class="org.eclipse.osee.ats.actions.wizard.NewActionWizard"
+            class="org.eclipse.osee.ats.ide.actions.wizard.NewActionWizard"
             hasPages="true"
             icon="OSEE-INF/images/action.gif"
-            id="org.eclipse.osee.ats.NewAction.wizard"
+            id="org.eclipse.osee.ats.ide.NewAction.wizard"
             name="Action">
       </wizard>
       <wizard
             canFinishEarly="false"
             category="org.eclipse.osee.category"
-            class="org.eclipse.osee.ats.config.wizard.AtsConfigWizard"
+            class="org.eclipse.osee.ats.ide.config.wizard.AtsConfigWizard"
             hasPages="true"
             icon="OSEE-INF/images/workflow.gif"
-            id="org.eclipse.osee.ats.config.wizard.AtsConfigWizard"
+            id="org.eclipse.osee.ats.ide.config.wizard.AtsConfigWizard"
             name="ATS Configuration">
       </wizard>
    </extension>
 <extension point="org.eclipse.ui.perspectives">
    <perspective
          name="OSEE"
-         class="org.eclipse.osee.ats.internal.OseePerspective"
+         class="org.eclipse.osee.ats.ide.internal.OseePerspective"
          fixed="false"
          id="org.eclipse.osee.OseePerspective"
          icon="OSEE-INF/images/osee_16.png">
    </perspective>
    <perspective
-         class="org.eclipse.osee.ats.workflow.review.ReviewPerspective"
+         class="org.eclipse.osee.ats.ide.workflow.review.ReviewPerspective"
          icon="OSEE-INF/images/review.gif"
          id="org.eclipse.osee.ats.review.ReviewPerspective"
          name="Review">
@@ -117,24 +117,24 @@
          name="OSEE Review">
     </category>
     <view
-         class="org.eclipse.osee.ats.navigate.NavigateView"
+         class="org.eclipse.osee.ats.ide.navigate.NavigateView"
          icon="OSEE-INF/images/osee_16.png"
          category="org.eclipse.osee.category"
          name="OSEE Navigator"
          id="org.eclipse.osee.navigate.NavigateView">
    </view>
     <view
-         class="org.eclipse.osee.ats.walker.ActionWalkerView"
+         class="org.eclipse.osee.ats.ide.walker.ActionWalkerView"
          icon="OSEE-INF/images/action.gif"
          category="org.eclipse.osee.category"
          name="Action View"
-         id="org.eclipse.osee.ats.ActionWalkerView">
+         id="org.eclipse.osee.ats.ide.ActionWalkerView">
     </view>
    <view
          category="org.eclipse.osee.ats.review.category"
-         class="org.eclipse.osee.ats.workflow.review.ReviewNavigateView"
+         class="org.eclipse.osee.ats.ide.workflow.review.ReviewNavigateView"
          icon="OSEE-INF/images/review.gif"
-         id="org.eclipse.osee.ats.review.ReviewNavigateView"
+         id="org.eclipse.osee.ats.ide.review.ReviewNavigateView"
          name="ReviewNavigator">
    </view>
    </extension>
@@ -447,7 +447,7 @@
          name="WEEditor Input Factory"
          point="org.eclipse.ui.elementFactories">
       <factory
-            class="org.eclipse.osee.ats.editor.WfeInputFactory"
+            class="org.eclipse.osee.ats.ide.editor.WfeInputFactory"
             id="org.eclipse.osee.ats.WEEditorInputFactory">
       </factory>
    </extension>
@@ -456,7 +456,7 @@
          name="World Editor Input Factory"
          point="org.eclipse.ui.elementFactories">
       <factory
-            class="org.eclipse.osee.ats.world.WorldEditorInputFactory"
+            class="org.eclipse.osee.ats.ide.world.WorldEditorInputFactory"
             id="org.eclipse.osee.ats.WorldEditorInputFactory">
       </factory>
    </extension>
@@ -465,7 +465,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.osee.framework.ui.skynet.OseePreferencePage"
-            class="org.eclipse.osee.ats.config.AtsConfigPreferencePage"
+            class="org.eclipse.osee.ats.ide.config.AtsConfigPreferencePage"
             id="atsConfigPreferencePage"
             name="ATS">
       </page>
