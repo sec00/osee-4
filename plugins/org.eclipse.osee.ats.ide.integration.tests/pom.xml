@@ -10,7 +10,7 @@
 		<relativePath>../../plugins/org.eclipse.osee.ats.ide.parent</relativePath>
 	</parent>
 
-	<artifactId>org.eclipse.osee.ats.ide.client.integration.tests</artifactId>
+	<artifactId>org.eclipse.osee.ats.ide.integration.tests</artifactId>
 	<packaging>eclipse-test-plugin</packaging>
 	<name>OSEE ATS Client Integration Tests (Incubation)</name>
 
@@ -21,8 +21,8 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
-					<testSuite>org.eclipse.osee.ats.ide.client.integration.tests</testSuite>
-					<testClass>org.eclipse.osee.ats.ide.client.integration.AtsClientIntegrationTestSuite</testClass>
+					<testSuite>org.eclipse.osee.ats.ide.integration.tests</testSuite>
+					<testClass>org.eclipse.osee.ats.ide.integration.AtsClientIntegrationTestSuite</testClass>
 					<useUIHarness>true</useUIHarness>
 					<useUIThread>true</useUIThread>
 					<showEclipseLog>true</showEclipseLog>
