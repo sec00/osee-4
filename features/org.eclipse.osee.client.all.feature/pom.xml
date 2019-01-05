@@ -41,7 +41,7 @@
 										<feature id="org.eclipse.osee.client.ote.rdt.feature" />
 										<feature id="org.eclipse.osee.core.runtime.feature" />
 										<feature id="org.eclipse.osee.ats.ide.feature" />
-										<feature id="org.eclipse.osee.ats.client.demo.feature" />
+										<feature id="org.eclipse.osee.ats.ide.demo.feature" />
 									</excludes>
 								</configuration>
 							</execution>
