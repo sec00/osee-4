@@ -88,7 +88,7 @@
    <perspective
          class="org.eclipse.osee.ats.ide.workflow.review.ReviewPerspective"
          icon="OSEE-INF/images/review.gif"
-         id="org.eclipse.osee.ats.review.ReviewPerspective"
+         id="org.eclipse.osee.ats.ide.review.ReviewPerspective"
          name="Review">
    </perspective>
 </extension>
@@ -106,14 +106,14 @@
          </perspectiveExtension>
       </extension>
    <extension
-      id="org.eclipse.osee.ats"
+      id="org.eclipse.osee.ats.ide"
       name="ATS"
       point="org.eclipse.ui.views">
     <category
          name="OSEE"
          id="org.eclipse.osee.category"/>
     <category
-         id="org.eclipse.osee.ats.review.category"
+         id="org.eclipse.osee.ats.ide.review.category"
          name="OSEE Review">
     </category>
     <view
@@ -131,7 +131,7 @@
          id="org.eclipse.osee.ats.ide.ActionWalkerView">
     </view>
    <view
-         category="org.eclipse.osee.ats.review.category"
+         category="org.eclipse.osee.ats.ide.review.category"
          class="org.eclipse.osee.ats.ide.workflow.review.ReviewNavigateView"
          icon="OSEE-INF/images/review.gif"
          id="org.eclipse.osee.ats.ide.review.ReviewNavigateView"
@@ -236,7 +236,7 @@
             name="ATS Work Definition Editor">
       </command>
       <command
-            id="osee.ats.actions.OpenArtifactExplorer"
+            id="osee.ats.ide.actions.OpenArtifactExplorer"
             name="Open Artifact Explorer">
       </command>
    </extension>
@@ -310,7 +310,7 @@
          point="org.eclipse.ui.commands">
       <category
             name="OSEE Category"
-            id="osee.ats.product.commands.category">
+            id="osee.ats.ide.product.commands.category">
       </category>
       <command
             name="OSEE"
@@ -319,27 +319,27 @@
       </command>
       <command
             name="OSEE Review"
-            categoryId="osee.ats.product.commands.category"
-            id="org.eclipse.osee.ats.actions.OpenReviewPerspective">
+            categoryId="osee.ats.ide.product.commands.category"
+            id="org.eclipse.osee.ats.ide.actions.OpenReviewPerspective">
       </command>
    </extension>
    <extension point="org.eclipse.ui.handlers">
       <handler
             commandId="org.eclipse.osee.actions.OpenOseePerspective"
-            class="org.eclipse.osee.ats.actions.OpenOseePerspectiveHandler"> 
+            class="org.eclipse.osee.ats.ide.actions.OpenOseePerspectiveHandler"> 
       </handler>
       <handler
-            commandId="org.eclipse.osee.ats.actions.OpenReviewPerspective"
-            class="org.eclipse.osee.ats.actions.OpenReviewPerspectiveHandler">  
+            commandId="org.eclipse.osee.ats.ide.actions.OpenReviewPerspective"
+            class="org.eclipse.osee.ats.ide.actions.OpenReviewPerspectiveHandler">  
       </handler>
       <handler
-            commandId="osee.ats.actions.OpenArtifactExplorer"
-            class="org.eclipse.osee.ats.actions.OpenArtifactExplorerHandler">  
+            commandId="osee.ats.ide.actions.OpenArtifactExplorer"
+            class="org.eclipse.osee.ats.ide.actions.OpenArtifactExplorerHandler">  
       </handler>
    </extension>
    <extension point="org.eclipse.ui.commandImages">
-     <image commandId="org.eclipse.osee.actions.OpenOseePerspective" icon="OSEE-INF/images/osee_16.png"> </image>
-     <image commandId="org.eclipse.osee.ats.actions.OpenReviewPerspective" icon="OSEE-INF/images/review.gif"> </image>
+     <image commandId="org.eclipse.osee.ide.actions.OpenOseePerspective" icon="OSEE-INF/images/osee_16.png"> </image>
+     <image commandId="org.eclipse.osee.ats.ide.actions.OpenReviewPerspective" icon="OSEE-INF/images/review.gif"> </image>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -353,20 +353,20 @@
                   mnemonic="A"
                   id="org.eclipse.osee.actions.OpenOseePerspective">
             </command>
-            <command commandId="org.eclipse.osee.ats.actions.OpenReviewPerspective"
+            <command commandId="org.eclipse.osee.ats.ide.actions.OpenReviewPerspective"
                   mnemonic="R"
-                  id="org.eclipse.osee.ats.actions.OpenReviewPerspective">
+                  id="org.eclipse.osee.ats.ide.actions.OpenReviewPerspective">
             </command>
          </menu>
       </menuContribution>
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
-               id="osee.ats.toolbar">
+               id="osee.ats.ide.toolbar">
             <command
-                  commandId="osee.ats.actions.OpenArtifactExplorer"
+                  commandId="osee.ats.ide.actions.OpenArtifactExplorer"
                   icon="OSEE-INF/images/artifact_explorer.gif"
-                  id="osee.ats.actions.OpenArtifactExplorer"
+                  id="osee.ats.ide.actions.OpenArtifactExplorer"
                   style="push">
             </command>
          </toolbar>
@@ -443,21 +443,21 @@
       </Operation>
    </extension>
    <extension
-         id="org.eclipse.osee.ats.WEEditorInputFactory"
+         id="org.eclipse.osee.ats.ide.WEEditorInputFactory"
          name="WEEditor Input Factory"
          point="org.eclipse.ui.elementFactories">
       <factory
             class="org.eclipse.osee.ats.ide.editor.WfeInputFactory"
-            id="org.eclipse.osee.ats.WEEditorInputFactory">
+            id="org.eclipse.osee.ats.ide.WEEditorInputFactory">
       </factory>
    </extension>
    <extension
-         id="org.eclipse.osee.ats.world.WorldEditorInputFactory"
+         id="org.eclipse.osee.ats.ide.world.WorldEditorInputFactory"
          name="World Editor Input Factory"
          point="org.eclipse.ui.elementFactories">
       <factory
             class="org.eclipse.osee.ats.ide.world.WorldEditorInputFactory"
-            id="org.eclipse.osee.ats.WorldEditorInputFactory">
+            id="org.eclipse.osee.ats.ide.WorldEditorInputFactory">
       </factory>
    </extension>
    

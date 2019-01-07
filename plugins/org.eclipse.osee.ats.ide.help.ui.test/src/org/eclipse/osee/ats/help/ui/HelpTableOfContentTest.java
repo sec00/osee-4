@@ -24,7 +24,7 @@ import org.junit.Test;
  */
 public class HelpTableOfContentTest {
 
-   private static final String PLUGIN_ID = "org.eclipse.osee.ats.help.ui";
+   private static final String PLUGIN_ID = "org.eclipse.osee.ats.ide.help.ui";
 
    private static TocParser parser;
 

@@ -55,7 +55,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.osee.ats.ide.api.workflow.transition.ITransitionListener"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.osee.ats.api.workflow.transition.ITransitionListener"/>
                </appInfo>
             </annotation>
          </attribute>

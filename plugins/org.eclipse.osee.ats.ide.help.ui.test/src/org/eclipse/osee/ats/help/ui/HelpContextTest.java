@@ -30,7 +30,7 @@ import org.junit.Test;
  */
 public class HelpContextTest {
 
-   private static final String PLUGIN_ID = "org.eclipse.osee.ats.help.ui";
+   private static final String PLUGIN_ID = "org.eclipse.osee.ats.ide.help.ui";
 
    private static Map<String, HelpContext> contexts;
    private static ContextParser parser;
