@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Boeing.
+ * Copyright (c) 2019 Boeing.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -221,9 +221,6 @@ public class ExportSet {
          sheetWriter.writeRow((Object[]) headers);
 
          for (DispoItem item : items) {
-            if (item.getName().equals("aiu.mgmt.bit.wrap_bit_results.2.ada.WRAP_BIT_RESULTS")) {
-               System.out.println("");
-            }
             Map<String, MCDCCoverageData> mcdcToCoverageData = new HashMap<>();
             List<DispoAnnotationData> annotations = item.getAnnotationsList();
             for (DispoAnnotationData annotation : annotations) {
@@ -395,18 +392,13 @@ public class ExportSet {
 
       // location ex. 24, 24.T, 24.A.RESULT
 
-      extracted(levelToResolutionToCount, levelToUnitsToCovered, unit, resolutionType, mcdcToCoverageData,
+      calculateTotals(levelToResolutionToCount, levelToUnitsToCovered, unit, resolutionType, mcdcToCoverageData,
          annotation.getLocationRefs());
    }
 
-   private void extracted(Map<CoverageLevel, Map<String, WrapInt>> levelToResolutionToCount, Map<CoverageLevel, Map<String, Pair<WrapInt, WrapInt>>> levelToUnitsToCovered, String unit, String resolutionType, Map<String, MCDCCoverageData> mcdcToCoverageData, String location) {
+   private void calculateTotals(Map<CoverageLevel, Map<String, WrapInt>> levelToResolutionToCount, Map<CoverageLevel, Map<String, Pair<WrapInt, WrapInt>>> levelToUnitsToCovered, String unit, String resolutionType, Map<String, MCDCCoverageData> mcdcToCoverageData, String location) {
       // Determine what level count to increment by location simple number = C, number.T or number.number.RESULT = B, number.number.T = A
       CoverageLevel thisAnnotationsLevel = getLevel(location);
-
-      // Just for debug
-      Pair<WrapInt, WrapInt> Apair = levelToUnitsToCovered.get(CoverageLevel.A).get(unit);
-      Pair<WrapInt, WrapInt> Bpair = levelToUnitsToCovered.get(CoverageLevel.B).get(unit);
-      Pair<WrapInt, WrapInt> Cpair = levelToUnitsToCovered.get(CoverageLevel.C).get(unit);
 
       switch (thisAnnotationsLevel) {
          case A: {
@@ -446,9 +438,6 @@ public class ExportSet {
             // do nothing
          }
       }
-
-      System.out.println();
-
    }
 
    private String getNameFromLocation(String location) {
