@@ -13,6 +13,7 @@ package org.eclipse.osee.orcs.core.internal;
 import static org.eclipse.osee.framework.core.enums.CoreBranches.COMMON;
 import java.util.List;
 import java.util.concurrent.Callable;
+import org.eclipse.osee.activity.api.ActivityLog;
 import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.UserId;
 import org.eclipse.osee.framework.core.data.UserToken;
@@ -21,6 +22,7 @@ import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.CoreRelationTypes;
 import org.eclipse.osee.framework.core.enums.SystemUser;
 import org.eclipse.osee.framework.core.exception.OseeAccessDeniedException;
+import org.eclipse.osee.framework.core.util.OseeInf;
 import org.eclipse.osee.logger.Log;
 import org.eclipse.osee.orcs.OrcsAdmin;
 import org.eclipse.osee.orcs.OrcsApi;
@@ -43,25 +45,28 @@ public class OrcsAdminImpl implements OrcsAdmin {
    private final DataStoreAdmin dataStoreAdmin;
    private final EventAdmin eventAdmin;
    private final QueryBuilder fromCommon;
+   private final ActivityLog activityLog;
 
-   public OrcsAdminImpl(OrcsApi orcsApi, Log logger, OrcsSession session, DataStoreAdmin dataStoreAdmin, EventAdmin eventAdmin) {
+   public OrcsAdminImpl(OrcsApi orcsApi, Log logger, OrcsSession session, DataStoreAdmin dataStoreAdmin, EventAdmin eventAdmin, ActivityLog activityLog) {
       this.orcsApi = orcsApi;
       this.logger = logger;
       this.session = session;
       this.dataStoreAdmin = dataStoreAdmin;
       this.eventAdmin = eventAdmin;
       fromCommon = orcsApi.getQueryFactory().fromBranch(COMMON);
+      this.activityLog = activityLog;
    }
 
    @Override
-   public void createDatastore(String typeModel) {
+   public void createDatastoreAndSystemBranches(String typeModel) {
+      activityLog.setEnabled(false);
+
+      typeModel += OseeInf.getResourceContents("OseeTypes_Framework.osee", getClass());
       dataStoreAdmin.createDataStore();
       orcsApi.getOrcsTypes().loadTypes(typeModel);
-   }
-
-   @Override
-   public void createSystemBranches(String typeModel) {
       new CreateSystemBranches(orcsApi, eventAdmin).create(typeModel);
+
+      activityLog.setEnabled(true);
    }
 
    @Override

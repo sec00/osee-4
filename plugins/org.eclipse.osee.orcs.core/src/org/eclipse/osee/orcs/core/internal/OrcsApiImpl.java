@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Set;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import org.eclipse.osee.activity.api.ActivityLog;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.data.TransactionId;
 import org.eclipse.osee.framework.core.executor.ExecutorAdmin;
@@ -90,6 +91,7 @@ public class OrcsApiImpl implements OrcsApi {
    private ScriptEngineManager manager;
    private OrcsApplicabilityOps applicability;
    private UserGroupService userGroupService;
+   private ActivityLog activityLog;
 
    ExternalArtifactManager proxyManager;
 
@@ -111,6 +113,10 @@ public class OrcsApiImpl implements OrcsApi {
 
    public void setEventAdmin(EventAdmin eventAdmin) {
       this.eventAdmin = eventAdmin;
+   }
+
+   public void setActivityLog(ActivityLog activityLog) {
+      this.activityLog = activityLog;
    }
 
    public void start() {
@@ -252,7 +258,7 @@ public class OrcsApiImpl implements OrcsApi {
    @Override
    public OrcsAdmin getAdminOps() {
       OrcsSession session = getSession();
-      return new OrcsAdminImpl(this, logger, session, module.getDataStoreAdmin(), eventAdmin);
+      return new OrcsAdminImpl(this, logger, session, module.getDataStoreAdmin(), eventAdmin, activityLog);
    }
 
    @Override
