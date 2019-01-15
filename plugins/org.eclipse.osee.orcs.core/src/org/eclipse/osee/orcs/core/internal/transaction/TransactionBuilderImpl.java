@@ -529,11 +529,6 @@ public class TransactionBuilderImpl implements TransactionBuilder {
    }
 
    @Override
-   public void addKeyValueOps(Long id, String name) {
-      keyValueOps.putByKey(id, name);
-   }
-
-   @Override
    public ArtifactToken createArtifact(ArtifactToken parent, ArtifactTypeToken artifactType, String name, Long id) {
       ArtifactToken art = createArtifact(artifactType, name, id);
       txManager.addChild(txData, parent, art);
@@ -548,5 +543,4 @@ public class TransactionBuilderImpl implements TransactionBuilder {
       }
       return art;
    }
-
 }

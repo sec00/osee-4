@@ -67,9 +67,9 @@ public class OrcsAdminImpl implements OrcsAdmin {
    }
 
    @Override
-   public TransactionId createDatastoreAndSystemBranches(String typeModel) {
+   public TransactionId createDatastoreAndSystemBranches(String typeModel, String largeAttributeStorePath) {
       typeModel += OseeInf.getResourceContents("OseeTypes_Framework.osee", getClass());
-      dataStoreAdmin.createDataStore();
+      dataStoreAdmin.createDataStore(largeAttributeStorePath);
       orcsApi.getOrcsTypes().loadTypes(typeModel);
       TransactionId tx = new CreateSystemBranches(orcsApi, eventAdmin).create(typeModel);
       return tx;
