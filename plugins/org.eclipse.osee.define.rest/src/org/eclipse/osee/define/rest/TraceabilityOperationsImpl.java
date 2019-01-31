@@ -49,6 +49,7 @@ import org.eclipse.osee.orcs.OrcsApi;
 import org.eclipse.osee.orcs.data.ArtifactReadable;
 import org.eclipse.osee.orcs.search.QueryFactory;
 import org.eclipse.osee.orcs.search.TupleQuery;
+import org.eclipse.osee.orcs.transaction.TransactionBuilder;
 
 /**
  * @author Ryan D. Brooks
@@ -145,7 +146,11 @@ public class TraceabilityOperationsImpl implements TraceabilityOperations {
 
    @Override
    public void parseGitHistory(ArtifactId repository, String gitHistory, BranchId branch, UserId account) {
-      new GitTraceability(orcsApi, branch, repository).parseGitHistory(gitHistory, branch, account);
+      TransactionBuilder tx = orcsApi.getTransactionFactory().createTransaction(branch, account,
+         "TraceabilityOperationsImpl.parseGitHistory repo [" + repository.getIdString() + "]");
+      HistoryImportStrategy importStrategy = new FastHistoryStrategy(repository, tx);
+      //new FullHistoryTolerant(repository, orcsApi.getQueryFactory().tupleQuery());
+      new GitTraceability(orcsApi, branch, repository).parseGitHistory(gitHistory, branch, account, importStrategy);
    }
 
    @Override
