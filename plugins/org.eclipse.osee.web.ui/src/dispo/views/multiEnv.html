@@ -13,7 +13,7 @@
         </div>
         <div class="form-group">
             Select Multi Environment Target
-            <select class="form-control" ng-model="selectedSet.multiEnvSettings.multiEnvTarget" ng-options="obj as obj.name for obj in multiEnvTargets"></select>
+            <select class="form-control" ng-model="selectedSet.multiEnvSettings.multiEnvTarget" ng-options="obj as obj.text for obj in multiEnvTargets"></select>
         </div>
         Path: <input id="multiEnvTargePathInput" readonly type="text" ng-model="selectedSet.multiEnvSettings.multiEnvTarget.path">
     </div>

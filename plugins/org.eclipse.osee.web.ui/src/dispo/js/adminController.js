@@ -1036,11 +1036,17 @@ app.controller('adminController', [
                 modalInstance.result.then(function (inputs) {
                     $scope.updateDispoConfig(inputs.config);
                 });
+            }, function(data) {
+                alert("Oops...Something went wrong");
             });
         }
 
         var EditDispoConfigCtrl = function ($scope, $modalInstance, config) {
-            $scope.validResolutionsJson = JSON.stringify(config.validResolutions);
+            $scope.resolutionsLocal = angular.copy(config.validResolutions);
+            $scope.addNew = false;
+
+            $scope.previewedResolution = null;
+            $scope.validResolutionsJson = JSON.stringify($scope.resolutionsLocal);
             $scope.multiEnvTargetsJson = JSON.stringify(config.multiEnvTargets);
             $scope.ok = function () {
                 var inputs = {};
@@ -1076,7 +1082,12 @@ app.controller('adminController', [
             }
             $scope.isValidJson = function () {
                 return $scope.isResolutionTypesValidJson && $scope.ismultiEnvTargetsValidJson;
+            }
 
+            $scope.addToResolutions = function() {
+                $scope.resolutionsLocal.push($scope.previewedResolution);
+                $scope.addNew = false;
+                $scope.previewedResolution = null;
             }
         }
 

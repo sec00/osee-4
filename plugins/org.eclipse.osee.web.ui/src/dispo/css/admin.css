@@ -76,5 +76,10 @@ button#mergetAnnotationsBtn {
 	background-color: pink;
 }
 
-input#multiEnvTargePathInput {
-    border: none;
+#editMultiEnvBtn {
+	margin-top:20px;
+}
+
+#editConfigBtn {
+	margin-top:20px;
+}

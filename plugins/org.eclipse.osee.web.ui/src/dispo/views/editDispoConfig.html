@@ -3,9 +3,16 @@
     <h4 class="modal-title">Each field must be a valid JSON Array</h4>
 </div>
 <div class="modal-body" overflow: auto;>
+
     Resolution Types:
-    <textarea ng-class="{ 'config-json-invalid': !isResolutionTypesValidJson() }" rows=10 style="resize: vertical"
-        class="form-control" ng-model="validResolutionsJson"></textarea>
+    <select class="form-control" ng-model="previewedResolution" ng-options="obj as obj.text for obj in resolutionsLocal"></select>
+    <u ng-click="addNew = !addNew; previewedResolution = null">Add New</u>
+    <div ng-show="addNew && !previewedResolution"><input class="form-control" ng-model="newResolution" type="text" name="newResolution"><button
+        ng-click="resolutionsLocal.push(previewedResolution); addNew = false" class="form-control">Add</button></div>
+    <br>
+    <div ng-show="!addNew && previewedResolution" id="previewedResolutionDiv">
+        <input ng-readonly="previewedResolution.isDefault" type="text" name="resolutionValue" ng-model="previewedResolution.value">
+    </div> 
     <br>
     Multi Env Targets:
     <textarea placeholder='[{"name": "example", "path": "src_host/example"}]' ng-class="{ 'config-json-invalid': !ismultiEnvTargetsValidJson() }"
@@ -13,6 +20,6 @@
 
 </div>
 <div class="modal-footer">
-    <button ng-disabled="!isValidJson()" class="btn btn-primary" ng-click="ok()">OK</button>
+    <button ng-disabled="!isValidJson()" class="btn btn-primary" ng-click="ok()">Save</button>
     <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
 </div>

@@ -68,9 +68,9 @@
                                     ng-show="isCoverage && sets.length > 0" class="btn btn-primary" id=generateReportBtn>Get
                                     Rerun Report</button>
                                 <button ng-disabled="isRunningOperation" ng-click="openMultiEnvModal()" ng-show="isCoverage && sets.length > 0"
-                                    class="btn btn-primary" id=multiEnvBtn>Multi Environment</button>
-                                <button ng-disabled="isRunningOperation" ng-click="openEditDispoConfigModal()" ng-show="sets.length > 0"
-                                        class="btn btn-primary" id=multiEnvBtn>Edit Config</button>
+                                    class="btn btn-primary" id=editMultiEnvBtn>Multi Environment</button>
+                                <button ng-disabled="isRunningOperation" ng-click="openEditDispoConfigModal()" ng-show="isCoverage && sets.length > 0"
+                                        class="btn btn-primary" id=editConfigBtn>Edit Config</button>
                             </div>
                         </div>
                     </div>
