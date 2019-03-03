@@ -26,12 +26,34 @@ public interface ArtifactTypeToken extends NamedId, ArtifactTypeId {
    }
 
    public static ArtifactTypeToken valueOf(long id, String name) {
-      final class ArtifactTypeTokenImpl extends NamedIdBase implements ArtifactTypeToken {
+      return valueOf(id, false, name);
+   }
 
-         public ArtifactTypeTokenImpl(Long id, String name) {
+   boolean isAbstract();
+
+   ArtifactTypeToken[] getSuperTypes();
+
+   public static ArtifactTypeToken valueOf(long id, boolean isAbstract, String name, ArtifactTypeToken... superTypes) {
+      final class ArtifactTypeTokenImpl extends NamedIdBase implements ArtifactTypeToken {
+         private final boolean isAbstract;
+         private final ArtifactTypeToken[] superTypes;
+
+         public ArtifactTypeTokenImpl(Long id, String name, boolean isAbstract, ArtifactTypeToken... superTypes) {
             super(id, name);
+            this.isAbstract = isAbstract;
+            this.superTypes = superTypes;
+         }
+
+         @Override
+         public boolean isAbstract() {
+            return isAbstract;
+         }
+
+         @Override
+         public ArtifactTypeToken[] getSuperTypes() {
+            return superTypes;
          }
       }
-      return new ArtifactTypeTokenImpl(id, name);
+      return new ArtifactTypeTokenImpl(id, name, isAbstract, superTypes);
    }
 }
