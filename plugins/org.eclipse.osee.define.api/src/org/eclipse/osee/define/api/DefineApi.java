@@ -28,4 +28,6 @@ public interface DefineApi {
    //Import
    ImportOperations getImportOperations();
 
+   GitOperations gitOperations();
+
 }

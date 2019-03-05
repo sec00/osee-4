@@ -53,6 +53,8 @@ public final class CoreArtifactTypes {
    public static final ArtifactTypeToken Function = add(ArtifactTypeToken.valueOf(34L, true, "Function", MSWordTemplate));
    public static final ArtifactTypeToken NativeArtifact = add(ArtifactTypeToken.valueOf(20L, true, "Native Artifact", Artifact));
    public static final ArtifactTypeToken GeneralDocument = add(ArtifactTypeToken.valueOf(14L, false, "General Document", NativeArtifact));
+   public static final ArtifactTypeToken GitCommit = add(ArtifactTypeToken.valueOf(100L, false, "Git Commit", Artifact));
+   public static final ArtifactTypeToken GitRepository = add(ArtifactTypeToken.valueOf(97L, false, "Git Repository", Artifact));
    public static final ArtifactTypeToken GlobalPreferences = add(ArtifactTypeToken.valueOf(3L, false, "Global Preferences", Artifact));
    public static final ArtifactTypeToken GroupArtifact = add(ArtifactTypeToken.valueOf(6L, false, "Group Artifact", Artifact));
    public static final ArtifactTypeToken HTMLArtifact = add(ArtifactTypeToken.valueOf(798L, false, "HTML Artifact", Artifact));
@@ -120,7 +122,6 @@ public final class CoreArtifactTypes {
    public static final ArtifactTypeToken WorkRuleDefinition = add(ArtifactTypeToken.valueOf(53L, false, "Work Rule Definition", WorkItemDefinition));
    public static final ArtifactTypeToken WorkWidgetDefinition = add(ArtifactTypeToken.valueOf(54L, false, "Work Widget Definition", WorkItemDefinition));
    public static final ArtifactTypeToken XViewerGlobalCustomization = add(ArtifactTypeToken.valueOf(55L, false, "XViewer Global Customization", Artifact));
-
 // @formatter:on
 
    private CoreArtifactTypes() {

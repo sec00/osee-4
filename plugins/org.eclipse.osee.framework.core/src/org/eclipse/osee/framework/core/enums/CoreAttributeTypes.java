@@ -52,11 +52,17 @@ public final class CoreAttributeTypes {
    public static final AttributeTypeToken FaxPhone = AttributeTypeToken.valueOf(1152921504606847081L, "Fax Phone");
    public static final AttributeTypeToken FeatureMultivalued = AttributeTypeToken.valueOf(3641431177461038717L, "Feature Multivalued");
    public static final AttributeTypeToken FeatureValueType = AttributeTypeToken.valueOf(31669009535111027L, "Feature Value Type");
+   public static final AttributeTypeToken FileSystemPath = AttributeTypeToken.valueOf(1152921504606847707L, "File System Path");
    public static final AttributeTypeToken FunctionalCategory = AttributeTypeToken.valueOf(1152921504606847871L, "Functional Category");
    public static final AttributeTypeToken FunctionalDAL = AttributeTypeToken.valueOf(8007959514939954596L, "Functional Development Assurance Level");
    public static final AttributeTypeToken FunctionalDALRationale = AttributeTypeToken.valueOf(926274413268034710L, "Functional Development Assurance Level Rationale");
    public static final AttributeTypeToken GeneralStringData = AttributeTypeToken.valueOf(1152921504606847096L, "General String Data");
    public static final AttributeTypeToken GfeCfe = AttributeTypeToken.valueOf(1152921504606847144L, "GFE / CFE");
+   public static final AttributeTypeToken GitChangeId = AttributeTypeToken.valueOf(1152921504606847702L, "Git Change-Id");
+   public static final AttributeTypeToken GitCommitSHA = AttributeTypeToken.valueOf(1152921504606847703L, "Git Commit SHA");
+   public static final AttributeTypeToken GitCommitAuthorDate = AttributeTypeToken.valueOf(1152921504606847704L, "Git Commit Author Date");
+   public static final AttributeTypeToken GitCommitMessage = AttributeTypeToken.valueOf(1152921504606847705L, "Git Commit Message");
+   public static final AttributeTypeToken GitRepositoryReference = AttributeTypeToken.valueOf(1152921504606847706L, "Git Repository Reference");
    public static final AttributeTypeToken GraphitiDiagram = AttributeTypeToken.valueOf(1152921504606847319L, "Graphiti Diagram");
    public static final AttributeTypeToken Hazard = AttributeTypeToken.valueOf(1152921504606847138L, "Hazard");
    public static final AttributeTypeToken HazardSeverity = AttributeTypeToken.valueOf(1152921504606847141L, "Hazard Severity");
@@ -78,8 +84,9 @@ public final class CoreAttributeTypes {
    public static final AttributeTypeToken Phone = AttributeTypeToken.valueOf(1152921504606847079L, "Phone");
    public static final AttributeTypeToken PublishInline = AttributeTypeToken.valueOf(1152921504606847122L, "PublishInline");
    public static final AttributeTypeToken QualificationMethod = AttributeTypeToken.valueOf(1152921504606847113L, "Qualification Method");
-   public static final AttributeTypeToken RendererOptions = AttributeTypeToken.valueOf(904, "Renderer Options");
    public static final AttributeTypeToken RelationOrder = AttributeTypeToken.valueOf(1152921504606847089L, "Relation Order");
+   public static final AttributeTypeToken RendererOptions = AttributeTypeToken.valueOf(904, "Renderer Options");
+   public static final AttributeTypeToken RepositoryUrl = AttributeTypeToken.valueOf(1152921504606847700L, "Repository URL");
    public static final AttributeTypeToken RequireConfirmation = AttributeTypeToken.valueOf(188458869981239L, "Require Confirmation");
    public static final AttributeTypeToken Sfha = AttributeTypeToken.valueOf(1152921504606847140L, "SFHA");
    public static final AttributeTypeToken SafetySeverity = AttributeTypeToken.valueOf(846763346271224762L, "Safety Severity");
@@ -98,6 +105,7 @@ public final class CoreAttributeTypes {
    public static final AttributeTypeToken TestScriptGuid = AttributeTypeToken.valueOf(1152921504606847301L, "Test Script GUID");
    public static final AttributeTypeToken UserId = AttributeTypeToken.valueOf(1152921504606847073L, "User Id");
    public static final AttributeTypeToken UriGeneralStringData = AttributeTypeToken.valueOf(1152921504606847381L, "Uri General String Data");
+   public static final AttributeTypeToken UserArtifactId = AttributeTypeToken.valueOf(1152921504606847701L, "User Artifact Id");
    public static final AttributeTypeToken UserSettings = AttributeTypeToken.valueOf(1152921504606847076L, "User Settings");
    public static final AttributeTypeToken VerificationEvent = AttributeTypeToken.valueOf(1152921504606847124L, "Verification Event");
    public static final AttributeTypeToken VerificationLevel = AttributeTypeToken.valueOf(1152921504606847115L, "Verification Level");
