@@ -8,8 +8,8 @@
 <plugin id="ch.qos.logback.core"/>
 <plugin id="ch.qos.logback.slf4j"/>
 <plugin id="com.ctc.wstx"/>
-<plugin id="com.fasterxml.jackson.core.jackson-core"/>
 <plugin id="com.fasterxml.jackson.core.jackson-annotations"/>
+<plugin id="com.fasterxml.jackson.core.jackson-core"/>
 <plugin id="com.fasterxml.jackson.core.jackson-databind"/>
 <plugin id="com.fasterxml.jackson.jaxrs.jackson-jaxrs-base"/>
 <plugin id="com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider"/>
@@ -29,9 +29,6 @@
 <plugin id="com.ibm.icu"/>
 <plugin id="com.jcraft.jsch"/>
 <plugin id="com.lowagie.text"/>
-<plugin id="org.eclipse.eclemma.core"/>
-<plugin id="org.eclipse.eclemma.doc"/>
-<plugin id="org.eclipse.eclemma.ui"/>
 <plugin id="com.sun.el"/>
 <plugin id="com.sun.xml.fastinfoset"/>
 <plugin id="javaewah"/>
@@ -97,7 +94,6 @@
 <plugin id="org.apache.xml.resolver"/>
 <plugin id="org.apache.xml.serializer"/>
 <plugin id="org.apache.xmlrpc"/>
-
 <plugin id="org.codehaus.stax2"/>
 <plugin id="org.cyberneko.html"/>
 <plugin id="org.eclipse.aether.api"/>
@@ -174,6 +170,9 @@
 <plugin id="org.eclipse.ecf.provider.filetransfer.httpclient4.ssl"/>
 <plugin id="org.eclipse.ecf.provider.filetransfer.ssl"/>
 <plugin id="org.eclipse.ecf.ssl"/>
+<plugin id="org.eclipse.eclemma.core"/>
+<plugin id="org.eclipse.eclemma.doc"/>
+<plugin id="org.eclipse.eclemma.ui"/>
 <plugin id="org.eclipse.egit"/>
 <plugin id="org.eclipse.egit.core"/>
 <plugin id="org.eclipse.egit.doc"/>
