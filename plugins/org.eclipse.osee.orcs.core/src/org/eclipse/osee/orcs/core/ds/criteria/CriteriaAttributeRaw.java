@@ -64,7 +64,7 @@ public class CriteriaAttributeRaw extends Criteria {
    }
 
    @Override
-   public void checkValid(Options options) {
+   public boolean checkValid(Options options) {
       Conditions.checkNotNullOrEmptyOrContainNull(getAttributeTypes(), "attributeType");
       Conditions.checkExpressionFailOnTrue(getAttributeTypes().equals(QueryBuilder.ANY_ATTRIBUTE_TYPE),
          "Any attribute type is not allowed");
@@ -74,6 +74,7 @@ public class CriteriaAttributeRaw extends Criteria {
          throw new OseeArgumentException("Invalid QueryOptions present: [%s]",
             Collections.toString(",", unsupportedOptions));
       }
+      return true;
    }
 
    private List<QueryOption> getUnsupportedOptions() {

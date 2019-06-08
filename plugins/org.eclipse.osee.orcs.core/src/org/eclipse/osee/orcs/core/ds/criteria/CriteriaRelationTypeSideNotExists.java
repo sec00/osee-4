@@ -37,8 +37,9 @@ public final class CriteriaRelationTypeSideNotExists extends Criteria {
    }
 
    @Override
-   public void checkValid(Options options) {
+   public boolean checkValid(Options options) {
       Conditions.checkValid(relationType, "relation type");
+      return true;
    }
 
    @Override
