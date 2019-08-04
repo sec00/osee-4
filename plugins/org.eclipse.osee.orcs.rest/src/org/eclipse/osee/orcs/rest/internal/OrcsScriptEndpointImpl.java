@@ -19,6 +19,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -31,20 +32,23 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.StreamingOutput;
+import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.jdk.core.type.OseeCoreException;
 import org.eclipse.osee.framework.jdk.core.util.Lib;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.orcs.rest.model.OrcsScriptEndpoint;
+import org.eclipse.osee.orcs.search.QueryFactory;
 
 /**
  * @author Roberto E. Escobar
  */
 public class OrcsScriptEndpointImpl implements OrcsScriptEndpoint {
-
    private final ScriptEngine engine;
+   private final QueryFactory queryFactory;
 
-   public OrcsScriptEndpointImpl(ScriptEngine engine) {
+   public OrcsScriptEndpointImpl(ScriptEngine engine, QueryFactory queryFactory) {
       this.engine = engine;
+      this.queryFactory = queryFactory;
    }
 
    @Override
@@ -150,5 +154,15 @@ public class OrcsScriptEndpointImpl implements OrcsScriptEndpoint {
          }
       }
       return properties;
+   }
+
+   @Override
+   public List<ArtifactId> getArtifactIds(String orcsScript) {
+      return queryFactory.fromOrcsScript(orcsScript).asArtifactIds();
+   }
+
+   @Override
+   public List<Map<String, Object>> getArtifactMaps(String orcsScript) {
+      return queryFactory.fromOrcsScript(orcsScript).asArtifactMaps();
    }
 }

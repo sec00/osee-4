@@ -36,6 +36,7 @@ public class OrcsApplication extends Application {
    private IResourceManager resourceManager;
    private ActivityLog activityLog;
    private JdbcService jdbcService;
+
    public void setOrcsApi(OrcsApi orcsApi) {
       this.orcsApi = orcsApi;
    }
@@ -57,7 +58,7 @@ public class OrcsApplication extends Application {
 
    public void start() {
       resources.add(new BranchesResource(orcsApi));
-      resources.add(new OrcsScriptEndpointImpl(orcsApi.getScriptEngine()));
+      resources.add(new OrcsScriptEndpointImpl(orcsApi.getScriptEngine(), orcsApi.getQueryFactory()));
       resources.add(new BranchEndpointImpl(orcsApi, resourceManager, activityLog));
       resources.add(new ApplicabilityUiEndpointImpl(orcsApi));
       resources.add(new OrcsWriterEndpointImpl(orcsApi));

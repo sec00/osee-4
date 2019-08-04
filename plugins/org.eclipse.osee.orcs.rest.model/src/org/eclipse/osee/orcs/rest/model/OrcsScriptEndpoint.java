@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.osee.orcs.rest.model;
 
+import java.util.List;
+import java.util.Map;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -22,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.eclipse.osee.framework.core.data.ArtifactId;
 
 @Path("script")
 public interface OrcsScriptEndpoint {
@@ -46,4 +49,16 @@ public interface OrcsScriptEndpoint {
    @Consumes(MediaType.TEXT_PLAIN)
    @Produces(MediaType.APPLICATION_JSON)
    String getScriptResult(String script);
+
+   @POST
+   @Path("artifact-id")
+   @Consumes(MediaType.TEXT_PLAIN)
+   @Produces(MediaType.APPLICATION_JSON)
+   List<ArtifactId> getArtifactIds(String orcsScript);
+
+   @POST
+   @Path("artifact-map")
+   @Consumes(MediaType.TEXT_PLAIN)
+   @Produces(MediaType.APPLICATION_JSON)
+   List<Map<String, Object>> getArtifactMaps(String orcsScript);
 }
