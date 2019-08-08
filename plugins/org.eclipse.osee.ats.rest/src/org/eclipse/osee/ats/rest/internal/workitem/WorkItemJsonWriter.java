@@ -61,7 +61,7 @@ public class WorkItemJsonWriter implements MessageBodyWriter<IAtsWorkItem> {
 
    private static final String ATS_UI_ACTION_PREFIX = "/ats/ui/action/ID";
    private JsonFactory jsonFactory;
-   private AtsApi atsApi;
+   private IAtsServer atsApi;
    private OrcsApi orcsApi;
 
    public void setOrcsApi(OrcsApi orcsApi) {
@@ -109,8 +109,8 @@ public class WorkItemJsonWriter implements MessageBodyWriter<IAtsWorkItem> {
       JsonGenerator writer = null;
       try {
          writer = jsonFactory.createGenerator(entityStream);
-         addWorkItem(atsApi, orcsApi, config, annotations, writer, matches(IdentityView.class, annotations),
-            getAttributeTypes(), Collections.emptyList());
+         addWorkItem(atsApi, config, annotations, writer, matches(IdentityView.class, annotations), getAttributeTypes(),
+            Collections.emptyList());
       } finally {
          if (writer != null) {
             writer.flush();
@@ -118,8 +118,7 @@ public class WorkItemJsonWriter implements MessageBodyWriter<IAtsWorkItem> {
       }
    }
 
-   protected static void addWorkItem(AtsApi atsApi, OrcsApi orcsApi, IAtsWorkItem workItem, Annotation[] annotations, JsonGenerator writer, boolean identityView, AttributeTypes attributeTypes, List<WorkItemWriterOptions> options) throws IOException, JsonGenerationException, JsonProcessingException {
-
+   protected static void addWorkItem(IAtsServer atsApi, IAtsWorkItem workItem, Annotation[] annotations, JsonGenerator writer, boolean identityView, AttributeTypes attributeTypes, List<WorkItemWriterOptions> options) throws IOException, JsonGenerationException, JsonProcessingException {
       ArtifactReadable workItemArt = (ArtifactReadable) workItem.getStoreObject();
       writer.writeStartObject();
       writer.writeNumberField("id", workItem.getId());
@@ -130,7 +129,7 @@ public class WorkItemJsonWriter implements MessageBodyWriter<IAtsWorkItem> {
       String actionUrl = AtsUtil.getActionUrl(atsId, ATS_UI_ACTION_PREFIX, atsApi);
       writer.writeStringField("actionLocation", actionUrl);
       if (!identityView) {
-         ConfigJsonWriter.addAttributeData(writer, attributeTypes, workItemArt, options, atsApi, orcsApi);
+         ConfigJsonWriter.addAttributeData(writer, attributeTypes, workItemArt, options, atsApi);
          writer.writeStringField("TeamName", ActionPage.getTeamStr(atsApi, workItemArt));
          writer.writeStringField("Assignees", workItem.getStateMgr().getAssigneesStr());
          if (options.contains(WorkItemWriterOptions.WriteRelatedAsTokens)) {
@@ -169,7 +168,7 @@ public class WorkItemJsonWriter implements MessageBodyWriter<IAtsWorkItem> {
       writer.writeEndObject();
    }
 
-   protected static void addWorkItemWithIds(AtsApi atsApi, OrcsApi orcsApi, IAtsWorkItem workItem, Annotation[] annotations, JsonGenerator writer, boolean identityView, List<WorkItemWriterOptions> options) throws IOException, JsonGenerationException, JsonProcessingException {
+   protected static void addWorkItemWithIds(IAtsServer atsApi, IAtsWorkItem workItem, Annotation[] annotations, JsonGenerator writer, boolean identityView, List<WorkItemWriterOptions> options) throws IOException, JsonGenerationException, JsonProcessingException {
       ArtifactReadable workItemArt = (ArtifactReadable) workItem.getStoreObject();
       writer.writeStartObject();
       writer.writeNumberField("id", workItem.getId());
@@ -179,7 +178,7 @@ public class WorkItemJsonWriter implements MessageBodyWriter<IAtsWorkItem> {
       String actionUrl = AtsUtil.getActionUrl(atsId, ATS_UI_ACTION_PREFIX, atsApi);
       writer.writeStringField("actionLocation", actionUrl);
       if (!identityView) {
-         ConfigJsonWriter.addAttributeDataWithIds(writer, workItemArt, options, atsApi, orcsApi);
+         ConfigJsonWriter.addAttributeDataWithIds(writer, workItemArt, options, atsApi);
          writer.writeStringField("TeamName", ActionPage.getTeamStr(atsApi, workItemArt));
          writeAssignees(writer, workItemArt, workItem);
          writeType(writer, workItemArt, workItem, "ChangeType", AtsAttributeTypes.ChangeType);

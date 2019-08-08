@@ -90,6 +90,7 @@ import org.eclipse.osee.ats.core.agile.SprintUtil;
 import org.eclipse.osee.ats.core.agile.operations.SprintBurndownOperations;
 import org.eclipse.osee.ats.core.agile.operations.SprintBurnupOperations;
 import org.eclipse.osee.ats.core.util.chart.LineChart;
+import org.eclipse.osee.ats.rest.IAtsServer;
 import org.eclipse.osee.ats.rest.internal.agile.operations.EndpointOperations;
 import org.eclipse.osee.ats.rest.internal.agile.operations.KanbanOperations;
 import org.eclipse.osee.ats.rest.internal.agile.operations.ProgramOperations;
@@ -98,8 +99,8 @@ import org.eclipse.osee.ats.rest.internal.query.TokenSearchOperations;
 import org.eclipse.osee.ats.rest.internal.world.WorldResource;
 import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
-import org.eclipse.osee.framework.core.data.AttributeTypeToken;
 import org.eclipse.osee.framework.core.data.ArtifactTypeToken;
+import org.eclipse.osee.framework.core.data.AttributeTypeToken;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.core.enums.CoreRelationTypes;
 import org.eclipse.osee.framework.core.util.JsonUtil;
@@ -117,7 +118,6 @@ import org.eclipse.osee.framework.jdk.core.util.SortOrder;
 import org.eclipse.osee.framework.jdk.core.util.Strings;
 import org.eclipse.osee.jaxrs.OseeWebApplicationException;
 import org.eclipse.osee.jdbc.JdbcService;
-import org.eclipse.osee.orcs.OrcsApi;
 import org.eclipse.osee.orcs.data.ArtifactReadable;
 import org.eclipse.osee.template.engine.PageCreator;
 import org.eclipse.osee.template.engine.PageFactory;
@@ -132,17 +132,15 @@ public class AgileEndpointImpl implements AgileEndpointApi {
 
    @Context
    private UriInfo uriInfo;
-   private final AtsApi atsApi;
+   private final IAtsServer atsApi;
    private final IResourceRegistry resourceRegistry;
    private final JdbcService jdbcService;
-   private final OrcsApi orcsApi;
    private EndpointOperations endpointOps;
 
-   public AgileEndpointImpl(AtsApi atsApi, IResourceRegistry resourceRegistry, JdbcService jdbcService, OrcsApi orcsApi) {
+   public AgileEndpointImpl(IAtsServer atsApi, IResourceRegistry resourceRegistry, JdbcService jdbcService) {
       this.atsApi = atsApi;
       this.resourceRegistry = resourceRegistry;
       this.jdbcService = jdbcService;
-      this.orcsApi = orcsApi;
    }
 
    public void setUriInfo(UriInfo uriInfo) {
@@ -329,7 +327,8 @@ public class AgileEndpointImpl implements AgileEndpointApi {
          featureItem.getResults().errorf("Program Id %s not found", programId);
          return featureItem;
       }
-      ArtifactToken parentBacklogItem = atsApi.getQueryService().getArtifact(featureItem.getSelectedId());
+      ArtifactToken parentBacklogItem = atsApi.getArtifactToken(featureItem.getSelectedId());
+
       if (atsApi.getStoreService().isOfType(parentBacklogItem, AtsArtifactTypes.AgileProgramFeature)) {
          parentBacklogItem = atsApi.getRelationResolver().getParent(parentBacklogItem);
       }
@@ -677,7 +676,7 @@ public class AgileEndpointImpl implements AgileEndpointApi {
       if (!relatedSprints.isEmpty()) {
          Collection<ArtifactToken> inWorkSprints =
             TokenSearchOperations.getArtifactTokensMatchingAttrValue(atsApi.getAtsBranch(), relatedSprints,
-               AtsAttributeTypes.CurrentStateType, StateType.Working.name(), orcsApi, jdbcService);
+               AtsAttributeTypes.CurrentStateType, StateType.Working.name(), jdbcService);
 
          for (ArtifactToken sprintArt : inWorkSprints) {
             sprints.add(sprintArt);
@@ -934,7 +933,7 @@ public class AgileEndpointImpl implements AgileEndpointApi {
       if (id == null || id <= 0) {
          id = Lib.generateArtifactIdAsInt();
       }
-      ArtifactToken teamArt = atsApi.getQueryService().getArtifact(newBacklog.getTeamId());
+      ArtifactToken teamArt = atsApi.getArtifactToken(newBacklog.getTeamId());
       if (!atsApi.getRelationResolver().getRelated(teamArt, AtsRelationTypes.AgileTeamToBacklog_Backlog).isEmpty()) {
          throw new OseeWebApplicationException(Status.BAD_REQUEST, "Backlog already set for team %s",
             teamArt.toStringWithId());

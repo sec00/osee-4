@@ -26,7 +26,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import org.eclipse.osee.ats.api.AtsApi;
 import org.eclipse.osee.ats.api.IAtsWorkItem;
 import org.eclipse.osee.ats.api.workflow.WorkItemWriterOptions;
 import org.eclipse.osee.ats.rest.IAtsServer;
@@ -42,7 +41,7 @@ import org.eclipse.osee.orcs.data.AttributeTypes;
 @Provider
 public class WorkItemsJsonWriter implements MessageBodyWriter<Collection<IAtsWorkItem>> {
    private JsonFactory jsonFactory;
-   private AtsApi atsApi;
+   private IAtsServer atsApi;
    @Context
    private UriInfo uriInfo;
    private OrcsApi orcsApi;
@@ -122,10 +121,10 @@ public class WorkItemsJsonWriter implements MessageBodyWriter<Collection<IAtsWor
          }
          for (IAtsWorkItem workItem : workItems) {
             if (valuesWithIds) {
-               WorkItemJsonWriter.addWorkItemWithIds(atsApi, orcsApi, workItem, annotations, writer,
+               WorkItemJsonWriter.addWorkItemWithIds(atsApi, workItem, annotations, writer,
                   matches(IdentityView.class, annotations), options);
             } else {
-               WorkItemJsonWriter.addWorkItem(atsApi, orcsApi, workItem, annotations, writer,
+               WorkItemJsonWriter.addWorkItem(atsApi, workItem, annotations, writer,
                   matches(IdentityView.class, annotations), getAttributeTypes(), options);
             }
          }

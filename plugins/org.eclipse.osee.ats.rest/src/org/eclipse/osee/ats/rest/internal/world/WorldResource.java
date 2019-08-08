@@ -32,6 +32,7 @@ import org.eclipse.osee.ats.api.user.IAtsUser;
 import org.eclipse.osee.ats.api.workflow.WorkItemType;
 import org.eclipse.osee.ats.core.column.AtsColumnId;
 import org.eclipse.osee.ats.rest.IAtsServer;
+import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
 import org.eclipse.osee.framework.jdk.core.util.AHTML;
 import org.eclipse.osee.framework.jdk.core.util.Conditions;
@@ -79,8 +80,8 @@ public class WorldResource {
    @GET
    @Path("my/{id}")
    @Produces(MediaType.APPLICATION_JSON)
-   public Collection<IAtsWorkItem> getMyWorld(@PathParam("id") int id) throws Exception {
-      ArtifactReadable userArt = (ArtifactReadable) atsServer.getQueryService().getArtifact(Long.valueOf(id));
+   public Collection<IAtsWorkItem> getMyWorld(@PathParam("id") Long id) throws Exception {
+      ArtifactReadable userArt = atsServer.getArtifact(id);
       IAtsUser userById =
          atsServer.getUserService().getUserById(userArt.getSoleAttributeValue(CoreAttributeTypes.UserId));
       Collection<IAtsWorkItem> myWorldItems =
@@ -92,24 +93,24 @@ public class WorldResource {
    @GET
    @Path("my/{id}/ui")
    @Produces(MediaType.TEXT_HTML)
-   public String getMyWorldUI(@PathParam("id") int id) throws Exception {
+   public String getMyWorldUI(@PathParam("id") ArtifactId id) throws Exception {
       StringBuilder sb = new StringBuilder();
-      ArtifactReadable userArt = (ArtifactReadable) atsServer.getQueryService().getArtifact(Long.valueOf(id));
+      ArtifactReadable userArt = atsServer.getArtifact(id);
       IAtsUser userById =
          atsServer.getUserService().getUserById(userArt.getSoleAttributeValue(CoreAttributeTypes.UserId));
       Collection<IAtsWorkItem> myWorldItems =
          atsServer.getQueryService().createQuery(WorkItemType.WorkItem).andAssignee(userById).getItems(
             IAtsWorkItem.class);
-      getDefaultUiTable(id, sb, "My World - " + userById.getName(), myWorldItems);
+      getDefaultUiTable(sb, "My World - " + userById.getName(), myWorldItems);
       return sb.toString();
    }
 
    @GET
    @Path("my/{id}/ui/{customize_guid}")
    @Produces(MediaType.TEXT_HTML)
-   public String getMyWorldUICustomized(@PathParam("id") int id, @PathParam("customize_guid") String customize_guid) throws Exception {
+   public String getMyWorldUICustomized(@PathParam("id") ArtifactId id, @PathParam("customize_guid") String customize_guid) throws Exception {
       ElapsedTime time = new ElapsedTime("start");
-      ArtifactReadable userArt = (ArtifactReadable) atsServer.getQueryService().getArtifact(Long.valueOf(id));
+      ArtifactReadable userArt = atsServer.getArtifact(id);
       IAtsUser userById =
          atsServer.getUserService().getUserById(userArt.getSoleAttributeValue(CoreAttributeTypes.UserId));
       Conditions.checkNotNull(userById, "User by Id " + id);
@@ -135,9 +136,8 @@ public class WorldResource {
    @GET
    @Path("coll/{id}")
    @Produces(MediaType.APPLICATION_JSON)
-   public Collection<IAtsWorkItem> getCollection(@PathParam("id") long id) throws Exception {
-      ArtifactReadable collectorArt = (ArtifactReadable) atsServer.getQueryService().getArtifact(id);
-      return getCollection(collectorArt);
+   public Collection<IAtsWorkItem> getCollection(@PathParam("id") ArtifactId id) throws Exception {
+      return getCollection(atsServer.getArtifact(id));
    }
 
    private Collection<IAtsWorkItem> getCollection(ArtifactReadable collectorArt) {
@@ -157,17 +157,17 @@ public class WorldResource {
    @GET
    @Path("coll/{id}/ui")
    @Produces(MediaType.TEXT_HTML)
-   public String getCollectionUI(@PathParam("id") long id) throws Exception {
+   public String getCollectionUI(@PathParam("id") ArtifactId id) throws Exception {
       StringBuilder sb = new StringBuilder();
-      ArtifactReadable collectorArt = (ArtifactReadable) atsServer.getQueryService().getArtifact(id);
-      getDefaultUiTable(id, sb, "Collection - " + collectorArt.getName(), getCollection(id));
+      ArtifactReadable collectorArt = atsServer.getArtifact(id);
+      getDefaultUiTable(sb, "Collection - " + collectorArt.getName(), getCollection(id));
       return sb.toString();
    }
 
    @GET
    @Path("coll/{id}/ui/{customize_guid}")
    @Produces(MediaType.TEXT_HTML)
-   public String getCollectionUICustomized(@PathParam("id") long id, @PathParam("customize_guid") String customize_guid) throws Exception {
+   public String getCollectionUICustomized(@PathParam("id") ArtifactId id, @PathParam("customize_guid") String customize_guid) throws Exception {
       ElapsedTime time = new ElapsedTime("start");
 
       ElapsedTime getCustomization = new ElapsedTime("getCustomizationByGuid");
@@ -176,7 +176,7 @@ public class WorldResource {
 
       // get work items
       ElapsedTime getWorkItems = new ElapsedTime("get work items");
-      ArtifactReadable collectorArt = (ArtifactReadable) atsServer.getQueryService().getArtifact(id);
+      ArtifactReadable collectorArt = atsServer.getArtifact(id);
       Collection<IAtsWorkItem> collectorItems = getCollection(collectorArt);
       getWorkItems.end();
 
@@ -232,7 +232,7 @@ public class WorldResource {
       return sb.toString();
    }
 
-   private void getDefaultUiTable(long id, StringBuilder sb, String tableName, Collection<IAtsWorkItem> workItems) throws Exception {
+   private void getDefaultUiTable(StringBuilder sb, String tableName, Collection<IAtsWorkItem> workItems) throws Exception {
       List<IAtsColumnId> columns = Arrays.asList(AtsColumnId.Team, AtsColumnId.State, AtsColumnId.Priority,
          AtsColumnId.ChangeType, AtsColumnId.Assignees, AtsColumnId.Title, AtsColumnId.ActionableItem,
          AtsColumnId.CreatedDate, AtsColumnId.TargetedVersion, AtsColumnId.Notes, AtsColumnId.AtsId);

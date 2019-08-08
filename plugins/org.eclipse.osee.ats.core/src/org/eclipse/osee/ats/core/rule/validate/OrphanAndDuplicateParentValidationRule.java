@@ -30,15 +30,13 @@ public class OrphanAndDuplicateParentValidationRule extends AbstractValidationRu
    @Override
    public void validate(ArtifactToken artifact, XResultData results) {
       try {
-         if (!atsApi.getStoreService().isHistorical(artifact)) {
-            int count =
-               atsApi.getRelationResolver().getRelatedCount(artifact, CoreRelationTypes.Default_Hierarchical__Parent);
-            if (count == 0) {
-               logError(artifact, "is orphaned (no parent on Default Hierarchy).", results);
-            } else if (count > 1) {
-               logError(artifact, String.format("has %s parents (duplicate parents on Default Hierarchy).", count),
-                  results);
-            }
+         int count =
+            atsApi.getRelationResolver().getRelatedCount(artifact, CoreRelationTypes.Default_Hierarchical__Parent);
+         if (count == 0) {
+            logError(artifact, "is orphaned (no parent on Default Hierarchy).", results);
+         } else if (count > 1) {
+            logError(artifact, String.format("has %s parents (duplicate parents on Default Hierarchy).", count),
+               results);
          }
       } catch (Exception ex) {
          String errStr =

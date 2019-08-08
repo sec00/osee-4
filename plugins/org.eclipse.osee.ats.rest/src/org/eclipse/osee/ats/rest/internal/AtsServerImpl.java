@@ -62,11 +62,14 @@ import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.ArtifactTypeToken;
 import org.eclipse.osee.framework.core.enums.CoreArtifactTypes;
 import org.eclipse.osee.framework.core.enums.CoreAttributeTypes;
+import org.eclipse.osee.framework.core.enums.CoreBranches;
 import org.eclipse.osee.framework.core.executor.ExecutorAdmin;
 import org.eclipse.osee.framework.core.server.OseeInfo;
 import org.eclipse.osee.framework.core.util.JsonUtil;
 import org.eclipse.osee.framework.jdk.core.type.OseeArgumentException;
 import org.eclipse.osee.orcs.OrcsApi;
+import org.eclipse.osee.orcs.data.ArtifactReadable;
+import org.eclipse.osee.orcs.search.QueryFactory;
 
 /**
  * @author Donald G Dunne
@@ -85,9 +88,11 @@ public class AtsServerImpl extends AtsApiImpl implements IAtsServer {
    private AtsActionEndpointApi actionEndpoint;
    private ExecutorAdmin executorAdmin;
    private IAtsHealthService healthService;
+   private QueryFactory queryFactory;
 
    public void setOrcsApi(OrcsApi orcsApi) {
       this.orcsApi = orcsApi;
+      queryFactory = orcsApi.getQueryFactory();
    }
 
    public void setExecutorAdmin(ExecutorAdmin executorAdmin) {
@@ -372,4 +377,31 @@ public class AtsServerImpl extends AtsApiImpl implements IAtsServer {
       return healthService;
    }
 
+   @Override
+   public ArtifactReadable getArtifact(IAtsObject atsObject) {
+      if (atsObject.getStoreObject() instanceof ArtifactReadable) {
+         return (ArtifactReadable) atsObject.getStoreObject();
+      }
+      return getArtifact(atsObject.getId());
+   }
+
+   @Override
+   public ArtifactReadable getArtifact(Long artifactId) {
+      return getArtifact(ArtifactId.valueOf(artifactId));
+   }
+
+   @Override
+   public ArtifactReadable getArtifact(ArtifactId artifactId) {
+      return queryFactory.fromBranch(CoreBranches.COMMON).andId(artifactId).asArtifact();
+   }
+
+   @Override
+   public ArtifactToken getArtifactToken(ArtifactId artifactId) {
+      return queryFactory.fromBranch(CoreBranches.COMMON).andId(artifactId).asArtifactToken();
+   }
+
+   @Override
+   public ArtifactToken getArtifactToken(Long artifactId) {
+      return getArtifactToken(ArtifactId.valueOf(artifactId));
+   }
 }

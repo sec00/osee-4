@@ -94,8 +94,6 @@ public interface IAtsStoreService {
 
    boolean isProductionDb();
 
-   boolean isHistorical(IAtsObject atsObject);
-
    JdbcService getJdbcService();
 
    default Map<ArtifactId, ArtifactTypeToken> getArtifactTypes(Collection<ArtifactId> artIds) {
@@ -111,6 +109,4 @@ public interface IAtsStoreService {
    boolean isOfType(IAtsObject atsObject, ArtifactTypeToken... artifactType);
 
    boolean inheritsFrom(ArtifactTypeToken artType, ArtifactTypeToken... artifactType);
-
-   boolean isHistorical(ArtifactId artifact);
 }
