@@ -425,19 +425,17 @@ public class OrcsApplicabilityOps implements OrcsApplicability {
                results.errorf("Variant Name is already in use.");
                return results;
             }
-            if ((xVariant == null)) {
-               try {
-                  UserId user = account;
-                  if (user == null) {
-                     user = SystemUser.OseeSystem;
-                  }
-                  TransactionBuilder tx = orcsApi.getTransactionFactory().createTransaction(branch, user,
-                     "Update Variant " + variant.toStringWithId());
-                  createUpdateVariantDefinition(variant, tx);
-                  tx.commit();
-               } catch (Exception ex) {
-                  results.error(Lib.exceptionToString(ex));
+            try {
+               UserId user = account;
+               if (user == null) {
+                  user = SystemUser.OseeSystem;
                }
+               TransactionBuilder tx = orcsApi.getTransactionFactory().createTransaction(branch, user,
+                  "Update Variant " + variant.toStringWithId());
+               createUpdateVariantDefinition(variant, tx);
+               tx.commit();
+            } catch (Exception ex) {
+               results.error(Lib.exceptionToString(ex));
             }
             //If copyFrom indicated; set applicability for each feature to match
             if (variant.copyFrom != null) {

@@ -908,7 +908,7 @@ public class ApplicabilityGrammarParser extends Parser {
             state._fsp--;
 
             adaptor.addChild(root_0, operator24.getTree());
-            id_values_map.get(id).add((operator24 != null ? input.toString(operator24.start, operator24.stop) : null));
+            id_values_map.get(id).add(input.toString(operator24.start, operator24.stop));
             pushFollow(FOLLOW_compound_value_in_multiple_compounds330);
             compound_value25 = compound_value();
 
