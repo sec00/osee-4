@@ -21,9 +21,7 @@ import static org.eclipse.osee.ats.api.data.AtsAttributeTypes.Description;
 import static org.eclipse.osee.ats.api.data.AtsRelationTypes.TeamActionableItem_ActionableItem;
 import static org.eclipse.osee.ats.api.data.AtsRelationTypes.TeamDefinitionToVersion_Version;
 import static org.eclipse.osee.framework.core.enums.CoreRelationTypes.Users_User;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.osee.ats.api.AtsApi;
@@ -43,8 +41,10 @@ import org.eclipse.osee.framework.core.data.ArtifactId;
 import org.eclipse.osee.framework.core.data.ArtifactToken;
 import org.eclipse.osee.framework.core.data.BranchId;
 import org.eclipse.osee.framework.core.enums.CoreBranches;
+import org.eclipse.osee.framework.core.enums.CoreRelationTypes;
 import org.eclipse.osee.framework.jdk.core.result.XResultData;
-import org.eclipse.osee.framework.jdk.core.util.Collections;
+import org.eclipse.osee.framework.jdk.core.util.ElapsedTime;
+import org.eclipse.osee.framework.jdk.core.util.ElapsedTime.Units;
 import org.eclipse.osee.orcs.OrcsApi;
 import org.eclipse.osee.orcs.data.ArtifactReadable;
 import org.eclipse.osee.orcs.search.QueryBuilder;
@@ -94,28 +94,22 @@ public class AtsConfigurationsService extends AbstractAtsConfigurationService {
    }
 
    private AtsConfigurations getAtsConfigurationsFromDb() {
-      List<Long> teamDefIds = new LinkedList<>();
       QueryBuilder query = orcsApi.getQueryFactory().fromBranch(CoreBranches.COMMON);
-      for (ArtifactId art : query.andTypeEquals(TeamDefinition).asArtifactIds()) {
-         teamDefIds.add(art.getId());
-      }
 
-      List<Long> aiIds = new LinkedList<>();
-      for (ArtifactId art : query.andTypeEquals(ActionableItem).asArtifactIds()) {
-         aiIds.add(art.getId());
-      }
+      ElapsedTime time = new ElapsedTime("getAtsConfigurationsFromDb");
 
-      Collection<ArtifactReadable> artifacts =
-         Collections.castAll(atsApi.getQueryService().getArtifacts(Configuration));
+      List<ArtifactId> teamDefIds = query.andTypeEquals(TeamDefinition).asArtifactIds();
+      List<ArtifactId> aiIds = query.andTypeEquals(ActionableItem).asArtifactIds();
+
       // load ats branch configurations
       AtsConfigurations configs = new AtsConfigurations();
-      for (ArtifactReadable art : artifacts) {
+      for (ArtifactReadable art : query.andTypeEquals(Configuration).asArtifacts()) {
          AtsConfiguration config = new AtsConfiguration();
-         configs.getConfigs().add(config);
          config.setName(art.getName());
          config.setArtifactId(art);
          config.setBranchId(BranchId.valueOf(art.getSoleAttributeValue(AtsConfiguredBranch, "0")));
          config.setIsDefault(art.getSoleAttributeValue(Default, false));
+         configs.getConfigs().add(config);
       }
       UpdateAtsConfiguration update = new UpdateAtsConfiguration(atsApi, orcsApi);
       AtsViews views = update.getConfigViews();
@@ -129,57 +123,53 @@ public class AtsConfigurationsService extends AbstractAtsConfigurationService {
       for (IAtsUser user : atsApi.getUserService().getUsersFromDb()) {
          configs.getUsers().add((AtsUser) user);
       }
+
       // load admins
-      ArtifactReadable atsAdminArt = (ArtifactReadable) atsApi.getQueryService().getArtifact(AtsUserGroups.AtsAdmin);
-      if (atsAdminArt != null) {
-         for (ArtifactReadable member : atsAdminArt.getRelated(Users_User)) {
-            configs.getAtsAdmins().add(member);
-         }
-      }
-
-      Map<Long, ArtifactReadable> idToArtifact = new HashMap<>();
-
-      List<ArtifactReadable> configArts = Collections.castAll(
-         atsApi.getQueryService().getArtifacts(atsApi.getAtsBranch(), false, TeamDefinition, Version, ActionableItem));
+      configs.getAtsAdmins().addAll(query.andId(AtsUserGroups.AtsAdmin).asArtifact().getRelated(Users_User).getList());
 
       // load ats config objects
-      for (ArtifactReadable configArtId : configArts) {
-         if (atsApi.getStoreService().isOfType(configArtId, TeamDefinition)) {
-            JaxTeamDefinition teamDef = createJaxTeamDefinition(configArtId);
+      Map<ArtifactId, ArtifactReadable> idToConfigArtifact =
+         query.andTypeEquals(Arrays.asList(TeamDefinition, Version, ActionableItem)).asArtifactMap();
+
+      for (ArtifactReadable configArt : idToConfigArtifact.values()) {
+         if (configArt.isTypeEqual(TeamDefinition)) {
+            JaxTeamDefinition teamDef = createJaxTeamDefinition(configArt);
             configs.addTeamDef(teamDef);
-         } else if (atsApi.getStoreService().isOfType(configArtId, ActionableItem)) {
-            JaxActionableItem ai = createJaxActionableItem(configArtId);
+         } else if (configArt.isTypeEqual(ActionableItem)) {
+            JaxActionableItem ai = createJaxActionableItem(configArt);
             configs.addAi(ai);
-         } else if (atsApi.getStoreService().isOfType(configArtId, Version)) {
-            JaxVersion version = createJaxVersion(configArtId);
+         } else if (configArt.isTypeEqual(Version)) {
+            JaxVersion version = createJaxVersion(configArt);
             configs.addVersion(version);
          }
-         idToArtifact.put(configArtId.getId(), configArtId);
       }
+
+      query.andTypeEquals(TeamDefinition).andRelatedRecursive(CoreRelationTypes.Default_Hierarchical__Child,
+         AtsArtifactToken.TopTeamDefinition);
 
       // load team def tree
 
-      addTeamDefinitionChildrenWIthRecurse(AtsArtifactToken.TopTeamDefinition.getId(), idToArtifact, configs,
-         teamDefIds);
+      addTeamDefinitionChildrenWIthRecurse(AtsArtifactToken.TopTeamDefinition, idToConfigArtifact, configs, teamDefIds);
       configs.setTopTeamDefinition(AtsArtifactToken.TopTeamDefinition);
 
       // load actionable items tree
-      addActionableItemChildrenWIthRecurse(AtsArtifactToken.TopActionableItem.getId(), idToArtifact, configs, aiIds);
+      addActionableItemChildrenWIthRecurse(AtsArtifactToken.TopActionableItem, idToConfigArtifact, configs, aiIds);
       configs.setTopActionableItem(AtsArtifactToken.TopActionableItem);
 
+      time.end(Units.SEC);
       return configs;
    }
 
-   private JaxTeamDefinition addTeamDefinitionChildrenWIthRecurse(Long teamDefId, Map<Long, ArtifactReadable> idToArtifact, AtsConfigurations configs, List<Long> teamDefIds) {
+   private JaxTeamDefinition addTeamDefinitionChildrenWIthRecurse(ArtifactId teamDefId, Map<ArtifactId, ArtifactReadable> idToArtifact, AtsConfigurations configs, List<ArtifactId> teamDefIds) {
       ArtifactReadable teamDef = idToArtifact.get(teamDefId);
       if (teamDef != null && teamDef.isOfType(TeamDefinition)) {
-         JaxTeamDefinition jaxTeamDef = configs.getIdToTeamDef().get(teamDefId);
-         for (Long childId : teamDef.getChildrentIds()) {
+         JaxTeamDefinition jaxTeamDef = configs.getIdToTeamDef().get(teamDefId.getId());
+         for (ArtifactId childId : teamDef.getChildren()) {
             if (teamDefIds.contains(childId)) {
                JaxTeamDefinition child =
                   addTeamDefinitionChildrenWIthRecurse(childId, idToArtifact, configs, teamDefIds);
                if (child != null) {
-                  child.setParentId(teamDefId);
+                  child.setParentId(teamDefId.getId());
                   jaxTeamDef.addChild(child);
                }
             }
@@ -188,14 +178,14 @@ public class AtsConfigurationsService extends AbstractAtsConfigurationService {
          for (Long versionId : atsApi.getRelationResolver().getRelatedIds(teamDef, TeamDefinitionToVersion_Version)) {
             jaxTeamDef.addVersion(versionId);
             JaxVersion version = configs.getIdToVersion().get(versionId);
-            version.setTeamDefId(teamDefId);
+            version.setTeamDefId(teamDefId.getId());
          }
          // add team to ai ids
          for (Long aiId : atsApi.getRelationResolver().getRelatedIds(teamDef, TeamActionableItem_ActionableItem)) {
             JaxActionableItem jai = configs.getIdToAi().get(aiId);
             if (jai != null) {
                jaxTeamDef.addAi(aiId);
-               jai.setTeamDefId(teamDefId);
+               jai.setTeamDefId(teamDefId.getId());
             }
          }
          return jaxTeamDef;
@@ -235,15 +225,15 @@ public class AtsConfigurationsService extends AbstractAtsConfigurationService {
       return jaxAi;
    }
 
-   private JaxActionableItem addActionableItemChildrenWIthRecurse(Long aiId, Map<Long, ArtifactReadable> idToArtifact, AtsConfigurations configs, List<Long> aiIds) {
+   private JaxActionableItem addActionableItemChildrenWIthRecurse(ArtifactId aiId, Map<ArtifactId, ArtifactReadable> idToArtifact, AtsConfigurations configs, List<ArtifactId> aiIds) {
       ArtifactReadable aiArt = idToArtifact.get(aiId);
       if (aiArt != null && aiArt.isOfType(ActionableItem)) {
-         JaxActionableItem jaxAi = configs.getIdToAi().get(aiId);
-         for (Long childId : aiArt.getChildrentIds()) {
+         JaxActionableItem jaxAi = configs.getIdToAi().get(aiId.getId());
+         for (ArtifactId childId : aiArt.getChildren()) {
             if (aiIds.contains(childId)) {
                JaxActionableItem child = addActionableItemChildrenWIthRecurse(childId, idToArtifact, configs, aiIds);
                if (child != null) {
-                  child.setParentId(aiId);
+                  child.setParentId(aiId.getId());
                   jaxAi.addChild(child);
                }
             }
@@ -263,5 +253,4 @@ public class AtsConfigurationsService extends AbstractAtsConfigurationService {
       AtsDatabaseConfig config = new AtsDatabaseConfig(atsApi, orcsApi);
       return config.run();
    }
-
 }
