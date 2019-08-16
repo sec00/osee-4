@@ -195,7 +195,8 @@ public class QueryEngineImpl implements QueryEngine {
          Long otherArtId = stmt.getLong("other_art_id");
          String value = stmt.getString("value");
          if (otherArtId == 0) {
-            artifact.putAttributeValue(attributeTypes.get(typeId), value);
+            AttributeTypeToken attributeTypeToken = attributeTypes.get(typeId);
+            artifact.putAttributeValue(attributeTypeToken, value);
          } else {
             Long otherArtType = stmt.getLong("other_art_type_id");
             RelationSide side = value.equals("A") ? RelationSide.SIDE_A : RelationSide.SIDE_B;
