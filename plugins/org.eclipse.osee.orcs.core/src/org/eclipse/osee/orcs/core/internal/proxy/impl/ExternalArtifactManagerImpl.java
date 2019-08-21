@@ -44,7 +44,7 @@ public class ExternalArtifactManagerImpl implements ExternalArtifactManager {
 
    @Override
    public Artifact asInternalArtifact(ArtifactReadable external) {
-      return external == null || external.isInvalid() ? null : ((ArtifactReadOnlyImpl) external).getProxiedObject();
+      return external instanceof ArtifactReadOnlyImpl && external.isValid() ? ((ArtifactReadOnlyImpl) external).getProxiedObject() : null;
    }
 
    @Override
