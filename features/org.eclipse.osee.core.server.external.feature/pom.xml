@@ -47,6 +47,8 @@
 							   <plugin id="org.apache.xerces" />
 							   <plugin id="org.apache.xml.resolver" />
 							   <plugin id="org.apache.xml.serializer" />
+							   								<plugin id="org.ccil.cowan.tagsoup" />
+							   
 							   <plugin id="org.eclipse.core.net" />
 							   <plugin id="org.eclipse.equinox.security" />
 							   <plugin id="org.eclipse.jetty.http" />
