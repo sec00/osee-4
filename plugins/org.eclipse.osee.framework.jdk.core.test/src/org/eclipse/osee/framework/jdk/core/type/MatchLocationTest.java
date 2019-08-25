@@ -15,7 +15,7 @@ import org.junit.Assert;
 
 /**
  * Test Case for {@link MatchLocation}
- * 
+ *
  * @author Roberto E. Escobar
  */
 public class MatchLocationTest {
@@ -44,6 +44,7 @@ public class MatchLocationTest {
 
    @org.junit.Test
    public void testSetters() {
+      System.out.println("BRANCH SUCCESSFUL");
       MatchLocation newLocation = new MatchLocation(0, 0);
       newLocation.setStartPosition(a);
       newLocation.setEndPosition(b);
