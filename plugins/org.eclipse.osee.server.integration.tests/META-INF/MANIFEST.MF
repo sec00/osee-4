@@ -34,3 +34,4 @@ Require-Bundle: org.eclipse.osee.ats.api,
  org.apache.commons.logging,
  org.hamcrest.core,
  org.mockito;visibility:=reexport
+DynamicImport-Package: *ccil*
