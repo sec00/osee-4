@@ -20,7 +20,7 @@
    <includes
          id="org.eclipse.egit"
          version="5.0.0"/>
-  
+
   <includes
          id="org.eclipse.jgit.lfs"
          version="5.0.0"/>
@@ -261,5 +261,12 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-            
+      
+    <plugin
+         id="org.postgresql.driver"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+              
 </feature>
