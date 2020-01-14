@@ -17,6 +17,7 @@
       %license
    </license>
 
+
    <includes
          id="org.eclipse.egit"
          version="5.0.0"/>
