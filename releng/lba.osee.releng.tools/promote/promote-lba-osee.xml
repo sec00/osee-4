@@ -1,0 +1,741 @@
+<project name="Promote OSEE build artifacts" default="run">
+
+       <target name="init">
+             <property environment="env" />
+
+             <fail message="Production builds area not found: [${production-builds}]">
+                    <condition>
+                           <not>
+                                 <available file="${production-builds}" />
+                           </not>
+                    </condition>
+             </fail>
+
+             <echo>--------------------------------------------------------------</echo>
+             <echo>Promote-Type: [${promote-type}]</echo>
+             <echo>Production-Builds: [${production-builds}]</echo>
+             <echo>Copy-From-Local-Build: [${copy-from-local-build}]</echo>
+             <echo>--------------------------------------------------------------</echo>
+             <echo>--------------------------------------------------------------</echo>
+             <echo>Update-Installs: [${update-installs}]</echo>
+             <if>
+                    <equals arg1="${update-installs}" arg2="true" />
+                    <then>
+                           <echo>Production-Server: [${production-server}]</echo>
+                           <echo>Production-Installs: [${production-installs}]</echo>
+                           <echo>Server-Install-Link: [${server-install-link}]</echo>
+                           <echo>Server-Launch-Cmd: [${server-launch-cmd}]</echo>
+                           <echo>Install-Cmd: [${install-links-cmd}]</echo>
+                    </then>
+             </if>
+             <echo>--------------------------------------------------------------</echo>
+
+             <echo>org.eclipse.osee repository path: [${osee-repo-path}]</echo>
+             <echo>lba.osee repository path: [${lba-osee-repo-path}]</echo>
+
+             <fail message="Specify the repository location '-Dosee-repo-path=[] -Dlba-osee-repo-path=[]'">
+                    <condition>
+                           <or>
+                                 <not>
+                                        <isset property="osee-repo-path" />
+                                 </not>
+                                 <not>
+                                        <isset property="lba-osee-repo-path" />
+                                 </not>
+                           </or>
+                    </condition>
+             </fail>
+
+             <echo>Integration-Server: [${integration-server}]</echo>
+             <echo>Jobs-Path: [${jobs-path}]</echo>
+             <echo>Build-Path: [${build-path}]</echo>
+             <echo>Artifacts-Path: [${artifacts-path}]</echo>
+             <echo>--------------------------------------------------------------</echo>
+             <echo>OSEE-JOB: [${osee-job}]</echo>
+             <echo>LBA-JOB: [${lba-osee-job}]</echo>
+             <property name="osee-job-artifacts" value="${osee-repo-path}/plugins" />
+             <property name="lba-osee-job-artifacts" value="${lba-osee-repo-path}/plugins" />
+             <property name="osee-job-url" value="${integration-server}/${jobs-path}/${osee-job}/${build-path}" />
+             <property name="lba-osee-job-url" value="${integration-server}/${jobs-path}/${lba-osee-job}/${build-path}" />
+
+             <!-- Artifact Paths -->
+             <property name="osee-ide-job-path" value="${osee-job-artifacts}/org.eclipse.osee.client.all.p2/target" />
+             <property name="osee-products-job-path" value="${osee-job-artifacts}/org.eclipse.osee.client.all.product/target/products" />
+             <property name="osee-server-job-path" value="${osee-job-artifacts}/org.eclipse.osee.server.p2/target" />
+             <!--<property name="osee-ote-products-job-path" value="${osee-job-artifacts}/org.eclipse.osee.ote.master.product/target/products" />-->
+
+             <property name="lba-ide-job-path" value="${lba-osee-job-artifacts}/lba.osee.client.all.p2/target" />
+             <property name="lba-products-job-path" value="${lba-osee-job-artifacts}/lba.osee.client.all.product/target/products" />
+             <property name="lba-osee-server-job-path" value="${lba-osee-job-artifacts}/lba.osee.server.p2/target" />
+
+             <!-- 1. Get Build Label to determine folder location - lba.osee.client.all.product/target/products/build_label.txt -->
+             <switch value="${promote-type}">
+                    <case value="alpha">
+                           <if>
+                                 <equals arg1="${copy-from-local-build}" arg2="true" />
+                                 <then>
+                                        <loadresource property="release-tag">
+                                               <url file="${lba-products-job-path}/build_label.txt" />
+                                        </loadresource>
+                                 </then>
+                                 <else>
+                                        <getAsProperty property="release-tag" url="${lba-products-job-path}/build_label.txt" />
+                                        <!--                                    <loadresource property="release-tag">
+                                               <url url="${lba-products-job-path}/build_label.txt" />
+                                        </loadresource>-->
+                                 </else>
+                           </if>
+                    </case>
+                    <case value="beta">
+                           <acquire-release-tag-from-build-info />
+                    </case>
+                    <case value="release">
+                           <acquire-release-tag-from-build-info />
+                    </case>
+                    <default>
+                           <fail message="promote-type not supported: [${promote-type}] - should be [alpha,beta,release]" />
+                    </default>
+             </switch>
+
+             <fail message="Release Tag was not found: [${release-tag}]">
+                    <condition>
+                           <isset property="${release-tag}" />
+                    </condition>
+             </fail>
+
+             <propertyregex property="build-version" override="true" input="${release-tag}" regexp="(.*)?\.v" select="\1" casesensitive="false" />
+             <propertyregex property="build-qualifier" override="true" input="${release-tag}" regexp=".*?v(.*)?-" select="\1" casesensitive="false" />
+             <propertyregex property="build-alias" override="true" input="${release-tag}" regexp="-(.*)" select="\1" casesensitive="false" />
+
+             <property name="deploy-name" value="OSEE_${build-version}_${build-alias}_${build-qualifier}" />
+             <property name="deploy-path" value="${production-builds}/${deploy-name}" />
+
+             <echo>--------------------------------------------------------------</echo>
+             <echo>Release-Tag: [${release-tag}]</echo>
+             <echo>Build-Version: [${build-version}]</echo>
+             <echo>Build-Qualifier: [${build-qualifier}]</echo>
+             <echo>Build-Alias: [${build-alias}]</echo>
+             <echo>--------------------------------------------------------------</echo>
+             <echo>Deploy-Name: [${deploy-name}]</echo>
+             <echo>Deploy-Location: [${deploy-path}]</echo>
+             <echo>--------------------------------------------------------------</echo>
+
+             <if>
+                    <equals arg1="${promote-type}" arg2="alpha" />
+                    <then>
+                           <!-- Do Nothing for now -->
+                    </then>
+                    <else>
+                           <fail message="deploy-path was not found: [${deploy-path}]">
+                                 <condition>
+                                        <not>
+                                               <available file="${deploy-path}" />
+                                        </not>
+                                 </condition>
+                           </fail>
+                    </else>
+             </if>
+
+             <property name="update-sites-path" value="${deploy-path}/osee_update_sites" />
+
+             <!-- Build area variables -->
+             <property name="build-info" value="${deploy-path}/build_info.xml" />
+             <property name="products-path" value="${deploy-path}/osee_products" />
+             <!--<property name="ote-server-path" value="${deploy-path}/osee_ote_server" />-->
+             <property name="lba-osee-server-path" value="${deploy-path}/osee_application_server" />
+             <property name="lba-update-site-path" value="${update-sites-path}/lba_osee_master_site" />
+             <!--<property name="lba-ote-server-update-site-path" value="${update-sites-path}/lba_osee_ote_server_site" />-->
+
+             <!---<property name="deploy-javadoc-path" value="${deploy-path}/osee_javadoc" />-->
+
+             <property name="p2-project-version" value="-${build-version}-SNAPSHOT" />
+
+             <property name="lba-osee-server-p2-zip" value="lba.osee.server.p2${p2-project-version}.zip" />
+             <property name="lba-osee-client-all-p2-zip" value="lba.osee.client.all.p2${p2-project-version}.zip" />
+             <property name="osee-server-p2-zip" value="org.eclipse.osee.server.p2${p2-project-version}.zip" />
+             <property name="osee-client-all-p2-zip" value="org.eclipse.osee.client.all.p2${p2-project-version}.zip" />
+
+             <!--<property name="lba-ote-server-runtime-zip" value="ote.server.runtime.zip" />-->
+             <property name="lba-osee-server-runtime-zip" value="lba.osee.server.runtime.zip" />
+             <property name="osee-server-runtime-zip" value="org.eclipse.osee.server.runtime.zip" />
+
+             <!-- update SDC Nightly DEV sites -->
+             <property name="sdc-promote-comment" value="Automatic update from nightly build" />
+             <property name="lba-site-name" value="LBA Dev Nightly" />
+             <property name="osee-site-name" value="OSEE Dev Nightly" />
+             <property name="lba-site-zip" value="${update-sites-path}/${lba-osee-client-all-p2-zip}" />
+             <property name="osee-site-zip" value="${update-sites-path}/${osee-client-all-p2-zip}" />
+             <property name="sdc-package-name" value="OSEE Dev Nightly" />
+             <property name="sdc-promoted-dir" value="${deploy-path}/osee_sdc" />
+
+             <echo>SDC Promote Comment: [${sdc-promote-comment}]</echo>
+             <echo>Lba Site Name: [${lba-site-name}]</echo>
+             <echo>Osee Site Name: [${osee-site-name}]</echo>
+             <echo>Lba Site Zip: [${lba-site-zip}]</echo>
+             <echo>Osee Site Zip: [${osee-site-zip}]</echo>
+             <echo>SDC Package Name: [${sdc-package-name}]</echo>
+             <echo>SDC Status Dir: [${sdc-promoted-dir}]</echo>
+             <echo>--------------------------------------------------------------</echo>
+
+       </target>
+
+       <!-- *************************************************************** -->
+       <!-- START OF setup-build-artifacts-area                               -->
+       <!-- *************************************************************** -->
+       <target name="checks">
+             <condition property="is-deploy-path-available">
+                    <available file="${deploy-path}" />
+             </condition>
+             <if>
+                    <equals arg1="${is-deploy-path-available}" arg2="true" />
+                    <then>
+                           <if>
+                                 <equals arg1="${delete-deploy-path-if-found}" arg2="true" />
+                                 <then>
+                                        <echo>--------------------------------------------------------------</echo>
+                                        <echo>Delete deploy path [${is-deploy-path-available}]</echo>
+                                        <echo>Deploy-path to delete: [${${deploy-path}]</echo>
+                                        <echo>--------------------------------------------------------------</echo>
+                                        <delete includeEmptyDirs="true" failonerror="true">
+                                               <fileset dir="${deploy-path}" />
+                                        </delete>
+                                 </then>
+                           </if>
+                    </then>
+             </if>
+
+             <condition property="is-build-info-available">
+                    <available file="${build-info}" />
+             </condition>
+
+             <condition property="are-update-sites-available">
+                    <and>
+                           <available file="${update-sites-path}" />
+                           <available file="${update-sites-path}/${osee-client-all-p2-zip}" />
+                           <available file="${update-sites-path}/${osee-server-p2-zip}" />
+
+                           <available file="${update-sites-path}/${lba-osee-client-all-p2-zip}" />
+                           <available file="${update-sites-path}/${lba-osee-server-p2-zip}" />
+                    </and>
+             </condition>
+
+             <condition property="are-product-artifacts-available">
+                    <and>
+                           <available file="${products-path}" />
+                           <available file="${products-path}/lba.osee.ide.id-linux.gtk.x86.tar.gz" />
+                           <available file="${products-path}/lba.osee.ide.id-linux.gtk.x86_64.tar.gz" />
+                           <!-- <available file="${products-path}/lba.osee.ide.id-solaris.gtk.sparc.zip" /> -->
+                           <available file="${products-path}/lba.osee.ide.id-win32.win32.x86_64.zip" />
+                           <available file="${products-path}/${lba-osee-server-runtime-zip}" />
+                           <!--<available file="${products-path}/${lba-ote-server-runtime-zip}" /> -->
+                           <available file="${products-path}/${osee-server-runtime-zip}" />
+                           <!--<available file="${products-path}/org.eclipse.osee.ote.master.product-linux.gtk.x86.tar.gz" />
+                           <available file="${products-path}/org.eclipse.osee.ote.master.product-linux.gtk.x86_64.tar.gz" />
+                           <available file="${products-path}/org.eclipse.osee.ote.master.product-win32.win32.x86.zip" />
+                           <available file="${products-path}/org.eclipse.osee.ote.master.product-win32.win32.x86_64.zip" />
+                           <available file="${products-path}/org.eclipse.osee.ote.master.product-macosx.cocoa.x86_64.tar.gz" />
+                           -->
+                    </and>
+             </condition>
+
+             <condition property="is-lba-update-site-installed">
+                    <available file="${lba-update-site-path}" />
+             </condition>
+<!--
+             <condition property="is-ote-server-update-site-installed">
+                    <available file="${lba-ote-server-update-site-path}" />
+             </condition>
+
+             <condition property="is-ote-server-installed">
+                    <available file="${ote-server-path}" />
+             </condition>
+-->
+             <condition property="is-lba-osee-server-installed">
+                    <available file="${lba-osee-server-path}" />
+             </condition>
+
+             <condition property="is-win32-x86-64-installed">
+                    <available file="${deploy-path}/osee_win32_x86_64" />
+             </condition>
+
+             <condition property="is-linux-x86-installed">
+                    <available file="${deploy-path}/osee_linux" />
+             </condition>
+
+             <condition property="is-linux-x86-64-installed">
+                    <available file="${deploy-path}/osee_linux_x86_64" />
+             </condition>
+
+             <!--
+             <condition property="is-solaris-sparc-installed">
+                    <available file="${deploy-path}/osee_solaris" />
+             </condition>
+             -->
+
+             <echo>--------------------------------------------------------------</echo>
+             <echo>                      CHECKS                                      </echo>
+             <echo>--------------------------------------------------------------</echo>
+             <echo>is-deploy-path-available: [${is-deploy-path-available}]</echo>
+             <echo>is-build-info-available: [${is-build-info-available}]</echo>
+             <echo>are-update-sites-available: [${are-update-sites-available}]</echo>
+             <echo>are-product-artifacts-available: [${are-product-artifacts-available}]</echo>
+             <echo>--------------------------------------------------------------</echo>
+             <echo>--------------------------------------------------------------</echo>
+             <echo>is-lba-update-site-installed: [${is-lba-update-site-installed}]</echo>
+             <!-- <echo>is-ote-server-update-site-installed: [${is-ote-server-update-site-installed}]</echo>
+             <echo>is-ote-server-installed: [${is-ote-server-installed}]</echo>
+             -->
+             <echo>is-win32-x86-installed: [${is-win32-x86-installed}]</echo>
+             <echo>is-win32-x86-64-installed: [${is-win32-x86-64-installed}]</echo>
+             <echo>is-linux-x86-installed: [${is-linux-x86-installed}]</echo>
+             <echo>is-linux-x86-64-installed: [${is-linux-x86-64-installed}]</echo>
+             <!-- <echo>is-solaris-sparc-installed: [${is-solaris-sparc-installed}]</echo> -->
+             <echo>--------------------------------------------------------------</echo>
+       </target>
+
+       <target name="acquireBuildInfo" unless="is-build-info-available">
+             <!--
+             <if>
+                    <equals arg1="${copy-from-local-build}" arg2="true" />
+                    <then>
+                           <property name="osee-timestamp" value="copied-from-local" />
+                           <property name="lba-osee-timestamp" value="copied-from-local" />
+
+                           <property name="osee-build-commit" value="&lt;branch&gt;&lt;SHA1&gt;unknown&lt;/SHA1&gt;&lt;name&gt;unknown&lt;/name&gt;&lt;/branch&gt;" />
+                           <property name="lba-osee-build-commit" value="&lt;branch&gt;&lt;SHA1&gt;unknown&lt;/SHA1&gt;&lt;name&gt;unknown&lt;/name&gt;&lt;/branch&gt;" />
+
+                           <property name="osee-job-site" value="&lt;url&gt;${osee-job-artifacts}&lt;/url&gt;" />
+                           <property name="lba-osee-job-site" value="&lt;url&gt;${lba-osee-job-artifacts}&lt;/url&gt;" />
+                    </then>
+                    <else>
+                    -->
+              <getAsProperty property="osee-timestamp" url="${osee-job-url}/buildTimestamp" />
+             <getAsProperty property="lba-osee-timestamp" url="${lba-osee-job-url}/buildTimestamp" />
+             <getAsProperty property="osee-build-commit" url="${osee-job-url}/api/xml?xpath=/*/*/lastBuiltRevision/branch" />
+             <getAsProperty property="lba-osee-build-commit" url="${lba-osee-job-url}/api/xml?xpath=/*/*/lastBuiltRevision/branch" />
+             <getAsProperty property="osee-job-site" url="${osee-job-url}/api/xml?xpath=/*/url" />
+             <getAsProperty property="lba-osee-job-site" url="${lba-osee-job-url}/api/xml?xpath=/*/url" />
+             <!--
+                           <loadresource property="osee-timestamp">
+                                 <url url="${osee-job-url}/buildTimestamp" />
+                           </loadresource>
+                           <loadresource property="lba-osee-timestamp">
+                                 <url url="${lba-osee-job-url}/buildTimestamp" />
+                           </loadresource>
+                          <loadresource property="osee-build-commit">
+                                 <url url="${osee-job-url}/api/xml?xpath=/*/*/lastBuiltRevision/branch" />
+                           </loadresource>
+                           <loadresource property="lba-osee-build-commit">
+                                 <url url="${lba-osee-job-url}/api/xml?xpath=/*/*/lastBuiltRevision/branch" />
+                           </loadresource>
+                           <loadresource property="osee-job-site">
+                                 <url url="${osee-job-url}/api/xml?xpath=/*/url" />
+                           </loadresource>
+                           <loadresource property="lba-osee-job-site">
+                                 <url url="${lba-osee-job-url}/api/xml?xpath=/*/url" />
+                           </loadresource>
+                    </else>
+             </if>
+                           -->
+
+             <echo file="${build-info}" append="false">&lt;build&gt;
+&lt;build-tag&gt;${release-tag}&lt;/build-tag&gt;
+&lt;deploy-tag&gt;${deploy-name}&lt;/deploy-tag&gt;
+&lt;repository&gt;
+&lt;name&gt;org.eclipse.osee&lt;/name&gt;
+&lt;build-date&gt;${osee-timestamp}&lt;/build-date&gt;
+&lt;build-source&gt;${osee-build-commit}&lt;/build-source&gt;
+${osee-job-site}
+&lt;/repository&gt;
+&lt;repository&gt;
+&lt;name&gt;lba.osee&lt;/name&gt;
+&lt;build-date&gt;${lba-osee-timestamp}&lt;/build-date&gt;
+&lt;build-source&gt;${lba-osee-build-commit}&lt;/build-source&gt;
+${lba-osee-job-site}
+&lt;/repository&gt;
+&lt;/build&gt;
+</echo>
+       </target>
+
+       <target name="acquireUpdateSites" unless="are-update-sites-available">
+             <mkdir dir="${update-sites-path}" />
+             <if>
+                    <equals arg1="${copy-from-local-build}" arg2="true" />
+                    <then>
+                           <parallel>
+                                 <copy file="${osee-ide-job-path}/${osee-client-all-p2-zip}" tofile="${update-sites-path}/${osee-client-all-p2-zip}" overwrite="true" />
+                                 <copy file="${osee-server-job-path}/${osee-server-p2-zip}" tofile="${update-sites-path}/${osee-server-p2-zip}" overwrite="true" />
+                                 <copy file="${lba-ide-job-path}/${lba-osee-client-all-p2-zip}" tofile="${update-sites-path}/${lba-osee-client-all-p2-zip}" overwrite="true" />
+                                 <copy file="${lba-osee-server-job-path}/${lba-osee-server-p2-zip}" tofile="${update-sites-path}/${lba-osee-server-p2-zip}" overwrite="true" />
+                           </parallel>
+                    </then>
+                    <else>
+                           <parallel>
+                                 <get username="${ldap.uname}" password="${ldap.pw}" src="${osee-ide-job-path}/${osee-client-all-p2-zip}" dest="${update-sites-path}/${osee-client-all-p2-zip}" />
+                                 <get username="${ldap.uname}" password="${ldap.pw}" src="${osee-server-job-path}/${osee-server-p2-zip}" dest="${update-sites-path}/${osee-server-p2-zip}" />
+                                 <get username="${ldap.uname}" password="${ldap.pw}" src="${lba-ide-job-path}/${lba-osee-client-all-p2-zip}" dest="${update-sites-path}/${lba-osee-client-all-p2-zip}" />
+                                 <get username="${ldap.uname}" password="${ldap.pw}" src="${lba-osee-server-job-path}/${lba-osee-server-p2-zip}" dest="${update-sites-path}/${lba-osee-server-p2-zip}" />
+                           </parallel>
+                    </else>
+             </if>
+       </target>
+
+       <target name="acquireProducts" unless="are-product-artifacts-available">
+             <mkdir dir="${products-path}" />
+             <!--lba.osee.client.all.product/target/products/*zip*/products.zip -> osee_ide/-->
+             <if>
+                    <equals arg1="${copy-from-local-build}" arg2="true" />
+                    <then>
+                           <parallel>
+                                 <copy file="${lba-products-job-path}/lba.osee.ide.id-linux.gtk.x86.tar.gz" tofile="${products-path}/lba.osee.ide.id-linux.gtk.x86.tar.gz" />
+                                 <copy file="${lba-products-job-path}/lba.osee.ide.id-linux.gtk.x86_64.tar.gz" tofile="${products-path}/lba.osee.ide.id-linux.gtk.x86_64.tar.gz" />
+                                 <!-- <copy file="${lba-products-job-path}/lba.osee.ide.id-solaris.gtk.sparc.zip" tofile="${products-path}/lba.osee.ide.id-solaris.gtk.sparc.zip" /> -->
+                                 <copy file="${lba-products-job-path}/lba.osee.ide.id-win32.win32.x86_64.zip" tofile="${products-path}/lba.osee.ide.id-win32.win32.x86_64.zip" />
+                                 <!--                             <copy file="${lba-products-job-path}/lba.osee.ide.id-macosx.cocoa.x86_64.tar.gz" tofile="${products-path}/lba.osee.ide.id-macosx.cocoa.x86_64.tar.gz" /> -->
+
+                                 <copy file="${lba-osee-server-job-path}/${lba-osee-server-runtime-zip}" tofile="${products-path}/${lba-osee-server-runtime-zip}" />
+
+                                 <copy file="${osee-server-job-path}/${osee-server-runtime-zip}" tofile="${products-path}/${osee-server-runtime-zip}" />
+
+                          <!--   <copy file="${lba-ote-server-job-path}/${lba-ote-server-runtime-zip}" tofile="${products-path}/${lba-ote-server-runtime-zip}" />
+                                 <copy file="${osee-ote-products-job-path}/org.eclipse.osee.ote.master.product-linux.gtk.x86.tar.gz" tofile="${products-path}/org.eclipse.osee.ote.master.product-linux.gtk.x86.tar.gz" />
+                                 <copy file="${osee-ote-products-job-path}/org.eclipse.osee.ote.master.product-linux.gtk.x86_64.tar.gz" tofile="${products-path}/org.eclipse.osee.ote.master.product-linux.gtk.x86_64.tar.gz" />
+                                 <copy file="${osee-ote-products-job-path}/org.eclipse.osee.ote.master.product-win32.win32.x86.zip" tofile="${products-path}/org.eclipse.osee.ote.master.product-win32.win32.x86.zip" />
+                                 <copy file="${osee-ote-products-job-path}/org.eclipse.osee.ote.master.product-win32.win32.x86_64.zip" tofile="${products-path}/org.eclipse.osee.ote.master.product-win32.win32.x86_64.zip" />
+                                 <copy file="${osee-ote-products-job-path}/org.eclipse.osee.ote.master.product-macosx.cocoa.x86_64.tar.gz" tofile="${products-path}/org.eclipse.osee.ote.master.product-macosx.cocoa.x86_64.tar.gz" />
+                                 -->
+                           </parallel>
+                    </then>
+                    <else>
+                           <parallel>
+                                 <get username="${ldap.uname}" password="${ldap.pw}" src="${lba-products-job-path}/lba.osee.ide.id-linux.gtk.x86.tar.gz" dest="${products-path}/lba.osee.ide.id-linux.gtk.x86.tar.gz" />
+                                 <get username="${ldap.uname}" password="${ldap.pw}" src="${lba-products-job-path}/lba.osee.ide.id-linux.gtk.x86_64.tar.gz" dest="${products-path}/lba.osee.ide.id-linux.gtk.x86_64.tar.gz" />
+                                 <!-- <get username="${ldap.uname}" password="${ldap.pw}" src="${lba-products-job-path}/lba.osee.ide.id-solaris.gtk.sparc.zip" dest="${products-path}/lba.osee.ide.id-solaris.gtk.sparc.zip" /> -->
+                                 <get username="${ldap.uname}" password="${ldap.pw}" src="${lba-products-job-path}/lba.osee.ide.id-win32.win32.x86_64.zip" dest="${products-path}/lba.osee.ide.id-win32.win32.x86_64.zip" />
+                                 <!--                             <get username="${ldap.uname}" password="${ldap.pw}" src="${lba-products-job-path}/lba.osee.ide.id-macosx.cocoa.x86_64.tar.gz" dest="${products-path}/lba.osee.ide.id-macosx.cocoa.x86_64.tar.gz" /> -->
+                                 <!--<get username="${ldap.uname}" password="${ldap.pw}" src="${lba-ote-server-job-path}/${lba-ote-server-runtime-zip}" dest="${products-path}/${lba-ote-server-runtime-zip}" /> -->
+                                <get username="${ldap.uname}" password="${ldap.pw}" src="${lba-osee-server-job-path}/${lba-osee-server-runtime-zip}" dest="${products-path}/${lba-osee-server-runtime-zip}" />
+                                 <get username="${ldap.uname}" password="${ldap.pw}" src="${osee-server-job-path}/${osee-server-runtime-zip}" dest="${products-path}/${osee-server-runtime-zip}" />
+                                 <!-- <get username="${ldap.uname}" password="${ldap.pw}" src="${osee-ote-products-job-path}/org.eclipse.osee.ote.master.product-linux.gtk.x86.tar.gz" dest="${products-path}/org.eclipse.osee.ote.master.product-linux.gtk.x86.tar.gz" />
+                                 <get username="${ldap.uname}" password="${ldap.pw}" src="${osee-ote-products-job-path}/org.eclipse.osee.ote.master.product-linux.gtk.x86_64.tar.gz" dest="${products-path}/org.eclipse.osee.ote.master.product-linux.gtk.x86_64.tar.gz" />
+                                 <get username="${ldap.uname}" password="${ldap.pw}" src="${osee-ote-products-job-path}/org.eclipse.osee.ote.master.product-win32.win32.x86.zip" dest="${products-path}/org.eclipse.osee.ote.master.product-win32.win32.x86.zip" />
+                                 <get username="${ldap.uname}" password="${ldap.pw}" src="${osee-ote-products-job-path}/org.eclipse.osee.ote.master.product-win32.win32.x86_64.zip" dest="${products-path}/org.eclipse.osee.ote.master.product-win32.win32.x86_64.zip" />
+                                 <get username="${ldap.uname}" password="${ldap.pw}" src="${osee-ote-products-job-path}/org.eclipse.osee.ote.master.product-macosx.cocoa.x86_64.tar.gz" dest="${products-path}/org.eclipse.osee.ote.master.product-macosx.cocoa.x86_64.tar.gz" />
+                                 -->
+                           </parallel>
+                    </else>
+             </if>
+       </target>
+
+       <target name="installWin64" unless="is-win32-x86-64-installed">
+             <install-ide os="win32" ws="win32" arch="x86_64" product-name="lba.osee.ide.id" />
+       </target>
+
+       <target name="installLinux" unless="is-linux-x86-installed">
+             <install-ide os="linux" ws="gtk" arch="x86" product-name="lba.osee.ide.id" />
+       </target>
+
+       <target name="installLinux64" unless="is-linux-x86-64-installed">
+             <install-ide os="linux" ws="gtk" arch="x86_64" product-name="lba.osee.ide.id" />
+       </target>
+
+       <!-- 
+       <target name="installSolaris" unless="is-solaris-sparc-installed">
+             <install-ide os="solaris" ws="gtk" arch="sparc" product-name="lba.osee.ide.id" />
+       </target>
+       -->
+
+       <target name="installLbaUpdateSite" unless="is-lba-update-site-installed">
+             <mkdir dir="${lba-update-site-path}" />
+             <unzip src="${update-sites-path}/${lba-osee-client-all-p2-zip}" dest="${lba-update-site-path}" overwrite="true" />
+       </target>
+
+       <target name="installLbaOseeServer" unless="is-lba-osee-server-installed">
+             <install-server-runtime runtime-binary-path="${products-path}/${lba-osee-server-runtime-zip}" install-path="${lba-osee-server-path}" />
+       </target>
+       
+
+       <macrodef name="getAsProperty">
+             <attribute name="url" />
+             <attribute name="property" />
+             <sequential>
+                    <get username="${ldap.uname}" password="${ldap.pw}" src="@{url}" dest="${temp-dir}/file" verbose="false" />
+                    <loadfile property="@{property}" srcfile="${temp-dir}/file" />
+                    <delete file="${temp-dir}/file" />
+             </sequential>
+       </macrodef>
+
+       <macrodef name="install-ide">
+             <attribute name="os" />
+             <attribute name="ws" />
+             <attribute name="arch" />
+             <attribute name="product-name" />
+             <sequential>
+                    <if>
+                           <equals arg1="@{arch}" arg2="x86_64" />
+                           <then>
+                                 <var name="install-path" value="${deploy-path}/osee_@{os}_@{arch}" />
+                           </then>
+                           <else>
+                                 <var name="install-path" value="${deploy-path}/osee_@{os}" />
+                           </else>
+                    </if>
+
+                    <mkdir dir="${install-path}/eclipse" />
+
+                    <if>
+                           <equals arg1="@{os}" arg2="linux" />
+                           <then>
+                                 <gunzip src="${products-path}/@{product-name}-@{os}.@{ws}.@{arch}.tar.gz" dest="${install-path}/temp.tar" />
+                                 <untar src="${install-path}/temp.tar" dest="${install-path}/eclipse" overwrite="true" />
+                                 <delete file="${install-path}/temp.tar" />
+                           </then>
+                           <else>
+                                 <unzip src="${products-path}/@{product-name}-@{os}.@{ws}.@{arch}.zip" dest="${install-path}/eclipse" overwrite="true" />
+                           </else>
+                    </if>
+
+                    <chmod perm="+x" type="file">
+                           <fileset dir="${install-path}/eclipse">
+                                 <filename name="*" />
+                           </fileset>
+                    </chmod>
+
+                    <chmod perm="+x" type="both">
+                           <fileset dir="${install-path}/eclipse/jre">
+                                 <filename name="**/*" />
+                           </fileset>
+                    </chmod>
+
+                    <!-- Update Config File -->
+                    <replaceregexp file="${install-path}/eclipse/configuration/config.ini" match="osgi.configuration.area=(.*)" replace="osgi.configuration.area=\1-remote" byline="true" />
+
+             </sequential>
+       </macrodef>
+
+       <macrodef name="install-rcp">
+             <attribute name="os" />
+             <attribute name="ws" />
+             <attribute name="arch" />
+             <attribute name="product-name" />
+             <attribute name="dest-name" />
+             <sequential>
+                    <if>
+                           <equals arg1="@{arch}" arg2="x86_64" />
+                           <then>
+                                 <var name="install-path" value="${deploy-path}/@{dest-name}_@{os}_@{arch}" />
+                           </then>
+                           <else>
+                                 <var name="install-path" value="${deploy-path}/@{dest-name}_@{os}" />
+                           </else>
+                    </if>
+
+                    <mkdir dir="${install-path}/eclipse" />
+
+                    <if>
+                           <equals arg1="@{os}" arg2="linux" />
+                           <then>
+                                 <gunzip src="${products-path}/@{product-name}-@{os}.@{ws}.@{arch}.tar.gz" dest="${install-path}/temp.tar" />
+                                 <untar src="${install-path}/temp.tar" dest="${install-path}/eclipse" overwrite="true" />
+                                 <delete file="${install-path}/temp.tar" />
+                           </then>
+                           <else>
+                                 <unzip src="${products-path}/@{product-name}-@{os}.@{ws}.@{arch}.zip" dest="${install-path}/eclipse" overwrite="true" />
+                           </else>
+                    </if>
+
+                    <chmod perm="+x" type="file">
+                           <fileset dir="${install-path}/eclipse">
+                                 <filename name="*" />
+                           </fileset>
+                    </chmod>
+
+                    <!--   <chmod perm="+x" type="both">
+                           <fileset dir="${install-path}/eclipse/jre">
+                                 <filename name="**/*" />
+                           </fileset>
+                    </chmod> -->
+
+             </sequential>
+       </macrodef>
+
+
+       <macrodef name="install-server-runtime">
+             <attribute name="runtime-binary-path" />
+             <attribute name="install-path" />
+             <sequential>
+                    <mkdir dir="@{install-path}" />
+                    <unzip src="@{runtime-binary-path}" dest="@{install-path}" overwrite="true" />
+
+                    <chmod perm="+x" type="file">
+                           <fileset dir="@{install-path}">
+                                 <filename name="*" />
+                           </fileset>
+                    </chmod>
+             </sequential>
+       </macrodef>
+
+       <!-- *************************************************************** -->
+       <!--   Acquire Deploy Path From Build INFO                           -->
+       <!-- *************************************************************** -->
+       <macrodef name="acquire-release-tag-from-build-info">
+             <sequential>
+                    <fail message="Specify the deploy user and password '-Ddeploy.userid=[] -Ddeploy.password=[]'">
+                           <condition>
+                                 <or>
+                                        <not>
+                                               <isset property="deploy.userid" />
+                                        </not>
+                                        <not>
+                                               <isset property="deploy.password" />
+                                        </not>
+                                 </or>
+                           </condition>
+                    </fail>
+
+                    <fail message="promote-from-install-link not set: [${promote-from-install-link}]">
+                           <condition>
+                                 <isset property="${promote-from-install-link}" />
+                           </condition>
+                    </fail>
+
+                    <echo>Promoting From Link: [${production-installs}/${promote-from-install-link}]</echo>
+                    
+                    <var name="commandsToExecute" value="cd ${production-installs}/${promote-from-install-link}" />
+                    <var name="commandsToExecute" value="${commandsToExecute};cat build_info.xml | grep 'build-tag' | awk -F\&gt; '{print $2}' | awk -F\&lt; '{print $1}' | tr -d '[:space:]'" />
+                    <sshexec host="${production-server}" port="22" username="${deploy.userid}" password="${deploy.password}" command="${commandsToExecute}" verbose="false" trust="true" outputproperty="tmp.output" />
+                    <property name="release-tag" value="${tmp.output}" />
+             </sequential>
+       </macrodef>
+
+       <!-- *************************************************************** -->
+       <!--   Update Links and Launch Server                                -->
+       <!-- *************************************************************** -->
+       <target name="updateLinksAndLaunchServerServer">
+             <echo>--------------------------------------------------------------</echo>
+             <echo>Update-Installs: [${update-installs}]</echo>
+             <if>
+                    <equals arg1="${update-installs}" arg2="true" />
+                    <then>
+                           <echo>Production-Server: [${production-server}]</echo>
+                           <echo>Production-Installs: [${production-installs}]</echo>
+                           <echo>Server-Install-Link: [${server-install-link}]</echo>
+                           <echo>Server-Install-Cmd: [${install-links-cmd}]</echo>
+                           <echo>Server-Launch-Cmd: [${server-launch-cmd}]</echo>
+                    </then>
+             </if>
+             <echo>--------------------------------------------------------------</echo>
+             <if>
+                    <equals arg1="${update-installs}" arg2="true" />
+                    <then>
+                           <fail message="Specify the deploy user and password '-Ddeploy.userid=[] -Ddeploy.password=[]'">
+                                 <condition>
+                                        <or>
+                                               <not>
+                                                     <isset property="deploy.userid" />
+                                               </not>
+                                               <not>
+                                                     <isset property="deploy.password" />
+                                               </not>
+                                        </or>
+                                 </condition>
+                           </fail>
+
+                           <var name="commandsToExecute" value="cd ${production-installs}" />
+                           <var name="commandsToExecute" value="${commandsToExecute};./${install-links-cmd} ${deploy-path} -noPrompt" />
+
+                           <var name="commandsToExecute" value="${commandsToExecute};cd ${production-installs}/${server-install-link}" />
+                           <if>
+                                 <equals arg1="${F18_Type}" arg2="Alpha"/>
+                                 <then>
+                                 	    <echo message="Restarting F18 Dev Alpha Server" />
+                                        <sshexec host="${production-server}" port="22" username="${deploy.userid}" password="${deploy.password}" command="${commandsToExecute};./${server-launch-cmd} restart 54710" verbose="true" trust="true" outputproperty="tmp.output" />
+                                        <sshexec host="${production-server}" port="22" username="${deploy.userid}" password="${deploy.password}" command="${commandsToExecute};./${server-launch-cmd} restart 54712" verbose="true" trust="true" outputproperty="tmp.output" />
+                                 </then>
+                           	 <elseif>
+                           	  <equals arg1="${F18_Type}" arg2="Beta" />
+                           	  <then>
+                           	  	       <echo message="Restarting F18 Dev Beta Server" /> 
+                           	  	       <sshexec host="${production-server}" port="22" username="${deploy.userid}" password="${deploy.password}" command="${commandsToExecute};./${server-launch-cmd} restart 59710" verbose="true" trust="true" outputproperty="tmp.output" />
+                           	  	       <sshexec host="${production-server}" port="22" username="${deploy.userid}" password="${deploy.password}" command="${commandsToExecute};./${server-launch-cmd} restart 59712" verbose="true" trust="true" outputproperty="tmp.output" />
+                           	  </then>
+                           	 </elseif>
+                           <else> 
+                           	   <echo message="Restarting AMS Server" />
+                                 <var name="commandsToExecute" value="${commandsToExecute};./${server-launch-cmd} restart" />
+                                 <sshexec host="${production-server}" port="22" username="${deploy.userid}" password="${deploy.password}" command="${commandsToExecute}" verbose="true" trust="true" outputproperty="tmp.output" />
+
+                           </else>
+                       </if>
+                           <echo>ssh - update Development Server: ${tmp.output}</echo>
+                           <echo message="NEW - application server instance: ${production-installs}/${server-install-link}/${server-launch-cmd} on ${production-server}" />
+                    </then>
+                    <else>
+                           <echo message="NOT_UPDATED - application server instance: ${production-installs}/${server-install-link}/${server-launch-cmd} on ${production-server}" />
+                    </else>
+             </if>
+       </target>
+
+       <!-- *************************************************************** -->
+       <!--   Update SDC                                                    -->
+       <!-- *************************************************************** -->
+       <target name="updateSdc">
+             <echo>--------------------------------------------------------------</echo>
+             <echo>is-update-sdc-installs-allowed: [${update-sdc-installs}]</echo>
+             <echo>--------------------------------------------------------------</echo>
+             <if>
+                    <equals arg1="${update-sdc-installs}" arg2="true" />
+                    
+                           
+                    <then>
+                           
+                           <ant antfile="sdc-osee.xml" dir="../sdc" target="run" inheritRefs="true" inheritall="true" />
+                           
+                           
+                           </then>
+                           
+             </if>
+       </target>
+
+       <!-- *************************************************************** -->
+       <!--   MAIN                                                          -->
+       <!-- *************************************************************** -->
+       <target name="run" depends="init,checks">
+             <switch value="${promote-type}">
+                    <case value="alpha">
+                           <parallel>
+                                 <antcall target="acquireBuildInfo" inheritall="true" inheritrefs="true" />
+                                 <antcall target="acquireUpdateSites" inheritall="true" inheritrefs="true" />
+                                 <antcall target="acquireProducts" inheritall="true" inheritrefs="true" />
+                           </parallel>
+                           <parallel>
+                                 <antcall target="installLbaUpdateSite" inheritall="true" inheritrefs="true" />
+
+                                 <antcall target="installLinux" inheritall="true" inheritrefs="true" />
+                                 <antcall target="installLinux64" inheritall="true" inheritrefs="true" />
+                                 <!-- <antcall target="installSolaris" inheritall="true" inheritrefs="true" /> -->
+
+                                 <antcall target="installWin64" inheritall="true" inheritrefs="true" />
+                                 <antcall target="installLbaOseeServer" inheritall="true" inheritrefs="true" />
+
+                                 <antcall target="updateSdc" inheritall="true" inheritrefs="true" />
+                    
+</parallel>
+                           <antcall target="updateLinksAndLaunchServerServer" inheritall="true" inheritrefs="true" />
+                    </case>
+                    <case value="beta">
+                           <antcall target="updateSdc" inheritall="true" inheritrefs="true" />
+                           <antcall target="updateLinksAndLaunchServerServer" inheritall="true" inheritrefs="true" />
+                    </case>
+                    <case value="release">
+                           <antcall target="updateSdc" inheritall="true" inheritrefs="true" />
+                           <antcall target="updateLinksAndLaunchServerServer" inheritall="true" inheritrefs="true" />
+                    </case>
+                    <default>
+                           <fail message="promote-type not supported: [${promote-type}] - should be [alpha,beta,release]" />
+                    </default>
+             </switch>
+       </target>
+</project>
+
+
