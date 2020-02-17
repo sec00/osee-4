@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+ 
+   <feature url="features/org.eclipse.osee.core.demo.feature_0.26.0.qualifier.jar" id="org.eclipse.osee.core.demo.feature" version="0.26.0.qualifier">
+      <category name="org.eclipse.osee.demo"/>
+   </feature>
+   <category-def name="org.eclipse.osee.demo" label="Eclipse OSEE Demo - (Incubation)">
+      <description>
+         Eclipse OSEE Demo - (Incubation)
+      </description>
+   </category-def>
+</site>

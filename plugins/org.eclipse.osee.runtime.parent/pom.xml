@@ -37,8 +37,10 @@
 		<module>../../features/org.eclipse.osee.external.feature</module>
 		<module>../../plugins/jms.activemq.launch</module>
 		<module>../../plugins/jms.libraries</module>
-		
+				<module>../../features/org.eclipse.osee.core.demo.feature</module>
 		<module>../../plugins/org.eclipse.osee.runtime.p2</module>
+		<module>../../plugins/org.eclipse.osee.demo.p2</module>
+		
 	</modules>
 
 </project>
