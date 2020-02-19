@@ -100,7 +100,7 @@
 		<repository>
 			<id>findbugs</id>
 			<layout>p2</layout>
-			<url>http://findbugs.cs.umd.edu/eclipse</url>
+			<url>https://findbugs.cs.umd.edu/eclipse</url>
 		</repository>
 		
 		<!--  <repository>
