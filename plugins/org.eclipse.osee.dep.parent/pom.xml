@@ -73,6 +73,12 @@
 	</organization>
 
  	<repositories>
+  <repository>
+                                                                                <id>runtime_test</id>
+                                                                                <layout>p2</layout>
+                                                                                <url>http://msa-ci.msc.az.boeing.com/build-artifacts/01_osee_dev_bld_org.eclipse.osee/org.eclipse.osee/plugins/org.eclipse.osee.runtime.p2/target/repository/</url>
+                                                                </repository>
+
  	<repository>
 			<id>mylyn</id>
 			<layout>p2</layout>
@@ -83,12 +89,12 @@
  	   	<layout>p2</layout> 
  	   	<url>${egit-site}</url> 
 	  </repository>
-	  	  <repository>  		
+	  	 <!--   <repository>  		
  	   	<id>demo_repo</id>
  	   	<layout>p2</layout> 
  	   	<url>http://msa-ci.msc.az.boeing.com/build-artifacts/01_osee_dev_bld_org.eclipse.osee/org.eclipse.osee/plugins/org.eclipse.osee.demo.p2/target/repository/
  	   	</url> 
-	  </repository>
+	  </repository>-->
  	 <repository>
 			<id>orbit</id>
 			<layout>p2</layout>
