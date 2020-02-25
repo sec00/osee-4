@@ -96,7 +96,11 @@
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/mylyn/releases/3.5/</url>
 		</repository>
-			
+			<repository>
+			<id>mylyn</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/modeling/tmf/xtext/updates/releases/2.20.0/plugins/</url>
+		</repository>
 		<repository>
 			<id>findbugs</id>
 			<layout>p2</layout>
