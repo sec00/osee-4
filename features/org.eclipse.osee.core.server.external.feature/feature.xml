@@ -667,7 +667,7 @@
          id="org.eclipse.xtext.ecore"
          download-size="0"
          install-size="0"
-         version="2.20.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
@@ -691,12 +691,7 @@
          version="0.0.0"
          unpack="false"/>
 
-   <plugin
-         id="org.eclipse.xtext.xtext.generator"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+
 
    <plugin
          id="org.eclipse.xtext.smap"
